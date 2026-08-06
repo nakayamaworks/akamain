@@ -1,0 +1,115 @@
+{
+  "scenarioId": "customer-save-multiple-clicks-duplicate",
+  "rubricVersion": "customer-save-multiple-clicks-duplicate.v2",
+  "fixtures": [
+    {
+      "fixtureId": "excellent",
+      "label": "必要情報がそろった回答",
+      "answer": {
+        "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客が重複登録される",
+        "sections": {
+          "detail": "保存ボタンを素早く3回クリックすると、同じ内容の顧客データが異なる顧客IDで3件登録される。",
+          "preconditions": "管理者ユーザーでログインしている。",
+          "steps": "1. 顧客登録画面を開く\\n2. 必須項目を入力する\\n3. 保存ボタンを素早く3回クリックする",
+          "expected": "連続クリックしても顧客データが1件だけ登録される。",
+          "actual": "同じ顧客データが3件登録される。",
+          "reproducibility": "3/3"
+        }
+      },
+      "expected": {
+        "scoreMin": 92,
+        "scoreMax": 100,
+        "missingFactIds": [],
+        "forbiddenClaimIds": []
+      }
+    },
+    {
+      "fixtureId": "missing-critical-facts",
+      "label": "クリック回数と再現性が不足した回答",
+      "answer": {
+        "subject": "顧客データが重複登録される",
+        "sections": {
+          "detail": "顧客登録画面で保存すると同じ内容が複数登録される。",
+          "preconditions": "管理者ユーザーでログインしている。",
+          "steps": "顧客登録画面を開き、必要事項を入力して保存する。",
+          "expected": "顧客データが1件だけ登録される。",
+          "actual": "同じ顧客データが3件登録される。",
+          "reproducibility": ""
+        }
+      },
+      "expected": {
+        "scoreMin": 55,
+        "scoreMax": 72,
+        "missingFactIds": [
+          "subject-condition",
+          "steps-click-save-three-times",
+          "reproducibility-three-of-three"
+        ],
+        "forbiddenClaimIds": []
+      }
+    },
+    {
+      "fixtureId": "unsupported-root-cause",
+      "label": "原因を断定した回答",
+      "answer": {
+        "subject": "DBの排他制御不足により顧客データが重複登録される",
+        "sections": {
+          "detail": "保存ボタンを3回クリックすると同じ顧客が3件登録される。データベースの排他制御不足が原因である。",
+          "preconditions": "管理者ユーザーでログインしている。",
+          "steps": "1. 顧客登録画面を開く\\n2. 必須項目を入力する\\n3. 保存ボタンを素早く3回クリックする",
+          "expected": "顧客データが1件だけ登録される。",
+          "actual": "同じ顧客データが3件登録される。",
+          "reproducibility": "3/3"
+        }
+      },
+      "expected": {
+        "scoreMin": 55,
+        "scoreMax": 75,
+        "missingFactIds": ["detail-distinct-customer-ids"],
+        "forbiddenClaimIds": ["claim-database-lock"]
+      }
+    },
+    {
+      "fixtureId": "misplaced-sections",
+      "label": "情報はあるが配置が悪い回答",
+      "answer": {
+        "subject": "顧客登録画面で保存ボタンを3回クリックすると重複登録される",
+        "sections": {
+          "detail": "管理者でログインし、画面を開き、必須項目を入力する。本来は1件だけ登録される。",
+          "preconditions": "同じ内容が異なる顧客IDで3件登録される。",
+          "steps": "再現性は3/3。",
+          "expected": "保存ボタンを素早く3回クリックする。",
+          "actual": "同じデータが3件登録される。",
+          "reproducibility": "顧客登録画面を使用した。"
+        }
+      },
+      "expected": {
+        "scoreMin": 65,
+        "scoreMax": 82,
+        "missingFactIds": [],
+        "forbiddenClaimIds": []
+      }
+    },
+    {
+      "fixtureId": "verbose",
+      "label": "必要情報はあるが冗長な回答",
+      "answer": {
+        "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客が3件登録される",
+        "sections": {
+          "detail": "顧客登録画面で保存ボタンを素早く3回クリックすると、同じ内容の顧客データが異なる顧客IDで3件登録される。この問題については注意して確認する必要があり、今後も継続的に様子を見る必要があると考えられる。",
+          "preconditions": "管理者ユーザーでログインしている。ログイン後に画面を表示して操作可能な状態である。",
+          "steps": "1. 顧客登録画面を開く\\n2. 必須項目を入力する\\n3. 保存ボタンを素早く3回クリックする",
+          "expected": "連続クリックしても顧客データが1件だけ登録される。",
+          "actual": "同じ顧客データが3件登録される。",
+          "reproducibility": "3/3"
+        }
+      },
+      "expected": {
+        "scoreMin": 78,
+        "scoreMax": 91,
+        "missingFactIds": [],
+        "forbiddenClaimIds": []
+      }
+    }
+  ]
+}

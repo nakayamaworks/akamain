@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://typing-workbench.local/schemas/attempt-record.v3.json",
+  "title": "Typing Workbench Attempt Record v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "attemptId",
+    "ticketId",
+    "revisionNumber",
+    "parentAttemptId",
+    "userId",
+    "scenarioId",
+    "projectId",
+    "authoringMode",
+    "answer",
+    "selectedEvidenceIds",
+    "startedAt",
+    "completedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "attempt.v3"
+    },
+    "attemptId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ticketId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "revisionNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "parentAttemptId": {
+      "type": ["string", "null"],
+      "format": "uuid"
+    },
+    "userId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Verified provider subject. For Google Sign-In this is the ID token sub claim, never the email address."
+    },
+    "scenarioId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "projectId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "authoringMode": {
+      "enum": ["reference", "practice"]
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject", "sections", "ticketFields"],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "sections": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "ticketFields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tracker",
+            "private",
+            "status",
+            "severity",
+            "priority",
+            "assigneeId",
+            "category",
+            "version",
+            "environment",
+            "startDate",
+            "dueDate",
+            "progress",
+            "watcherIds"
+          ],
+          "properties": {
+            "tracker": { "enum": ["bug", "feature", "support"] },
+            "private": { "type": "boolean" },
+            "status": { "enum": ["new", "in-progress", "resolved", "closed", "on-hold"] },
+            "severity": { "type": ["string", "null"] },
+            "priority": { "type": ["string", "null"] },
+            "assigneeId": { "type": ["string", "null"] },
+            "category": { "type": ["string", "null"] },
+            "version": { "type": ["string", "null"] },
+            "environment": { "type": ["string", "null"] },
+            "startDate": { "type": ["string", "null"] },
+            "dueDate": { "type": ["string", "null"] },
+            "progress": { "type": "integer", "minimum": 0, "maximum": 100, "multipleOf": 10 },
+            "watcherIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "selectedEvidenceIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

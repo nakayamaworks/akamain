@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="あかマインは、現場で通用するバグ起票力を育てるトレーニングツールです。" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <title>あかマイン｜バグ報告を、伝わる技術に。</title>
+    <meta name="theme-color" content="#cf2026" />
+    <link rel="canonical" href="https://akamain.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:site_name" content="あかマイン" />
+    <meta property="og:title" content="あかマイン｜バグ報告を、伝わる技術に。" />
+    <meta property="og:description" content="現場で通用するバグ起票力を育てるトレーニングツール" />
+    <meta property="og:url" content="https://akamain.com/" />
+    <meta property="og:image" content="https://akamain.com/assets/images/brand/akamain-main-visual.png" />
+    <meta property="og:image:alt" content="あかマイン" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="あかマイン｜バグ報告を、伝わる技術に。" />
+    <meta name="twitter:description" content="現場で通用するバグ起票力を育てるトレーニングツール" />
+    <meta name="twitter:image" content="https://akamain.com/assets/images/brand/akamain-main-visual.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./assets/images/brand/akamain-favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="stylesheet" href="./welcome.css?v=20260806a" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="./welcome.html" aria-label="あかマイン Welcomeページ">
+          <img src="./assets/images/brand/akamain-main-visual.png" alt="" />
+          <span><b>あか</b>マイン</span>
+        </a>
+
+        <nav class="header-links" aria-label="サポートメニュー">
+          <a class="contact-link" href="https://nakayamaworks.jp/#cta-final" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="welcomeTitle">
+          <div class="hero-visual-wrap">
+            <img
+              class="hero-visual"
+              src="./assets/images/brand/akamain-main-visual.png"
+              alt="赤い鉱石を積んだトロッコとつるはし"
+            />
+          </div>
+
+          <div class="hero-copy">
+            <h1 id="welcomeTitle"><span>あか</span>マイン</h1>
+            <p class="tagline">バグ報告を、<strong>伝わる技術</strong>に。</p>
+            <p class="lead">現場で通用するバグ起票力を育てるトレーニングツール</p>
+          </div>
+
+          <div class="auth-panel" aria-labelledby="authPanelTitle">
+            <div id="signedOutView" class="auth-view">
+              <div>
+                <h2 id="authPanelTitle">トレーニングをはじめよう</h2>
+                <p>Googleアカウントでログインして、成長の記録を残せます。</p>
+              </div>
+              <div class="google-button-area">
+                <div id="googleSignInButton" aria-label="Googleでログイン"></div>
+                <span id="authLoading" class="auth-loading">ログインを準備しています…</span>
+              </div>
+              <div class="guest-entry">
+                <span class="auth-divider">または</span>
+                <a class="guest-button" href="./index.html?guest=1">
+                  ログインせず体験する
+                  <span aria-hidden="true">→</span>
+                </a>
+                <p class="guest-note">見本入力を体験できます。<br />実践起票と記録の保存にはログインが必要です。</p>
+              </div>
+            </div>
+
+            <div id="signedInView" class="auth-view signed-in-view" hidden>
+              <div class="user-greeting">
+                <img id="userAvatar" class="user-avatar" alt="" hidden />
+                <span id="userAvatarFallback" class="user-avatar-fallback" aria-hidden="true">A</span>
+                <div>
+                  <p>ログインしました</p>
+                  <strong id="userName">Googleユーザー</strong>
+                </div>
+              </div>
+              <a class="start-button" href="./index.html">
+                あかマインをはじめる
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <p id="authMessage" class="auth-message" role="status"></p>
+          </div>
+        </section>
+
+        <section class="features" aria-labelledby="featureTitle">
+          <h2 id="featureTitle" class="visually-hidden">あかマインで身につくこと</h2>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <img src="./assets/images/features/feature-find-bugs.png" alt="" />
+              <div>
+                <h3>バグを見つける</h3>
+                <p>さまざまなシーンから不具合の手がかりを発見</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <img src="./assets/images/features/feature-create-ticket.png" alt="" />
+              <div>
+                <h3>チケットを作る</h3>
+                <p>実務に近い画面で、伝わるバグ報告を作成</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <img src="./assets/images/features/feature-build-skill.png" alt="" />
+              <div>
+                <h3>スキルを伸ばす</h3>
+                <p>AIフィードバックで、起票力をレベルアップ</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <img src="./assets/images/features/feature-ranking.png" alt="" />
+              <div>
+                <h3>ランキングで競う</h3>
+                <p>スコアを競って、楽しみながら成長</p>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>見つける力を、伝える力へ。</p>
+        <small>© 2026 あかマイン <span aria-hidden="true">·</span> Developed by <a href="https://nakayamaworks.jp/" target="_blank" rel="noopener noreferrer">Nakayama Works</a></small>
+      </footer>
+    </div>
+
+    <script src="./runtime-config.js?v=20260805a"></script>
+    <script src="./auth-client.js?v=20260805a"></script>
+    <script src="./welcome.js?v=20260805a"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "あかマイン",
+        "url": "https://akamain.com/",
+        "image": "https://akamain.com/assets/images/brand/akamain-main-visual.png",
+        "description": "現場で通用するバグ起票力を育てるトレーニングツール",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "creator": {
+          "@type": "Organization",
+          "name": "Nakayama Works",
+          "url": "https://nakayamaworks.jp/"
+        }
+      }
+    </script>
+  </body>
+</html>

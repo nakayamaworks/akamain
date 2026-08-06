@@ -1,0 +1,9 @@
+backend/node_modules/
+backend/.env
+backend/credentials/
+backend/*service-account*.json
+dist/
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.DS_Store

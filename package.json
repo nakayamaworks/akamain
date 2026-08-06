@@ -1,0 +1,13 @@
+{
+  "name": "akamain-web",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "test:site": "node scripts/verify-dist.mjs",
+    "verify": "node --check main.js && node validate-scenarios.js && npm run build && npm run test:site"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

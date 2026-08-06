@@ -1,0 +1,4439 @@
+{
+  "schemaVersion": "scenario-rubric-registry.v1",
+  "dimensions": [
+    {
+      "id": "factualGrounding",
+      "label": "事実性",
+      "weight": 20
+    },
+    {
+      "id": "informationCoverage",
+      "label": "情報充足",
+      "weight": 20
+    },
+    {
+      "id": "reproducibility",
+      "label": "再現性",
+      "weight": 20
+    },
+    {
+      "id": "expectedActualSeparation",
+      "label": "期待・実績の分離",
+      "weight": 15
+    },
+    {
+      "id": "interpretiveClarity",
+      "label": "解釈の明瞭さ",
+      "weight": 10
+    },
+    {
+      "id": "investigationReadiness",
+      "label": "切り分け支援",
+      "weight": 15
+    }
+  ],
+  "scenarios": {
+    "customer-context-menu-not-shown": {
+      "scenarioId": "customer-context-menu-not-shown",
+      "projectId": "customer",
+      "rubricVersion": "customer-context-menu-not-shown.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "顧客一覧画面で右クリックしても",
+            "importance": "critical"
+          },
+          {
+            "id": "detail-2",
+            "description": "コンテキストメニューが表示されず仕様と異なる",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "管理者ユーザーでログインしていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 顧客一覧画面を開く",
+            "importance": "important"
+          },
+          {
+            "id": "steps-2",
+            "description": "2. 任意の顧客を選択する",
+            "importance": "important"
+          },
+          {
+            "id": "steps-3",
+            "description": "3. 右クリックを実行する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "コンテキストメニューが表示されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "コンテキストメニューが表示されない",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "左クリックで顧客詳細を開く操作は正常に行えることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "App version: 2.3.1",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "tsunagi",
+        "watcherIds": [
+          "tsunagi",
+          "kikuta"
+        ],
+        "dueDatePolicy": {
+          "mode": "unset"
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "right-click-video",
+          "name": "customer_list_right_click_103012.mp4",
+          "summary": "顧客を選択して右クリックしてもメニューが表示されない一連の操作録画。",
+          "required": true
+        },
+        {
+          "id": "context-event-log",
+          "name": "contextmenu_event_103015.log",
+          "summary": "発生時のブラウザイベント記録。contextmenuイベント後もメニュー生成が行われていない。",
+          "required": true
+        },
+        {
+          "id": "left-click-normal",
+          "name": "customer_detail_left_click_101500.png",
+          "summary": "左クリックで顧客詳細を正常に開いた別操作の画像。",
+          "required": false
+        },
+        {
+          "id": "search-bug-image",
+          "name": "customer_search_all_rows_102200.png",
+          "summary": "存在しない氏名の検索で全件表示された別不具合の画像。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+        "sections": {
+          "detail": "顧客一覧画面で右クリックしても\nコンテキストメニューが表示されず仕様と異なる",
+          "preconditions": "管理者ユーザーでログインしていること",
+          "steps": "1. 顧客一覧画面を開く\n2. 任意の顧客を選択する\n3. 右クリックを実行する",
+          "expected": "コンテキストメニューが表示されること",
+          "actual": "コンテキストメニューが表示されない",
+          "remarks": "左クリックで顧客詳細を開く操作は正常に行えることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "customer-search-nonexistent-name-all-results": {
+      "scenarioId": "customer-search-nonexistent-name-all-results",
+      "projectId": "customer",
+      "rubricVersion": "customer-search-nonexistent-name-all-results.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると",
+            "importance": "critical"
+          },
+          {
+            "id": "detail-2",
+            "description": "該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "一般ユーザーでログインしていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 顧客一覧画面を開く",
+            "importance": "important"
+          },
+          {
+            "id": "steps-2",
+            "description": "2. 検索欄に「ZZZZZZ」と入力する",
+            "importance": "important"
+          },
+          {
+            "id": "steps-3",
+            "description": "3. 検索ボタンをクリックする",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "検索結果が0件と表示されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "検索前と同じ248件が表示される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "顧客番号を指定した検索では対象の1件だけが表示されることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "input",
+        "version": "Web release: 2026.07.24",
+        "environment": "Microsoft Edge 126.0.2592.102 / Windows 11 23H2",
+        "assigneeId": "tsunagi",
+        "watcherIds": [
+          "tsunagi",
+          "kyakuno"
+        ],
+        "dueDatePolicy": {
+          "mode": "unset"
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "search-result-screen",
+          "name": "search_zzzzzz_result_103014.png",
+          "summary": "検索欄に存在しない氏名を入力しても248件が表示された結果画面。",
+          "required": true
+        },
+        {
+          "id": "search-request-har",
+          "name": "customer_search_zzzzzz_103013.har",
+          "summary": "発生時の検索API通信。name=ZZZZZZに対しtotal=248を返している。",
+          "required": true
+        },
+        {
+          "id": "customer-id-normal",
+          "name": "search_customer_id_c1001_101100.png",
+          "summary": "顧客番号C-1001で1件を正常検索した画像。",
+          "required": false
+        },
+        {
+          "id": "empty-search-log",
+          "name": "customer_search_empty_100500.har",
+          "summary": "検索条件を空欄にして全件取得した正常通信。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+        "sections": {
+          "detail": "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると\n該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう",
+          "preconditions": "一般ユーザーでログインしていること",
+          "steps": "1. 顧客一覧画面を開く\n2. 検索欄に「ZZZZZZ」と入力する\n3. 検索ボタンをクリックする",
+          "expected": "検索結果が0件と表示されること",
+          "actual": "検索前と同じ248件が表示される",
+          "remarks": "顧客番号を指定した検索では対象の1件だけが表示されることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "customer-save-multiple-clicks-duplicate": {
+      "scenarioId": "customer-save-multiple-clicks-duplicate",
+      "projectId": "customer",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v3",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-target",
+            "description": "顧客登録画面または顧客データの登録で発生する問題だと分かる",
+            "importance": "important"
+          },
+          {
+            "id": "subject-condition",
+            "description": "保存ボタンの連続クリックが発生条件だと分かる",
+            "importance": "critical"
+          },
+          {
+            "id": "subject-phenomenon",
+            "description": "同じ顧客データが重複登録される現象だと分かる",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-three-records",
+            "description": "同じ内容の顧客データが3件登録される",
+            "importance": "critical"
+          },
+          {
+            "id": "detail-distinct-customer-ids",
+            "description": "重複した3件には異なる顧客IDが採番される",
+            "importance": "important"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "precondition-admin-login",
+            "description": "管理者ユーザーでログインしている",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-open-customer-registration",
+            "description": "顧客登録画面を開く",
+            "importance": "important"
+          },
+          {
+            "id": "steps-enter-required-fields",
+            "description": "必須項目を入力する",
+            "importance": "important"
+          },
+          {
+            "id": "steps-click-save-three-times",
+            "description": "保存ボタンを素早く3回クリックする",
+            "importance": "critical"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-single-record",
+            "description": "連続クリックしても顧客データは1件だけ登録される",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-three-records",
+            "description": "同じデータが3件登録される",
+            "importance": "critical"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-three-of-three",
+            "description": "3回中3回再現する",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-database-lock",
+          "description": "データベースの排他制御不足が原因だと断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-api-defect",
+          "description": "APIの実装不備が原因だと断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-all-users",
+          "description": "すべての利用者で発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-no-workaround",
+          "description": "確認されていない回避策の有無を断定する",
+          "severity": "minor"
+        },
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Build 2.3.1-20260724.1",
+        "environment": "Firefox 128.0 / macOS 15.5",
+        "assigneeId": "tsunagi",
+        "watcherIds": [
+          "tsunagi",
+          "kikuta"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "network-har",
+          "name": "customer_register_103015.har",
+          "summary": "保存操作直後の顧客登録API通信。412ms以内に3件のPOSTが成功している。",
+          "required": true
+        },
+        {
+          "id": "duplicate-screen",
+          "name": "duplicate_customer_rows_103018.png",
+          "summary": "顧客一覧に同じ氏名・電話番号のデータが異なるIDで3件表示されている。",
+          "required": true
+        },
+        {
+          "id": "database-export",
+          "name": "customer_rows_103020.csv",
+          "summary": "保存後のcustomerテーブルから対象電話番号で抽出した3行。",
+          "required": true
+        },
+        {
+          "id": "normal-server-log",
+          "name": "customer_api_094800.log",
+          "summary": "同日09:48に行った通常登録のログ。保存要求は1回だけで正常終了している。",
+          "required": false
+        },
+        {
+          "id": "search-screen",
+          "name": "customer_search_zero_results_102200.png",
+          "summary": "存在しない氏名を検索した際の顧客一覧画面。別の検索不具合を確認した画像。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
+        "sections": {
+          "detail": "顧客登録画面で保存ボタンを素早く3回クリックすると\n同じ氏名・電話番号の顧客データが異なる顧客IDで3件登録されてしまう",
+          "preconditions": "管理者ユーザーでログインしていること",
+          "steps": "1. 顧客登録画面を開く\n2. 必須項目を入力する\n3. 保存ボタンを素早く3回クリックする",
+          "expected": "保存ボタンを連続クリックしても顧客データが1件だけ登録されること",
+          "actual": "同じ顧客データが異なる顧客IDで3件登録される",
+          "remarks": "重複した3件にはそれぞれ異なる顧客IDが採番されていることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "attendance-clock-out-next-day": {
+      "scenarioId": "attendance-clock-out-next-day",
+      "projectId": "attendance",
+      "rubricVersion": "attendance-clock-out-next-day.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト対象の従業員と勤務予定が登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 勤務開始と退勤時刻を同じ日付で登録する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "勤務開始日と同じ日付で退勤時刻が登録されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "退勤時刻が翌日の18:00として保存される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "勤務日を手動で戻すと給与集計は正しい値になることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "high",
+        "category": "workflow",
+        "version": "Web version: 4.12.0",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "uchikoshi",
+        "watcherIds": [
+          "uchikoshi",
+          "yasuda"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 3
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "attendance-screen",
+          "name": "attendance_e031_saved_date_103014.png",
+          "summary": "同日09:00〜18:00の勤務が、翌日18:00退勤として保存された画面。",
+          "required": true
+        },
+        {
+          "id": "attendance-row",
+          "name": "attendance_e031_20260729.csv",
+          "summary": "保存後の対象勤務レコードを抽出したデータ。",
+          "required": true
+        },
+        {
+          "id": "manual-correction",
+          "name": "attendance_e031_corrected.png",
+          "summary": "勤務日を手動修正した後の正常画面。",
+          "required": false
+        },
+        {
+          "id": "night-shift",
+          "name": "attendance_e044_night_shift.csv",
+          "summary": "実際に日付をまたいだ別従業員の夜勤データ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+        "sections": {
+          "detail": "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう",
+          "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+          "steps": "1. 勤務開始と退勤時刻を同じ日付で登録する",
+          "expected": "勤務開始日と同じ日付で退勤時刻が登録されること",
+          "actual": "退勤時刻が翌日の18:00として保存される",
+          "remarks": "勤務日を手動で戻すと給与集計は正しい値になることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "salon-duplicate-reservation": {
+      "scenarioId": "salon-duplicate-reservation",
+      "projectId": "salon",
+      "rubricVersion": "salon-duplicate-reservation.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "対象店舗の担当者と予約枠が登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 予約済みの担当者と時間帯を選択して予約を確定する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "予約済みの時間帯は選択できないこと",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "予約済みの14:00枠に2件目の予約が登録される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "別の担当者または別の時間帯では重複しないことを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Release 2026.07.2",
+        "environment": "Safari 18.5 / macOS 15.5",
+        "assigneeId": "kamino",
+        "watcherIds": [
+          "kamino",
+          "soroi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "reserved-slot-request",
+          "name": "reserved_slot_second_booking.har",
+          "summary": "予約済み14:00枠へ2件目を登録して成功した通信。",
+          "required": true
+        },
+        {
+          "id": "reserved-slot-screen",
+          "name": "reserved_slot_double_booking.png",
+          "summary": "同じ担当者・14:00枠に予約が2件表示された管理画面。",
+          "required": true
+        },
+        {
+          "id": "reserved-slot-db",
+          "name": "reservation_st08_1400.csv",
+          "summary": "同じ担当者・開始時刻で保存された2件の予約データ。",
+          "required": true
+        },
+        {
+          "id": "different-staff",
+          "name": "reservation_other_staff_1400.png",
+          "summary": "同じ時刻に別担当者へ入った正常な予約。",
+          "required": false
+        },
+        {
+          "id": "different-time",
+          "name": "reservation_st08_1430.csv",
+          "summary": "同じ担当者の14:30枠の予約データ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
+        "sections": {
+          "detail": "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう",
+          "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+          "steps": "1. 予約済みの担当者と時間帯を選択して予約を確定する",
+          "expected": "予約済みの時間帯は選択できないこと",
+          "actual": "予約済みの14:00枠に2件目の予約が登録される",
+          "remarks": "別の担当者または別の時間帯では重複しないことを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "ec-out-of-stock-cart": {
+      "scenarioId": "ec-out-of-stock-cart",
+      "projectId": "ec",
+      "rubricVersion": "ec-out-of-stock-cart.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト商品と購入者アカウントが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 在庫数を0にした商品をカートへ追加する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "在庫切れの商品はカートに追加できないこと",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "在庫切れの商品がカートに追加され、注文確認画面まで進める",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "商品APIが返す在庫数は0でカート追加後も変化していないことを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Storefront v8.4.2",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "kagotani",
+        "watcherIds": [
+          "kagotani",
+          "urino"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "stock-zero-response",
+          "name": "product_p771_stock_zero.har",
+          "summary": "商品APIが在庫数0を返した発生時の通信。",
+          "required": true
+        },
+        {
+          "id": "cart-add-response",
+          "name": "cart_add_p771_103014.har",
+          "summary": "在庫数0の商品をカートへ追加して成功した通信。",
+          "required": true
+        },
+        {
+          "id": "checkout-screen",
+          "name": "checkout_outofstock_p771.png",
+          "summary": "在庫切れ商品を含んだまま注文確認まで進んだ画面。",
+          "required": true
+        },
+        {
+          "id": "instock-product",
+          "name": "cart_add_p552.har",
+          "summary": "在庫12個の商品を正常にカート追加した通信。",
+          "required": false
+        },
+        {
+          "id": "wishlist-add",
+          "name": "wishlist_p771.png",
+          "summary": "在庫切れ商品をお気に入りへ追加した画像。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+        "sections": {
+          "detail": "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう",
+          "preconditions": "テスト商品と購入者アカウントが登録されていること",
+          "steps": "1. 在庫数を0にした商品をカートへ追加する",
+          "expected": "在庫切れの商品はカートに追加できないこと",
+          "actual": "在庫切れの商品がカートに追加され、注文確認画面まで進める",
+          "remarks": "商品APIが返す在庫数は0でカート追加後も変化していないことを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "inventory-over-shipment": {
+      "scenarioId": "inventory-over-shipment",
+      "projectId": "inventory",
+      "rubricVersion": "inventory-over-shipment.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "対象商品の在庫とロットが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 現在庫を超える出庫数を入力して登録する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "在庫数を超える出庫はエラーになること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "在庫数5個に対して出庫数8個の登録が成功する",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "登録後の在庫数はマイナス3と表示されることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "input",
+        "version": "Client 5.7.0 (Build 1842)",
+        "environment": "Microsoft Edge 126.0.2592.102 / Windows 10 22H2",
+        "assigneeId": "nimotsu",
+        "watcherIds": [
+          "nimotsu",
+          "tanahashi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "overqty-screen",
+          "name": "shipment_item330_qty8.png",
+          "summary": "現在庫5個の商品へ出庫数8個を登録できた画面。",
+          "required": true
+        },
+        {
+          "id": "overqty-log",
+          "name": "shipment_validation_item330.log",
+          "summary": "出庫数8の登録処理で在庫上限チェックを通過したログ。",
+          "required": true
+        },
+        {
+          "id": "overqty-db",
+          "name": "item330_after_shipment.csv",
+          "summary": "登録後の在庫数と出庫実績を抽出したデータ。",
+          "required": true
+        },
+        {
+          "id": "valid-quantity",
+          "name": "shipment_item330_qty3.png",
+          "summary": "同じ商品を3個出庫して残数2となった正常画面。",
+          "required": false
+        },
+        {
+          "id": "other-item-error",
+          "name": "shipment_item441_stock_error.log",
+          "summary": "別商品で在庫不足エラーになったログ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+        "sections": {
+          "detail": "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう",
+          "preconditions": "対象商品の在庫とロットが登録されていること",
+          "steps": "1. 現在庫を超える出庫数を入力して登録する",
+          "expected": "在庫数を超える出庫はエラーになること",
+          "actual": "在庫数5個に対して出庫数8個の登録が成功する",
+          "remarks": "登録後の在庫数はマイナス3と表示されることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "mobile-rotation-clears-input": {
+      "scenarioId": "mobile-rotation-clears-input",
+      "projectId": "mobile",
+      "rubricVersion": "mobile-rotation-clears-input.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト端末に対象ビルドがインストールされていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 入力フォームへ内容を入力したまま端末を回転する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "画面回転後も入力内容が保持されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "画面回転後、入力済みの120文字がすべて消える",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "回転前の入力内容はサーバーへ送信されていないことを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "App 3.4.0 (34018)",
+        "environment": "Android 15 / Pixel 9",
+        "assigneeId": "gamen",
+        "watcherIds": [
+          "gamen",
+          "hashiru"
+        ],
+        "dueDatePolicy": {
+          "mode": "unset"
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "rotation-video",
+          "name": "inquiry_form_rotation.mp4",
+          "summary": "問い合わせフォームへ120文字入力後、横向きにすると全文が消える操作録画。",
+          "required": true
+        },
+        {
+          "id": "rotation-lifecycle-log",
+          "name": "inquiry_rotation_lifecycle.log",
+          "summary": "端末回転による画面再生成時の状態保存ログ。",
+          "required": true
+        },
+        {
+          "id": "submitted-form",
+          "name": "inquiry_submitted_success.png",
+          "summary": "送信済み問い合わせが正常保存された完了画面。",
+          "required": false
+        },
+        {
+          "id": "background-restore",
+          "name": "inquiry_background_restore.mp4",
+          "summary": "画面回転せずバックグラウンド復帰した正常録画。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
+        "sections": {
+          "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう",
+          "preconditions": "テスト端末に対象ビルドがインストールされていること",
+          "steps": "1. 入力フォームへ内容を入力したまま端末を回転する",
+          "expected": "画面回転後も入力内容が保持されること",
+          "actual": "画面回転後、入力済みの120文字がすべて消える",
+          "remarks": "回転前の入力内容はサーバーへ送信されていないことを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-speed-display-delay": {
+      "scenarioId": "automotive-speed-display-delay",
+      "projectId": "automotive",
+      "rubricVersion": "automotive-speed-display-delay.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "CANoeをテスト車両へ接続していること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. CANoeから車速信号を変更してメーター表示を確認する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "車速信号の変更から200ms以内にメーター速度表示が更新されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "車速信号の変更から表示更新まで最大1.2秒かかる",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "CANログ上では車速信号が即時に80km/hへ更新されていることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "high",
+        "category": "ui",
+        "version": "ECU Software: v5.12.3",
+        "environment": "Hardware Rev: C / Vehicle profile: TEST-02",
+        "assigneeId": "wajima",
+        "watcherIds": [
+          "wajima",
+          "michigami"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 1
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "speed-can-trace",
+          "name": "vehicle_speed_60_to_80.asc",
+          "summary": "車速信号を60km/hから80km/hへ変更したCANトレース。",
+          "required": true
+        },
+        {
+          "id": "meter-measurement",
+          "name": "meter_speed_delay_1200ms.png",
+          "summary": "CAN入力とメーター表示の更新時刻を比較した計測画面。",
+          "required": true
+        },
+        {
+          "id": "hmi-speed-log",
+          "name": "hmi_speed_update.log",
+          "summary": "HMIが車速変更通知を受けて表示を更新したログ。",
+          "required": true
+        },
+        {
+          "id": "normal-speed-update",
+          "name": "vehicle_speed_40_to_60_normal.asc",
+          "summary": "別条件で180ms以内に更新した正常計測。",
+          "required": false
+        },
+        {
+          "id": "rpm-trace",
+          "name": "engine_rpm_update.asc",
+          "summary": "同じ計測中のエンジン回転数信号。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+        "sections": {
+          "detail": "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう",
+          "preconditions": "CANoeをテスト車両へ接続していること",
+          "steps": "1. CANoeから車速信号を変更してメーター表示を確認する",
+          "expected": "車速信号の変更から200ms以内にメーター速度表示が更新されること",
+          "actual": "車速信号の変更から表示更新まで最大1.2秒かかる",
+          "remarks": "CANログ上では車速信号が即時に80km/hへ更新されていることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "payment-failed-payment-sales-record": {
+      "scenarioId": "payment-failed-payment-sales-record",
+      "projectId": "payment",
+      "rubricVersion": "payment-failed-payment-sales-record.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "Sandbox環境でテスト加盟店を利用できること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 失敗応答となるテスト決済を実行して売上データを確認する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "決済失敗時は売上が計上されないこと",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "決済失敗後も12,800円の売上データが作成される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "urgent",
+        "category": "api",
+        "version": "API version: 2024-06-20",
+        "environment": "Environment: Sandbox / Gateway build: 7.18.4",
+        "assigneeId": "kinjo",
+        "watcherIds": [
+          "kinjo",
+          "haraikawa"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 1
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "gateway-failure",
+          "name": "gateway_txn_t8110_failed.json",
+          "summary": "12,800円の対象決済に対するゲートウェイ失敗応答。",
+          "required": true
+        },
+        {
+          "id": "sales-row",
+          "name": "sales_for_t8110.csv",
+          "summary": "失敗取引T-8110に対して作成された売上データ。",
+          "required": true
+        },
+        {
+          "id": "merchant-screen",
+          "name": "merchant_sales_t8110.png",
+          "summary": "加盟店管理画面で失敗取引の売上が計上済みになった画像。",
+          "required": true
+        },
+        {
+          "id": "successful-sale",
+          "name": "sales_for_t8099.csv",
+          "summary": "決済成功後に売上計上された正常データ。",
+          "required": false
+        },
+        {
+          "id": "failed-no-sale",
+          "name": "gateway_txn_t8002_failed.json",
+          "summary": "別取引で失敗後に売上が作られなかった正常記録。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+        "sections": {
+          "detail": "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう",
+          "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+          "steps": "1. 失敗応答となるテスト決済を実行して売上データを確認する",
+          "expected": "決済失敗時は売上が計上されないこと",
+          "actual": "決済失敗後も12,800円の売上データが作成される",
+          "remarks": "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "medical-cross-patient-results": {
+      "scenarioId": "medical-cross-patient-results",
+      "projectId": "medical",
+      "rubricVersion": "medical-cross-patient-results.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "患者切替後も別の患者の検査結果が表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト患者と検査・処方データが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 患者Aの検査結果を表示した後に患者Bへ切り替える",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "選択した患者の検査結果だけが表示されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "患者Bへ切替後も患者Aの検査結果3件が表示される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s1",
+        "priority": "urgent",
+        "category": "ui",
+        "version": "Client version: 4.8.2",
+        "environment": "Database schema: 2026.07 / Windows 11 Enterprise 23H2",
+        "assigneeId": "kenmi",
+        "watcherIds": [
+          "kenmi",
+          "yakushiji"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 0
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "patient-switch-video",
+          "name": "patient_a_to_b_results.mp4",
+          "summary": "患者Aの結果表示後、患者Bへ切り替えてもAの結果3件が残る操作録画。",
+          "required": true
+        },
+        {
+          "id": "patient-b-api",
+          "name": "patient_b_results_response.har",
+          "summary": "切替後に患者Bの検査結果を正しく返したAPI通信。",
+          "required": true
+        },
+        {
+          "id": "result-cache-log",
+          "name": "patient_result_cache.log",
+          "summary": "患者切替時のクライアントキャッシュ利用ログ。",
+          "required": true
+        },
+        {
+          "id": "patient-a-original",
+          "name": "patient_a_results_before_switch.png",
+          "summary": "切替前に患者Aの結果3件を正常表示した画像。",
+          "required": false
+        },
+        {
+          "id": "patient-b-reloaded",
+          "name": "patient_b_results_after_reload.png",
+          "summary": "画面再読み込み後に患者Bの結果へ戻った画像。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
+        "sections": {
+          "detail": "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう",
+          "preconditions": "テスト患者と検査・処方データが登録されていること",
+          "steps": "1. 患者Aの検査結果を表示した後に患者Bへ切り替える",
+          "expected": "選択した患者の検査結果だけが表示されること",
+          "actual": "患者Bへ切替後も患者Aの検査結果3件が表示される",
+          "remarks": "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "attendance-overnight-break-not-deducted": {
+      "scenarioId": "attendance-overnight-break-not-deducted",
+      "projectId": "attendance",
+      "rubricVersion": "attendance-overnight-break-not-deducted.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "22:00から翌日07:00までの勤務に翌日01:00から02:00の休憩を登録すると、実労働時間が8時間ではなく9時間として集計されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト対象の従業員と勤務予定が登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 日付をまたぐ勤務に翌日分の休憩を登録する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "翌日分を含む1時間の休憩を控除し、実労働時間を8時間とすること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "1時間の休憩が控除されず、実労働時間が9時間として集計される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "同日内で完結する休憩は正しく控除されることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "2/5",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "high",
+        "category": "workflow",
+        "version": "Web version: 4.12.0",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "tokito",
+        "watcherIds": [
+          "tokito",
+          "yasuda"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 3
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "work-summary-screen",
+          "name": "overnight_work_summary_103014.png",
+          "summary": "22:00〜翌07:00、休憩01:00〜02:00の勤務が実労働9時間と表示された画面。",
+          "required": true
+        },
+        {
+          "id": "calculation-log",
+          "name": "worktime_calculation_103013.log",
+          "summary": "日またぎ勤務の集計ログ。休憩時間が0分として計算されている。",
+          "required": true
+        },
+        {
+          "id": "work-export",
+          "name": "employee_e042_work_20260728.csv",
+          "summary": "対象従業員の確定済み勤務実績をエクスポートしたファイル。",
+          "required": true
+        },
+        {
+          "id": "daytime-break-normal",
+          "name": "day_shift_break_100200.png",
+          "summary": "同じ従業員の日中勤務で休憩が正常控除された画像。",
+          "required": false
+        },
+        {
+          "id": "other-employee",
+          "name": "employee_e019_work_103000.csv",
+          "summary": "別従業員E-019の勤務実績。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+        "sections": {
+          "detail": "22:00から翌日07:00までの勤務に翌日01:00から02:00の休憩を登録すると、実労働時間が8時間ではなく9時間として集計されてしまうことがある",
+          "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+          "steps": "1. 日付をまたぐ勤務に翌日分の休憩を登録する",
+          "expected": "翌日分を含む1時間の休憩を控除し、実労働時間を8時間とすること",
+          "actual": "1時間の休憩が控除されず、実労働時間が9時間として集計される",
+          "remarks": "同日内で完結する休憩は正しく控除されることを確認",
+          "reproducibility": "2/5"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "attendance-simultaneous-clock-out-double-overtime": {
+      "scenarioId": "attendance-simultaneous-clock-out-double-overtime",
+      "projectId": "attendance",
+      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "月末処理中に2台の端末から同じ従業員の退勤打刻を同時に送信すると、30分の残業が60分として集計されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト対象の従業員と勤務予定が登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 月末処理中に複数端末から同時に打刻する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "同じ退勤打刻を一度だけ処理し、残業時間を30分として集計すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "同じ退勤打刻が2回処理され、残業時間が60分として集計される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "1台の端末から打刻した場合は二重計上されないことを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/20",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Web version: 4.12.0",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "uchikoshi",
+        "watcherIds": [
+          "uchikoshi",
+          "yasuda"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "terminal-a-log",
+          "name": "clock_terminal_a_235959.log",
+          "summary": "端末Aから送信した退勤打刻ログ。",
+          "required": true
+        },
+        {
+          "id": "terminal-b-log",
+          "name": "clock_terminal_b_235959.log",
+          "summary": "端末Bからほぼ同時に送信した同じ従業員の退勤打刻ログ。",
+          "required": true
+        },
+        {
+          "id": "overtime-export",
+          "name": "monthly_overtime_e118_000015.csv",
+          "summary": "月次集計後の対象従業員の残業明細。",
+          "required": true
+        },
+        {
+          "id": "single-clock-normal",
+          "name": "clock_terminal_a_183000.log",
+          "summary": "通常日に端末Aだけで行った退勤打刻。",
+          "required": false
+        },
+        {
+          "id": "previous-month-export",
+          "name": "monthly_overtime_e118_202606.csv",
+          "summary": "前月の残業時間集計。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+        "sections": {
+          "detail": "月末処理中に2台の端末から同じ従業員の退勤打刻を同時に送信すると、30分の残業が60分として集計されてしまうことがある",
+          "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+          "steps": "1. 月末処理中に複数端末から同時に打刻する",
+          "expected": "同じ退勤打刻を一度だけ処理し、残業時間を30分として集計すること",
+          "actual": "同じ退勤打刻が2回処理され、残業時間が60分として集計される",
+          "remarks": "1台の端末から打刻した場合は二重計上されないことを確認",
+          "reproducibility": "1/20"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "salon-cancelled-slot-remains-booked": {
+      "scenarioId": "salon-cancelled-slot-remains-booked",
+      "projectId": "salon",
+      "rubricVersion": "salon-cancelled-slot-remains-booked.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "14:00の予約をキャンセルしても対象時間帯が予約済みのまま表示され、新しい予約を登録できなくなってしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "対象店舗の担当者と予約枠が登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 確定済みの予約をキャンセルして対象時間帯を再表示する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "キャンセルした時間帯を再度予約できること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "キャンセルした14:00枠が予約済みのままで、新しい予約を登録できない",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Release 2026.07.2",
+        "environment": "Safari 18.5 / macOS 15.5",
+        "assigneeId": "kamino",
+        "watcherIds": [
+          "kamino",
+          "soroi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "cancel-request",
+          "name": "reservation_cancel_r8821_103012.har",
+          "summary": "予約R-8821のキャンセルAPIが成功した通信。",
+          "required": true
+        },
+        {
+          "id": "slot-screen",
+          "name": "stylist_slot_1400_after_cancel_103016.png",
+          "summary": "キャンセル後も14:00枠が予約済みのまま表示された画面。",
+          "required": true
+        },
+        {
+          "id": "reservation-db",
+          "name": "reservation_r8821_after_cancel.csv",
+          "summary": "キャンセル後の予約と予約枠の状態を抽出したデータ。",
+          "required": true
+        },
+        {
+          "id": "before-cancel",
+          "name": "stylist_slot_1400_before_cancel.png",
+          "summary": "キャンセル操作前に14:00枠が予約済みだった画像。",
+          "required": false
+        },
+        {
+          "id": "other-stylist",
+          "name": "stylist_slot_1400_other_staff.png",
+          "summary": "別担当者の14:00枠が空いている画像。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+        "sections": {
+          "detail": "14:00の予約をキャンセルしても対象時間帯が予約済みのまま表示され、新しい予約を登録できなくなってしまう",
+          "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+          "steps": "1. 確定済みの予約をキャンセルして対象時間帯を再表示する",
+          "expected": "キャンセルした時間帯を再度予約できること",
+          "actual": "キャンセルした14:00枠が予約済みのままで、新しい予約を登録できない",
+          "remarks": "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "salon-simultaneous-double-booking": {
+      "scenarioId": "salon-simultaneous-double-booking",
+      "projectId": "salon",
+      "rubricVersion": "salon-simultaneous-double-booking.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "2台の端末から300ms以内に同じ担当者の14:00枠を確定すると、それぞれ異なる予約番号で2件登録されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "対象店舗の担当者と予約枠が登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 別端末から同じ担当者と時間帯の予約を同時に確定する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "先に確定した予約だけが登録されること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "同じ担当者の14:00枠が異なる予約番号で2件登録される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/10",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Release 2026.07.2",
+        "environment": "Safari 18.5 / macOS 15.5",
+        "assigneeId": "kamino",
+        "watcherIds": [
+          "kamino",
+          "soroi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "device-a-booking",
+          "name": "booking_device_a_140000.har",
+          "summary": "端末Aから14:00枠を確定した要求。",
+          "required": true
+        },
+        {
+          "id": "device-b-booking",
+          "name": "booking_device_b_140000.har",
+          "summary": "端末Bから同じ枠を確定した要求。",
+          "required": true
+        },
+        {
+          "id": "double-reservation-db",
+          "name": "reservation_slot_st12_1400.csv",
+          "summary": "同じ担当者・日時で保存された2件の予約データ。",
+          "required": true
+        },
+        {
+          "id": "sequential-conflict",
+          "name": "booking_sequential_conflict.har",
+          "summary": "5秒後に同じ枠を予約して409エラーになった正常系通信。",
+          "required": false
+        },
+        {
+          "id": "different-date",
+          "name": "reservation_slot_st12_next_day.csv",
+          "summary": "同じ担当者の翌日の予約データ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+        "sections": {
+          "detail": "2台の端末から300ms以内に同じ担当者の14:00枠を確定すると、それぞれ異なる予約番号で2件登録されてしまうことがある",
+          "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+          "steps": "1. 別端末から同じ担当者と時間帯の予約を同時に確定する",
+          "expected": "先に確定した予約だけが登録されること",
+          "actual": "同じ担当者の14:00枠が異なる予約番号で2件登録される",
+          "remarks": "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認",
+          "reproducibility": "1/10"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "ec-tax-rounding-inconsistent": {
+      "scenarioId": "ec-tax-rounding-inconsistent",
+      "projectId": "ec",
+      "rubricVersion": "ec-tax-rounding-inconsistent.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "税抜105円・税率10%の同一条件でも、商品Aは115円、商品Bは116円と異なる税込価格が表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト商品と購入者アカウントが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 同じ税率を設定した複数商品の税込価格を表示する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "設定された切り捨て処理を適用し、どちらも税込115円と表示すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "同じ税条件でも商品Aは115円、商品Bは116円と表示される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "カート合計は115円で商品一覧の表示だけが116円であることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Storefront v8.4.2",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "urino",
+        "watcherIds": [
+          "urino",
+          "warita"
+        ],
+        "dueDatePolicy": {
+          "mode": "unset"
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "price-comparison",
+          "name": "product_tax_comparison_103014.png",
+          "summary": "同じ税抜価格・税率の商品AとBで税込価格が異なる一覧画面。",
+          "required": true
+        },
+        {
+          "id": "pricing-trace",
+          "name": "pricing_calculation_103013.log",
+          "summary": "商品ごとの税込計算処理ログ。",
+          "required": true
+        },
+        {
+          "id": "product-settings",
+          "name": "product_tax_settings_103010.csv",
+          "summary": "商品A・Bの税率と端数設定を抽出したデータ。",
+          "required": true
+        },
+        {
+          "id": "reduced-tax-item",
+          "name": "product_c_reduced_tax.png",
+          "summary": "軽減税率8%の商品Cの価格画面。",
+          "required": false
+        },
+        {
+          "id": "sale-discount",
+          "name": "product_b_sale_price.log",
+          "summary": "セール割引適用時の商品Bの計算ログ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+        "sections": {
+          "detail": "税抜105円・税率10%の同一条件でも、商品Aは115円、商品Bは116円と異なる税込価格が表示されてしまう",
+          "preconditions": "テスト商品と購入者アカウントが登録されていること",
+          "steps": "1. 同じ税率を設定した複数商品の税込価格を表示する",
+          "expected": "設定された切り捨て処理を適用し、どちらも税込115円と表示すること",
+          "actual": "同じ税条件でも商品Aは115円、商品Bは116円と表示される",
+          "remarks": "カート合計は115円で商品一覧の表示だけが116円であることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "ec-payment-notification-double-order": {
+      "scenarioId": "ec-payment-notification-double-order",
+      "projectId": "ec",
+      "rubricVersion": "ec-payment-notification-double-order.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "決済通知ID「PAY-4821」を再送すると、1件の決済に対して異なる注文番号が2件発行されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト商品と購入者アカウントが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 同じ決済通知を注文APIへ再送する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "同じ通知を受信しても注文を一度だけ確定すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "1件の決済に対して異なる注文番号が2件発行される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "再送前後の通知IDと決済IDは同一であることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/15",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "urgent",
+        "category": "api",
+        "version": "Storefront v8.4.2",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "kagotani",
+        "watcherIds": [
+          "kagotani",
+          "urino"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 1
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "webhook-replay-log",
+          "name": "payment_webhook_pay4821.log",
+          "summary": "同じ通知IDを初回受信・再送したアプリケーションログ。",
+          "required": true
+        },
+        {
+          "id": "duplicate-orders",
+          "name": "orders_for_pay4821.csv",
+          "summary": "通知ID PAY-4821に紐づく注文をDBから抽出した結果。",
+          "required": true
+        },
+        {
+          "id": "order-admin-screen",
+          "name": "order_admin_pay4821_103022.png",
+          "summary": "管理画面に同額の確定注文が2件表示された画像。",
+          "required": true
+        },
+        {
+          "id": "different-notifications",
+          "name": "payment_webhook_two_ids.log",
+          "summary": "異なる通知IDがそれぞれ別注文を作った正常ログ。",
+          "required": false
+        },
+        {
+          "id": "failed-webhook",
+          "name": "payment_webhook_500.log",
+          "summary": "別通知が500エラーで失敗したログ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+        "sections": {
+          "detail": "決済通知ID「PAY-4821」を再送すると、1件の決済に対して異なる注文番号が2件発行されてしまうことがある",
+          "preconditions": "テスト商品と購入者アカウントが登録されていること",
+          "steps": "1. 同じ決済通知を注文APIへ再送する",
+          "expected": "同じ通知を受信しても注文を一度だけ確定すること",
+          "actual": "1件の決済に対して異なる注文番号が2件発行される",
+          "remarks": "再送前後の通知IDと決済IDは同一であることを確認",
+          "reproducibility": "1/15"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "inventory-expired-lot-fifo": {
+      "scenarioId": "inventory-expired-lot-fifo",
+      "projectId": "inventory",
+      "rubricVersion": "inventory-expired-lot-fifo.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "出庫候補を表示すると、有効期限が2026年7月26日のロットが期限内の8月31日ロットより先に表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "対象商品の在庫とロットが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 期限切れロットを含む商品の出庫候補を表示する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "有効期限内のロットだけが出庫候補になること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "期限切れの7月26日ロットが出庫候補の先頭に表示される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "期限判定に使用するサーバー日時は2026年7月27日であることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Client 5.7.0 (Build 1842)",
+        "environment": "Microsoft Edge 126.0.2592.102 / Windows 10 22H2",
+        "assigneeId": "nimotsu",
+        "watcherIds": [
+          "nimotsu",
+          "tanahashi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "allocation-screen",
+          "name": "shipment_lot_candidates_103014.png",
+          "summary": "出庫候補の先頭に期限切れロットが表示された画面。",
+          "required": true
+        },
+        {
+          "id": "lot-master",
+          "name": "item441_lot_master_103010.csv",
+          "summary": "対象商品のロット、有効期限、在庫数を抽出したデータ。",
+          "required": true
+        },
+        {
+          "id": "allocation-log",
+          "name": "fifo_allocation_item441_103013.log",
+          "summary": "出庫候補を決定した処理ログ。",
+          "required": true
+        },
+        {
+          "id": "normal-valid-lots",
+          "name": "item512_lot_candidates.png",
+          "summary": "別商品で期限内ロットだけが並んだ正常画面。",
+          "required": false
+        },
+        {
+          "id": "received-order",
+          "name": "item441_receiving_history.csv",
+          "summary": "対象商品の過去の入庫履歴。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+        "sections": {
+          "detail": "出庫候補を表示すると、有効期限が2026年7月26日のロットが期限内の8月31日ロットより先に表示されてしまう",
+          "preconditions": "対象商品の在庫とロットが登録されていること",
+          "steps": "1. 期限切れロットを含む商品の出庫候補を表示する",
+          "expected": "有効期限内のロットだけが出庫候補になること",
+          "actual": "期限切れの7月26日ロットが出庫候補の先頭に表示される",
+          "remarks": "期限判定に使用するサーバー日時は2026年7月27日であることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "inventory-simultaneous-shipment-negative-stock": {
+      "scenarioId": "inventory-simultaneous-shipment-negative-stock",
+      "projectId": "inventory",
+      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "在庫1個の商品を2台の端末から同時に1個ずつ出庫すると、2件とも登録に成功し、在庫数がマイナス1になってしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "対象商品の在庫とロットが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 複数端末から同じ商品の出庫を同時に確定する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "先に確定した出庫だけを登録し、2件目は在庫不足として処理すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "2件の出庫がともに成功し、在庫数がマイナス1になる",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "2/30",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "high",
+        "category": "workflow",
+        "version": "Client 5.7.0 (Build 1842)",
+        "environment": "Microsoft Edge 126.0.2592.102 / Windows 10 22H2",
+        "assigneeId": "nimotsu",
+        "watcherIds": [
+          "nimotsu",
+          "tanahashi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 3
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "shipment-terminal-a",
+          "name": "shipment_terminal_a_103012.log",
+          "summary": "端末Aから在庫1個の商品を1個出庫した要求ログ。",
+          "required": true
+        },
+        {
+          "id": "shipment-terminal-b",
+          "name": "shipment_terminal_b_103012.log",
+          "summary": "端末Bから同じ商品を1個出庫した要求ログ。",
+          "required": true
+        },
+        {
+          "id": "negative-stock",
+          "name": "item990_stock_after_shipments.csv",
+          "summary": "二つの出庫後に保存された在庫数と出庫履歴。",
+          "required": true
+        },
+        {
+          "id": "sequential-rejection",
+          "name": "shipment_sequential_rejection.log",
+          "summary": "5秒後の追加出庫が在庫不足で拒否された正常ログ。",
+          "required": false
+        },
+        {
+          "id": "other-item-stock",
+          "name": "item991_stock.csv",
+          "summary": "別商品ITEM-991の在庫データ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+        "sections": {
+          "detail": "在庫1個の商品を2台の端末から同時に1個ずつ出庫すると、2件とも登録に成功し、在庫数がマイナス1になってしまうことがある",
+          "preconditions": "対象商品の在庫とロットが登録されていること",
+          "steps": "1. 複数端末から同じ商品の出庫を同時に確定する",
+          "expected": "先に確定した出庫だけを登録し、2件目は在庫不足として処理すること",
+          "actual": "2件の出庫がともに成功し、在庫数がマイナス1になる",
+          "remarks": "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認",
+          "reproducibility": "2/30"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "mobile-notification-opens-wrong-news": {
+      "scenarioId": "mobile-notification-opens-wrong-news",
+      "projectId": "mobile",
+      "rubricVersion": "mobile-notification-opens-wrong-news.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト端末に対象ビルドがインストールされていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. テスト通知を送信して端末の通知をタップする",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "タップした通知に対応するお知らせを表示すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "2/5",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "App 3.4.0 (34018)",
+        "environment": "iOS 18.5 / iPhone 15",
+        "assigneeId": "otoha",
+        "watcherIds": [
+          "otoha",
+          "yubisaki"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "notification-payload",
+          "name": "push_news102_payload.json",
+          "summary": "端末へ送信したお知らせID NEWS-102の通知ペイロード。",
+          "required": true
+        },
+        {
+          "id": "notification-video",
+          "name": "tap_news102_open_news101.mp4",
+          "summary": "NEWS-102の通知をタップするとNEWS-101が開く操作録画。",
+          "required": true
+        },
+        {
+          "id": "navigation-log",
+          "name": "notification_navigation_103015.log",
+          "summary": "通知タップ後のアプリ内遷移ログ。",
+          "required": true
+        },
+        {
+          "id": "home-news-open",
+          "name": "news102_from_home.mp4",
+          "summary": "アプリの一覧画面からNEWS-102を正常に開いた録画。",
+          "required": false
+        },
+        {
+          "id": "different-push",
+          "name": "push_news099_payload.json",
+          "summary": "過去に送信したNEWS-099の通知ペイロード。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+        "sections": {
+          "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある",
+          "preconditions": "テスト端末に対象ビルドがインストールされていること",
+          "steps": "1. テスト通知を送信して端末の通知をタップする",
+          "expected": "タップした通知に対応するお知らせを表示すること",
+          "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
+          "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
+          "reproducibility": "2/5"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "mobile-background-sync-data-lost": {
+      "scenarioId": "mobile-background-sync-data-lost",
+      "projectId": "mobile",
+      "rubricVersion": "mobile-background-sync-data-lost.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト端末に対象ビルドがインストールされていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "未送信データを保持して復帰後に同期すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/25",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "high",
+        "category": "api",
+        "version": "App 3.4.0 (34018)",
+        "environment": "iOS 18.5 / iPhone 15",
+        "assigneeId": "yubisaki",
+        "watcherIds": [
+          "yubisaki",
+          "hashiru"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 3
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "pending-before",
+          "name": "pending_queue_before_memory_release.csv",
+          "summary": "メモリ解放前に端末内へ保持されていた未送信データ3件。",
+          "required": true
+        },
+        {
+          "id": "lifecycle-log",
+          "name": "app_lifecycle_memory_release.log",
+          "summary": "バックグラウンド移行、メモリ解放、復帰時の端末ログ。",
+          "required": true
+        },
+        {
+          "id": "pending-after",
+          "name": "pending_queue_after_restore.csv",
+          "summary": "アプリ復帰後の端末内未送信キュー。",
+          "required": true
+        },
+        {
+          "id": "synced-empty-queue",
+          "name": "pending_queue_after_successful_sync.csv",
+          "summary": "サーバー同期成功後にキューが0件になった正常データ。",
+          "required": false
+        },
+        {
+          "id": "other-device-log",
+          "name": "iphone14_memory_warning.log",
+          "summary": "別端末iPhone 14で取得したメモリ警告ログ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
+        "sections": {
+          "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある",
+          "preconditions": "テスト端末に対象ビルドがインストールされていること",
+          "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+          "expected": "未送信データを保持して復帰後に同期すること",
+          "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
+          "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+          "reproducibility": "1/25"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-can-byte-order-reversed": {
+      "scenarioId": "automotive-can-byte-order-reversed",
+      "projectId": "automotive",
+      "rubricVersion": "automotive-can-byte-order-reversed.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "DBCでリトルエンディアンと定義された信号に0x0BB8を送信すると、期待値30.00Vに対してメーターに471.15Vと表示されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "CANoeをテスト車両へ接続していること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. CANoeから既知のCAN信号を送信して復号値を確認する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "DBC定義のバイト順でCAN信号を復号すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "受信値0x0BB8に対し、期待値30.00Vではなく471.15Vと表示される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "CANoeの送信フレームはDBC定義と一致していることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "api",
+        "version": "ECU Software: v5.12.3",
+        "environment": "Hardware Rev: C / Vehicle profile: TEST-02",
+        "assigneeId": "wajima",
+        "watcherIds": [
+          "wajima",
+          "michigami"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "canoe-voltage-trace",
+          "name": "battery_voltage_0bb8.asc",
+          "summary": "CANoeから0x0BB8を送信した発生時のCANトレース。",
+          "required": true
+        },
+        {
+          "id": "ecu-decode-log",
+          "name": "ecu_voltage_decode_103013.log",
+          "summary": "対象ECUが受信バイトを復号したログ。",
+          "required": true
+        },
+        {
+          "id": "voltage-display",
+          "name": "battery_voltage_display_47115.png",
+          "summary": "0x0BB8送信中に471.15Vと表示されたモニター画面。",
+          "required": true
+        },
+        {
+          "id": "dbc-definition",
+          "name": "vehicle_test02.dbc",
+          "summary": "BatteryVoltage信号のリトルエンディアン定義ファイル。",
+          "required": false
+        },
+        {
+          "id": "speed-signal-trace",
+          "name": "vehicle_speed_trace.asc",
+          "summary": "同じ車両で取得した車速信号のCANトレース。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+        "sections": {
+          "detail": "DBCでリトルエンディアンと定義された信号に0x0BB8を送信すると、期待値30.00Vに対してメーターに471.15Vと表示されてしまう",
+          "preconditions": "CANoeをテスト車両へ接続していること",
+          "steps": "1. CANoeから既知のCAN信号を送信して復号値を確認する",
+          "expected": "DBC定義のバイト順でCAN信号を復号すること",
+          "actual": "受信値0x0BB8に対し、期待値30.00Vではなく471.15Vと表示される",
+          "remarks": "CANoeの送信フレームはDBC定義と一致していることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-bus-off-recovery-receive-stopped": {
+      "scenarioId": "automotive-bus-off-recovery-receive-stopped",
+      "projectId": "automotive",
+      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "CANバス負荷率90%以上の状態でBus-Offを発生させて復帰処理を実行しても、解除から30秒経過後もADAS ECUのCAN受信が再開されないことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "CANoeを接続しCANバスを高負荷状態にしていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. CANoeでADAS ECUに送信エラーを連続発生させる",
+            "importance": "important"
+          },
+          {
+            "id": "steps-2",
+            "description": "2. ADAS ECUがBus-Offへ遷移したことを確認する",
+            "importance": "important"
+          },
+          {
+            "id": "steps-3",
+            "description": "3. 送信エラーを解除する",
+            "importance": "important"
+          },
+          {
+            "id": "steps-4",
+            "description": "4. 規定のBus-Off復帰処理を実行する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "Bus-Off解除後500ms以内にADAS ECUのCAN受信を再開すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "Bus-Off解除から30秒経過後もADAS ECUのCAN受信が再開されない",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/50",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "high",
+        "category": "api",
+        "version": "ECU Software: v5.12.3",
+        "environment": "Hardware Rev: C / Vehicle profile: TEST-02",
+        "assigneeId": "kurumatani",
+        "watcherIds": [
+          "kurumatani",
+          "michigami"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 3
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "busoff-trace",
+          "name": "adas_busoff_recovery_90pct.asc",
+          "summary": "バス負荷率90%以上でBus-Off発生から解除後30秒までを記録したトレース。",
+          "required": true
+        },
+        {
+          "id": "adas-recovery-log",
+          "name": "adas_ecu_recovery_103012.log",
+          "summary": "Bus-Off解除後のADAS ECU復帰処理ログ。",
+          "required": true
+        },
+        {
+          "id": "canoe-measurement",
+          "name": "adas_rx_monitor_103044.png",
+          "summary": "解除後30秒時点でもADAS受信カウンタが増えないCANoe計測画面。",
+          "required": true
+        },
+        {
+          "id": "low-load-normal",
+          "name": "adas_busoff_recovery_40pct.asc",
+          "summary": "バス負荷率40%で500ms以内に復帰した正常トレース。",
+          "required": false
+        },
+        {
+          "id": "body-ecu-log",
+          "name": "body_ecu_busoff.log",
+          "summary": "Body ECUで取得したBus-Offログ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+        "sections": {
+          "detail": "CANバス負荷率90%以上の状態でBus-Offを発生させて復帰処理を実行しても、解除から30秒経過後もADAS ECUのCAN受信が再開されないことがある",
+          "preconditions": "CANoeを接続しCANバスを高負荷状態にしていること",
+          "steps": "1. CANoeでADAS ECUに送信エラーを連続発生させる\n2. ADAS ECUがBus-Offへ遷移したことを確認する\n3. 送信エラーを解除する\n4. 規定のBus-Off復帰処理を実行する",
+          "expected": "Bus-Off解除後500ms以内にADAS ECUのCAN受信を再開すること",
+          "actual": "Bus-Off解除から30秒経過後もADAS ECUのCAN受信が再開されない",
+          "remarks": "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認",
+          "reproducibility": "1/50"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "payment-idempotency-key-double-charge": {
+      "scenarioId": "payment-idempotency-key-double-charge",
+      "projectId": "payment",
+      "rubricVersion": "payment-idempotency-key-double-charge.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "5,000円の決済に使用した冪等キーで10秒後に同額の決済を再試行すると、異なる取引IDで売上が2件確定してしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "Sandbox環境でテスト加盟店を利用できること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 同じ冪等キーで決済APIを再試行する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "同じ冪等キーには最初の処理結果を返すこと",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "同じ冪等キーに対し、異なる取引IDで売上が2件確定する",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "2回のリクエストで冪等キーと決済内容は一致していることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "2/10",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s1",
+        "priority": "urgent",
+        "category": "api",
+        "version": "API version: 2024-06-20",
+        "environment": "Environment: Sandbox / Gateway build: 7.18.4",
+        "assigneeId": "kinjo",
+        "watcherIds": [
+          "kinjo",
+          "haraikawa"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 1
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "idempotency-requests",
+          "name": "payment_idem_a81f_requests.json",
+          "summary": "同じ冪等キーで10秒差に送信した2回の決済要求と応答。",
+          "required": true
+        },
+        {
+          "id": "transaction-export",
+          "name": "transactions_idem_a81f.csv",
+          "summary": "冪等キーidem-a81fで確定した売上取引の抽出結果。",
+          "required": true
+        },
+        {
+          "id": "gateway-screen",
+          "name": "gateway_idem_a81f_103025.png",
+          "summary": "決済ゲートウェイ管理画面に5,000円の売上が2件表示された画像。",
+          "required": true
+        },
+        {
+          "id": "different-keys",
+          "name": "payment_two_keys.json",
+          "summary": "異なる冪等キーで行った2件の正常決済。",
+          "required": false
+        },
+        {
+          "id": "declined-payment",
+          "name": "payment_declined_5000.json",
+          "summary": "同額だが与信否決となった別取引。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+        "sections": {
+          "detail": "5,000円の決済に使用した冪等キーで10秒後に同額の決済を再試行すると、異なる取引IDで売上が2件確定してしまうことがある",
+          "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+          "steps": "1. 同じ冪等キーで決済APIを再試行する",
+          "expected": "同じ冪等キーには最初の処理結果を返すこと",
+          "actual": "同じ冪等キーに対し、異なる取引IDで売上が2件確定する",
+          "remarks": "2回のリクエストで冪等キーと決済内容は一致していることを確認",
+          "reproducibility": "2/10"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "payment-timeout-authorization-remains": {
+      "scenarioId": "payment-timeout-authorization-remains",
+      "projectId": "payment",
+      "rubricVersion": "payment-timeout-authorization-remains.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "30秒でタイムアウトした取引を再照会すると決済失敗となっているが、50,000円の与信枠が15分後も残ってしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "Sandbox環境でテスト加盟店を利用できること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 応答をタイムアウトさせて取引と与信の状態を確認する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "再照会で決済失敗を確定した場合、5分以内に与信を取り消すこと",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "決済失敗の確定から15分後も50,000円の与信枠が残っている",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "売上確定と売上取消は発生せず与信だけが残っていることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/40",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "api",
+        "version": "API version: 2024-06-20",
+        "environment": "Environment: Sandbox / Gateway build: 7.18.4",
+        "assigneeId": "tsuburaya",
+        "watcherIds": [
+          "tsuburaya",
+          "kinjo"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "timeout-requery",
+          "name": "payment_timeout_requery_t9021.json",
+          "summary": "30秒タイムアウト後に再照会して決済失敗を確認したAPI記録。",
+          "required": true
+        },
+        {
+          "id": "authorization-export",
+          "name": "authorization_t9021_after_15min.csv",
+          "summary": "失敗確定から15分後も残っていた与信枠の管理API出力。",
+          "required": true
+        },
+        {
+          "id": "auth-admin-screen",
+          "name": "gateway_auth_t9021_104546.png",
+          "summary": "ゲートウェイ管理画面で対象取引の与信が保持中になっている画像。",
+          "required": true
+        },
+        {
+          "id": "normal-void",
+          "name": "authorization_t8990_voided.csv",
+          "summary": "別取引で3分後に与信取消が完了した正常記録。",
+          "required": false
+        },
+        {
+          "id": "other-timeout",
+          "name": "payment_timeout_t8770.json",
+          "summary": "別の1,000円取引で発生したタイムアウト記録。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+        "sections": {
+          "detail": "30秒でタイムアウトした取引を再照会すると決済失敗となっているが、50,000円の与信枠が15分後も残ってしまうことがある",
+          "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+          "steps": "1. 応答をタイムアウトさせて取引と与信の状態を確認する",
+          "expected": "再照会で決済失敗を確定した場合、5分以内に与信を取り消すこと",
+          "actual": "決済失敗の確定から15分後も50,000円の与信枠が残っている",
+          "remarks": "売上確定と売上取消は発生せず与信だけが残っていることを確認",
+          "reproducibility": "1/40"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "medical-weight-conversion-dose-thousandfold": {
+      "scenarioId": "medical-weight-conversion-dose-thousandfold",
+      "projectId": "medical",
+      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "体重18,000gの患者に10mg/kgの薬剤を指定して自動計算すると、期待値180mgに対して180,000mgと算出されてしまう",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト患者と検査・処方データが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. グラム単位の体重を連携して投薬量を自動計算する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "体重18,000gを18kgへ変換し、投薬量を180mgと計算すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "投薬量が期待値180mgではなく180,000mgと算出される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "3/3",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s1",
+        "priority": "urgent",
+        "category": "workflow",
+        "version": "Client version: 4.8.2",
+        "environment": "Database schema: 2026.07 / Windows 11 Enterprise 23H2",
+        "assigneeId": "yakushiji",
+        "watcherIds": [
+          "yakushiji",
+          "shinno"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 0
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "dose-screen",
+          "name": "patient_p204_dose_180000mg.png",
+          "summary": "体重18,000g・10mg/kgの入力に対し180,000mgと表示された処方画面。",
+          "required": true
+        },
+        {
+          "id": "dose-calculation-log",
+          "name": "dose_calculation_p204_103013.log",
+          "summary": "投薬量の計算処理ログ。",
+          "required": true
+        },
+        {
+          "id": "prescription-audit",
+          "name": "prescription_audit_p204.csv",
+          "summary": "対象患者の処方計算監査データ。",
+          "required": true
+        },
+        {
+          "id": "dose-kg-normal",
+          "name": "patient_p204_dose_18kg.png",
+          "summary": "体重を18kgで入力して180mgとなった正常画面。",
+          "required": false
+        },
+        {
+          "id": "other-patient",
+          "name": "prescription_audit_p311.csv",
+          "summary": "別患者P-311の処方監査データ。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+        "sections": {
+          "detail": "体重18,000gの患者に10mg/kgの薬剤を指定して自動計算すると、期待値180mgに対して180,000mgと算出されてしまう",
+          "preconditions": "テスト患者と検査・処方データが登録されていること",
+          "steps": "1. グラム単位の体重を連携して投薬量を自動計算する",
+          "expected": "体重18,000gを18kgへ変換し、投薬量を180mgと計算すること",
+          "actual": "投薬量が期待値180mgではなく180,000mgと算出される",
+          "remarks": "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "medical-lab-result-resend-duplicate": {
+      "scenarioId": "medical-lab-result-resend-duplicate",
+      "projectId": "medical",
+      "rubricVersion": "medical-lab-result-resend-duplicate.v1",
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-1",
+            "description": "検査結果ID「LAB-9031」の連携データを再送すると、同じ測定時刻と測定値の結果が患者記録に2件登録されてしまうことがある",
+            "importance": "critical"
+          }
+        ],
+        "preconditions": [
+          {
+            "id": "preconditions-1",
+            "description": "テスト患者と検査・処方データが登録されていること",
+            "importance": "supporting"
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-1",
+            "description": "1. 同じ検査結果IDの連携データを再送する",
+            "importance": "important"
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-1",
+            "description": "検査結果IDを使って重複登録を防止すること",
+            "importance": "critical"
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-1",
+            "description": "同じ測定時刻と測定値の検査結果が患者記録に2件登録される",
+            "importance": "critical"
+          }
+        ],
+        "remarks": [
+          {
+            "id": "remarks-1",
+            "description": "重複した2件は検査結果IDと測定時刻が同一であることを確認",
+            "importance": "important"
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-1",
+            "description": "1/30",
+            "importance": "important"
+          }
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "api",
+        "version": "Client version: 4.8.2",
+        "environment": "Database schema: 2026.07 / Windows 11 Enterprise 23H2",
+        "assigneeId": "kenmi",
+        "watcherIds": [
+          "kenmi",
+          "yakushiji"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "lab-interface-log",
+          "name": "lab_result_lab9031_replay.log",
+          "summary": "同じ検査結果IDを初回受信・再送した連携ログ。",
+          "required": true
+        },
+        {
+          "id": "patient-record-screen",
+          "name": "patient_p552_lab9031_duplicate.png",
+          "summary": "患者記録に同一測定時刻・値の結果が2件表示された画面。",
+          "required": true
+        },
+        {
+          "id": "lab-result-db",
+          "name": "lab_result_lab9031_rows.csv",
+          "summary": "検査結果ID LAB-9031で抽出した患者結果テーブル。",
+          "required": true
+        },
+        {
+          "id": "different-result-ids",
+          "name": "patient_p552_two_tests.csv",
+          "summary": "同じ患者の異なる検査結果IDを持つ2件の正常データ。",
+          "required": false
+        },
+        {
+          "id": "single-original",
+          "name": "lab_result_lab9031_before_replay.png",
+          "summary": "再送前にLAB-9031が1件だけ表示されていた画面。",
+          "required": false
+        }
+      ],
+      "referenceAnswer": {
+        "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+        "sections": {
+          "detail": "検査結果ID「LAB-9031」の連携データを再送すると、同じ測定時刻と測定値の結果が患者記録に2件登録されてしまうことがある",
+          "preconditions": "テスト患者と検査・処方データが登録されていること",
+          "steps": "1. 同じ検査結果IDの連携データを再送する",
+          "expected": "検査結果IDを使って重複登録を防止すること",
+          "actual": "同じ測定時刻と測定値の検査結果が患者記録に2件登録される",
+          "remarks": "重複した2件は検査結果IDと測定時刻が同一であることを確認",
+          "reproducibility": "1/30"
+        }
+      },
+      "rubricNotes": [
+        "参考回答との表現一致は要求しない",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    }
+  }
+}

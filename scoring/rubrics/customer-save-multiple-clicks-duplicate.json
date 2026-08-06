@@ -1,0 +1,154 @@
+{
+  "scenarioId": "customer-save-multiple-clicks-duplicate",
+  "rubricVersion": "customer-save-multiple-clicks-duplicate.v2",
+  "dimensions": [
+    {
+      "id": "factualGrounding",
+      "label": "事実性",
+      "weight": 20
+    },
+    {
+      "id": "informationCoverage",
+      "label": "情報充足",
+      "weight": 20
+    },
+    {
+      "id": "reproducibility",
+      "label": "再現性",
+      "weight": 20
+    },
+    {
+      "id": "expectedActualSeparation",
+      "label": "期待・実績の分離",
+      "weight": 15
+    },
+    {
+      "id": "interpretiveClarity",
+      "label": "解釈の明瞭さ",
+      "weight": 10
+    },
+    {
+      "id": "investigationReadiness",
+      "label": "切り分け支援",
+      "weight": 15
+    }
+  ],
+  "requiredFacts": {
+    "subject": [
+      {
+        "id": "subject-target",
+        "description": "顧客登録画面または顧客データの登録で発生する問題だと分かる",
+        "importance": "important"
+      },
+      {
+        "id": "subject-condition",
+        "description": "保存ボタンの連続クリックが発生条件だと分かる",
+        "importance": "critical"
+      },
+      {
+        "id": "subject-phenomenon",
+        "description": "同じ顧客データが重複登録される現象だと分かる",
+        "importance": "critical"
+      }
+    ],
+    "detail": [
+      {
+        "id": "detail-three-records",
+        "description": "同じ内容の顧客データが3件登録される",
+        "importance": "critical"
+      },
+      {
+        "id": "detail-distinct-customer-ids",
+        "description": "重複した3件には異なる顧客IDが採番される",
+        "importance": "important"
+      }
+    ],
+    "preconditions": [
+      {
+        "id": "precondition-admin-login",
+        "description": "管理者ユーザーでログインしている",
+        "importance": "supporting"
+      }
+    ],
+    "steps": [
+      {
+        "id": "steps-open-customer-registration",
+        "description": "顧客登録画面を開く",
+        "importance": "important"
+      },
+      {
+        "id": "steps-enter-required-fields",
+        "description": "必須項目を入力する",
+        "importance": "important"
+      },
+      {
+        "id": "steps-click-save-three-times",
+        "description": "保存ボタンを素早く3回クリックする",
+        "importance": "critical"
+      }
+    ],
+    "expected": [
+      {
+        "id": "expected-single-record",
+        "description": "連続クリックしても顧客データは1件だけ登録される",
+        "importance": "critical"
+      }
+    ],
+    "actual": [
+      {
+        "id": "actual-three-records",
+        "description": "同じデータが3件登録される",
+        "importance": "critical"
+      }
+    ],
+    "reproducibility": [
+      {
+        "id": "reproducibility-three-of-three",
+        "description": "3回中3回再現する",
+        "importance": "important"
+      }
+    ]
+  },
+  "forbiddenClaims": [
+    {
+      "id": "claim-database-lock",
+      "description": "データベースの排他制御不足が原因だと断定する",
+      "severity": "major"
+    },
+    {
+      "id": "claim-api-defect",
+      "description": "APIの実装不備が原因だと断定する",
+      "severity": "major"
+    },
+    {
+      "id": "claim-all-users",
+      "description": "すべての利用者で発生すると断定する",
+      "severity": "major"
+    },
+    {
+      "id": "claim-no-workaround",
+      "description": "確認されていない回避策の有無を断定する",
+      "severity": "minor"
+    }
+  ],
+  "optionalFacts": [
+    {
+      "id": "optional-build",
+      "description": "確認ビルドを記載する"
+    },
+    {
+      "id": "optional-browser-os",
+      "description": "確認ブラウザとOSを記載する"
+    },
+    {
+      "id": "optional-evidence-summary",
+      "description": "添付した通信・画面・CSVの証跡を簡潔に示す"
+    }
+  ],
+  "rubricNotes": [
+    "参考回答との表現一致は要求しない",
+    "原因の仮説と確認済み事実を区別する",
+    "事実誤認は文章の拙さより重く扱う",
+    "同じ事実を複数セクションへ重複記載しても加点しない"
+  ]
+}

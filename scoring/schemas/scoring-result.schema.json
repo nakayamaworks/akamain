@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://typing-workbench.local/schemas/scoring-result.v3.json",
+  "title": "Typing Workbench AI Review Result v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "scoringResultId",
+    "attemptId",
+    "status",
+    "totalScore",
+    "dimensions",
+    "verdict",
+    "overallAssessment",
+    "readerQuestions",
+    "ambiguityRisks",
+    "investigationAdvice",
+    "rewriteSuggestions",
+    "strengths",
+    "rubricFindings",
+    "rubricVersion",
+    "promptVersion",
+    "modelId",
+    "scoredAt",
+    "errorCode"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "scoring-result.v3" },
+    "scoringResultId": { "type": "string", "format": "uuid" },
+    "attemptId": { "type": "string", "format": "uuid" },
+    "status": { "enum": ["succeeded", "failed", "unavailable"] },
+    "totalScore": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factualGrounding",
+        "informationCoverage",
+        "reproducibility",
+        "expectedActualSeparation",
+        "interpretiveClarity",
+        "investigationReadiness"
+      ],
+      "properties": {
+        "factualGrounding": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "informationCoverage": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "reproducibility": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "expectedActualSeparation": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "interpretiveClarity": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "investigationReadiness": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+      }
+    },
+    "verdict": {
+      "anyOf": [
+        { "enum": ["開発着手可能", "追加確認を推奨", "再整理を推奨"] },
+        { "type": "null" }
+      ]
+    },
+    "overallAssessment": { "type": ["string", "null"] },
+    "readerQuestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reader", "question", "whyItMatters", "classification", "factId"],
+        "properties": {
+          "reader": { "type": "string" },
+          "question": { "type": "string" },
+          "whyItMatters": { "type": "string" },
+          "classification": { "enum": ["不足情報", "調査提案"] },
+          "factId": { "type": "string" }
+        }
+      }
+    },
+    "ambiguityRisks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["quote", "risk", "advice"],
+        "properties": {
+          "quote": { "type": "string" },
+          "risk": { "type": "string" },
+          "advice": { "type": "string" }
+        }
+      }
+    },
+    "investigationAdvice": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "purpose"],
+        "properties": {
+          "action": { "type": "string" },
+          "purpose": { "type": "string" }
+        }
+      }
+    },
+    "rewriteSuggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section", "original", "suggested", "reason"],
+        "properties": {
+          "section": { "type": "string" },
+          "original": { "type": "string" },
+          "suggested": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "strengths": { "type": "array", "items": { "type": "string" } },
+    "rubricFindings": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "factAssessments",
+        "forbiddenClaimIds",
+        "missingCriticalFactIds",
+        "contradictedCriticalFactIds",
+        "ticketFieldChecks",
+        "evidenceCheck",
+        "rawWeightedScore",
+        "scoreCaps",
+        "appliedScoreCap"
+      ],
+      "properties": {
+        "factAssessments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["factId", "status", "evidenceQuote"],
+            "properties": {
+              "factId": { "type": "string" },
+              "status": { "enum": ["present", "missing", "contradicted"] },
+              "evidenceQuote": { "type": "string" }
+            }
+          }
+        },
+        "forbiddenClaimIds": { "type": "array", "items": { "type": "string" } },
+        "missingCriticalFactIds": { "type": "array", "items": { "type": "string" } },
+        "contradictedCriticalFactIds": { "type": "array", "items": { "type": "string" } },
+        "ticketFieldChecks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "expected", "actual", "matched"],
+            "properties": {
+              "field": { "type": "string" },
+              "expected": {},
+              "actual": {},
+              "matched": { "type": "boolean" }
+            }
+          }
+        },
+        "evidenceCheck": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expectedEvidenceIds",
+            "selectedEvidenceIds",
+            "missingEvidenceIds",
+            "unrelatedEvidenceIds",
+            "matched"
+          ],
+          "properties": {
+            "expectedEvidenceIds": { "type": "array", "items": { "type": "string" } },
+            "selectedEvidenceIds": { "type": "array", "items": { "type": "string" } },
+            "missingEvidenceIds": { "type": "array", "items": { "type": "string" } },
+            "unrelatedEvidenceIds": { "type": "array", "items": { "type": "string" } },
+            "matched": { "type": "boolean" }
+          }
+        },
+        "rawWeightedScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "scoreCaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["reason", "maximum"],
+            "properties": {
+              "reason": { "type": "string" },
+              "maximum": { "type": "integer", "minimum": 0, "maximum": 100 }
+            }
+          }
+        },
+        "appliedScoreCap": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+      }
+    },
+    "rubricVersion": { "type": "string" },
+    "promptVersion": { "type": "string" },
+    "modelId": { "type": "string" },
+    "scoredAt": { "type": "string", "format": "date-time" },
+    "errorCode": { "type": ["string", "null"] }
+  }
+}

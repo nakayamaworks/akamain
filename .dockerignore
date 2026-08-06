@@ -1,0 +1,12 @@
+.git
+.DS_Store
+**/.DS_Store
+backend/.env
+backend/node_modules
+node_modules
+*.log
+docs
+*.png
+*.jpg
+*.jpeg
+*.webp

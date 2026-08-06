@@ -1,0 +1,3142 @@
+{
+  "schemaVersion": "scenario-scoring-fixtures.v1",
+  "scenarios": {
+    "customer-context-menu-not-shown": {
+      "scenarioId": "customer-context-menu-not-shown",
+      "rubricVersion": "customer-context-menu-not-shown.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+            "sections": {
+              "detail": "顧客一覧画面で右クリックしても\nコンテキストメニューが表示されず仕様と異なる",
+              "preconditions": "管理者ユーザーでログインしていること",
+              "steps": "1. 顧客一覧画面を開く\n2. 任意の顧客を選択する\n3. 右クリックを実行する",
+              "expected": "コンテキストメニューが表示されること",
+              "actual": "コンテキストメニューが表示されない",
+              "remarks": "左クリックで顧客詳細を開く操作は正常に行えることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "detail-2",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+            "sections": {
+              "detail": "顧客一覧画面で右クリックしても\nコンテキストメニューが表示されず仕様と異なる\n原因は実装不備であることを確認しました。",
+              "preconditions": "管理者ユーザーでログインしていること",
+              "steps": "1. 顧客一覧画面を開く\n2. 任意の顧客を選択する\n3. 右クリックを実行する",
+              "expected": "コンテキストメニューが表示されること",
+              "actual": "コンテキストメニューが表示されない",
+              "remarks": "左クリックで顧客詳細を開く操作は正常に行えることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+            "sections": {
+              "detail": "管理者ユーザーでログインしていること",
+              "preconditions": "1. 顧客一覧画面を開く\n2. 任意の顧客を選択する\n3. 右クリックを実行する",
+              "steps": "コンテキストメニューが表示されること",
+              "expected": "コンテキストメニューが表示されない",
+              "actual": "左クリックで顧客詳細を開く操作は正常に行えることを確認",
+              "remarks": "3/3",
+              "reproducibility": "顧客一覧画面で右クリックしても\nコンテキストメニューが表示されず仕様と異なる"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
+            "sections": {
+              "detail": "顧客一覧画面で右クリックしても\nコンテキストメニューが表示されず仕様と異なる\n上記について継続して確認が必要です。",
+              "preconditions": "管理者ユーザーでログインしていること\n上記について継続して確認が必要です。",
+              "steps": "1. 顧客一覧画面を開く\n2. 任意の顧客を選択する\n3. 右クリックを実行する\n上記について継続して確認が必要です。",
+              "expected": "コンテキストメニューが表示されること\n上記について継続して確認が必要です。",
+              "actual": "コンテキストメニューが表示されない\n上記について継続して確認が必要です。",
+              "remarks": "左クリックで顧客詳細を開く操作は正常に行えることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "customer-search-nonexistent-name-all-results": {
+      "scenarioId": "customer-search-nonexistent-name-all-results",
+      "rubricVersion": "customer-search-nonexistent-name-all-results.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+            "sections": {
+              "detail": "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると\n該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう",
+              "preconditions": "一般ユーザーでログインしていること",
+              "steps": "1. 顧客一覧画面を開く\n2. 検索欄に「ZZZZZZ」と入力する\n3. 検索ボタンをクリックする",
+              "expected": "検索結果が0件と表示されること",
+              "actual": "検索前と同じ248件が表示される",
+              "remarks": "顧客番号を指定した検索では対象の1件だけが表示されることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "detail-2",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+            "sections": {
+              "detail": "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると\n該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "一般ユーザーでログインしていること",
+              "steps": "1. 顧客一覧画面を開く\n2. 検索欄に「ZZZZZZ」と入力する\n3. 検索ボタンをクリックする",
+              "expected": "検索結果が0件と表示されること",
+              "actual": "検索前と同じ248件が表示される",
+              "remarks": "顧客番号を指定した検索では対象の1件だけが表示されることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+            "sections": {
+              "detail": "一般ユーザーでログインしていること",
+              "preconditions": "1. 顧客一覧画面を開く\n2. 検索欄に「ZZZZZZ」と入力する\n3. 検索ボタンをクリックする",
+              "steps": "検索結果が0件と表示されること",
+              "expected": "検索前と同じ248件が表示される",
+              "actual": "顧客番号を指定した検索では対象の1件だけが表示されることを確認",
+              "remarks": "3/3",
+              "reproducibility": "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると\n該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
+            "sections": {
+              "detail": "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると\n該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "一般ユーザーでログインしていること\n上記について継続して確認が必要です。",
+              "steps": "1. 顧客一覧画面を開く\n2. 検索欄に「ZZZZZZ」と入力する\n3. 検索ボタンをクリックする\n上記について継続して確認が必要です。",
+              "expected": "検索結果が0件と表示されること\n上記について継続して確認が必要です。",
+              "actual": "検索前と同じ248件が表示される\n上記について継続して確認が必要です。",
+              "remarks": "顧客番号を指定した検索では対象の1件だけが表示されることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "customer-save-multiple-clicks-duplicate": {
+      "scenarioId": "customer-save-multiple-clicks-duplicate",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v3",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
+            "sections": {
+              "detail": "顧客登録画面で保存ボタンを素早く3回クリックすると\n同じ氏名・電話番号の顧客データが異なる顧客IDで3件登録されてしまう",
+              "preconditions": "管理者ユーザーでログインしていること",
+              "steps": "1. 顧客登録画面を開く\n2. 必須項目を入力する\n3. 保存ボタンを素早く3回クリックする",
+              "expected": "保存ボタンを連続クリックしても顧客データが1件だけ登録されること",
+              "actual": "同じ顧客データが異なる顧客IDで3件登録される",
+              "remarks": "重複した3件にはそれぞれ異なる顧客IDが採番されていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "subject-condition",
+              "subject-phenomenon",
+              "detail-three-records",
+              "steps-click-save-three-times",
+              "expected-single-record",
+              "actual-three-records"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
+            "sections": {
+              "detail": "顧客登録画面で保存ボタンを素早く3回クリックすると\n同じ氏名・電話番号の顧客データが異なる顧客IDで3件登録されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "管理者ユーザーでログインしていること",
+              "steps": "1. 顧客登録画面を開く\n2. 必須項目を入力する\n3. 保存ボタンを素早く3回クリックする",
+              "expected": "保存ボタンを連続クリックしても顧客データが1件だけ登録されること",
+              "actual": "同じ顧客データが異なる顧客IDで3件登録される",
+              "remarks": "重複した3件にはそれぞれ異なる顧客IDが採番されていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
+            "sections": {
+              "detail": "管理者ユーザーでログインしていること",
+              "preconditions": "1. 顧客登録画面を開く\n2. 必須項目を入力する\n3. 保存ボタンを素早く3回クリックする",
+              "steps": "保存ボタンを連続クリックしても顧客データが1件だけ登録されること",
+              "expected": "同じ顧客データが異なる顧客IDで3件登録される",
+              "actual": "重複した3件にはそれぞれ異なる顧客IDが採番されていることを確認",
+              "remarks": "3/3",
+              "reproducibility": "顧客登録画面で保存ボタンを素早く3回クリックすると\n同じ氏名・電話番号の顧客データが異なる顧客IDで3件登録されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
+            "sections": {
+              "detail": "顧客登録画面で保存ボタンを素早く3回クリックすると\n同じ氏名・電話番号の顧客データが異なる顧客IDで3件登録されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "管理者ユーザーでログインしていること\n上記について継続して確認が必要です。",
+              "steps": "1. 顧客登録画面を開く\n2. 必須項目を入力する\n3. 保存ボタンを素早く3回クリックする\n上記について継続して確認が必要です。",
+              "expected": "保存ボタンを連続クリックしても顧客データが1件だけ登録されること\n上記について継続して確認が必要です。",
+              "actual": "同じ顧客データが異なる顧客IDで3件登録される\n上記について継続して確認が必要です。",
+              "remarks": "重複した3件にはそれぞれ異なる顧客IDが採番されていることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "attendance-clock-out-next-day": {
+      "scenarioId": "attendance-clock-out-next-day",
+      "rubricVersion": "attendance-clock-out-next-day.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+            "sections": {
+              "detail": "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+              "steps": "1. 勤務開始と退勤時刻を同じ日付で登録する",
+              "expected": "勤務開始日と同じ日付で退勤時刻が登録されること",
+              "actual": "退勤時刻が翌日の18:00として保存される",
+              "remarks": "勤務日を手動で戻すと給与集計は正しい値になることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+            "sections": {
+              "detail": "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+              "steps": "1. 勤務開始と退勤時刻を同じ日付で登録する",
+              "expected": "勤務開始日と同じ日付で退勤時刻が登録されること",
+              "actual": "退勤時刻が翌日の18:00として保存される",
+              "remarks": "勤務日を手動で戻すと給与集計は正しい値になることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+            "sections": {
+              "detail": "テスト対象の従業員と勤務予定が登録されていること",
+              "preconditions": "1. 勤務開始と退勤時刻を同じ日付で登録する",
+              "steps": "勤務開始日と同じ日付で退勤時刻が登録されること",
+              "expected": "退勤時刻が翌日の18:00として保存される",
+              "actual": "勤務日を手動で戻すと給与集計は正しい値になることを確認",
+              "remarks": "3/3",
+              "reproducibility": "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
+            "sections": {
+              "detail": "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 勤務開始と退勤時刻を同じ日付で登録する\n上記について継続して確認が必要です。",
+              "expected": "勤務開始日と同じ日付で退勤時刻が登録されること\n上記について継続して確認が必要です。",
+              "actual": "退勤時刻が翌日の18:00として保存される\n上記について継続して確認が必要です。",
+              "remarks": "勤務日を手動で戻すと給与集計は正しい値になることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "salon-duplicate-reservation": {
+      "scenarioId": "salon-duplicate-reservation",
+      "rubricVersion": "salon-duplicate-reservation.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
+            "sections": {
+              "detail": "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+              "steps": "1. 予約済みの担当者と時間帯を選択して予約を確定する",
+              "expected": "予約済みの時間帯は選択できないこと",
+              "actual": "予約済みの14:00枠に2件目の予約が登録される",
+              "remarks": "別の担当者または別の時間帯では重複しないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により予約登録画面で予約済みの時間帯を重複予約できてしまう",
+            "sections": {
+              "detail": "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+              "steps": "1. 予約済みの担当者と時間帯を選択して予約を確定する",
+              "expected": "予約済みの時間帯は選択できないこと",
+              "actual": "予約済みの14:00枠に2件目の予約が登録される",
+              "remarks": "別の担当者または別の時間帯では重複しないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
+            "sections": {
+              "detail": "対象店舗の担当者と予約枠が登録されていること",
+              "preconditions": "1. 予約済みの担当者と時間帯を選択して予約を確定する",
+              "steps": "予約済みの時間帯は選択できないこと",
+              "expected": "予約済みの14:00枠に2件目の予約が登録される",
+              "actual": "別の担当者または別の時間帯では重複しないことを確認",
+              "remarks": "3/3",
+              "reproducibility": "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
+            "sections": {
+              "detail": "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 予約済みの担当者と時間帯を選択して予約を確定する\n上記について継続して確認が必要です。",
+              "expected": "予約済みの時間帯は選択できないこと\n上記について継続して確認が必要です。",
+              "actual": "予約済みの14:00枠に2件目の予約が登録される\n上記について継続して確認が必要です。",
+              "remarks": "別の担当者または別の時間帯では重複しないことを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "ec-out-of-stock-cart": {
+      "scenarioId": "ec-out-of-stock-cart",
+      "rubricVersion": "ec-out-of-stock-cart.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+            "sections": {
+              "detail": "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること",
+              "steps": "1. 在庫数を0にした商品をカートへ追加する",
+              "expected": "在庫切れの商品はカートに追加できないこと",
+              "actual": "在庫切れの商品がカートに追加され、注文確認画面まで進める",
+              "remarks": "商品APIが返す在庫数は0でカート追加後も変化していないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+            "sections": {
+              "detail": "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること",
+              "steps": "1. 在庫数を0にした商品をカートへ追加する",
+              "expected": "在庫切れの商品はカートに追加できないこと",
+              "actual": "在庫切れの商品がカートに追加され、注文確認画面まで進める",
+              "remarks": "商品APIが返す在庫数は0でカート追加後も変化していないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+            "sections": {
+              "detail": "テスト商品と購入者アカウントが登録されていること",
+              "preconditions": "1. 在庫数を0にした商品をカートへ追加する",
+              "steps": "在庫切れの商品はカートに追加できないこと",
+              "expected": "在庫切れの商品がカートに追加され、注文確認画面まで進める",
+              "actual": "商品APIが返す在庫数は0でカート追加後も変化していないことを確認",
+              "remarks": "3/3",
+              "reproducibility": "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
+            "sections": {
+              "detail": "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 在庫数を0にした商品をカートへ追加する\n上記について継続して確認が必要です。",
+              "expected": "在庫切れの商品はカートに追加できないこと\n上記について継続して確認が必要です。",
+              "actual": "在庫切れの商品がカートに追加され、注文確認画面まで進める\n上記について継続して確認が必要です。",
+              "remarks": "商品APIが返す在庫数は0でカート追加後も変化していないことを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "inventory-over-shipment": {
+      "scenarioId": "inventory-over-shipment",
+      "rubricVersion": "inventory-over-shipment.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+            "sections": {
+              "detail": "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう",
+              "preconditions": "対象商品の在庫とロットが登録されていること",
+              "steps": "1. 現在庫を超える出庫数を入力して登録する",
+              "expected": "在庫数を超える出庫はエラーになること",
+              "actual": "在庫数5個に対して出庫数8個の登録が成功する",
+              "remarks": "登録後の在庫数はマイナス3と表示されることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+            "sections": {
+              "detail": "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象商品の在庫とロットが登録されていること",
+              "steps": "1. 現在庫を超える出庫数を入力して登録する",
+              "expected": "在庫数を超える出庫はエラーになること",
+              "actual": "在庫数5個に対して出庫数8個の登録が成功する",
+              "remarks": "登録後の在庫数はマイナス3と表示されることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+            "sections": {
+              "detail": "対象商品の在庫とロットが登録されていること",
+              "preconditions": "1. 現在庫を超える出庫数を入力して登録する",
+              "steps": "在庫数を超える出庫はエラーになること",
+              "expected": "在庫数5個に対して出庫数8個の登録が成功する",
+              "actual": "登録後の在庫数はマイナス3と表示されることを確認",
+              "remarks": "3/3",
+              "reproducibility": "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
+            "sections": {
+              "detail": "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "対象商品の在庫とロットが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 現在庫を超える出庫数を入力して登録する\n上記について継続して確認が必要です。",
+              "expected": "在庫数を超える出庫はエラーになること\n上記について継続して確認が必要です。",
+              "actual": "在庫数5個に対して出庫数8個の登録が成功する\n上記について継続して確認が必要です。",
+              "remarks": "登録後の在庫数はマイナス3と表示されることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "mobile-rotation-clears-input": {
+      "scenarioId": "mobile-rotation-clears-input",
+      "rubricVersion": "mobile-rotation-clears-input.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
+            "sections": {
+              "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "steps": "1. 入力フォームへ内容を入力したまま端末を回転する",
+              "expected": "画面回転後も入力内容が保持されること",
+              "actual": "画面回転後、入力済みの120文字がすべて消える",
+              "remarks": "回転前の入力内容はサーバーへ送信されていないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により問い合わせフォームで画面回転後に入力内容が消えてしまう",
+            "sections": {
+              "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "steps": "1. 入力フォームへ内容を入力したまま端末を回転する",
+              "expected": "画面回転後も入力内容が保持されること",
+              "actual": "画面回転後、入力済みの120文字がすべて消える",
+              "remarks": "回転前の入力内容はサーバーへ送信されていないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
+            "sections": {
+              "detail": "テスト端末に対象ビルドがインストールされていること",
+              "preconditions": "1. 入力フォームへ内容を入力したまま端末を回転する",
+              "steps": "画面回転後も入力内容が保持されること",
+              "expected": "画面回転後、入力済みの120文字がすべて消える",
+              "actual": "回転前の入力内容はサーバーへ送信されていないことを確認",
+              "remarks": "3/3",
+              "reproducibility": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
+            "sections": {
+              "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
+              "steps": "1. 入力フォームへ内容を入力したまま端末を回転する\n上記について継続して確認が必要です。",
+              "expected": "画面回転後も入力内容が保持されること\n上記について継続して確認が必要です。",
+              "actual": "画面回転後、入力済みの120文字がすべて消える\n上記について継続して確認が必要です。",
+              "remarks": "回転前の入力内容はサーバーへ送信されていないことを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-speed-display-delay": {
+      "scenarioId": "automotive-speed-display-delay",
+      "rubricVersion": "automotive-speed-display-delay.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+            "sections": {
+              "detail": "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう",
+              "preconditions": "CANoeをテスト車両へ接続していること",
+              "steps": "1. CANoeから車速信号を変更してメーター表示を確認する",
+              "expected": "車速信号の変更から200ms以内にメーター速度表示が更新されること",
+              "actual": "車速信号の変更から表示更新まで最大1.2秒かかる",
+              "remarks": "CANログ上では車速信号が即時に80km/hへ更新されていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+            "sections": {
+              "detail": "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "CANoeをテスト車両へ接続していること",
+              "steps": "1. CANoeから車速信号を変更してメーター表示を確認する",
+              "expected": "車速信号の変更から200ms以内にメーター速度表示が更新されること",
+              "actual": "車速信号の変更から表示更新まで最大1.2秒かかる",
+              "remarks": "CANログ上では車速信号が即時に80km/hへ更新されていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+            "sections": {
+              "detail": "CANoeをテスト車両へ接続していること",
+              "preconditions": "1. CANoeから車速信号を変更してメーター表示を確認する",
+              "steps": "車速信号の変更から200ms以内にメーター速度表示が更新されること",
+              "expected": "車速信号の変更から表示更新まで最大1.2秒かかる",
+              "actual": "CANログ上では車速信号が即時に80km/hへ更新されていることを確認",
+              "remarks": "3/3",
+              "reproducibility": "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
+            "sections": {
+              "detail": "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "CANoeをテスト車両へ接続していること\n上記について継続して確認が必要です。",
+              "steps": "1. CANoeから車速信号を変更してメーター表示を確認する\n上記について継続して確認が必要です。",
+              "expected": "車速信号の変更から200ms以内にメーター速度表示が更新されること\n上記について継続して確認が必要です。",
+              "actual": "車速信号の変更から表示更新まで最大1.2秒かかる\n上記について継続して確認が必要です。",
+              "remarks": "CANログ上では車速信号が即時に80km/hへ更新されていることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "payment-failed-payment-sales-record": {
+      "scenarioId": "payment-failed-payment-sales-record",
+      "rubricVersion": "payment-failed-payment-sales-record.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+            "sections": {
+              "detail": "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+              "steps": "1. 失敗応答となるテスト決済を実行して売上データを確認する",
+              "expected": "決済失敗時は売上が計上されないこと",
+              "actual": "決済失敗後も12,800円の売上データが作成される",
+              "remarks": "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+            "sections": {
+              "detail": "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+              "steps": "1. 失敗応答となるテスト決済を実行して売上データを確認する",
+              "expected": "決済失敗時は売上が計上されないこと",
+              "actual": "決済失敗後も12,800円の売上データが作成される",
+              "remarks": "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+            "sections": {
+              "detail": "Sandbox環境でテスト加盟店を利用できること",
+              "preconditions": "1. 失敗応答となるテスト決済を実行して売上データを確認する",
+              "steps": "決済失敗時は売上が計上されないこと",
+              "expected": "決済失敗後も12,800円の売上データが作成される",
+              "actual": "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認",
+              "remarks": "3/3",
+              "reproducibility": "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
+            "sections": {
+              "detail": "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること\n上記について継続して確認が必要です。",
+              "steps": "1. 失敗応答となるテスト決済を実行して売上データを確認する\n上記について継続して確認が必要です。",
+              "expected": "決済失敗時は売上が計上されないこと\n上記について継続して確認が必要です。",
+              "actual": "決済失敗後も12,800円の売上データが作成される\n上記について継続して確認が必要です。",
+              "remarks": "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "medical-cross-patient-results": {
+      "scenarioId": "medical-cross-patient-results",
+      "rubricVersion": "medical-cross-patient-results.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
+            "sections": {
+              "detail": "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう",
+              "preconditions": "テスト患者と検査・処方データが登録されていること",
+              "steps": "1. 患者Aの検査結果を表示した後に患者Bへ切り替える",
+              "expected": "選択した患者の検査結果だけが表示されること",
+              "actual": "患者Bへ切替後も患者Aの検査結果3件が表示される",
+              "remarks": "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により患者切替後も別の患者の検査結果が表示されてしまう",
+            "sections": {
+              "detail": "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト患者と検査・処方データが登録されていること",
+              "steps": "1. 患者Aの検査結果を表示した後に患者Bへ切り替える",
+              "expected": "選択した患者の検査結果だけが表示されること",
+              "actual": "患者Bへ切替後も患者Aの検査結果3件が表示される",
+              "remarks": "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
+            "sections": {
+              "detail": "テスト患者と検査・処方データが登録されていること",
+              "preconditions": "1. 患者Aの検査結果を表示した後に患者Bへ切り替える",
+              "steps": "選択した患者の検査結果だけが表示されること",
+              "expected": "患者Bへ切替後も患者Aの検査結果3件が表示される",
+              "actual": "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認",
+              "remarks": "3/3",
+              "reproducibility": "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
+            "sections": {
+              "detail": "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "テスト患者と検査・処方データが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 患者Aの検査結果を表示した後に患者Bへ切り替える\n上記について継続して確認が必要です。",
+              "expected": "選択した患者の検査結果だけが表示されること\n上記について継続して確認が必要です。",
+              "actual": "患者Bへ切替後も患者Aの検査結果3件が表示される\n上記について継続して確認が必要です。",
+              "remarks": "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "attendance-overnight-break-not-deducted": {
+      "scenarioId": "attendance-overnight-break-not-deducted",
+      "rubricVersion": "attendance-overnight-break-not-deducted.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+            "sections": {
+              "detail": "22:00から翌日07:00までの勤務に翌日01:00から02:00の休憩を登録すると、実労働時間が8時間ではなく9時間として集計されてしまうことがある",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+              "steps": "1. 日付をまたぐ勤務に翌日分の休憩を登録する",
+              "expected": "翌日分を含む1時間の休憩を控除し、実労働時間を8時間とすること",
+              "actual": "1時間の休憩が控除されず、実労働時間が9時間として集計される",
+              "remarks": "同日内で完結する休憩は正しく控除されることを確認",
+              "reproducibility": "2/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+            "sections": {
+              "detail": "22:00から翌日07:00までの勤務に翌日01:00から02:00の休憩を登録すると、実労働時間が8時間ではなく9時間として集計されてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+              "steps": "1. 日付をまたぐ勤務に翌日分の休憩を登録する",
+              "expected": "翌日分を含む1時間の休憩を控除し、実労働時間を8時間とすること",
+              "actual": "1時間の休憩が控除されず、実労働時間が9時間として集計される",
+              "remarks": "同日内で完結する休憩は正しく控除されることを確認",
+              "reproducibility": "2/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+            "sections": {
+              "detail": "テスト対象の従業員と勤務予定が登録されていること",
+              "preconditions": "1. 日付をまたぐ勤務に翌日分の休憩を登録する",
+              "steps": "翌日分を含む1時間の休憩を控除し、実労働時間を8時間とすること",
+              "expected": "1時間の休憩が控除されず、実労働時間が9時間として集計される",
+              "actual": "同日内で完結する休憩は正しく控除されることを確認",
+              "remarks": "2/5",
+              "reproducibility": "22:00から翌日07:00までの勤務に翌日01:00から02:00の休憩を登録すると、実労働時間が8時間ではなく9時間として集計されてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
+            "sections": {
+              "detail": "22:00から翌日07:00までの勤務に翌日01:00から02:00の休憩を登録すると、実労働時間が8時間ではなく9時間として集計されてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 日付をまたぐ勤務に翌日分の休憩を登録する\n上記について継続して確認が必要です。",
+              "expected": "翌日分を含む1時間の休憩を控除し、実労働時間を8時間とすること\n上記について継続して確認が必要です。",
+              "actual": "1時間の休憩が控除されず、実労働時間が9時間として集計される\n上記について継続して確認が必要です。",
+              "remarks": "同日内で完結する休憩は正しく控除されることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "2/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "attendance-simultaneous-clock-out-double-overtime": {
+      "scenarioId": "attendance-simultaneous-clock-out-double-overtime",
+      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+            "sections": {
+              "detail": "月末処理中に2台の端末から同じ従業員の退勤打刻を同時に送信すると、30分の残業が60分として集計されてしまうことがある",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+              "steps": "1. 月末処理中に複数端末から同時に打刻する",
+              "expected": "同じ退勤打刻を一度だけ処理し、残業時間を30分として集計すること",
+              "actual": "同じ退勤打刻が2回処理され、残業時間が60分として集計される",
+              "remarks": "1台の端末から打刻した場合は二重計上されないことを確認",
+              "reproducibility": "1/20"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+            "sections": {
+              "detail": "月末処理中に2台の端末から同じ従業員の退勤打刻を同時に送信すると、30分の残業が60分として集計されてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること",
+              "steps": "1. 月末処理中に複数端末から同時に打刻する",
+              "expected": "同じ退勤打刻を一度だけ処理し、残業時間を30分として集計すること",
+              "actual": "同じ退勤打刻が2回処理され、残業時間が60分として集計される",
+              "remarks": "1台の端末から打刻した場合は二重計上されないことを確認",
+              "reproducibility": "1/20"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+            "sections": {
+              "detail": "テスト対象の従業員と勤務予定が登録されていること",
+              "preconditions": "1. 月末処理中に複数端末から同時に打刻する",
+              "steps": "同じ退勤打刻を一度だけ処理し、残業時間を30分として集計すること",
+              "expected": "同じ退勤打刻が2回処理され、残業時間が60分として集計される",
+              "actual": "1台の端末から打刻した場合は二重計上されないことを確認",
+              "remarks": "1/20",
+              "reproducibility": "月末処理中に2台の端末から同じ従業員の退勤打刻を同時に送信すると、30分の残業が60分として集計されてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
+            "sections": {
+              "detail": "月末処理中に2台の端末から同じ従業員の退勤打刻を同時に送信すると、30分の残業が60分として集計されてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "テスト対象の従業員と勤務予定が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 月末処理中に複数端末から同時に打刻する\n上記について継続して確認が必要です。",
+              "expected": "同じ退勤打刻を一度だけ処理し、残業時間を30分として集計すること\n上記について継続して確認が必要です。",
+              "actual": "同じ退勤打刻が2回処理され、残業時間が60分として集計される\n上記について継続して確認が必要です。",
+              "remarks": "1台の端末から打刻した場合は二重計上されないことを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/20\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "salon-cancelled-slot-remains-booked": {
+      "scenarioId": "salon-cancelled-slot-remains-booked",
+      "rubricVersion": "salon-cancelled-slot-remains-booked.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+            "sections": {
+              "detail": "14:00の予約をキャンセルしても対象時間帯が予約済みのまま表示され、新しい予約を登録できなくなってしまう",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+              "steps": "1. 確定済みの予約をキャンセルして対象時間帯を再表示する",
+              "expected": "キャンセルした時間帯を再度予約できること",
+              "actual": "キャンセルした14:00枠が予約済みのままで、新しい予約を登録できない",
+              "remarks": "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+            "sections": {
+              "detail": "14:00の予約をキャンセルしても対象時間帯が予約済みのまま表示され、新しい予約を登録できなくなってしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+              "steps": "1. 確定済みの予約をキャンセルして対象時間帯を再表示する",
+              "expected": "キャンセルした時間帯を再度予約できること",
+              "actual": "キャンセルした14:00枠が予約済みのままで、新しい予約を登録できない",
+              "remarks": "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+            "sections": {
+              "detail": "対象店舗の担当者と予約枠が登録されていること",
+              "preconditions": "1. 確定済みの予約をキャンセルして対象時間帯を再表示する",
+              "steps": "キャンセルした時間帯を再度予約できること",
+              "expected": "キャンセルした14:00枠が予約済みのままで、新しい予約を登録できない",
+              "actual": "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認",
+              "remarks": "3/3",
+              "reproducibility": "14:00の予約をキャンセルしても対象時間帯が予約済みのまま表示され、新しい予約を登録できなくなってしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
+            "sections": {
+              "detail": "14:00の予約をキャンセルしても対象時間帯が予約済みのまま表示され、新しい予約を登録できなくなってしまう\n上記について継続して確認が必要です。",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 確定済みの予約をキャンセルして対象時間帯を再表示する\n上記について継続して確認が必要です。",
+              "expected": "キャンセルした時間帯を再度予約できること\n上記について継続して確認が必要です。",
+              "actual": "キャンセルした14:00枠が予約済みのままで、新しい予約を登録できない\n上記について継続して確認が必要です。",
+              "remarks": "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "salon-simultaneous-double-booking": {
+      "scenarioId": "salon-simultaneous-double-booking",
+      "rubricVersion": "salon-simultaneous-double-booking.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+            "sections": {
+              "detail": "2台の端末から300ms以内に同じ担当者の14:00枠を確定すると、それぞれ異なる予約番号で2件登録されてしまうことがある",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+              "steps": "1. 別端末から同じ担当者と時間帯の予約を同時に確定する",
+              "expected": "先に確定した予約だけが登録されること",
+              "actual": "同じ担当者の14:00枠が異なる予約番号で2件登録される",
+              "remarks": "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認",
+              "reproducibility": "1/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+            "sections": {
+              "detail": "2台の端末から300ms以内に同じ担当者の14:00枠を確定すると、それぞれ異なる予約番号で2件登録されてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること",
+              "steps": "1. 別端末から同じ担当者と時間帯の予約を同時に確定する",
+              "expected": "先に確定した予約だけが登録されること",
+              "actual": "同じ担当者の14:00枠が異なる予約番号で2件登録される",
+              "remarks": "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認",
+              "reproducibility": "1/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+            "sections": {
+              "detail": "対象店舗の担当者と予約枠が登録されていること",
+              "preconditions": "1. 別端末から同じ担当者と時間帯の予約を同時に確定する",
+              "steps": "先に確定した予約だけが登録されること",
+              "expected": "同じ担当者の14:00枠が異なる予約番号で2件登録される",
+              "actual": "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認",
+              "remarks": "1/10",
+              "reproducibility": "2台の端末から300ms以内に同じ担当者の14:00枠を確定すると、それぞれ異なる予約番号で2件登録されてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
+            "sections": {
+              "detail": "2台の端末から300ms以内に同じ担当者の14:00枠を確定すると、それぞれ異なる予約番号で2件登録されてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "対象店舗の担当者と予約枠が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 別端末から同じ担当者と時間帯の予約を同時に確定する\n上記について継続して確認が必要です。",
+              "expected": "先に確定した予約だけが登録されること\n上記について継続して確認が必要です。",
+              "actual": "同じ担当者の14:00枠が異なる予約番号で2件登録される\n上記について継続して確認が必要です。",
+              "remarks": "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "ec-tax-rounding-inconsistent": {
+      "scenarioId": "ec-tax-rounding-inconsistent",
+      "rubricVersion": "ec-tax-rounding-inconsistent.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+            "sections": {
+              "detail": "税抜105円・税率10%の同一条件でも、商品Aは115円、商品Bは116円と異なる税込価格が表示されてしまう",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること",
+              "steps": "1. 同じ税率を設定した複数商品の税込価格を表示する",
+              "expected": "設定された切り捨て処理を適用し、どちらも税込115円と表示すること",
+              "actual": "同じ税条件でも商品Aは115円、商品Bは116円と表示される",
+              "remarks": "カート合計は115円で商品一覧の表示だけが116円であることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+            "sections": {
+              "detail": "税抜105円・税率10%の同一条件でも、商品Aは115円、商品Bは116円と異なる税込価格が表示されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること",
+              "steps": "1. 同じ税率を設定した複数商品の税込価格を表示する",
+              "expected": "設定された切り捨て処理を適用し、どちらも税込115円と表示すること",
+              "actual": "同じ税条件でも商品Aは115円、商品Bは116円と表示される",
+              "remarks": "カート合計は115円で商品一覧の表示だけが116円であることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+            "sections": {
+              "detail": "テスト商品と購入者アカウントが登録されていること",
+              "preconditions": "1. 同じ税率を設定した複数商品の税込価格を表示する",
+              "steps": "設定された切り捨て処理を適用し、どちらも税込115円と表示すること",
+              "expected": "同じ税条件でも商品Aは115円、商品Bは116円と表示される",
+              "actual": "カート合計は115円で商品一覧の表示だけが116円であることを確認",
+              "remarks": "3/3",
+              "reproducibility": "税抜105円・税率10%の同一条件でも、商品Aは115円、商品Bは116円と異なる税込価格が表示されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
+            "sections": {
+              "detail": "税抜105円・税率10%の同一条件でも、商品Aは115円、商品Bは116円と異なる税込価格が表示されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 同じ税率を設定した複数商品の税込価格を表示する\n上記について継続して確認が必要です。",
+              "expected": "設定された切り捨て処理を適用し、どちらも税込115円と表示すること\n上記について継続して確認が必要です。",
+              "actual": "同じ税条件でも商品Aは115円、商品Bは116円と表示される\n上記について継続して確認が必要です。",
+              "remarks": "カート合計は115円で商品一覧の表示だけが116円であることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "ec-payment-notification-double-order": {
+      "scenarioId": "ec-payment-notification-double-order",
+      "rubricVersion": "ec-payment-notification-double-order.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "決済通知ID「PAY-4821」を再送すると、1件の決済に対して異なる注文番号が2件発行されてしまうことがある",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること",
+              "steps": "1. 同じ決済通知を注文APIへ再送する",
+              "expected": "同じ通知を受信しても注文を一度だけ確定すること",
+              "actual": "1件の決済に対して異なる注文番号が2件発行される",
+              "remarks": "再送前後の通知IDと決済IDは同一であることを確認",
+              "reproducibility": "1/15"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "決済通知ID「PAY-4821」を再送すると、1件の決済に対して異なる注文番号が2件発行されてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること",
+              "steps": "1. 同じ決済通知を注文APIへ再送する",
+              "expected": "同じ通知を受信しても注文を一度だけ確定すること",
+              "actual": "1件の決済に対して異なる注文番号が2件発行される",
+              "remarks": "再送前後の通知IDと決済IDは同一であることを確認",
+              "reproducibility": "1/15"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "テスト商品と購入者アカウントが登録されていること",
+              "preconditions": "1. 同じ決済通知を注文APIへ再送する",
+              "steps": "同じ通知を受信しても注文を一度だけ確定すること",
+              "expected": "1件の決済に対して異なる注文番号が2件発行される",
+              "actual": "再送前後の通知IDと決済IDは同一であることを確認",
+              "remarks": "1/15",
+              "reproducibility": "決済通知ID「PAY-4821」を再送すると、1件の決済に対して異なる注文番号が2件発行されてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "決済通知ID「PAY-4821」を再送すると、1件の決済に対して異なる注文番号が2件発行されてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "テスト商品と購入者アカウントが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 同じ決済通知を注文APIへ再送する\n上記について継続して確認が必要です。",
+              "expected": "同じ通知を受信しても注文を一度だけ確定すること\n上記について継続して確認が必要です。",
+              "actual": "1件の決済に対して異なる注文番号が2件発行される\n上記について継続して確認が必要です。",
+              "remarks": "再送前後の通知IDと決済IDは同一であることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/15\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "inventory-expired-lot-fifo": {
+      "scenarioId": "inventory-expired-lot-fifo",
+      "rubricVersion": "inventory-expired-lot-fifo.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+            "sections": {
+              "detail": "出庫候補を表示すると、有効期限が2026年7月26日のロットが期限内の8月31日ロットより先に表示されてしまう",
+              "preconditions": "対象商品の在庫とロットが登録されていること",
+              "steps": "1. 期限切れロットを含む商品の出庫候補を表示する",
+              "expected": "有効期限内のロットだけが出庫候補になること",
+              "actual": "期限切れの7月26日ロットが出庫候補の先頭に表示される",
+              "remarks": "期限判定に使用するサーバー日時は2026年7月27日であることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+            "sections": {
+              "detail": "出庫候補を表示すると、有効期限が2026年7月26日のロットが期限内の8月31日ロットより先に表示されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象商品の在庫とロットが登録されていること",
+              "steps": "1. 期限切れロットを含む商品の出庫候補を表示する",
+              "expected": "有効期限内のロットだけが出庫候補になること",
+              "actual": "期限切れの7月26日ロットが出庫候補の先頭に表示される",
+              "remarks": "期限判定に使用するサーバー日時は2026年7月27日であることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+            "sections": {
+              "detail": "対象商品の在庫とロットが登録されていること",
+              "preconditions": "1. 期限切れロットを含む商品の出庫候補を表示する",
+              "steps": "有効期限内のロットだけが出庫候補になること",
+              "expected": "期限切れの7月26日ロットが出庫候補の先頭に表示される",
+              "actual": "期限判定に使用するサーバー日時は2026年7月27日であることを確認",
+              "remarks": "3/3",
+              "reproducibility": "出庫候補を表示すると、有効期限が2026年7月26日のロットが期限内の8月31日ロットより先に表示されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
+            "sections": {
+              "detail": "出庫候補を表示すると、有効期限が2026年7月26日のロットが期限内の8月31日ロットより先に表示されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "対象商品の在庫とロットが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 期限切れロットを含む商品の出庫候補を表示する\n上記について継続して確認が必要です。",
+              "expected": "有効期限内のロットだけが出庫候補になること\n上記について継続して確認が必要です。",
+              "actual": "期限切れの7月26日ロットが出庫候補の先頭に表示される\n上記について継続して確認が必要です。",
+              "remarks": "期限判定に使用するサーバー日時は2026年7月27日であることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "inventory-simultaneous-shipment-negative-stock": {
+      "scenarioId": "inventory-simultaneous-shipment-negative-stock",
+      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+            "sections": {
+              "detail": "在庫1個の商品を2台の端末から同時に1個ずつ出庫すると、2件とも登録に成功し、在庫数がマイナス1になってしまうことがある",
+              "preconditions": "対象商品の在庫とロットが登録されていること",
+              "steps": "1. 複数端末から同じ商品の出庫を同時に確定する",
+              "expected": "先に確定した出庫だけを登録し、2件目は在庫不足として処理すること",
+              "actual": "2件の出庫がともに成功し、在庫数がマイナス1になる",
+              "remarks": "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認",
+              "reproducibility": "2/30"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+            "sections": {
+              "detail": "在庫1個の商品を2台の端末から同時に1個ずつ出庫すると、2件とも登録に成功し、在庫数がマイナス1になってしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象商品の在庫とロットが登録されていること",
+              "steps": "1. 複数端末から同じ商品の出庫を同時に確定する",
+              "expected": "先に確定した出庫だけを登録し、2件目は在庫不足として処理すること",
+              "actual": "2件の出庫がともに成功し、在庫数がマイナス1になる",
+              "remarks": "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認",
+              "reproducibility": "2/30"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+            "sections": {
+              "detail": "対象商品の在庫とロットが登録されていること",
+              "preconditions": "1. 複数端末から同じ商品の出庫を同時に確定する",
+              "steps": "先に確定した出庫だけを登録し、2件目は在庫不足として処理すること",
+              "expected": "2件の出庫がともに成功し、在庫数がマイナス1になる",
+              "actual": "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認",
+              "remarks": "2/30",
+              "reproducibility": "在庫1個の商品を2台の端末から同時に1個ずつ出庫すると、2件とも登録に成功し、在庫数がマイナス1になってしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
+            "sections": {
+              "detail": "在庫1個の商品を2台の端末から同時に1個ずつ出庫すると、2件とも登録に成功し、在庫数がマイナス1になってしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "対象商品の在庫とロットが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 複数端末から同じ商品の出庫を同時に確定する\n上記について継続して確認が必要です。",
+              "expected": "先に確定した出庫だけを登録し、2件目は在庫不足として処理すること\n上記について継続して確認が必要です。",
+              "actual": "2件の出庫がともに成功し、在庫数がマイナス1になる\n上記について継続して確認が必要です。",
+              "remarks": "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "2/30\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "mobile-notification-opens-wrong-news": {
+      "scenarioId": "mobile-notification-opens-wrong-news",
+      "rubricVersion": "mobile-notification-opens-wrong-news.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+            "sections": {
+              "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "steps": "1. テスト通知を送信して端末の通知をタップする",
+              "expected": "タップした通知に対応するお知らせを表示すること",
+              "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
+              "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
+              "reproducibility": "2/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりプッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+            "sections": {
+              "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "steps": "1. テスト通知を送信して端末の通知をタップする",
+              "expected": "タップした通知に対応するお知らせを表示すること",
+              "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
+              "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
+              "reproducibility": "2/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+            "sections": {
+              "detail": "テスト端末に対象ビルドがインストールされていること",
+              "preconditions": "1. テスト通知を送信して端末の通知をタップする",
+              "steps": "タップした通知に対応するお知らせを表示すること",
+              "expected": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
+              "actual": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
+              "remarks": "2/5",
+              "reproducibility": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
+            "sections": {
+              "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
+              "steps": "1. テスト通知を送信して端末の通知をタップする\n上記について継続して確認が必要です。",
+              "expected": "タップした通知に対応するお知らせを表示すること\n上記について継続して確認が必要です。",
+              "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される\n上記について継続して確認が必要です。",
+              "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "2/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "mobile-background-sync-data-lost": {
+      "scenarioId": "mobile-background-sync-data-lost",
+      "rubricVersion": "mobile-background-sync-data-lost.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
+            "sections": {
+              "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+              "expected": "未送信データを保持して復帰後に同期すること",
+              "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
+              "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+              "reproducibility": "1/25"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりバックグラウンド復帰後に未送信データが消えてしまうことがある",
+            "sections": {
+              "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+              "expected": "未送信データを保持して復帰後に同期すること",
+              "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
+              "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+              "reproducibility": "1/25"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
+            "sections": {
+              "detail": "テスト端末に対象ビルドがインストールされていること",
+              "preconditions": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+              "steps": "未送信データを保持して復帰後に同期すること",
+              "expected": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
+              "actual": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+              "remarks": "1/25",
+              "reproducibility": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
+            "sections": {
+              "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "テスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
+              "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する\n上記について継続して確認が必要です。",
+              "expected": "未送信データを保持して復帰後に同期すること\n上記について継続して確認が必要です。",
+              "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する\n上記について継続して確認が必要です。",
+              "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/25\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-can-byte-order-reversed": {
+      "scenarioId": "automotive-can-byte-order-reversed",
+      "rubricVersion": "automotive-can-byte-order-reversed.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+            "sections": {
+              "detail": "DBCでリトルエンディアンと定義された信号に0x0BB8を送信すると、期待値30.00Vに対してメーターに471.15Vと表示されてしまう",
+              "preconditions": "CANoeをテスト車両へ接続していること",
+              "steps": "1. CANoeから既知のCAN信号を送信して復号値を確認する",
+              "expected": "DBC定義のバイト順でCAN信号を復号すること",
+              "actual": "受信値0x0BB8に対し、期待値30.00Vではなく471.15Vと表示される",
+              "remarks": "CANoeの送信フレームはDBC定義と一致していることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+            "sections": {
+              "detail": "DBCでリトルエンディアンと定義された信号に0x0BB8を送信すると、期待値30.00Vに対してメーターに471.15Vと表示されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "CANoeをテスト車両へ接続していること",
+              "steps": "1. CANoeから既知のCAN信号を送信して復号値を確認する",
+              "expected": "DBC定義のバイト順でCAN信号を復号すること",
+              "actual": "受信値0x0BB8に対し、期待値30.00Vではなく471.15Vと表示される",
+              "remarks": "CANoeの送信フレームはDBC定義と一致していることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+            "sections": {
+              "detail": "CANoeをテスト車両へ接続していること",
+              "preconditions": "1. CANoeから既知のCAN信号を送信して復号値を確認する",
+              "steps": "DBC定義のバイト順でCAN信号を復号すること",
+              "expected": "受信値0x0BB8に対し、期待値30.00Vではなく471.15Vと表示される",
+              "actual": "CANoeの送信フレームはDBC定義と一致していることを確認",
+              "remarks": "3/3",
+              "reproducibility": "DBCでリトルエンディアンと定義された信号に0x0BB8を送信すると、期待値30.00Vに対してメーターに471.15Vと表示されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
+            "sections": {
+              "detail": "DBCでリトルエンディアンと定義された信号に0x0BB8を送信すると、期待値30.00Vに対してメーターに471.15Vと表示されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "CANoeをテスト車両へ接続していること\n上記について継続して確認が必要です。",
+              "steps": "1. CANoeから既知のCAN信号を送信して復号値を確認する\n上記について継続して確認が必要です。",
+              "expected": "DBC定義のバイト順でCAN信号を復号すること\n上記について継続して確認が必要です。",
+              "actual": "受信値0x0BB8に対し、期待値30.00Vではなく471.15Vと表示される\n上記について継続して確認が必要です。",
+              "remarks": "CANoeの送信フレームはDBC定義と一致していることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-bus-off-recovery-receive-stopped": {
+      "scenarioId": "automotive-bus-off-recovery-receive-stopped",
+      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+            "sections": {
+              "detail": "CANバス負荷率90%以上の状態でBus-Offを発生させて復帰処理を実行しても、解除から30秒経過後もADAS ECUのCAN受信が再開されないことがある",
+              "preconditions": "CANoeを接続しCANバスを高負荷状態にしていること",
+              "steps": "1. CANoeでADAS ECUに送信エラーを連続発生させる\n2. ADAS ECUがBus-Offへ遷移したことを確認する\n3. 送信エラーを解除する\n4. 規定のBus-Off復帰処理を実行する",
+              "expected": "Bus-Off解除後500ms以内にADAS ECUのCAN受信を再開すること",
+              "actual": "Bus-Off解除から30秒経過後もADAS ECUのCAN受信が再開されない",
+              "remarks": "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認",
+              "reproducibility": "1/50"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+            "sections": {
+              "detail": "CANバス負荷率90%以上の状態でBus-Offを発生させて復帰処理を実行しても、解除から30秒経過後もADAS ECUのCAN受信が再開されないことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "CANoeを接続しCANバスを高負荷状態にしていること",
+              "steps": "1. CANoeでADAS ECUに送信エラーを連続発生させる\n2. ADAS ECUがBus-Offへ遷移したことを確認する\n3. 送信エラーを解除する\n4. 規定のBus-Off復帰処理を実行する",
+              "expected": "Bus-Off解除後500ms以内にADAS ECUのCAN受信を再開すること",
+              "actual": "Bus-Off解除から30秒経過後もADAS ECUのCAN受信が再開されない",
+              "remarks": "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認",
+              "reproducibility": "1/50"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+            "sections": {
+              "detail": "CANoeを接続しCANバスを高負荷状態にしていること",
+              "preconditions": "1. CANoeでADAS ECUに送信エラーを連続発生させる\n2. ADAS ECUがBus-Offへ遷移したことを確認する\n3. 送信エラーを解除する\n4. 規定のBus-Off復帰処理を実行する",
+              "steps": "Bus-Off解除後500ms以内にADAS ECUのCAN受信を再開すること",
+              "expected": "Bus-Off解除から30秒経過後もADAS ECUのCAN受信が再開されない",
+              "actual": "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認",
+              "remarks": "1/50",
+              "reproducibility": "CANバス負荷率90%以上の状態でBus-Offを発生させて復帰処理を実行しても、解除から30秒経過後もADAS ECUのCAN受信が再開されないことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
+            "sections": {
+              "detail": "CANバス負荷率90%以上の状態でBus-Offを発生させて復帰処理を実行しても、解除から30秒経過後もADAS ECUのCAN受信が再開されないことがある\n上記について継続して確認が必要です。",
+              "preconditions": "CANoeを接続しCANバスを高負荷状態にしていること\n上記について継続して確認が必要です。",
+              "steps": "1. CANoeでADAS ECUに送信エラーを連続発生させる\n2. ADAS ECUがBus-Offへ遷移したことを確認する\n3. 送信エラーを解除する\n4. 規定のBus-Off復帰処理を実行する\n上記について継続して確認が必要です。",
+              "expected": "Bus-Off解除後500ms以内にADAS ECUのCAN受信を再開すること\n上記について継続して確認が必要です。",
+              "actual": "Bus-Off解除から30秒経過後もADAS ECUのCAN受信が再開されない\n上記について継続して確認が必要です。",
+              "remarks": "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/50\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "payment-idempotency-key-double-charge": {
+      "scenarioId": "payment-idempotency-key-double-charge",
+      "rubricVersion": "payment-idempotency-key-double-charge.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "5,000円の決済に使用した冪等キーで10秒後に同額の決済を再試行すると、異なる取引IDで売上が2件確定してしまうことがある",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+              "steps": "1. 同じ冪等キーで決済APIを再試行する",
+              "expected": "同じ冪等キーには最初の処理結果を返すこと",
+              "actual": "同じ冪等キーに対し、異なる取引IDで売上が2件確定する",
+              "remarks": "2回のリクエストで冪等キーと決済内容は一致していることを確認",
+              "reproducibility": "2/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "5,000円の決済に使用した冪等キーで10秒後に同額の決済を再試行すると、異なる取引IDで売上が2件確定してしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+              "steps": "1. 同じ冪等キーで決済APIを再試行する",
+              "expected": "同じ冪等キーには最初の処理結果を返すこと",
+              "actual": "同じ冪等キーに対し、異なる取引IDで売上が2件確定する",
+              "remarks": "2回のリクエストで冪等キーと決済内容は一致していることを確認",
+              "reproducibility": "2/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "Sandbox環境でテスト加盟店を利用できること",
+              "preconditions": "1. 同じ冪等キーで決済APIを再試行する",
+              "steps": "同じ冪等キーには最初の処理結果を返すこと",
+              "expected": "同じ冪等キーに対し、異なる取引IDで売上が2件確定する",
+              "actual": "2回のリクエストで冪等キーと決済内容は一致していることを確認",
+              "remarks": "2/10",
+              "reproducibility": "5,000円の決済に使用した冪等キーで10秒後に同額の決済を再試行すると、異なる取引IDで売上が2件確定してしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
+            "sections": {
+              "detail": "5,000円の決済に使用した冪等キーで10秒後に同額の決済を再試行すると、異なる取引IDで売上が2件確定してしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること\n上記について継続して確認が必要です。",
+              "steps": "1. 同じ冪等キーで決済APIを再試行する\n上記について継続して確認が必要です。",
+              "expected": "同じ冪等キーには最初の処理結果を返すこと\n上記について継続して確認が必要です。",
+              "actual": "同じ冪等キーに対し、異なる取引IDで売上が2件確定する\n上記について継続して確認が必要です。",
+              "remarks": "2回のリクエストで冪等キーと決済内容は一致していることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "2/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "payment-timeout-authorization-remains": {
+      "scenarioId": "payment-timeout-authorization-remains",
+      "rubricVersion": "payment-timeout-authorization-remains.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+            "sections": {
+              "detail": "30秒でタイムアウトした取引を再照会すると決済失敗となっているが、50,000円の与信枠が15分後も残ってしまうことがある",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+              "steps": "1. 応答をタイムアウトさせて取引と与信の状態を確認する",
+              "expected": "再照会で決済失敗を確定した場合、5分以内に与信を取り消すこと",
+              "actual": "決済失敗の確定から15分後も50,000円の与信枠が残っている",
+              "remarks": "売上確定と売上取消は発生せず与信だけが残っていることを確認",
+              "reproducibility": "1/40"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+            "sections": {
+              "detail": "30秒でタイムアウトした取引を再照会すると決済失敗となっているが、50,000円の与信枠が15分後も残ってしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること",
+              "steps": "1. 応答をタイムアウトさせて取引と与信の状態を確認する",
+              "expected": "再照会で決済失敗を確定した場合、5分以内に与信を取り消すこと",
+              "actual": "決済失敗の確定から15分後も50,000円の与信枠が残っている",
+              "remarks": "売上確定と売上取消は発生せず与信だけが残っていることを確認",
+              "reproducibility": "1/40"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+            "sections": {
+              "detail": "Sandbox環境でテスト加盟店を利用できること",
+              "preconditions": "1. 応答をタイムアウトさせて取引と与信の状態を確認する",
+              "steps": "再照会で決済失敗を確定した場合、5分以内に与信を取り消すこと",
+              "expected": "決済失敗の確定から15分後も50,000円の与信枠が残っている",
+              "actual": "売上確定と売上取消は発生せず与信だけが残っていることを確認",
+              "remarks": "1/40",
+              "reproducibility": "30秒でタイムアウトした取引を再照会すると決済失敗となっているが、50,000円の与信枠が15分後も残ってしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
+            "sections": {
+              "detail": "30秒でタイムアウトした取引を再照会すると決済失敗となっているが、50,000円の与信枠が15分後も残ってしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "Sandbox環境でテスト加盟店を利用できること\n上記について継続して確認が必要です。",
+              "steps": "1. 応答をタイムアウトさせて取引と与信の状態を確認する\n上記について継続して確認が必要です。",
+              "expected": "再照会で決済失敗を確定した場合、5分以内に与信を取り消すこと\n上記について継続して確認が必要です。",
+              "actual": "決済失敗の確定から15分後も50,000円の与信枠が残っている\n上記について継続して確認が必要です。",
+              "remarks": "売上確定と売上取消は発生せず与信だけが残っていることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/40\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "medical-weight-conversion-dose-thousandfold": {
+      "scenarioId": "medical-weight-conversion-dose-thousandfold",
+      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+            "sections": {
+              "detail": "体重18,000gの患者に10mg/kgの薬剤を指定して自動計算すると、期待値180mgに対して180,000mgと算出されてしまう",
+              "preconditions": "テスト患者と検査・処方データが登録されていること",
+              "steps": "1. グラム単位の体重を連携して投薬量を自動計算する",
+              "expected": "体重18,000gを18kgへ変換し、投薬量を180mgと計算すること",
+              "actual": "投薬量が期待値180mgではなく180,000mgと算出される",
+              "remarks": "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+            "sections": {
+              "detail": "体重18,000gの患者に10mg/kgの薬剤を指定して自動計算すると、期待値180mgに対して180,000mgと算出されてしまう\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト患者と検査・処方データが登録されていること",
+              "steps": "1. グラム単位の体重を連携して投薬量を自動計算する",
+              "expected": "体重18,000gを18kgへ変換し、投薬量を180mgと計算すること",
+              "actual": "投薬量が期待値180mgではなく180,000mgと算出される",
+              "remarks": "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+            "sections": {
+              "detail": "テスト患者と検査・処方データが登録されていること",
+              "preconditions": "1. グラム単位の体重を連携して投薬量を自動計算する",
+              "steps": "体重18,000gを18kgへ変換し、投薬量を180mgと計算すること",
+              "expected": "投薬量が期待値180mgではなく180,000mgと算出される",
+              "actual": "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認",
+              "remarks": "3/3",
+              "reproducibility": "体重18,000gの患者に10mg/kgの薬剤を指定して自動計算すると、期待値180mgに対して180,000mgと算出されてしまう"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
+            "sections": {
+              "detail": "体重18,000gの患者に10mg/kgの薬剤を指定して自動計算すると、期待値180mgに対して180,000mgと算出されてしまう\n上記について継続して確認が必要です。",
+              "preconditions": "テスト患者と検査・処方データが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. グラム単位の体重を連携して投薬量を自動計算する\n上記について継続して確認が必要です。",
+              "expected": "体重18,000gを18kgへ変換し、投薬量を180mgと計算すること\n上記について継続して確認が必要です。",
+              "actual": "投薬量が期待値180mgではなく180,000mgと算出される\n上記について継続して確認が必要です。",
+              "remarks": "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "medical-lab-result-resend-duplicate": {
+      "scenarioId": "medical-lab-result-resend-duplicate",
+      "rubricVersion": "medical-lab-result-resend-duplicate.v1",
+      "fixtures": [
+        {
+          "fixtureId": "excellent",
+          "label": "見本と同等の必要情報がそろった回答",
+          "answer": {
+            "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+            "sections": {
+              "detail": "検査結果ID「LAB-9031」の連携データを再送すると、同じ測定時刻と測定値の結果が患者記録に2件登録されてしまうことがある",
+              "preconditions": "テスト患者と検査・処方データが登録されていること",
+              "steps": "1. 同じ検査結果IDの連携データを再送する",
+              "expected": "検査結果IDを使って重複登録を防止すること",
+              "actual": "同じ測定時刻と測定値の検査結果が患者記録に2件登録される",
+              "remarks": "重複した2件は検査結果IDと測定時刻が同一であることを確認",
+              "reproducibility": "1/30"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+            "sections": {
+              "detail": "対象画面で問題を確認しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-1",
+              "expected-1",
+              "actual-1"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+            "sections": {
+              "detail": "検査結果ID「LAB-9031」の連携データを再送すると、同じ測定時刻と測定値の結果が患者記録に2件登録されてしまうことがある\n原因は実装不備であることを確認しました。",
+              "preconditions": "テスト患者と検査・処方データが登録されていること",
+              "steps": "1. 同じ検査結果IDの連携データを再送する",
+              "expected": "検査結果IDを使って重複登録を防止すること",
+              "actual": "同じ測定時刻と測定値の検査結果が患者記録に2件登録される",
+              "remarks": "重複した2件は検査結果IDと測定時刻が同一であることを確認",
+              "reproducibility": "1/30"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+            "sections": {
+              "detail": "テスト患者と検査・処方データが登録されていること",
+              "preconditions": "1. 同じ検査結果IDの連携データを再送する",
+              "steps": "検査結果IDを使って重複登録を防止すること",
+              "expected": "同じ測定時刻と測定値の検査結果が患者記録に2件登録される",
+              "actual": "重複した2件は検査結果IDと測定時刻が同一であることを確認",
+              "remarks": "1/30",
+              "reproducibility": "検査結果ID「LAB-9031」の連携データを再送すると、同じ測定時刻と測定値の結果が患者記録に2件登録されてしまうことがある"
+            }
+          },
+          "expected": {
+            "scoreMin": 55,
+            "scoreMax": 90,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
+            "sections": {
+              "detail": "検査結果ID「LAB-9031」の連携データを再送すると、同じ測定時刻と測定値の結果が患者記録に2件登録されてしまうことがある\n上記について継続して確認が必要です。",
+              "preconditions": "テスト患者と検査・処方データが登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 同じ検査結果IDの連携データを再送する\n上記について継続して確認が必要です。",
+              "expected": "検査結果IDを使って重複登録を防止すること\n上記について継続して確認が必要です。",
+              "actual": "同じ測定時刻と測定値の検査結果が患者記録に2件登録される\n上記について継続して確認が必要です。",
+              "remarks": "重複した2件は検査結果IDと測定時刻が同一であることを確認\n上記について継続して確認が必要です。",
+              "reproducibility": "1/30\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    }
+  }
+}

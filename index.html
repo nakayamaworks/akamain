@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>あかマイン</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta name="theme-color" content="#cf2026" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./assets/images/brand/akamain-favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="stylesheet" href="./styles.css?v=20260805a" />
+  </head>
+  <body>
+    <div class="redmine-shell">
+      <header class="rm-topbar">
+        <div class="rm-topbar-meta">
+          <nav class="rm-meta-nav" aria-label="グローバルメニュー">
+            <button id="homeNavButton" class="rm-meta-link is-interactive is-active" type="button" aria-current="page">ホーム</button>
+            <button id="myPageNavButton" class="rm-meta-link is-interactive" type="button">マイページ</button>
+          </nav>
+          <div class="rm-meta-user">
+            <span id="authStatusLabel" class="rm-auth-status">未ログイン</span>
+            <strong id="authUserName" class="rm-auth-user-name hidden"></strong>
+            <div id="googleSignInButton" class="google-sign-in-button"></div>
+            <button id="googleSignOutButton" class="rm-meta-link is-interactive hidden" type="button">ログアウト</button>
+          </div>
+        </div>
+
+        <div id="rmProjectHeader" class="rm-topbar-project">
+          <div id="rmProjectTitle" class="rm-project-title">顧客管理システム</div>
+          <div class="rm-project-tools">
+            <select id="rmProjectSwitcher" class="rm-project-switcher" aria-label="プロジェクトの移動">
+              <optgroup label="一般業務">
+                <option value="customer">顧客管理システム</option>
+                <option value="attendance">勤怠管理システム</option>
+                <option value="salon">美容室予約システム</option>
+              </optgroup>
+              <optgroup label="商取引・業務運用">
+                <option value="ec">ECサイト</option>
+                <option value="inventory">在庫管理システム</option>
+                <option value="mobile">スマホアプリ</option>
+              </optgroup>
+              <optgroup label="高信頼性・専門領域">
+                <option value="automotive">車載ソフト</option>
+                <option value="payment">決済システム</option>
+                <option value="medical">医療システム</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div id="rmMyPageHeader" class="rm-topbar-project rm-my-page-header hidden">
+          <div class="rm-project-title">マイページ</div>
+        </div>
+
+        <div id="rmMyPageNavigation" class="rm-topbar-nav rm-my-page-navigation hidden" aria-label="マイページナビゲーション">
+          <button class="rm-tab-button is-interactive is-active" type="button" data-my-page-tab="progress" aria-selected="true">学習状況</button>
+          <button class="rm-tab-button is-interactive" type="button" data-my-page-tab="history" aria-selected="false">履歴</button>
+          <button class="rm-tab-button is-interactive" type="button" data-my-page-tab="ranking" aria-selected="false">ランキング</button>
+        </div>
+      </header>
+
+      <main class="rm-workspace">
+        <section id="ticketListView" class="ticket-list-view">
+          <div class="ticket-page-head">
+            <div class="ticket-page-copy">
+              <h1>作成したチケット</h1>
+            </div>
+            <div class="ticket-page-actions">
+              <button id="startButton" class="primary-button" type="button">チケット作成</button>
+            </div>
+          </div>
+
+          <article class="ticket-list-card">
+            <div id="ticketListAuthGate" class="ticket-list-state hidden">
+              <strong>作成したチケットの表示にはGoogleログインが必要です。</strong>
+              <p>ログインすると、保存済みの実践起票をこのプロジェクトごとに確認できます。</p>
+            </div>
+            <div id="ticketListStatus" class="ticket-list-state" role="status">読み込み中です…</div>
+
+            <div id="ticketListContent" class="hidden">
+            <div class="ticket-list-table-wrap">
+              <table class="ticket-list-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>AIレビュー</th>
+                    <th>優先度</th>
+                    <th>題名</th>
+                    <th>担当者</th>
+                    <th>作成日</th>
+                  </tr>
+                </thead>
+                <tbody id="ticketListBody"></tbody>
+              </table>
+            </div>
+            <div class="ticket-list-load-more">
+              <button id="ticketListMoreButton" class="secondary-button hidden" type="button">さらに表示</button>
+            </div>
+            </div>
+          </article>
+        </section>
+
+        <section id="ticketDetailView" class="ticket-detail-view hidden">
+          <div class="ticket-page-head">
+            <div class="ticket-page-copy">
+              <h1 id="ticketDetailNumber" class="ticket-detail-number">チケット #</h1>
+            </div>
+            <div class="ticket-page-actions">
+              <button id="ticketDetailBackButton" class="secondary-button" type="button">一覧へ戻る</button>
+            </div>
+          </div>
+          <div id="ticketDetailAuthGate" class="ticket-list-state hidden">
+            <strong>起票内容の表示にはGoogleログインが必要です。</strong>
+            <p>ログイン後、このURLの起票内容を読み込みます。</p>
+          </div>
+          <div id="ticketDetailStatus" class="ticket-list-state" role="status">読み込み中です…</div>
+          <div id="ticketDetailContent" class="hidden"></div>
+        </section>
+
+        <section id="myPageView" class="my-page-view hidden">
+          <div class="ticket-page-head my-page-head">
+            <div class="ticket-page-copy">
+              <h1>マイページ</h1>
+            </div>
+          </div>
+
+          <div id="myPageAuthGate" class="my-page-auth-gate hidden">
+            <strong>マイページの利用にはGoogleログインが必要です。</strong>
+            <p>上部の「Google でログイン」からログインすると、成績と履歴を表示できます。</p>
+          </div>
+
+          <div id="myPageContent" class="my-page-content">
+            <section id="myPageProgressPanel" class="my-page-panel" aria-labelledby="myPageProgressTitle">
+              <div class="my-page-section-head">
+                <h2 id="myPageProgressTitle">学習状況</h2>
+                <button class="text-action my-page-refresh-button" type="button" data-my-page-refresh="progress">再読み込み</button>
+              </div>
+              <div id="myPageProgressStatus" class="my-page-status" role="status">読み込み中です…</div>
+              <div id="myPageProgressBody" class="hidden">
+                <div class="my-page-summary-grid">
+                  <article class="my-page-summary-card">
+                    <span>練習済み</span>
+                    <strong id="myPagePracticedCount">0</strong>
+                    <small id="myPageScenarioTotal">全0シナリオ</small>
+                  </article>
+                  <article class="my-page-summary-card">
+                    <span>達成済み</span>
+                    <strong id="myPageAchievedCount">0</strong>
+                    <small>80点以上</small>
+                  </article>
+                  <article class="my-page-summary-card">
+                    <span>最高スコア</span>
+                    <strong id="myPageBestScore">—</strong>
+                    <small>シナリオ別ベスト</small>
+                  </article>
+                  <article class="my-page-summary-card">
+                    <span>実践回数</span>
+                    <strong id="myPageAttemptCount">0</strong>
+                    <small>保存済みの起票</small>
+                  </article>
+                </div>
+                <div id="myPageProgressProjects" class="my-page-progress-projects"></div>
+              </div>
+            </section>
+
+            <section id="myPageHistoryPanel" class="my-page-panel hidden" aria-labelledby="myPageHistoryTitle">
+              <div class="my-page-section-head">
+                <h2 id="myPageHistoryTitle">履歴</h2>
+                <button class="text-action my-page-refresh-button" type="button" data-my-page-refresh="history">再読み込み</button>
+              </div>
+              <div id="myPageHistoryStatus" class="my-page-status" role="status">読み込み中です…</div>
+              <div id="myPageHistoryBody" class="hidden">
+                <div class="my-page-table-wrap">
+                  <table class="my-page-table">
+                    <thead>
+                      <tr>
+                        <th>実施日時</th>
+                        <th>プロジェクト</th>
+                        <th>シナリオ</th>
+                        <th>モード</th>
+                        <th>得点</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="myPageHistoryRows"></tbody>
+                  </table>
+                </div>
+                <div class="my-page-load-more">
+                  <button id="myPageHistoryMoreButton" class="secondary-button hidden" type="button">さらに表示</button>
+                </div>
+              </div>
+            </section>
+
+            <section id="myPageRankingPanel" class="my-page-panel hidden" aria-labelledby="myPageRankingTitle">
+              <div class="my-page-section-head">
+                <h2 id="myPageRankingTitle">ランキング</h2>
+                <button class="text-action my-page-refresh-button" type="button" data-my-page-refresh="ranking">再読み込み</button>
+              </div>
+
+              <form id="rankingProfileForm" class="ranking-profile-form">
+                <label>
+                  <span>ランキング公開名</span>
+                  <input id="rankingNameInput" type="text" maxlength="24" autocomplete="off" placeholder="24文字以内" />
+                </label>
+                <label class="ranking-opt-in">
+                  <input id="rankingOptInInput" type="checkbox" />
+                  <span>ランキングに参加する</span>
+                </label>
+                <button id="rankingProfileSaveButton" class="primary-button" type="submit">設定を保存</button>
+                <span id="rankingProfileStatus" class="ranking-profile-status" role="status"></span>
+              </form>
+
+              <div id="myPageRankingStatus" class="my-page-status" role="status">読み込み中です…</div>
+              <div id="myPageRankingBody" class="hidden">
+                <div class="my-page-table-wrap">
+                  <table class="my-page-table ranking-table">
+                    <thead>
+                      <tr>
+                        <th>順位</th>
+                        <th>公開名</th>
+                        <th>獲得ポイント</th>
+                        <th>達成数</th>
+                        <th>採点済み</th>
+                      </tr>
+                    </thead>
+                    <tbody id="myPageRankingRows"></tbody>
+                  </table>
+                </div>
+                <div class="my-page-load-more">
+                  <button id="myPageRankingMoreButton" class="secondary-button hidden" type="button">さらに表示</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="scenarioIntroView" class="scenario-intro-view hidden">
+          <div class="ticket-page-head">
+            <div class="ticket-page-copy">
+              <h1>バグシナリオ</h1>
+            </div>
+          </div>
+
+          <article class="scenario-intro-card">
+            <details class="scenario-glossary">
+              <summary>専門用語の解説</summary>
+              <dl id="scenarioIntroGlossary" class="scenario-glossary-list"></dl>
+            </details>
+            <div class="scenario-intro-columns">
+              <section class="scenario-intro-section">
+                <h3>確認内容</h3>
+                <dl id="scenarioIntroFacts" class="scenario-brief scenario-brief-wide"></dl>
+              </section>
+              <section class="scenario-intro-section scenario-intro-section-decision">
+                <h3>周辺情報</h3>
+                <dl id="scenarioIntroDecision" class="scenario-brief scenario-brief-wide"></dl>
+              </section>
+            </div>
+            <details class="scenario-rules scenario-category-rules" open>
+              <summary>カテゴリの判断基準</summary>
+              <div class="scenario-rule-list">
+                <p><strong>画面・UI</strong> 表示、レイアウト、画面遷移、操作後の表示状態</p>
+                <p><strong>入力チェック</strong> 入力値、検索条件、形式、必須、許容範囲</p>
+                <p><strong>業務ロジック</strong> 状態遷移、計算、重複防止、データ整合性</p>
+                <p><strong>外部連携・API</strong> 送受信、再送、通知、データ変換</p>
+              </div>
+            </details>
+            <details class="scenario-rules scenario-priority-rules" open>
+              <summary>優先度の判断基準</summary>
+              <div class="scenario-rule-list">
+                <p><strong>緊急</strong> 即時判断が必要。緊急リリースや当日対応を予定</p>
+                <p><strong>高め</strong> 締め処理・再試験など、直近の日程へ影響</p>
+                <p><strong>通常</strong> 次回リリースやバグ判定会で対応を判断</p>
+                <p><strong>低め</strong> 影響が軽微で、対応時期の制約がない</p>
+              </div>
+            </details>
+            <details class="scenario-rules" open>
+              <summary>障害レベルの判断基準</summary>
+              <div class="scenario-rule-list">
+                <p><strong>S1</strong> 人命・安全、情報漏洩、不正決済、復旧不能なデータ消失</p>
+                <p><strong>S2</strong> 法規違反、主要業務停止、大規模影響、回避策なし</p>
+                <p><strong>S3</strong> 限定的な機能停止、回避策あり</p>
+                <p><strong>S4</strong> 表示・文言など軽微な問題</p>
+              </div>
+            </details>
+          </article>
+
+          <div class="scenario-intro-actions">
+            <button id="scenarioIntroBackButton" class="secondary-button" type="button">一覧へ戻る</button>
+            <button id="scenarioIntroStartButton" class="primary-button reference-mode-button" type="button">見本入力を開始</button>
+            <button id="scenarioIntroPracticeButton" class="primary-button" type="button">実践起票を開始</button>
+          </div>
+        </section>
+
+        <section id="ticketCreateView" class="ticket-page hidden">
+          <div class="ticket-page-head">
+            <div class="ticket-page-copy">
+              <h1 id="ticketCreateTitle">新しいチケット</h1>
+            </div>
+            <div class="ticket-page-actions">
+              <button id="stopButton" class="danger-button" type="button" disabled>中止</button>
+            </div>
+          </div>
+
+          <div class="ticket-create-layout">
+          <div class="ticket-form-side">
+          <article class="ticket-form-card">
+            <div class="ticket-form-main">
+              <div class="ticket-form-row ticket-form-row-tracker">
+                <div class="ticket-form-label">トラッカー</div>
+                <div class="ticket-form-control ticket-form-control-tracker">
+                  <select id="trackerSelect" disabled aria-label="トラッカー（バグ固定）">
+                    <option value="bug">バグ</option>
+                    <option value="feature">機能</option>
+                    <option value="support">サポート</option>
+                  </select>
+                </div>
+                <label class="ticket-private-toggle">
+                  <input id="privateCheckbox" type="checkbox" />
+                  <span>プライベート</span>
+                </label>
+              </div>
+
+              <div class="ticket-form-row ticket-form-row-subject">
+                <div class="ticket-form-label">題名</div>
+                <div class="report-editor subject-editor ticket-form-control" id="subjectEditor">
+                  <div id="subjectDocument" class="report-document report-document-subject" aria-label="題名本文"></div>
+                  <div id="subjectLineClearCue" class="line-clear-cue hidden" aria-hidden="true">Clear!!</div>
+                </div>
+              </div>
+
+              <div class="ticket-form-row ticket-form-row-description">
+                <div class="ticket-form-label">説明</div>
+                <div class="report-editor ticket-form-control" id="reportEditor">
+                  <div id="reportDocument" class="report-document" aria-label="説明本文"></div>
+                  <div id="lineClearCue" class="line-clear-cue hidden" aria-hidden="true">Clear!!</div>
+                  <textarea
+                    id="typingInput"
+                    class="typing-input typing-input-overlay"
+                    rows="1"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    lang="en"
+                    spellcheck="false"
+                    readonly
+                    aria-label="題名と説明欄の入力"
+                    disabled
+                  ></textarea>
+                </div>
+              </div>
+
+              <div id="practiceWritingTransition" class="practice-writing-transition hidden">
+                <button id="practiceWritingCompleteButton" class="primary-button" type="button">
+                  チケット情報の設定へ
+                </button>
+                <div id="practiceWritingStatus" class="practice-writing-status hidden" role="alert"></div>
+              </div>
+
+              <div class="ticket-form-details">
+                <div class="ticket-form-column">
+                  <label class="ticket-field">
+                    <span>障害レベル</span>
+                    <select id="severitySelect">
+                      <option value="">--- 選択してください ---</option>
+                      <option value="s1">S1：重大</option>
+                      <option value="s2">S2：高</option>
+                      <option value="s3">S3：中</option>
+                      <option value="s4">S4：軽微</option>
+                    </select>
+                  </label>
+
+                  <label class="ticket-field">
+                    <span>ステータス</span>
+                    <select id="statusSelect" disabled aria-label="ステータス（新規固定）">
+                      <option value="new">新規</option>
+                    </select>
+                  </label>
+
+                  <label class="ticket-field">
+                    <span>優先度</span>
+                    <select id="prioritySelect">
+                      <option value="">--- 選択してください ---</option>
+                      <option value="low">低め</option>
+                      <option value="normal">通常</option>
+                      <option value="high">高め</option>
+                      <option value="urgent">緊急</option>
+                    </select>
+                  </label>
+
+                  <label class="ticket-field">
+                    <span>担当者</span>
+                    <select id="assigneeSelect"></select>
+                  </label>
+
+                  <label class="ticket-field">
+                    <span>カテゴリ</span>
+                    <select id="categorySelect">
+                      <option value="">--- 選択してください ---</option>
+                      <option value="ui">画面・UI</option>
+                      <option value="workflow">業務ロジック</option>
+                      <option value="input">入力チェック</option>
+                      <option value="api">外部連携・API</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="ticket-form-column">
+                  <label class="ticket-field">
+                    <span>確認バージョン</span>
+                    <select id="versionSelect">
+                      <option value="">--- 選択してください ---</option>
+                    </select>
+                  </label>
+
+                  <label class="ticket-field">
+                    <span>確認環境・構成</span>
+                    <select id="environmentSelect">
+                      <option value="">--- 選択してください ---</option>
+                    </select>
+                  </label>
+
+                  <label class="ticket-field">
+                    <span>開始日</span>
+                    <input id="startDateInput" type="date" value="2023-03-24" />
+                  </label>
+
+                  <div class="ticket-field">
+                    <span>期日</span>
+                    <div class="ticket-date-choice">
+                      <input id="dueDateInput" type="date" value="2023-03-28" />
+                      <button id="dueDateUnsetButton" class="ticket-date-unset" type="button">期日を設定しない</button>
+                    </div>
+                  </div>
+
+                  <label class="ticket-field">
+                    <span>進捗率</span>
+                    <select id="progressSelect">
+                      <option value="0">0%</option>
+                      <option value="10">10%</option>
+                      <option value="20">20%</option>
+                      <option value="30">30%</option>
+                      <option value="40">40%</option>
+                      <option value="50">50%</option>
+                      <option value="60">60%</option>
+                      <option value="70">70%</option>
+                      <option value="80">80%</option>
+                      <option value="90">90%</option>
+                      <option value="100">100%</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <fieldset id="evidenceAttachmentSection" class="ticket-attachments hidden">
+                <legend>ファイル</legend>
+                <div class="ticket-attachments-head">
+                  <span>添付エビデンス</span>
+                  <button id="openEvidencePickerButton" class="attachment-edit-button" type="button" disabled>
+                    添付ファイルを選択
+                  </button>
+                </div>
+                <div id="attachedEvidenceList" class="attached-evidence-list">
+                  <span class="attached-evidence-empty">ファイルは添付されていません</span>
+                </div>
+              </fieldset>
+
+              <fieldset class="ticket-watchers">
+                <legend>ウォッチャー</legend>
+                <div id="ticketWatchersList" class="ticket-watchers-list"></div>
+                <button class="watcher-search-link" type="button" aria-disabled="true" tabindex="-1">⊕ ウォッチャーを検索して追加</button>
+              </fieldset>
+            </div>
+          </article>
+          <div class="ticket-form-actions">
+            <button id="createButton" class="primary-button" type="button" disabled>作成</button>
+          </div>
+          </div>
+          <aside class="scenario-panel" aria-label="バグシナリオ">
+            <div class="scenario-panel-head">
+              <div>
+                <h2>バグシナリオ</h2>
+              </div>
+              <div class="scenario-panel-status">
+                <span id="scenarioPanelMode" class="scenario-mode-badge">見本入力</span>
+                <span id="scenarioReferenceHint" class="scenario-reference-hint hidden"></span>
+              </div>
+            </div>
+            <div id="scenarioPanelBody" class="scenario-panel-body">
+              <dl id="scenarioBrief" class="scenario-brief"></dl>
+              <details class="scenario-glossary-compact">
+                <summary>専門用語の解説</summary>
+                <dl id="scenarioGlossary" class="scenario-glossary-list"></dl>
+              </details>
+              <details class="scenario-rules scenario-category-rules">
+                <summary>カテゴリの判断基準</summary>
+                <div class="scenario-rule-list">
+                  <p><strong>画面・UI</strong> 表示、レイアウト、画面遷移</p>
+                  <p><strong>入力チェック</strong> 入力値、検索条件、形式、範囲</p>
+                  <p><strong>業務ロジック</strong> 状態遷移、計算、重複防止</p>
+                  <p><strong>外部連携・API</strong> 送受信、再送、データ変換</p>
+                </div>
+              </details>
+              <details class="scenario-rules scenario-priority-rules">
+                <summary>優先度の判断基準</summary>
+                <div class="scenario-rule-list">
+                  <p><strong>緊急</strong> 緊急リリース・当日対応</p>
+                  <p><strong>高め</strong> 直近の締め処理・再試験へ影響</p>
+                  <p><strong>通常</strong> 次回リリース・判定会で判断</p>
+                  <p><strong>低め</strong> 軽微で日程上の制約なし</p>
+                </div>
+              </details>
+              <details class="scenario-rules">
+                <summary>障害レベルの判断基準</summary>
+                <div class="scenario-rule-list">
+                  <p><strong>S1</strong> 人命・安全、情報漏洩、不正決済、復旧不能なデータ消失</p>
+                  <p><strong>S2</strong> 法規違反、主要業務停止、大規模影響、回避策なし</p>
+                  <p><strong>S3</strong> 限定的な機能停止、回避策あり</p>
+                  <p><strong>S4</strong> 表示・文言など軽微な問題</p>
+                </div>
+              </details>
+            </div>
+          </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      id="evidencePickerOverlay"
+      class="evidence-picker-overlay hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="evidencePickerTitle"
+    >
+      <div class="windows-file-picker">
+        <div class="windows-picker-titlebar">
+          <div class="windows-picker-title">
+            <span class="windows-picker-app-icon">📁</span>
+            <strong id="evidencePickerTitle">添付するエビデンスを選択</strong>
+          </div>
+          <button id="closeEvidencePickerButton" class="windows-close-button" type="button" aria-label="閉じる">×</button>
+        </div>
+        <div class="windows-picker-toolbar">
+          <button type="button" aria-disabled="true" tabindex="-1">←</button>
+          <button type="button" aria-disabled="true" tabindex="-1">↑</button>
+          <div id="evidenceFolderPath" class="windows-folder-path">PC &gt; ドキュメント &gt; BugEvidence</div>
+          <div class="windows-search-box">🔍 BugEvidenceを検索</div>
+        </div>
+        <div class="windows-picker-content">
+          <section class="windows-file-list-panel" aria-label="ファイル一覧">
+            <div class="windows-file-list-head">
+              <span>名前</span>
+              <span>更新日時</span>
+              <span>種類</span>
+              <span>サイズ</span>
+            </div>
+            <div id="evidenceFileList" class="windows-file-list"></div>
+          </section>
+          <aside class="windows-preview-panel" aria-label="ファイルのプレビュー">
+            <div id="evidencePreviewEmpty" class="windows-preview-empty">ファイルを選択すると内容を確認できます</div>
+            <div id="evidencePreview" class="windows-preview hidden">
+              <div class="windows-preview-head">
+                <span id="evidencePreviewIcon" class="windows-preview-icon">📄</span>
+                <div>
+                  <strong id="evidencePreviewName"></strong>
+                  <span id="evidencePreviewSummary"></span>
+                </div>
+              </div>
+              <dl id="evidencePreviewMetadata" class="windows-preview-metadata"></dl>
+              <div id="evidencePreviewContent" class="windows-preview-content"></div>
+            </div>
+          </aside>
+        </div>
+        <div class="windows-picker-footer">
+          <div>
+            <strong id="evidenceSelectionCount">0個選択</strong>
+            <span>複数選択できます</span>
+          </div>
+          <div class="windows-picker-actions">
+            <button id="cancelEvidencePickerButton" class="secondary-button" type="button">キャンセル</button>
+            <button id="attachEvidenceButton" class="primary-button" type="button">選択したファイルを添付</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultOverlay" class="result-overlay hidden" aria-live="polite">
+      <div class="result-card">
+        <div class="result-created-banner">
+          <div>
+            <div id="resultKicker" class="result-kicker">TICKET CREATED</div>
+            <h2 id="resultTitle">チケットを作成しました</h2>
+            <p id="resultTicketSubject" class="result-ticket-subject"></p>
+          </div>
+          <div id="resultRankBlock" class="result-rank-block">
+            <span>総合評価</span>
+            <strong id="resultRank">-</strong>
+            <small id="resultScore">0 / 100</small>
+          </div>
+        </div>
+
+        <section id="practiceScoringPreviewSection" class="practice-scoring-preview-section hidden">
+          <div class="practice-result-head">
+            <div>
+              <div class="result-section-title">AIレビュー</div>
+              <p id="practiceScoringHelp">開発・QAの読み手として、文章の解釈と次の調査をレビューします。</p>
+            </div>
+            <span id="practiceScoringBadge" class="practice-result-status">レビュー待ち</span>
+          </div>
+
+          <div id="practiceScoringMessage" class="practice-scoring-message" role="status"></div>
+          <button id="practiceScoringRetryButton" class="secondary-button hidden" type="button">
+            AIレビューを再試行
+          </button>
+
+          <div id="practiceScoringResult" class="hidden">
+            <div class="practice-ai-review-hero">
+              <article class="practice-ai-summary">
+                <div class="practice-ai-summary-meta">
+                  <span id="practiceScoringVerdict" class="practice-ai-verdict">--</span>
+                  <span class="practice-ai-total">
+                    <strong id="practiceScoringPreviewTotal">--</strong><small> / 100</small>
+                  </span>
+                </div>
+                <p id="practiceScoringOverallAssessment" class="practice-ai-overall-assessment"></p>
+                <p id="practiceScoringBasis" class="practice-ai-scoring-basis hidden"></p>
+                <div class="practice-ai-strengths">
+                  <h3>評価できる点</h3>
+                  <ul id="practiceScoringPreviewStrengths"></ul>
+                </div>
+              </article>
+
+              <div class="practice-ai-radar-panel">
+                <div class="practice-ai-radar-title">文章品質の6つの観点</div>
+                <div class="practice-ai-radar-shell">
+                  <svg
+                    id="practiceScoringRadar"
+                    class="practice-ai-radar"
+                    viewBox="0 0 360 320"
+                    role="img"
+                    aria-label="AIレビューの6項目"
+                  >
+                    <g class="result-radar-grid" aria-hidden="true">
+                      <polygon points="180,55 270.9,107.5 270.9,212.5 180,265 89.1,212.5 89.1,107.5"></polygon>
+                      <polygon points="180,81.3 248.2,120.6 248.2,199.4 180,238.8 111.8,199.4 111.8,120.6"></polygon>
+                      <polygon points="180,107.5 225.5,133.8 225.5,186.3 180,212.5 134.5,186.3 134.5,133.8"></polygon>
+                      <polygon points="180,133.8 202.7,146.9 202.7,173.1 180,186.3 157.3,173.1 157.3,146.9"></polygon>
+                      <line x1="180" y1="160" x2="180" y2="55"></line>
+                      <line x1="180" y1="160" x2="270.9" y2="107.5"></line>
+                      <line x1="180" y1="160" x2="270.9" y2="212.5"></line>
+                      <line x1="180" y1="160" x2="180" y2="265"></line>
+                      <line x1="180" y1="160" x2="89.1" y2="212.5"></line>
+                      <line x1="180" y1="160" x2="89.1" y2="107.5"></line>
+                    </g>
+                    <polygon
+                      id="practiceScoringRadarValue"
+                      class="result-radar-value"
+                      points="180,160 180,160 180,160 180,160 180,160 180,160"
+                    ></polygon>
+                    <g class="result-radar-labels">
+                      <text x="180" y="17" text-anchor="middle">事実性<tspan id="practiceRadarFactual" x="180" dy="15">0</tspan></text>
+                      <text x="298" y="87" text-anchor="middle">情報充足<tspan id="practiceRadarCoverage" x="298" dy="15">0</tspan></text>
+                      <text x="300" y="242" text-anchor="middle">再現性<tspan id="practiceRadarReproducibility" x="300" dy="15">0</tspan></text>
+                      <text x="180" y="298" text-anchor="middle">期待・実績<tspan id="practiceRadarSeparation" x="180" dy="15">0</tspan></text>
+                      <text x="60" y="242" text-anchor="middle">解釈明瞭<tspan id="practiceRadarClarity" x="60" dy="15">0</tspan></text>
+                      <text x="62" y="87" text-anchor="middle">切り分け<tspan id="practiceRadarInvestigation" x="62" dy="15">0</tspan></text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="practice-ai-advice">
+              <article>
+                <h3>読み手が疑問に思うこと</h3>
+                <div id="practiceScoringReaderQuestions" class="practice-ai-review-list"></div>
+              </article>
+              <article id="practiceScoringAmbiguitySection">
+                <h3>誤解される可能性がある表現</h3>
+                <div id="practiceScoringAmbiguityRisks" class="practice-ai-review-list"></div>
+              </article>
+              <article>
+                <h3>次に確認・切り分けすること</h3>
+                <ol id="practiceScoringInvestigationAdvice" class="practice-ai-action-list"></ol>
+              </article>
+              <article id="practiceScoringRewriteSection">
+                <h3>書き換えるなら</h3>
+                <div id="practiceScoringRewriteSuggestions" class="practice-ai-review-list"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <div id="resultReviewLayout" class="result-review-layout">
+          <section class="result-review-card">
+            <div class="result-section-title">チケット設定チェック</div>
+            <div id="resultFieldReview" class="result-field-review"></div>
+            <div id="resultEvidenceReviewSection" class="result-evidence-review-section hidden">
+              <div class="result-subsection-title">添付エビデンス</div>
+              <div id="resultEvidenceReview" class="result-evidence-review"></div>
+            </div>
+          </section>
+
+          <section id="resultSummaryCard" class="result-summary-card">
+            <div class="result-section-title">スコア内訳</div>
+            <div id="resultRadarShell" class="result-radar-shell">
+              <svg
+                id="resultRadar"
+                class="result-radar"
+                viewBox="0 0 360 320"
+                role="img"
+                aria-label="6項目のスコア内訳"
+              >
+                <g class="result-radar-grid" aria-hidden="true">
+                  <polygon points="180,55 270.9,107.5 270.9,212.5 180,265 89.1,212.5 89.1,107.5"></polygon>
+                  <polygon points="180,81.3 248.2,120.6 248.2,199.4 180,238.8 111.8,199.4 111.8,120.6"></polygon>
+                  <polygon points="180,107.5 225.5,133.8 225.5,186.3 180,212.5 134.5,186.3 134.5,133.8"></polygon>
+                  <polygon points="180,133.8 202.7,146.9 202.7,173.1 180,186.3 157.3,173.1 157.3,146.9"></polygon>
+                  <line x1="180" y1="160" x2="180" y2="55"></line>
+                  <line x1="180" y1="160" x2="270.9" y2="107.5"></line>
+                  <line x1="180" y1="160" x2="270.9" y2="212.5"></line>
+                  <line x1="180" y1="160" x2="180" y2="265"></line>
+                  <line x1="180" y1="160" x2="89.1" y2="212.5"></line>
+                  <line x1="180" y1="160" x2="89.1" y2="107.5"></line>
+                </g>
+                <polygon
+                  id="resultRadarValue"
+                  class="result-radar-value"
+                  points="180,160 180,160 180,160 180,160 180,160 180,160"
+                ></polygon>
+                <g class="result-radar-labels">
+                  <text x="180" y="17" text-anchor="middle">障害判断<tspan id="resultRadarSeverity" x="180" dy="15">0</tspan></text>
+                  <text x="298" y="87" text-anchor="middle">優先度<tspan id="resultRadarPriority" x="298" dy="15">0</tspan></text>
+                  <text x="300" y="242" text-anchor="middle">項目設定<tspan id="resultRadarFields" x="300" dy="15">0</tspan></text>
+                  <text x="180" y="298" text-anchor="middle">担当・共有<tspan id="resultRadarPeople" x="180" dy="15">0</tspan></text>
+                  <text x="60" y="242" text-anchor="middle">報告・証跡<tspan id="resultRadarReport" x="60" dy="15">0</tspan></text>
+                  <text x="62" y="87" text-anchor="middle">入力品質<tspan id="resultRadarTyping" x="62" dy="15">0</tspan></text>
+                </g>
+              </svg>
+            </div>
+            <div class="result-score-list result-score-contributions">
+              <div><span>項目判断</span><strong id="resultDecisionScore">0 / 30</strong></div>
+              <div><span>報告書完成</span><strong id="resultReportScore">30 / 30</strong></div>
+              <div><span>エビデンス</span><strong id="resultEvidenceScore">10 / 10</strong></div>
+              <div><span>入力精度</span><strong id="resultTypingScore">0 / 20</strong></div>
+              <div><span>作成時間</span><strong id="resultTimeScore">0 / 10</strong></div>
+            </div>
+            <div class="result-typing-meta">
+              <span>正答率 <strong id="resultAccuracy">0%</strong></span>
+              <span>ミス <strong id="resultFailureCount">0</strong></span>
+              <span>時間 <strong id="resultElapsedTime">0:00</strong></span>
+            </div>
+          </section>
+        </div>
+
+        <section id="practiceResultSection" class="practice-result-section hidden">
+          <details class="practice-comparison-details">
+            <summary>見本回答を確認する</summary>
+            <p>必要なときだけ、自分の文章と見本回答を見比べられます。</p>
+            <div class="practice-result-columns">
+              <article>
+                <h3>あなたの起票</h3>
+                <div id="practiceResultAnswer" class="practice-result-document"></div>
+              </article>
+              <article>
+                <h3>見本回答</h3>
+                <div id="practiceReferenceAnswer" class="practice-result-document"></div>
+              </article>
+            </div>
+          </details>
+        </section>
+
+        <div class="result-actions">
+          <button id="practiceSaveRetryButton" class="primary-button hidden" type="button">
+            保存を再試行
+          </button>
+          <button id="sameScenarioPracticeButton" class="primary-button hidden" type="button">
+            同じ題材で実践起票
+          </button>
+          <button id="nextScenarioButton" class="primary-button hidden" type="button">
+            次の未挑戦シナリオへ
+          </button>
+          <button id="retryButton" class="secondary-button" type="button">同じシナリオに再挑戦</button>
+          <button id="resultExitButton" class="danger-button" type="button">終了</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./runtime-config.js?v=20260802a"></script>
+    <script src="./auth-client.js?v=20260804a"></script>
+    <script src="./scoring-api.js?v=20260801a"></script>
+    <script src="./profile-api.js?v=20260803b"></script>
+    <script src="./scenario-library.js?v=20260805b"></script>
+    <script src="./scenario-briefing-library.js?v=20260805a"></script>
+    <script src="./evidence-library.js?v=20260805a"></script>
+    <script src="./scoring-preview.js?v=20260805a"></script>
+    <script src="./main.js?v=20260805c"></script>
+  </body>
+</html>

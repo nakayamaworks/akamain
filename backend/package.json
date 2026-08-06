@@ -1,0 +1,19 @@
+{
+  "name": "typing-workbench-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "test": "node --test",
+    "test:sheets": "node --env-file=.env scripts/verify-sheets-integration.js",
+    "verify:scoring-fixtures": "node --env-file=.env scripts/verify-scenario-fixtures.js",
+    "verify:scoring-fixtures:dry-run": "node scripts/verify-scenario-fixtures.js --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "google-auth-library": "^10.3.0"
+  }
+}

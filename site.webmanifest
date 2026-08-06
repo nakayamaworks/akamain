@@ -1,0 +1,18 @@
+{
+  "name": "あかマイン",
+  "short_name": "あかマイン",
+  "description": "現場で通用するバグ起票力を育てるトレーニングツール",
+  "lang": "ja",
+  "start_url": "./welcome.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#cf2026",
+  "icons": [
+    {
+      "src": "./assets/images/brand/akamain-site-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
