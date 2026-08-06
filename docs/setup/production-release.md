@@ -8,6 +8,7 @@
 - バックエンド: Cloud Run `typing-workbench-backend`
 - 保存先: Google Sheets
 - AI採点: Gemini API
+- 自動デプロイ認証: GitHub OIDC / Workload Identity Federation
 
 GitHub Pagesは商用SaaS用途の制限があるため、本番配信には使用しない。
 
@@ -51,12 +52,24 @@ Firebase CLIの初回認証も必要になる。
 npx firebase-tools login
 ```
 
+## GitHub自動デプロイ
+
+`main`へのpushで`.github/workflows/firebase-hosting.yml`が実行される。
+
+- Workload Identity Pool: `github-actions`
+- Provider: `akamain`
+- Service Account: `akamain-hosting-deploy@typing-workbench-misemaru.iam.gserviceaccount.com`
+- 許可リポジトリ: `nakayamaworks/akamain`
+- 許可ブランチ: `refs/heads/main`
+
+サービスアカウントJSON鍵やGitHub secretは使用しない。GitHub OIDCから短時間の認証情報を取得し、Firebase Hostingへデプロイする。
+
 ## Cloud Run本番設定
 
 `ALLOWED_ORIGINS`へ本番とローカル開発のオリジンを設定する。
 
 ```env
-ALLOWED_ORIGINS=https://akamain.com,https://www.akamain.com,http://localhost:4173
+ALLOWED_ORIGINS=https://akamain.com,https://www.akamain.com,https://typing-workbench-misemaru.web.app,http://localhost:4173,http://127.0.0.1:4173
 ```
 
 Cloud Run URLは当面変更しない。
