@@ -39,5 +39,14 @@ typing_workbench/
 node validate-scenarios.js
 ```
 
+公開用ファイルの生成と検証は次を実行する。
+
+```sh
+npm run verify
+```
+
+Firebase Hostingへの本番公開手順は
+`docs/setup/production-release.md`を参照する。
+
 現行16シナリオ × 5回答のGemini実採点を検証する手順は
 `docs/setup/ai-scoring-fixture-validation.md`を参照する。
