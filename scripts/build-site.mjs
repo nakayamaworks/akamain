@@ -56,6 +56,7 @@ const publicFiles = [
   "scoring-preview.js",
   "styles.css",
   "welcome.css",
+  "welcome.js",
 ];
 
 for (const fileName of publicFiles) {

@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { access, readdir, readFile, stat } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -23,6 +23,7 @@ const allowedTopLevelFiles = new Set([
   "sitemap.xml",
   "styles.css",
   "welcome.css",
+  "welcome.js",
 ]);
 
 async function listFiles(directory) {
@@ -59,6 +60,27 @@ const welcomeHtml = await readFile(join(outputDirectory, "index.html"), "utf8");
 const appHtml = await readFile(join(outputDirectory, "app.html"), "utf8");
 const manifest = await readFile(join(outputDirectory, "site.webmanifest"), "utf8");
 
+async function verifyLocalReferences(html, sourceFile) {
+  const references = [...html.matchAll(/\b(?:href|src)="([^"]+)"/g)].map((match) => match[1]);
+  for (const reference of references) {
+    if (/^(?:https?:|mailto:|tel:|data:|#)/.test(reference)) {
+      continue;
+    }
+    const cleanReference = reference.split(/[?#]/, 1)[0];
+    const targetPath = cleanReference === "./" || cleanReference === "/"
+      ? "index.html"
+      : cleanReference.replace(/^\.\//, "").replace(/^\//, "");
+    try {
+      await access(join(outputDirectory, targetPath));
+    } catch {
+      throw new Error(`${sourceFile}の参照先が公開成果物にありません: ${reference}`);
+    }
+  }
+}
+
+await verifyLocalReferences(welcomeHtml, "index.html");
+await verifyLocalReferences(appHtml, "app.html");
+
 const requiredWelcomeFragments = [
   'href="./"',
   'href="./app.html?guest=1"',
@@ -73,6 +95,9 @@ for (const fragment of requiredWelcomeFragments) {
 }
 if (welcomeHtml.includes("./welcome.html") || welcomeHtml.includes("./index.html")) {
   throw new Error("公開トップページにローカル用URLが残っています。");
+}
+if (!files.some((filePath) => relative(outputDirectory, filePath) === "welcome.js")) {
+  throw new Error("Welcomeページの動作スクリプトが公開成果物にありません。");
 }
 if (!appHtml.includes('<meta name="robots" content="noindex, nofollow" />')) {
   throw new Error("アプリ画面の検索除外設定がありません。");
