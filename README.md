@@ -48,5 +48,11 @@ npm run verify
 Firebase Hostingへの本番公開手順は
 `docs/setup/production-release.md`を参照する。
 
+現行システムの全体像は
+`docs/spec/system-architecture.md`を参照する。
+
+ポートフォリオや面談での説明方法は
+`docs/portfolio/akamain-explanation-guide.md`を参照する。
+
 現行16シナリオ × 5回答のGemini実採点を検証する手順は
 `docs/setup/ai-scoring-fixture-validation.md`を参照する。
