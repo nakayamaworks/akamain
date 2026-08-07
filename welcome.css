@@ -220,8 +220,34 @@ a:focus-visible {
 }
 
 .auth-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
   color: var(--muted);
   font-size: 0.74rem;
+}
+
+.auth-loading::before {
+  width: 1em;
+  height: 1em;
+  box-sizing: border-box;
+  border: 2px solid rgba(111, 119, 129, 0.22);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  content: "";
+  animation: welcome-loading-spin 0.72s linear infinite;
+}
+
+@keyframes welcome-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-loading::before {
+    animation-duration: 1.5s;
+  }
 }
 
 .guest-entry {

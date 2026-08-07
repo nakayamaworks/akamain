@@ -39,6 +39,7 @@
     elements.signedInView.hidden = !signedIn;
     elements.googleSignInButton.hidden = signedIn || loading || authState.status === "not_configured";
     elements.authLoading.hidden = !loading;
+    elements.authLoading.setAttribute("aria-busy", String(loading));
     elements.authMessage.textContent = "";
 
     if (signedIn) {

@@ -17,6 +17,36 @@
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
+@keyframes akamain-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.has-loading-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.has-loading-spinner::before {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  border: 2px solid rgba(64, 82, 104, 0.22);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  content: "";
+  animation: akamain-loading-spin 0.72s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .has-loading-spinner::before {
+    animation-duration: 1.5s;
+  }
+}
+
 .ticket-list-state {
   margin: 20px;
   padding: 22px 24px;
@@ -24,6 +54,11 @@
   border-radius: 8px;
   background: #f7f9fc;
   color: #405268;
+}
+
+.ticket-list-state.has-loading-spinner,
+.my-page-status.has-loading-spinner {
+  display: flex;
 }
 
 .ticket-list-state strong {
@@ -1139,6 +1174,10 @@ button {
   align-self: center;
   color: var(--muted);
   font-size: 0.78rem;
+}
+
+.ranking-profile-status.has-loading-spinner {
+  display: inline-flex;
 }
 
 .ranking-profile-status.is-error {
@@ -3437,6 +3476,12 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   color: #31597f;
   font-size: 0.68rem;
   font-weight: 800;
+}
+
+.practice-result-status.has-loading-spinner::before {
+  width: 0.82em;
+  height: 0.82em;
+  border-width: 1.5px;
 }
 
 .practice-comparison-details {

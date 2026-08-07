@@ -2280,6 +2280,7 @@ function renderTicketList() {
 function renderTicketListState() {
   const signedIn = state.authStatus === "signed_in";
   const authLoading = state.authStatus === "loading";
+  const isLoading = authLoading || (signedIn && state.ticketListStatus === "loading");
   elements.ticketListAuthGate?.classList.toggle("hidden", signedIn || state.authStatus === "loading");
   elements.ticketListContent?.classList.toggle("hidden", !signedIn || state.ticketListStatus !== "ready");
   elements.ticketListStatus?.classList.toggle(
@@ -2293,6 +2294,7 @@ function renderTicketListState() {
       ? "保存済みチケットを読み込めませんでした。再度お試しください。"
       : "保存済みチケットを読み込んでいます…";
     elements.ticketListStatus.classList.toggle("is-error", state.ticketListStatus === "error");
+    setLoadingIndicator(elements.ticketListStatus, isLoading);
   }
   elements.ticketListMoreButton?.classList.toggle("hidden", !state.ticketListNextCursor);
 }
@@ -2603,6 +2605,14 @@ function setTextContent(element, value) {
   if (element) {
     element.textContent = value;
   }
+}
+
+function setLoadingIndicator(element, loading) {
+  if (!element) {
+    return;
+  }
+  element.classList.toggle("has-loading-spinner", Boolean(loading));
+  element.setAttribute("aria-busy", String(Boolean(loading)));
 }
 
 function setControlValue(element, value) {
@@ -4583,6 +4593,10 @@ function renderPracticeScoringPreview() {
   elements.practiceScoringRetryButton?.classList.toggle("hidden", !isError);
   elements.practiceScoringMessage?.classList.toggle("hidden", isSucceeded);
   elements.practiceScoringMessage?.classList.toggle("is-error", isError);
+  setLoadingIndicator(elements.practiceScoringBadge, isLoading);
+  if (elements.practiceScoringPreviewSection) {
+    elements.practiceScoringPreviewSection.setAttribute("aria-busy", String(isLoading));
+  }
   setTextContent(
     elements.practiceScoringBadge,
     isLoading ? "レビュー中" : isSucceeded ? "レビュー済み" : isError ? "未完了" : "レビュー待ち"
@@ -4706,6 +4720,7 @@ async function requestPracticeScoring() {
         elements.resultTitle,
         state.revisionTicketId ? "修正版を保存しました" : "実践起票を保存しました"
       );
+      setLoadingIndicator(elements.resultTitle, false);
       if (elements.resultExitButton) elements.resultExitButton.disabled = false;
       if (elements.retryButton) elements.retryButton.disabled = false;
       if (elements.nextScenarioButton) elements.nextScenarioButton.disabled = false;
@@ -4733,6 +4748,7 @@ async function requestPracticeScoring() {
       error?.message || "保存またはAIレビューを完了できませんでした。入力内容は保持されています。";
     if (!state.currentAttemptSaved) {
       setTextContent(elements.resultTitle, "実践起票を保存できませんでした");
+      setLoadingIndicator(elements.resultTitle, false);
       elements.practiceSaveRetryButton?.classList.remove("hidden");
     }
     if (elements.resultExitButton) elements.resultExitButton.disabled = false;
@@ -4827,6 +4843,7 @@ function setMyPageStatus(statusElement, bodyElement, message, options = {}) {
     statusElement.textContent = message;
     statusElement.classList.toggle("hidden", Boolean(options.showBody));
     statusElement.classList.toggle("is-error", Boolean(options.error));
+    setLoadingIndicator(statusElement, Boolean(options.loading));
   }
   bodyElement?.classList.toggle("hidden", !options.showBody);
 }
@@ -5070,11 +5087,11 @@ async function loadMyPageTab(tab, options = {}) {
   const append = Boolean(options.append);
 
   if (tab === "progress") {
-    setMyPageStatus(elements.myPageProgressStatus, elements.myPageProgressBody, "学習状況を読み込んでいます…");
+    setMyPageStatus(elements.myPageProgressStatus, elements.myPageProgressBody, "学習状況を読み込んでいます…", { loading: true });
   } else if (tab === "history" && !append) {
-    setMyPageStatus(elements.myPageHistoryStatus, elements.myPageHistoryBody, "履歴を読み込んでいます…");
+    setMyPageStatus(elements.myPageHistoryStatus, elements.myPageHistoryBody, "履歴を読み込んでいます…", { loading: true });
   } else if (tab === "ranking" && !append) {
-    setMyPageStatus(elements.myPageRankingStatus, elements.myPageRankingBody, "ランキングを読み込んでいます…");
+    setMyPageStatus(elements.myPageRankingStatus, elements.myPageRankingBody, "ランキングを読み込んでいます…", { loading: true });
   }
 
   try {
@@ -5294,6 +5311,7 @@ async function loadTicketDetail(ticketId) {
   if (elements.ticketDetailStatus) {
     elements.ticketDetailStatus.textContent = "起票内容を読み込んでいます…";
     elements.ticketDetailStatus.classList.remove("hidden", "is-error");
+    setLoadingIndicator(elements.ticketDetailStatus, true);
   }
   try {
     const response = await window.TYPING_WORKBENCH_PROFILE_API.getTicket(ticketId);
@@ -5310,6 +5328,7 @@ async function loadTicketDetail(ticketId) {
     if (elements.ticketDetailStatus) {
       elements.ticketDetailStatus.textContent = error?.message || "起票内容を読み込めませんでした。";
       elements.ticketDetailStatus.classList.add("is-error");
+      setLoadingIndicator(elements.ticketDetailStatus, false);
     }
   }
 }
@@ -5466,6 +5485,7 @@ async function handleRankingProfileSubmit(event) {
   elements.rankingProfileSaveButton.disabled = true;
   elements.rankingProfileStatus?.classList.remove("is-error");
   setTextContent(elements.rankingProfileStatus, "保存しています…");
+  setLoadingIndicator(elements.rankingProfileStatus, true);
   try {
     const response = await window.TYPING_WORKBENCH_PROFILE_API.updateRankingProfile({
       rankingName,
@@ -5478,6 +5498,7 @@ async function handleRankingProfileSubmit(event) {
     setTextContent(elements.rankingProfileStatus, error?.message || "設定を保存できませんでした。");
     elements.rankingProfileStatus?.classList.add("is-error");
   } finally {
+    setLoadingIndicator(elements.rankingProfileStatus, false);
     elements.rankingProfileSaveButton.disabled = false;
   }
 }
@@ -5517,6 +5538,7 @@ function finishSession() {
     elements.resultTitle,
     practiceMode ? "実践起票を保存しています…" : "チケットを作成しました"
   );
+  setLoadingIndicator(elements.resultTitle, practiceMode);
   setTextContent(
     elements.retryButton,
     practiceMode ? "同じシナリオに再挑戦" : "もう一度見本入力"

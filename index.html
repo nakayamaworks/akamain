@@ -78,7 +78,7 @@
               <strong>作成したチケットの表示にはGoogleログインが必要です。</strong>
               <p>ログインすると、保存済みの実践起票をこのプロジェクトごとに確認できます。</p>
             </div>
-            <div id="ticketListStatus" class="ticket-list-state" role="status">読み込み中です…</div>
+            <div id="ticketListStatus" class="ticket-list-state has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
 
             <div id="ticketListContent" class="hidden">
             <div class="ticket-list-table-wrap">
@@ -116,7 +116,7 @@
             <strong>起票内容の表示にはGoogleログインが必要です。</strong>
             <p>ログイン後、このURLの起票内容を読み込みます。</p>
           </div>
-          <div id="ticketDetailStatus" class="ticket-list-state" role="status">読み込み中です…</div>
+          <div id="ticketDetailStatus" class="ticket-list-state has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
           <div id="ticketDetailContent" class="hidden"></div>
         </section>
 
@@ -138,7 +138,7 @@
                 <h2 id="myPageProgressTitle">学習状況</h2>
                 <button class="text-action my-page-refresh-button" type="button" data-my-page-refresh="progress">再読み込み</button>
               </div>
-              <div id="myPageProgressStatus" class="my-page-status" role="status">読み込み中です…</div>
+              <div id="myPageProgressStatus" class="my-page-status has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
               <div id="myPageProgressBody" class="hidden">
                 <div class="my-page-summary-grid">
                   <article class="my-page-summary-card">
@@ -171,7 +171,7 @@
                 <h2 id="myPageHistoryTitle">履歴</h2>
                 <button class="text-action my-page-refresh-button" type="button" data-my-page-refresh="history">再読み込み</button>
               </div>
-              <div id="myPageHistoryStatus" class="my-page-status" role="status">読み込み中です…</div>
+              <div id="myPageHistoryStatus" class="my-page-status has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
               <div id="myPageHistoryBody" class="hidden">
                 <div class="my-page-table-wrap">
                   <table class="my-page-table">
@@ -213,7 +213,7 @@
                 <span id="rankingProfileStatus" class="ranking-profile-status" role="status"></span>
               </form>
 
-              <div id="myPageRankingStatus" class="my-page-status" role="status">読み込み中です…</div>
+              <div id="myPageRankingStatus" class="my-page-status has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
               <div id="myPageRankingBody" class="hidden">
                 <div class="my-page-table-wrap">
                   <table class="my-page-table ranking-table">
