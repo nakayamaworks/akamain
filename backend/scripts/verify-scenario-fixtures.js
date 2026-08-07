@@ -142,7 +142,10 @@ async function scoreWithRetry(attempt, options) {
       }
       retryCount += 1;
       const retryDelay = Math.max(options.delayMs, 1000) * (2 ** retryCount);
-      console.warn(`  一時エラー ${error.code || "UNKNOWN"}。${retryDelay}ms後に再試行します。`);
+      const detail = error.cause?.message ? ` (${error.cause.message})` : "";
+      console.warn(
+        `  一時エラー ${error.code || "UNKNOWN"}${detail}。${retryDelay}ms後に再試行します。`
+      );
       await wait(retryDelay);
     }
   }
@@ -235,7 +238,8 @@ async function main() {
         scoringResult,
       });
     } catch (error) {
-      console.error(`  ERROR ${error.code || "UNKNOWN"}: ${error.message}`);
+      const detail = error.cause?.message ? ` (${error.cause.message})` : "";
+      console.error(`  ERROR ${error.code || "UNKNOWN"}: ${error.message}${detail}`);
       report.results.push({
         scenarioId: fixtureSet.scenarioId,
         fixtureId: fixture.fixtureId,

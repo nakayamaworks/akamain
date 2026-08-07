@@ -114,6 +114,19 @@ test("inconsistent question classifications are normalized conservatively", () =
   assert.equal(suggestionWithFact.readerQuestions[0].factId, "not-applicable");
 });
 
+test("a rewrite for a missing section gets a readable original placeholder", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    rewriteSuggestions: [{
+      section: "詳細",
+      original: "",
+      suggested: "確認した現象を具体的に記載する。",
+      reason: "元の記載がないため。",
+    }],
+  });
+  assert.equal(normalized.rewriteSuggestions[0].original, "（未記載）");
+});
+
 test("all registered scenarios can be stored and reviewed", async () => {
   const normalized = validateAttemptInput({
     scenarioId: "customer-context-menu-not-shown",
@@ -151,6 +164,10 @@ test("all 27 rubrics produce scenario-specific structured-output schemas", () =>
       schema.properties.dimensions.required,
       rubric.dimensions.map((dimension) => dimension.id)
     );
+    assert.equal(schema.properties.readerQuestions.minItems, 2);
+    assert.equal(schema.properties.readerQuestions.maxItems, 4);
+    assert.equal(schema.properties.investigationAdvice.minItems, 2);
+    assert.equal(schema.properties.investigationAdvice.maxItems, 4);
   });
 });
 

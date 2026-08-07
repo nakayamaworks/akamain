@@ -3,6 +3,7 @@
 **/.DS_Store
 backend/.env
 backend/node_modules
+backend/reports
 node_modules
 *.log
 docs

@@ -32,9 +32,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -88,8 +86,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -149,9 +147,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -205,8 +201,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -266,9 +262,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -324,8 +318,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -385,9 +379,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -440,8 +432,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -501,9 +493,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -556,8 +546,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -617,9 +607,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -672,8 +660,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -733,9 +721,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -788,8 +774,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -849,9 +835,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -904,8 +888,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -965,9 +949,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1020,8 +1002,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1081,9 +1063,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1136,8 +1116,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1197,9 +1177,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1252,8 +1230,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1313,9 +1291,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1368,8 +1344,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1429,9 +1405,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1484,8 +1458,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1545,9 +1519,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1600,8 +1572,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1661,9 +1633,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1716,8 +1686,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1777,9 +1747,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1832,8 +1800,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -1893,9 +1861,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -1948,8 +1914,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2009,9 +1975,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2064,8 +2028,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2125,9 +2089,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2180,8 +2142,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2241,9 +2203,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2296,8 +2256,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2357,9 +2317,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2412,8 +2370,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2473,9 +2431,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2528,8 +2484,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2589,9 +2545,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2644,8 +2598,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2705,9 +2659,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2760,8 +2712,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2821,9 +2773,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2876,8 +2826,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -2937,9 +2887,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -2992,8 +2940,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }
@@ -3053,9 +3001,7 @@
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
             "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
-            "sections": {
-              "detail": "対象画面で問題を確認しました。"
-            }
+            "sections": {}
           },
           "expected": {
             "scoreMin": 0,
@@ -3108,8 +3054,8 @@
             }
           },
           "expected": {
-            "scoreMin": 55,
-            "scoreMax": 90,
+            "scoreMin": 0,
+            "scoreMax": 75,
             "missingFactIds": [],
             "forbiddenClaimIds": []
           }

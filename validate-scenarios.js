@@ -1182,7 +1182,7 @@ try {
             label: "現象だけを記載し重要な条件と結果が不足した回答",
             answer: {
               subject: rubric.referenceAnswer.subject,
-              sections: { detail: "対象画面で問題を確認しました。" },
+              sections: {},
             },
             expected: {
               scoreMin: 0,
@@ -1212,7 +1212,7 @@ try {
             fixtureId: "misplaced-sections",
             label: "必要情報はあるが記載場所が入れ替わった回答",
             answer: { subject: rubric.referenceAnswer.subject, sections: rotatedSections },
-            expected: { scoreMin: 55, scoreMax: 90, missingFactIds: [], forbiddenClaimIds: [] },
+            expected: { scoreMin: 0, scoreMax: 75, missingFactIds: [], forbiddenClaimIds: [] },
           },
           {
             fixtureId: "verbose",

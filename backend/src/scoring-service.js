@@ -71,6 +71,8 @@ export function buildModelOutputSchema(rubric) {
     },
     readerQuestions: {
       type: "array",
+      minItems: 2,
+      maxItems: 4,
       items: {
         type: "object",
         required: ["reader", "question", "whyItMatters", "classification", "factId"],
@@ -97,6 +99,8 @@ export function buildModelOutputSchema(rubric) {
     },
     investigationAdvice: {
       type: "array",
+      minItems: 2,
+      maxItems: 4,
       items: {
         type: "object",
         required: ["action", "purpose"],
@@ -389,7 +393,8 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const rewriteSuggestions = requireArray(rawOutput.rewriteSuggestions, "rewriteSuggestions")
     .map((item, index) => ({
       section: requireNonEmptyString(item.section, `rewriteSuggestions[${index}].section`),
-      original: requireNonEmptyString(item.original, `rewriteSuggestions[${index}].original`),
+      original: optionalString(item.original, `rewriteSuggestions[${index}].original`)
+        || "（未記載）",
       suggested: requireNonEmptyString(item.suggested, `rewriteSuggestions[${index}].suggested`),
       reason: requireNonEmptyString(item.reason, `rewriteSuggestions[${index}].reason`),
     }));

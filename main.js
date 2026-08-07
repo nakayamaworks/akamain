@@ -1892,7 +1892,6 @@ const elements = {
   googleSignInButton: document.getElementById("googleSignInButton"),
   googleSignOutButton: document.getElementById("googleSignOutButton"),
   practiceScoringPreviewSection: document.getElementById("practiceScoringPreviewSection"),
-  practiceScoringHelp: document.getElementById("practiceScoringHelp"),
   practiceScoringBadge: document.getElementById("practiceScoringBadge"),
   practiceScoringMessage: document.getElementById("practiceScoringMessage"),
   practiceScoringRetryButton: document.getElementById("practiceScoringRetryButton"),
