@@ -287,6 +287,7 @@ test("QA scenarios use a question-focused rubric and never ask the model to deci
   const rubric = getScenarioRubric(scenarioId);
   assert.equal(rubric.ticketType, "qa");
   assert.equal(rubric.qaType, "behavior");
+  assert.equal("severity" in rubric.expectedTicketFields, false);
   assert.deepEqual(
     rubric.dimensions.map(({ id }) => id),
     [
@@ -326,6 +327,13 @@ test("QA attempts accept the QA tracker and QA verdicts", () => {
     scenarioId
   );
   assert.equal(normalizedOutput.verdict, "回答依頼可能");
+  const findings = buildRubricFindings({
+    scenarioId,
+    completedAt: "2026-08-12T01:00:00.000Z",
+    answer: { ticketFields: { ...rubric.expectedTicketFields, severity: null } },
+    selectedEvidenceIds: [],
+  }, normalizedOutput, 88);
+  assert.equal(findings.ticketFieldChecks.some(({ field }) => field === "severity"), false);
 });
 
 test("the mobile data-loss prompt rewards scenario-specific analysis without scoring future research", () => {

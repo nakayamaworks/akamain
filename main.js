@@ -145,6 +145,15 @@ function getScenarioSpecificationReference(rawScenario) {
   return getScenarioAuthoringProfile(rawScenario.scenarioId)?.specificationReference || "";
 }
 
+function getScenarioSpecificationDetails(rawScenario) {
+  const observations = getScenarioAuthoringProfile(rawScenario.scenarioId)
+    ?.reviewSource?.observations || [];
+  return observations
+    .filter(({ id, role }) => role === "specification-and-context" || /^source(?:-|$)/.test(id || ""))
+    .map(({ text }) => text?.trim())
+    .filter(Boolean);
+}
+
 scenarioBank.push(
   ...Object.values(window.TYPING_WORKBENCH_SCENARIO_AUTHORING || {}).map(
     ({ scenario }) => scenario
@@ -1301,6 +1310,7 @@ const elements = {
   resultRadar: document.getElementById("resultRadar"),
   resultRadarShell: document.getElementById("resultRadarShell"),
   resultRadarValue: document.getElementById("resultRadarValue"),
+  resultRadarPrimaryLabel: document.getElementById("resultRadarPrimaryLabel"),
   resultRadarSeverity: document.getElementById("resultRadarSeverity"),
   resultRadarPriority: document.getElementById("resultRadarPriority"),
   resultRadarFields: document.getElementById("resultRadarFields"),
@@ -2681,10 +2691,14 @@ function renderScenarioBrief() {
   const factItems = [
     ["", context.workMemo, "testTarget observation scope risk recovery workaround"],
   ].filter(([, value]) => value);
+  const specificationInfo = [
+    context.specification,
+    ...getScenarioSpecificationDetails(state.scenario).map((text) => `記載内容：${text}`),
+  ].filter(Boolean).join("\n");
   const decisionItems = [
     ...(qaScenario ? [["質問種別", getQaTypeLabel(state.scenario.qaType), "qaType"]] : []),
     ["確認日時・環境", environmentMemo, "occurredAt environment"],
-    ["関連資料", context.specification, "specification"],
+    ["関連資料", specificationInfo, "specification"],
     ["対応日程", context.schedule, "schedule risk"],
     ["関係者", peopleInfo, "assignee related"],
   ].filter(([, value]) => value);
@@ -3875,7 +3889,9 @@ function calculateEvidenceResult() {
 function calculateResult() {
   const expected = state.scenario.evaluation;
   const selected = getSelectedTicketFields();
-  const keys = Object.keys(fieldLabels);
+  const keys = Object.keys(fieldLabels).filter(
+    (key) => !isQaScenario() || key !== "severity"
+  );
   const reviews = keys.map((key) => {
     if (key === "watchers") {
       const selectedSet = new Set(selected.watchers);
@@ -3932,10 +3948,14 @@ function calculateResult() {
     }
   }
   const rank = total >= 95 ? "S" : total >= 85 ? "A" : total >= 70 ? "B" : total >= 50 ? "C" : "D";
+  const qaScenario = isQaScenario();
+  setTextContent(elements.resultRadarPrimaryLabel, qaScenario ? "設定整合" : "障害判断");
   const radarParameters = [
     {
-      label: "障害判断",
-      value: getAverageReviewPercent(reviews, ["severity"]),
+      label: qaScenario ? "設定整合" : "障害判断",
+      value: qaScenario
+        ? getAverageReviewPercent(reviews, keys)
+        : getAverageReviewPercent(reviews, ["severity"]),
       element: elements.resultRadarSeverity,
     },
     {
@@ -4240,14 +4260,16 @@ function renderPracticeRewriteSuggestions(items) {
     .join("");
 }
 
-function getRubricFindingsSummary(result) {
+function getRubricFindingsSummary(result, { qaTicket = isQaScenario() } = {}) {
   const findings = result?.rubricFindings;
   if (!findings) {
     return "";
   }
   const factAssessments = findings.factAssessments || [];
   const presentFacts = factAssessments.filter(({ status }) => status === "present").length;
-  const ticketChecks = findings.ticketFieldChecks || [];
+  const ticketChecks = (findings.ticketFieldChecks || []).filter(
+    ({ field }) => !qaTicket || field !== "severity"
+  );
   const matchedTicketFields = ticketChecks.filter(({ matched }) => matched).length;
   const evidenceMatched = findings.evidenceCheck?.matched ? "適合" : "不足・対象外あり";
   const capText = Number.isInteger(findings.appliedScoreCap)
@@ -4945,7 +4967,7 @@ function renderTicketDetail() {
   const scoreComparison = scoreDelta === null
     ? ""
     : `<p class="ticket-score-comparison">初回 ${initialScore}点 → ${escapeHtml(ticketRevisionLabel(revisionNumber))} ${currentScore}点 <strong class="${scoreDelta >= 0 ? "is-up" : "is-down"}">${scoreDelta >= 0 ? "+" : ""}${scoreDelta}点</strong></p>`;
-  const findingsSummary = getRubricFindingsSummary(result);
+  const findingsSummary = getRubricFindingsSummary(result, { qaTicket });
 
   setTextContent(elements.ticketDetailNumber, `${trackerLabel} #${ticket.displayId || ""}`);
   elements.ticketDetailContent.innerHTML = `

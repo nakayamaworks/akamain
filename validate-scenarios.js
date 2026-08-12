@@ -694,6 +694,13 @@ Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
   ) {
     errors.push(`${scenarioId}: review facts must be defined independently from the writing example`);
   }
+  if (
+    !reviewSource?.observations?.some(
+      ({ role, text }) => role === "specification-and-context" && text?.trim().length >= 20
+    )
+  ) {
+    errors.push(`${scenarioId}: the cited specification must include its concrete stated behavior`);
+  }
 });
 
 const qaScenarioIds = Object.keys(qaAuthoredScenarios);
@@ -765,6 +772,13 @@ Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
     || !reviewSource?.alternativeExcellentAnswer?.sections
   ) {
     errors.push(`${scenarioId}: QA review facts must be independent from the writing example`);
+  }
+  if (
+    !reviewSource?.observations?.some(
+      ({ id, text }) => /^source(?:-|$)/.test(id || "") && text?.trim().length >= 20
+    )
+  ) {
+    errors.push(`${scenarioId}: QA reference material must include the concrete statement or unresolved gap`);
   }
   if (
     !guide?.sourceBoundary

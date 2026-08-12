@@ -119,7 +119,6 @@ function buildQaRubric(profile) {
       { id: "optional-comparison", description: "類似仕様や比較条件を、同一仕様と断定せず補足する" },
     ],
     expectedTicketFields: {
-      severity: null,
       priority: scenario.evaluation.priority || null,
       category: scenario.evaluation.category || null,
       version: scenario.evaluation.version || null,
@@ -777,7 +776,11 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
     throw new Error("scenario rubric was not found");
   }
   const actualFields = attempt.answer?.ticketFields || {};
-  const expectedFields = rubric.expectedTicketFields || {};
+  const expectedFields = Object.fromEntries(
+    Object.entries(rubric.expectedTicketFields || {}).filter(
+      ([field]) => rubric.ticketType !== "qa" || field !== "severity"
+    )
+  );
   const ticketFieldChecks = Object.entries(expectedFields).map(([field, expected]) => {
     if (field === "dueDatePolicy") {
       const attemptDate = dateInJapan(attempt.startedAt || attempt.completedAt);
