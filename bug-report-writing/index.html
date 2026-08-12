@@ -22,8 +22,8 @@
     <link rel="icon" type="image/png" sizes="48x48" href="/assets/images/brand/akamain-favicon-48.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/brand/akamain-apple-touch-icon-180.png" />
-    <link rel="stylesheet" href="/welcome.css?v=20260812a" />
-    <link rel="stylesheet" href="/guide.css?v=20260812a" />
+    <link rel="stylesheet" href="/welcome.css?v=20260812b" />
+    <link rel="stylesheet" href="/guide.css?v=20260812b" />
   </head>
   <body>
     <div class="page-shell guide-page">
@@ -48,13 +48,14 @@
               <span aria-hidden="true">/</span>
               <span aria-current="page">バグ報告の書き方</span>
             </nav>
-            <p class="section-kicker">BUG REPORT GUIDE</p>
-            <h1>バグ報告の書き方<br /><span>伝わる不具合報告の8項目と記載例</span></h1>
-            <p class="article-lead">よいバグ報告は、見本と同じ文章ではありません。観測した事実と期待する仕様を分け、読み手が次の調査を始められる状態にする報告です。</p>
-            <div class="article-meta">
-              <span>更新日：2026年8月12日</span>
-              <span>読了目安：8分</span>
+            <div class="article-title-row">
+              <h1>バグ報告の書き方<br /><span>伝わる不具合報告の8項目と記載例</span></h1>
+              <div class="article-meta">
+                <span>更新日：2026年8月12日</span>
+                <span>読了目安：8分</span>
+              </div>
             </div>
+            <p class="article-lead">よいバグ報告は、見本と同じ文章ではありません。観測した事実と期待する仕様を分け、読み手が次の調査を始められる状態にする報告です。</p>
           </header>
 
           <div class="article-layout">
@@ -127,53 +128,43 @@
                 <h2>具体例：プッシュ通知から別のお知らせが開く</h2>
                 <p>次は、スマートフォンアプリで確認した現象を整理した記載例です。IDはログとの突合に使えるため記載していますが、この形式だけが正解という意味ではありません。</p>
 
-                <div class="ticket-example" aria-label="バグチケットの記載例">
-                  <div class="ticket-example-header">
-                    <div>
-                      <span class="ticket-id">#1024</span>
-                      <span class="ticket-status">新規</span>
+                <div class="redmine-example" aria-label="Redmine風のバグチケット記載例">
+                  <h3 class="redmine-example-number">バグ #1024</h3>
+                  <article class="redmine-example-card">
+                    <h4>プッシュ通知から開くと、1つ前のお知らせが表示されることがある</h4>
+                    <p class="redmine-example-created"><a href="#example">wataru nakayama</a> が 2026/08/12 10:54 に追加。初版</p>
+
+                    <div class="redmine-example-meta">
+                      <dl>
+                        <div><dt>ステータス:</dt><dd>新規</dd></div>
+                        <div><dt>優先度:</dt><dd>通常</dd></div>
+                        <div><dt>担当者:</dt><dd>通知 響</dd></div>
+                        <div><dt>カテゴリ:</dt><dd>業務ロジック</dd></div>
+                      </dl>
+                      <dl>
+                        <div><dt>確認バージョン:</dt><dd>App 3.4.0 (34018)</dd></div>
+                        <div><dt>障害レベル:</dt><dd>S3：中</dd></div>
+                        <div><dt>再現性:</dt><dd>5回中2回</dd></div>
+                        <div><dt>確認環境・構成:</dt><dd>iOS 18.5 / iPhone 15</dd></div>
+                      </dl>
                     </div>
-                    <span>確認環境：iOS 18.5 / iPhone 15</span>
-                  </div>
-                  <h3>プッシュ通知から開くと、1つ前のお知らせが表示されることがある</h3>
-                  <dl class="ticket-fields">
-                    <div>
-                      <dt>詳細</dt>
-                      <dd>お知らせID「NEWS-102」のプッシュ通知をタップすると、前回受信した「NEWS-101」の内容が表示されることがある。</dd>
-                    </div>
-                    <div>
-                      <dt>前提条件</dt>
-                      <dd>検証用のお知らせNEWS-101、NEWS-102が登録されていること。</dd>
-                    </div>
-                    <div>
-                      <dt>操作手順</dt>
-                      <dd><ol><li>NEWS-101のプッシュ通知を送信し、端末で開く</li><li>NEWS-102のプッシュ通知を送信する</li><li>端末に届いたNEWS-102の通知を開く</li></ol></dd>
-                    </div>
-                    <div>
-                      <dt>仕様根拠</dt>
-                      <dd>通知遷移仕様：通知タップ時は、通知に設定されたお知らせIDに対応する詳細を表示する。</dd>
-                    </div>
-                    <div>
-                      <dt>期待結果</dt>
-                      <dd>NEWS-102のお知らせ内容が表示される。</dd>
-                    </div>
-                    <div class="actual-field">
-                      <dt>実際の動作</dt>
-                      <dd>NEWS-101のお知らせ内容が表示されることがある。</dd>
-                    </div>
-                    <div>
-                      <dt>備考・周辺確認</dt>
-                      <dd>アプリ内のお知らせ一覧からNEWS-102を選択した場合は、正しい内容が表示される。Android端末および最新版アプリでは未確認。</dd>
-                    </div>
-                    <div>
-                      <dt>再現性</dt>
-                      <dd>5回中2回</dd>
-                    </div>
-                    <div>
-                      <dt>添付証跡</dt>
-                      <dd>通知ペイロード、画面収録、通知タップ前後の画面遷移ログ</dd>
-                    </div>
-                  </dl>
+
+                    <section class="redmine-example-description">
+                      <h5>説明</h5>
+                      <section><h6>詳細</h6><p>お知らせID「NEWS-102」のプッシュ通知をタップすると、前回受信した「NEWS-101」の内容が表示されることがある。</p></section>
+                      <section><h6>前提条件</h6><p>検証用のお知らせNEWS-101、NEWS-102が登録されていること。</p></section>
+                      <section><h6>操作手順</h6><ol><li>NEWS-101のプッシュ通知を送信し、端末で開く</li><li>NEWS-102のプッシュ通知を送信する</li><li>端末に届いたNEWS-102の通知を開く</li></ol></section>
+                      <section><h6>仕様根拠</h6><p>通知タップ時は、通知に設定されたお知らせIDに対応する詳細を表示する。</p></section>
+                      <section><h6>期待結果</h6><p>NEWS-102のお知らせ内容が表示される。</p></section>
+                      <section><h6>実際の動作</h6><p>NEWS-101のお知らせ内容が表示されることがある。</p></section>
+                      <section><h6>備考</h6><p>アプリ内のお知らせ一覧からNEWS-102を選択した場合は正常。Android端末および最新版アプリでは未確認。</p></section>
+                    </section>
+
+                    <section class="redmine-example-description redmine-example-evidence">
+                      <h5>添付エビデンス</h5>
+                      <ul><li>notification-payload</li><li>notification-video</li><li>navigation-log</li></ul>
+                    </section>
+                  </article>
                 </div>
 
                 <div class="why-it-works">
@@ -213,7 +204,6 @@
               <section class="article-cta" aria-labelledby="ctaTitle">
                 <img src="/assets/images/brand/akamain-main-visual.png" alt="" />
                 <div>
-                  <p class="section-kicker">PRACTICE</p>
                   <h2 id="ctaTitle">読んだら、実際に起票してみる</h2>
                   <p>実務に近いバグシナリオを読み、自分の言葉でチケットを作成できます。ゲスト体験はログイン不要です。</p>
                   <a class="start-button" href="/app.html?guest=1">ログインせず体験する <span aria-hidden="true">→</span></a>

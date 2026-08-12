@@ -385,25 +385,10 @@ a:focus-visible {
 }
 
 .features {
-  padding: 48px max(24px, calc((100% - 1100px) / 2)) 88px;
+  padding: 12px max(24px, calc((100% - 1100px) / 2)) 72px;
   background: linear-gradient(180deg, #fff 0%, var(--red-pale) 100%);
 }
 
-.section-heading {
-  width: min(760px, 100%);
-  margin: 0 auto;
-  text-align: center;
-}
-
-.section-kicker {
-  margin: 0 0 12px;
-  color: var(--red);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-}
-
-.section-heading h2,
 .learning-copy h2 {
   margin: 0;
   font-size: clamp(1.55rem, 3.2vw, 2.35rem);
@@ -411,8 +396,7 @@ a:focus-visible {
   letter-spacing: 0.025em;
 }
 
-.section-heading > p:last-child,
-.learning-copy > p:not(.section-kicker) {
+.learning-copy > p {
   margin: 16px 0 0;
   color: var(--muted);
   font-size: 0.94rem;
@@ -425,7 +409,7 @@ a:focus-visible {
   gap: 24px;
   width: min(1100px, 100%);
   margin: 0 auto;
-  padding-top: 48px;
+  padding-top: 26px;
 }
 
 .feature-card {
@@ -455,13 +439,10 @@ a:focus-visible {
 }
 
 .learning-section {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
-  align-items: center;
-  gap: clamp(48px, 8vw, 100px);
-  width: min(1100px, calc(100% - 48px));
+  width: min(680px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 100px 0;
+  padding: 82px 0;
+  text-align: center;
 }
 
 .learning-copy p {
@@ -481,66 +462,6 @@ a:focus-visible {
 
 .text-link:hover {
   color: var(--red);
-}
-
-.learning-ticket {
-  padding: 30px 32px 34px;
-  background: var(--white);
-  border: 1px solid #e5e7eb;
-  border-top: 5px solid #507aa2;
-  border-radius: 10px;
-  box-shadow: 0 22px 60px rgba(48, 57, 67, 0.12);
-}
-
-.learning-ticket-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #6b7280;
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
-.ticket-status {
-  padding: 4px 10px;
-  color: #315b7f;
-  background: #edf4fa;
-  border-radius: 999px;
-}
-
-.learning-ticket h3 {
-  margin: 18px 0 24px;
-  color: #25384a;
-  font-size: clamp(1.05rem, 2vw, 1.3rem);
-  line-height: 1.65;
-}
-
-.learning-ticket dl,
-.learning-ticket dd {
-  margin: 0;
-}
-
-.learning-ticket dl {
-  display: grid;
-  gap: 18px;
-}
-
-.learning-ticket dl > div {
-  padding-left: 14px;
-  border-left: 3px solid #d8e2eb;
-}
-
-.learning-ticket dt {
-  margin-bottom: 5px;
-  color: #52687b;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-.learning-ticket dd {
-  color: #263442;
-  font-size: 0.88rem;
-  line-height: 1.7;
 }
 
 .site-footer {
@@ -609,15 +530,6 @@ a:focus-visible {
 
   .feature-card {
     align-items: flex-start;
-  }
-
-  .learning-section {
-    grid-template-columns: 1fr;
-    gap: 42px;
-  }
-
-  .learning-copy {
-    text-align: center;
   }
 
   .learning-copy p {
@@ -716,10 +628,6 @@ a:focus-visible {
     padding-bottom: 60px;
   }
 
-  .section-heading {
-    text-align: left;
-  }
-
   .feature-grid {
     grid-template-columns: 1fr;
   }
@@ -747,14 +655,6 @@ a:focus-visible {
   .learning-section {
     width: min(100% - 32px, 1100px);
     padding: 68px 0;
-  }
-
-  .learning-copy {
-    text-align: left;
-  }
-
-  .learning-ticket {
-    padding: 24px 20px 26px;
   }
 
 }
