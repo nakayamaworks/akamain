@@ -34,13 +34,27 @@
     "dimensions": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "factualGrounding",
-        "informationCoverage",
-        "reproducibility",
-        "expectedActualSeparation",
-        "interpretiveClarity",
-        "investigationReadiness"
+      "anyOf": [
+        {
+          "required": [
+            "factualGrounding",
+            "informationCoverage",
+            "reproducibility",
+            "expectedActualSeparation",
+            "interpretiveClarity",
+            "investigationReadiness"
+          ]
+        },
+        {
+          "required": [
+            "questionFocus",
+            "answerability",
+            "sourceGrounding",
+            "factInterpretationSeparation",
+            "impactClarity",
+            "responseEfficiency"
+          ]
+        }
       ],
       "properties": {
         "factualGrounding": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
@@ -48,12 +62,18 @@
         "reproducibility": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
         "expectedActualSeparation": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
         "interpretiveClarity": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
-        "investigationReadiness": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+        "investigationReadiness": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "questionFocus": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "answerability": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "sourceGrounding": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "factInterpretationSeparation": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "impactClarity": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "responseEfficiency": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
       }
     },
     "verdict": {
       "anyOf": [
-        { "enum": ["開発着手可能", "追加確認を推奨", "再整理を推奨"] },
+        { "enum": ["開発着手可能", "追加確認を推奨", "再整理を推奨", "回答依頼可能", "追加整理を推奨", "質問の再整理を推奨"] },
         { "type": "null" }
       ]
     },

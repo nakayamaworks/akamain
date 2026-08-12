@@ -14,6 +14,7 @@ const allowedTopLevelFiles = new Set([
   "index.html",
   "main.js",
   "profile-api.js",
+  "qa-scenario-authoring-library.js",
   "robots.txt",
   "runtime-config.js",
   "scenario-authoring-library.js",

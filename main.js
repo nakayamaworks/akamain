@@ -129,15 +129,27 @@ const environmentLabelRules = [
   [/^Database schema$/i, "DBスキーマ"],
 ];
 
+function getScenarioAuthoringProfile(scenarioId) {
+  return window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[scenarioId]
+    || window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING?.[scenarioId]
+    || null;
+}
+
+function getScenarioBriefingProfile(scenarioId) {
+  return window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS?.[scenarioId]
+    || window.TYPING_WORKBENCH_QA_SCENARIO_BRIEFINGS?.[scenarioId]
+    || null;
+}
+
 function getScenarioSpecificationReference(rawScenario) {
-  return window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[rawScenario.scenarioId]
-    ?.specificationReference || "";
+  return getScenarioAuthoringProfile(rawScenario.scenarioId)?.specificationReference || "";
 }
 
 scenarioBank.push(
   ...Object.values(window.TYPING_WORKBENCH_SCENARIO_AUTHORING || {}).map(
     ({ scenario }) => scenario
-  )
+  ),
+  ...(window.TYPING_WORKBENCH_QA_SCENARIOS || [])
 );
 
 const projectCatalog = [
@@ -471,6 +483,8 @@ function buildScenario(rawScenario) {
   return {
     scenarioId: rawScenario.scenarioId,
     projectId: rawScenario.projectId,
+    ticketType: rawScenario.ticketType || "bug",
+    qaType: rawScenario.qaType || null,
     difficulty: rawScenario.difficulty || "beginner",
     evaluation: rawScenario.evaluation || buildDefaultEvaluation(rawScenario),
     evidenceProfile: getScenarioEvidenceProfile(rawScenario),
@@ -622,9 +636,7 @@ function joinFieldReportLines(lines) {
 }
 
 function getScenarioEnvironmentSelection(rawScenario) {
-  const briefingEnvironment = window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS?.[
-    rawScenario.scenarioId
-  ]?.environment;
+  const briefingEnvironment = getScenarioBriefingProfile(rawScenario.scenarioId)?.environment;
   const environmentLines = Array.isArray(briefingEnvironment)
     ? briefingEnvironment.map((text) => ({ text }))
     : rawScenario.environment || [];
@@ -676,9 +688,7 @@ function trimJapanesePeriod(value) {
 }
 
 function buildFieldObservation(rawScenario) {
-  const briefingNotes = window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS?.[
-    rawScenario.scenarioId
-  ]?.notes;
+  const briefingNotes = getScenarioBriefingProfile(rawScenario.scenarioId)?.notes;
   if (Array.isArray(briefingNotes) && briefingNotes.length > 0) {
     return briefingNotes.join("\n\n");
   }
@@ -686,9 +696,8 @@ function buildFieldObservation(rawScenario) {
 }
 
 function getScenarioTestTarget(rawScenario) {
-  return window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS?.[
-    rawScenario.scenarioId
-  ]?.testTarget || "対象機能の動作をテストしています。";
+  return getScenarioBriefingProfile(rawScenario.scenarioId)?.testTarget
+    || "対象機能の動作をテストしています。";
 }
 
 function getScenarioNarrativePatternIndex(scenarioId, patternCount = 10) {
@@ -700,9 +709,7 @@ function getScenarioNarrativePatternIndex(scenarioId, patternCount = 10) {
 }
 
 function getScenarioWorkMemo(rawScenario, profile) {
-  const briefing = window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS?.[
-    rawScenario.scenarioId
-  ];
+  const briefing = getScenarioBriefingProfile(rawScenario.scenarioId);
   const notes = Array.isArray(briefing?.notes) ? briefing.notes : [];
   const targetIntro = String(briefing?.testTarget || "対象機能の動作をテストしています。")
     .replace(/をテストしています。$/, "のテスト中に確認した内容です。");
@@ -792,9 +799,7 @@ function getScenarioWorkMemo(rawScenario, profile) {
 }
 
 function getScenarioJudgementProfile(rawScenario) {
-  const authoredProfile = window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[
-    rawScenario.scenarioId
-  ]?.judgement;
+  const authoredProfile = getScenarioAuthoringProfile(rawScenario.scenarioId)?.judgement;
   if (authoredProfile) {
     return authoredProfile;
   }
@@ -945,9 +950,27 @@ function shuffleIndices(length) {
   return indices;
 }
 
-function getLastScenarioIndex(projectId) {
+function getScenarioTicketType(scenario) {
+  return scenario?.ticketType === "qa" ? "qa" : "bug";
+}
+
+function isQaScenario(scenario = state.scenario) {
+  return getScenarioTicketType(scenario) === "qa";
+}
+
+function getQaTypeLabel(qaType) {
+  return {
+    specification: "仕様確認",
+    behavior: "動作確認",
+    conflict: "仕様矛盾",
+  }[qaType] || "—";
+}
+
+function getLastScenarioIndex(projectId, ticketType = state.trainingTicketType) {
   try {
-    const storedValue = window.sessionStorage.getItem(`typing-workbench:last-scenario:${projectId}`);
+    const storedValue = window.sessionStorage.getItem(
+      `typing-workbench:last-scenario:${projectId}:${ticketType}`
+    );
     const parsedValue = Number.parseInt(storedValue ?? "", 10);
     return Number.isInteger(parsedValue) ? parsedValue : -1;
   } catch {
@@ -955,10 +978,10 @@ function getLastScenarioIndex(projectId) {
   }
 }
 
-function saveLastScenarioIndex(projectId, scenarioIndex) {
+function saveLastScenarioIndex(projectId, scenarioIndex, ticketType = state.trainingTicketType) {
   try {
     window.sessionStorage.setItem(
-      `typing-workbench:last-scenario:${projectId}`,
+      `typing-workbench:last-scenario:${projectId}:${ticketType}`,
       String(scenarioIndex)
     );
   } catch {
@@ -966,10 +989,26 @@ function saveLastScenarioIndex(projectId, scenarioIndex) {
   }
 }
 
-function getProjectScenarioEntries(projectId = state.projectId) {
+function getProjectScenarioEntries(
+  projectId = state.projectId,
+  ticketType = state.trainingTicketType
+) {
   return scenarioBank
     .map((scenario, index) => ({ scenario, index }))
-    .filter(({ scenario }) => scenario.projectId === projectId);
+    .filter(({ scenario }) =>
+      scenario.projectId === projectId
+      && getScenarioTicketType(scenario) === ticketType
+    );
+}
+
+function getAvailableScenarioEntries(ticketType = state.trainingTicketType) {
+  const projectEntries = getProjectScenarioEntries(state.projectId, ticketType);
+  if (projectEntries.length > 0 || ticketType === "bug") {
+    return projectEntries;
+  }
+  return scenarioBank
+    .map((scenario, index) => ({ scenario, index }))
+    .filter(({ scenario }) => getScenarioTicketType(scenario) === ticketType);
 }
 
 function getKnownAttemptedScenarioIds() {
@@ -981,7 +1020,8 @@ function getKnownAttemptedScenarioIds() {
 
 function getUnattemptedScenarioEntries(projectId = state.projectId) {
   const attemptedScenarioIds = getKnownAttemptedScenarioIds();
-  return getProjectScenarioEntries(projectId)
+  const availableEntries = getAvailableScenarioEntries(state.trainingTicketType);
+  return availableEntries
     .filter(({ scenario }) => !attemptedScenarioIds.has(scenario.scenarioId));
 }
 
@@ -1012,7 +1052,9 @@ function orderReviewScenarioEntries(entries) {
 
 function avoidImmediateScenarioRepeat(entries) {
   const previousScenarioIndex =
-    state.scenarioIndex >= 0 ? state.scenarioIndex : getLastScenarioIndex(state.projectId);
+    state.scenarioIndex >= 0
+      ? state.scenarioIndex
+      : getLastScenarioIndex(state.projectId, state.trainingTicketType);
   if (previousScenarioIndex >= 0 && entries.length > 1 && entries[0]?.index === previousScenarioIndex) {
     [entries[0], entries[1]] = [entries[1], entries[0]];
   }
@@ -1020,7 +1062,7 @@ function avoidImmediateScenarioRepeat(entries) {
 }
 
 function refillScenarioQueue() {
-  const projectScenarios = getProjectScenarioEntries();
+  const projectScenarios = getAvailableScenarioEntries();
   const unattemptedScenarios = getUnattemptedScenarioEntries();
   const eligibleEntries = unattemptedScenarios.length
     ? shuffleIndices(unattemptedScenarios.length).map((position) => unattemptedScenarios[position])
@@ -1036,9 +1078,18 @@ function drawNextScenario() {
   }
 
   const nextIndex = state.scenarioQueue.shift();
+  if (!Number.isInteger(nextIndex)) {
+    return false;
+  }
   state.scenarioIndex = nextIndex;
-  saveLastScenarioIndex(state.projectId, nextIndex);
-  state.scenario = buildScenario(scenarioBank[nextIndex]);
+  const rawScenario = scenarioBank[nextIndex];
+  state.trainingTicketType = getScenarioTicketType(rawScenario);
+  state.projectId = rawScenario.projectId;
+  saveLastScenarioIndex(state.projectId, nextIndex, state.trainingTicketType);
+  state.scenario = buildScenario(rawScenario);
+  saveListPreferences();
+  renderProject();
+  return true;
 }
 
 function selectScenarioById(scenarioId) {
@@ -1047,10 +1098,11 @@ function selectScenarioById(scenarioId) {
     return false;
   }
   state.projectId = scenarioBank[scenarioIndex].projectId;
+  state.trainingTicketType = getScenarioTicketType(scenarioBank[scenarioIndex]);
   state.scenarioIndex = scenarioIndex;
   state.scenarioQueue = [];
   state.scenario = buildScenario(scenarioBank[scenarioIndex]);
-  saveLastScenarioIndex(state.projectId, scenarioIndex);
+  saveLastScenarioIndex(state.projectId, scenarioIndex, state.trainingTicketType);
   saveListPreferences();
   renderProject();
   return true;
@@ -1228,11 +1280,17 @@ const elements = {
   practiceScoringRadar: document.getElementById("practiceScoringRadar"),
   practiceScoringRadarValue: document.getElementById("practiceScoringRadarValue"),
   practiceRadarFactual: document.getElementById("practiceRadarFactual"),
+  practiceRadarLabelFactual: document.getElementById("practiceRadarLabelFactual"),
   practiceRadarCoverage: document.getElementById("practiceRadarCoverage"),
+  practiceRadarLabelCoverage: document.getElementById("practiceRadarLabelCoverage"),
   practiceRadarReproducibility: document.getElementById("practiceRadarReproducibility"),
+  practiceRadarLabelReproducibility: document.getElementById("practiceRadarLabelReproducibility"),
   practiceRadarSeparation: document.getElementById("practiceRadarSeparation"),
+  practiceRadarLabelSeparation: document.getElementById("practiceRadarLabelSeparation"),
   practiceRadarClarity: document.getElementById("practiceRadarClarity"),
+  practiceRadarLabelClarity: document.getElementById("practiceRadarLabelClarity"),
   practiceRadarInvestigation: document.getElementById("practiceRadarInvestigation"),
+  practiceRadarLabelInvestigation: document.getElementById("practiceRadarLabelInvestigation"),
   resultRank: document.getElementById("resultRank"),
   resultScore: document.getElementById("resultScore"),
   resultDecisionScore: document.getElementById("resultDecisionScore"),
@@ -1301,6 +1359,11 @@ const elements = {
   scenarioIntroStartButton: document.getElementById("scenarioIntroStartButton"),
   scenarioIntroPracticeButton: document.getElementById("scenarioIntroPracticeButton"),
   scenarioIntroBackButton: document.getElementById("scenarioIntroBackButton"),
+  scenarioIntroTitle: document.getElementById("scenarioIntroTitle"),
+  scenarioIntroSeverityRules: document.getElementById("scenarioIntroSeverityRules"),
+  scenarioPanel: document.getElementById("scenarioPanel"),
+  scenarioPanelTitle: document.getElementById("scenarioPanelTitle"),
+  scenarioPanelSeverityRules: document.getElementById("scenarioPanelSeverityRules"),
   rmProjectTitle: document.getElementById("rmProjectTitle"),
   rmProjectSwitcher: document.getElementById("rmProjectSwitcher"),
   ticketListBody: document.getElementById("ticketListBody"),
@@ -1308,12 +1371,15 @@ const elements = {
   ticketListStatus: document.getElementById("ticketListStatus"),
   ticketListContent: document.getElementById("ticketListContent"),
   ticketListMoreButton: document.getElementById("ticketListMoreButton"),
+  qaStartButton: document.getElementById("qaStartButton"),
+  ticketTypeFilterButtons: document.querySelectorAll("[data-ticket-type-filter]"),
   ticketDetailNumber: document.getElementById("ticketDetailNumber"),
   ticketDetailBackButton: document.getElementById("ticketDetailBackButton"),
   ticketDetailAuthGate: document.getElementById("ticketDetailAuthGate"),
   ticketDetailStatus: document.getElementById("ticketDetailStatus"),
   ticketDetailContent: document.getElementById("ticketDetailContent"),
   ticketCreateTitle: document.getElementById("ticketCreateTitle"),
+  severityField: document.getElementById("severityField"),
   ticketStatusFilter: document.getElementById("ticketStatusFilter"),
   ticketExtraFilter: document.getElementById("ticketExtraFilter"),
   applyTicketFiltersButton: document.getElementById("applyTicketFiltersButton"),
@@ -1324,6 +1390,8 @@ const elements = {
   scenarioGlossary: document.getElementById("scenarioGlossary"),
   scenarioPanelBody: document.getElementById("scenarioPanelBody"),
   scenarioReferenceHint: document.getElementById("scenarioReferenceHint"),
+  practiceScoringInvestigationSection: document.getElementById("practiceScoringInvestigationSection"),
+  practiceScoringInvestigationTitle: document.getElementById("practiceScoringInvestigationTitle"),
 };
 
 const listPreferenceDefaults = {
@@ -1333,6 +1401,7 @@ const listPreferenceDefaults = {
   sortDirection: "desc",
   statusFilter: "all",
   extraFilter: "all",
+  ticketTypeFilter: "all",
 };
 
 function loadListPreferences() {
@@ -1356,6 +1425,9 @@ function loadListPreferences() {
       sortDirection: parsedValue.sortDirection === "asc" ? "asc" : "desc",
       statusFilter: "all",
       extraFilter: "all",
+      ticketTypeFilter: new Set(["all", "bug", "qa"]).has(parsedValue.ticketTypeFilter)
+        ? parsedValue.ticketTypeFilter
+        : "all",
     };
   } catch {
     return { ...listPreferenceDefaults };
@@ -1373,6 +1445,7 @@ function saveListPreferences() {
         sortDirection: state.ticketSortDirection,
         statusFilter: state.ticketStatusFilter,
         extraFilter: state.ticketExtraFilter,
+        ticketTypeFilter: state.ticketTypeFilter,
       })
     );
   } catch {
@@ -1466,6 +1539,7 @@ const state = {
   awaitingCreate: false,
   view: "list",
   projectId: initialListPreferences.projectId,
+  trainingTicketType: "bug",
   authoringMode: initialListPreferences.authoringMode,
   completedSessionsByProject: {},
   scenarioIndex: -1,
@@ -1479,6 +1553,7 @@ const state = {
   ticketSortDirection: initialListPreferences.sortDirection,
   ticketStatusFilter: initialListPreferences.statusFilter,
   ticketExtraFilter: initialListPreferences.extraFilter,
+  ticketTypeFilter: initialListPreferences.ticketTypeFilter,
   ticketListItems: [],
   ticketListNextCursor: null,
   ticketListRequestId: 0,
@@ -1650,7 +1725,8 @@ function renderTicketList() {
 
   const filteredRows = state.ticketListItems
     .filter((row) => state.ticketStatusFilter === "all" || row.reviewStatus === state.ticketStatusFilter)
-    .filter((row) => state.ticketExtraFilter === "all" || row.priority === state.ticketExtraFilter);
+    .filter((row) => state.ticketExtraFilter === "all" || row.priority === state.ticketExtraFilter)
+    .filter((row) => state.ticketTypeFilter === "all" || row.tracker === state.ticketTypeFilter);
 
   elements.ticketListBody.innerHTML = filteredRows.length > 0
     ? filteredRows
@@ -1658,6 +1734,7 @@ function renderTicketList() {
           (row) => `
             <tr>
               <td>#${escapeHtml(String(row.displayId || ""))}</td>
+              <td><span class="ticket-type-pill is-${row.tracker === "qa" ? "qa" : "bug"}">${row.tracker === "qa" ? "QA" : "バグ"}</span></td>
               <td><span class="ticket-review-pill is-${escapeHtml(String(row.reviewStatus || "pending"))}">${escapeHtml(ticketReviewLabels[row.reviewStatus] || "採点待ち")}${Number.isInteger(row.totalScore) ? ` ${row.totalScore}点` : ""}</span></td>
               <td>${escapeHtml(ticketPriorityLabels[row.priority] || "未設定")}</td>
               <td><a class="ticket-subject-link" href="#/tickets/${encodeURIComponent(row.ticketId || row.attemptId)}">${escapeHtml(row.subject || "（題名なし）")}</a></td>
@@ -1667,8 +1744,8 @@ function renderTicketList() {
           `
         )
         .join("")
-    : `<tr><td colspan="6" class="ticket-list-empty">${state.ticketListItems.length === 0
-      ? "まだ作成したチケットはありません。チケット作成から最初の実践起票を始めましょう。"
+    : `<tr><td colspan="7" class="ticket-list-empty">${state.ticketListItems.length === 0
+      ? "まだ作成したチケットはありません。バグ起票またはQA起票から始めましょう。"
       : "条件に一致するチケットはありません。"}</td></tr>`;
 }
 
@@ -1709,6 +1786,7 @@ async function loadTicketList(options = {}) {
   try {
     const response = await window.TYPING_WORKBENCH_PROFILE_API.getTickets({
       projectId: state.projectId,
+      tracker: state.ticketTypeFilter === "all" ? "" : state.ticketTypeFilter,
       limit: 20,
       cursor: append ? state.ticketListNextCursor : null,
     });
@@ -1746,6 +1824,11 @@ function renderProject() {
   if (elements.ticketExtraFilter) {
     elements.ticketExtraFilter.value = state.ticketExtraFilter;
   }
+  elements.ticketTypeFilterButtons.forEach((button) => {
+    const active = button.dataset.ticketTypeFilter === state.ticketTypeFilter;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
 
   if (elements.assigneeSelect) {
     elements.assigneeSelect.innerHTML = [
@@ -2094,7 +2177,8 @@ function setView(view) {
 
 function applyTicketDefaults() {
   renderEnvironmentOptions();
-  setControlValue(elements.trackerSelect, ticketDefaults.tracker);
+  const qaScenario = isQaScenario();
+  setControlValue(elements.trackerSelect, qaScenario ? "qa" : ticketDefaults.tracker);
   setControlValue(elements.statusSelect, ticketDefaults.status);
   setControlValue(elements.prioritySelect, ticketDefaults.priority);
   setControlValue(elements.severitySelect, ticketDefaults.severity);
@@ -2108,6 +2192,7 @@ function applyTicketDefaults() {
   setControlValue(elements.startDateInput, ticketDefaults.startDate);
   setControlValue(elements.dueDateInput, ticketDefaults.dueDate);
   setControlValue(elements.progressSelect, ticketDefaults.progress);
+  elements.severityField?.classList.toggle("hidden", qaScenario);
 }
 
 function applyTicketFieldValues(fields = {}) {
@@ -2127,6 +2212,7 @@ function applyTicketFieldValues(fields = {}) {
   elements.ticketWatchersList?.querySelectorAll('input[name="watchers"]').forEach((checkbox) => {
     checkbox.checked = watcherIds.has(checkbox.value);
   });
+  elements.severityField?.classList.toggle("hidden", isQaScenario());
 }
 
 function getCurrentEvidenceProfile() {
@@ -2563,6 +2649,20 @@ function getScenarioGlossaryItems(context) {
 
 function renderScenarioBrief() {
   const context = state.scenario.evaluation.context || {};
+  const qaScenario = isQaScenario();
+  setTextContent(elements.scenarioIntroTitle, qaScenario ? "QAシナリオ" : "バグシナリオ");
+  setTextContent(elements.scenarioPanelTitle, qaScenario ? "QAシナリオ" : "バグシナリオ");
+  setTextContent(elements.ticketCreateTitle, qaScenario ? "新しいQA" : "新しいチケット");
+  elements.scenarioPanel?.setAttribute("aria-label", qaScenario ? "QAシナリオ" : "バグシナリオ");
+  elements.scenarioIntroSeverityRules?.classList.toggle("hidden", qaScenario);
+  elements.scenarioPanelSeverityRules?.classList.toggle("hidden", qaScenario);
+  if (elements.trackerSelect) {
+    elements.trackerSelect.setAttribute(
+      "aria-label",
+      qaScenario ? "トラッカー（QA固定）" : "トラッカー（バグ固定）"
+    );
+  }
+  elements.severityField?.classList.toggle("hidden", qaScenario);
   const project = getCurrentProject();
   const assignee = project.members.find((member) => member.id === state.scenario.evaluation.assignee);
   const relatedWatcherId = state.scenario.evaluation.watchers
@@ -2582,6 +2682,7 @@ function renderScenarioBrief() {
     ["", context.workMemo, "testTarget observation scope risk recovery workaround"],
   ].filter(([, value]) => value);
   const decisionItems = [
+    ...(qaScenario ? [["質問種別", getQaTypeLabel(state.scenario.qaType), "qaType"]] : []),
     ["確認日時・環境", environmentMemo, "occurredAt environment"],
     ["関連資料", context.specification, "specification"],
     ["対応日程", context.schedule, "schedule risk"],
@@ -2702,7 +2803,7 @@ function showScenarioReferences(config) {
 
 function getSetupFields() {
   return [
-    elements.severitySelect,
+    ...(isQaScenario() ? [] : [elements.severitySelect]),
     elements.prioritySelect,
     elements.assigneeSelect,
     elements.categorySelect,
@@ -3471,13 +3572,21 @@ async function startSession(options = {}) {
     return;
   }
   state.scenarioSelectionPending = true;
+  const requestedTicketType = options.ticketType === "qa" ? "qa" : "bug";
+  if (state.trainingTicketType !== requestedTicketType) {
+    state.trainingTicketType = requestedTicketType;
+    state.scenarioQueue = [];
+    state.scenarioIndex = -1;
+  }
   syncControls();
   try {
     if (options.refreshProgress !== false) {
       await refreshProgressForScenarioSelection();
       state.scenarioQueue = [];
     }
-    drawNextScenario();
+    if (!drawNextScenario()) {
+      return;
+    }
     showScenarioIntro();
   } finally {
     state.scenarioSelectionPending = false;
@@ -3574,7 +3683,7 @@ function getSelectedTicketFields() {
 
 function getPracticeTicketFieldPayload(selected = getSelectedTicketFields()) {
   return {
-    tracker: selected.tracker || "bug",
+    tracker: selected.tracker || (isQaScenario() ? "qa" : "bug"),
     private: false,
     status: selected.status || "new",
     severity: selected.severity || null,
@@ -4013,14 +4122,36 @@ function renderPracticeScoringPreviewList(element, items, emptyLabel = "該当�
 }
 
 function renderPracticeScoringRadar(preview) {
-  const parameters = [
-    ["事実性", preview.dimensions.factualGrounding, elements.practiceRadarFactual],
-    ["情報充足", preview.dimensions.informationCoverage, elements.practiceRadarCoverage],
-    ["再現性", preview.dimensions.reproducibility, elements.practiceRadarReproducibility],
-    ["期待・実績", preview.dimensions.expectedActualSeparation, elements.practiceRadarSeparation],
-    ["解釈明瞭", preview.dimensions.interpretiveClarity, elements.practiceRadarClarity],
-    ["切り分け", preview.dimensions.investigationReadiness, elements.practiceRadarInvestigation],
+  const slots = [
+    [elements.practiceRadarLabelFactual, elements.practiceRadarFactual],
+    [elements.practiceRadarLabelCoverage, elements.practiceRadarCoverage],
+    [elements.practiceRadarLabelReproducibility, elements.practiceRadarReproducibility],
+    [elements.practiceRadarLabelSeparation, elements.practiceRadarSeparation],
+    [elements.practiceRadarLabelClarity, elements.practiceRadarClarity],
+    [elements.practiceRadarLabelInvestigation, elements.practiceRadarInvestigation],
   ];
+  const definitions = isQaScenario()
+    ? [
+        ["論点焦点", "questionFocus"],
+        ["回答容易", "answerability"],
+        ["根拠明瞭", "sourceGrounding"],
+        ["事実・解釈", "factInterpretationSeparation"],
+        ["影響明瞭", "impactClarity"],
+        ["往復削減", "responseEfficiency"],
+      ]
+    : [
+        ["事実性", "factualGrounding"],
+        ["情報充足", "informationCoverage"],
+        ["再現性", "reproducibility"],
+        ["期待・実績", "expectedActualSeparation"],
+        ["解釈明瞭", "interpretiveClarity"],
+        ["切り分け", "investigationReadiness"],
+      ];
+  const parameters = definitions.map(([label, key], index) => {
+    const [labelElement, valueElement] = slots[index];
+    setTextContent(labelElement, label);
+    return [label, preview.dimensions[key], valueElement];
+  });
   elements.practiceScoringRadarValue?.setAttribute(
     "points",
     getResultRadarPoints(parameters.map(([, value]) => value))
@@ -4075,6 +4206,12 @@ function renderPracticeAmbiguityRisks(items) {
 }
 
 function renderPracticeInvestigationAdvice(items) {
+  const hasItems = items.length > 0;
+  elements.practiceScoringInvestigationSection?.classList.toggle("hidden", !hasItems);
+  setTextContent(
+    elements.practiceScoringInvestigationTitle,
+    isQaScenario() ? "回答依頼前に確認すること" : "次に確認・切り分けすること"
+  );
   if (!elements.practiceScoringInvestigationAdvice) {
     return;
   }
@@ -4132,6 +4269,18 @@ const scoringVerdictPresentation = {
     label: "起票内容の再整理を推奨",
     description: "調査を始める前に、発生条件や実際の結果を整理する必要があります。",
   },
+  "回答依頼可能": {
+    label: "回答を依頼できる状態",
+    description: "回答者が論点を理解し、判断または訂正できる情報が揃っています。",
+  },
+  "追加整理を推奨": {
+    label: "追加整理を推奨",
+    description: "質問は伝わりますが、回答の往復を減らすために補足するとよい情報があります。",
+  },
+  "質問の再整理を推奨": {
+    label: "質問内容の再整理を推奨",
+    description: "回答を依頼する前に、判断してほしい論点と確認済み事実を整理する必要があります。",
+  },
 };
 
 function getScoringVerdictPresentation(verdict) {
@@ -4166,7 +4315,9 @@ function renderPracticeScoringPreview() {
   setTextContent(
     elements.practiceScoringMessage,
     isLoading
-      ? "AIが開発・QAの読み手として文章をレビューしています。"
+      ? isQaScenario()
+        ? "AIが回答者の視点でQA起票をレビューしています。"
+        : "AIが開発・QAの読み手として文章をレビューしています。"
       : isSucceeded
         ? "AIレビューが完了しました。"
         : isError
@@ -4727,6 +4878,9 @@ function renderTicketDetail() {
     renderProject();
   }
   const fields = ticket.answer?.ticketFields || {};
+  const ticketAuthoringProfile = getScenarioAuthoringProfile(ticket.scenarioId);
+  const qaTicket = fields.tracker === "qa";
+  const qaTypeLabel = getQaTypeLabel(ticketAuthoringProfile?.scenario?.qaType);
   const result = getLatestScoringResult(ticket);
   const memberName = (memberId) => getProjectMemberName(ticket.projectId, memberId);
   const sections = Object.entries(ticket.answer?.sections || {})
@@ -4760,7 +4914,7 @@ function renderTicketDetail() {
   const hasImprovementSuggestions = Boolean(questions || ambiguityRisks || rewrites);
   const verdictPresentation = getScoringVerdictPresentation(result?.verdict);
   const reviewStatus = result?.status || (ticket.scoringSupported ? "pending" : "not_supported");
-  const trackerLabel = ticketFieldLabel({ bug: "バグ", feature: "機能", support: "サポート" }, fields.tracker);
+  const trackerLabel = ticketFieldLabel({ bug: "バグ", qa: "QA", feature: "機能", support: "サポート" }, fields.tracker);
   const authorName = elements.authUserName?.textContent?.trim() || "ログインユーザー";
   const progress = Number.isInteger(fields.progress) ? Math.min(100, Math.max(0, fields.progress)) : null;
   const revisions = state.ticketDetailRevisions.length
@@ -4802,11 +4956,12 @@ function renderTicketDetail() {
       <div class="ticket-detail-meta-grid">
         <div class="ticket-detail-meta-column">
           <dl><dt>ステータス:</dt><dd>${escapeHtml(ticketFieldLabel(fieldValueLabels.status, fields.status))}</dd></dl>
+          ${qaTicket ? `<dl><dt>質問種別:</dt><dd>${escapeHtml(qaTypeLabel)}</dd></dl>` : ""}
           <dl><dt>優先度:</dt><dd>${escapeHtml(ticketFieldLabel(fieldValueLabels.priority, fields.priority))}</dd></dl>
           <dl><dt>担当者:</dt><dd>${escapeHtml(memberName(fields.assigneeId))}</dd></dl>
           <dl><dt>カテゴリ:</dt><dd>${escapeHtml(ticketFieldLabel(fieldValueLabels.category, fields.category))}</dd></dl>
           <dl><dt>確認バージョン:</dt><dd>${escapeHtml(fields.version || "—")}</dd></dl>
-          <dl><dt>障害レベル:</dt><dd>${escapeHtml(ticketFieldLabel(fieldValueLabels.severity, fields.severity))}</dd></dl>
+          ${qaTicket ? "" : `<dl><dt>障害レベル:</dt><dd>${escapeHtml(ticketFieldLabel(fieldValueLabels.severity, fields.severity))}</dd></dl>`}
         </div>
         <div class="ticket-detail-meta-column">
           <dl><dt>開始日:</dt><dd>${escapeHtml(fields.startDate || "—")}</dd></dl>
@@ -5274,6 +5429,9 @@ function syncControls() {
   if (elements.startButton) {
     elements.startButton.disabled = !canStart;
   }
+  if (elements.qaStartButton) {
+    elements.qaStartButton.disabled = !canStart;
+  }
 
   if (elements.resumeDraftButton) {
     const hasProjectDraft = Boolean(getLatestPracticeDraft(state.projectId));
@@ -5365,7 +5523,13 @@ function selectAuthoringMode(nextMode) {
 
 function handleStartButton() {
   if (!state.running && !state.awaitingCreate) {
-    startSession();
+    startSession({ ticketType: "bug" });
+  }
+}
+
+function handleQaStartButton() {
+  if (!state.running && !state.awaitingCreate) {
+    startSession({ ticketType: "qa" });
   }
 }
 
@@ -5402,9 +5566,22 @@ function handleApplyTicketFilters() {
   renderTicketList();
 }
 
+function handleTicketTypeFilter(event) {
+  const nextType = event.currentTarget.dataset.ticketTypeFilter;
+  if (!new Set(["all", "bug", "qa"]).has(nextType)) {
+    return;
+  }
+  state.ticketTypeFilter = nextType;
+  state.ticketListItems = [];
+  state.ticketListNextCursor = null;
+  saveListPreferences();
+  renderProject();
+}
+
 function handleClearTicketFilters() {
   state.ticketStatusFilter = "all";
   state.ticketExtraFilter = "all";
+  state.ticketTypeFilter = "all";
   state.ticketSortKey = "completedAt";
   state.ticketSortDirection = "desc";
 
@@ -5458,7 +5635,7 @@ function handleRetryButton() {
 
 function handleNextScenarioButton() {
   selectAuthoringMode("practice");
-  startSession({ refreshProgress: false });
+  startSession({ refreshProgress: false, ticketType: state.trainingTicketType });
 }
 
 function handleSameScenarioPractice() {
@@ -5473,6 +5650,7 @@ function handleExitButton() {
 }
 
 on(elements.startButton, "click", handleStartButton);
+on(elements.qaStartButton, "click", handleQaStartButton);
 on(elements.resumeDraftButton, "click", handleResumeDraftButton);
 on(elements.draftSaveButton, "click", saveCurrentPracticeDraft);
 on(elements.homeNavButton, "click", () => {
@@ -5487,6 +5665,7 @@ elements.ticketSortButtons.forEach((button) => on(button, "click", handleTicketS
 on(elements.applyTicketFiltersButton, "click", handleApplyTicketFilters);
 on(elements.clearTicketFiltersButton, "click", handleClearTicketFilters);
 on(elements.ticketListMoreButton, "click", () => loadTicketList({ append: true }));
+elements.ticketTypeFilterButtons.forEach((button) => on(button, "click", handleTicketTypeFilter));
 on(elements.ticketDetailBackButton, "click", () => navigateToHash("#/tickets"));
 on(elements.ticketDetailContent, "click", handleTicketDetailAction);
 on(elements.stopButton, "click", handleStopButton);

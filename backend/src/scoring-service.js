@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -9,29 +10,183 @@ const rubricRegistryPath = path.resolve(
   "../../scoring/rubrics/scenario-rubrics.json"
 );
 const rubricRegistry = JSON.parse(fs.readFileSync(rubricRegistryPath, "utf8"));
+const qaScenarioSource = fs.readFileSync(
+  path.resolve(moduleDirectory, "../../qa-scenario-authoring-library.js"),
+  "utf8"
+);
+const qaScenarioContext = { window: {} };
+vm.runInNewContext(qaScenarioSource, qaScenarioContext, {
+  filename: "qa-scenario-authoring-library.js",
+});
+const qaAuthoringRegistry = qaScenarioContext.window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING || {};
+
+const qaDimensions = [
+  { id: "questionFocus", label: "論点の焦点", weight: 20 },
+  { id: "answerability", label: "回答しやすさ", weight: 20 },
+  { id: "sourceGrounding", label: "根拠の明瞭さ", weight: 15 },
+  { id: "factInterpretationSeparation", label: "事実・解釈", weight: 15 },
+  { id: "impactClarity", label: "影響の明瞭さ", weight: 15 },
+  { id: "responseEfficiency", label: "やり取り削減", weight: 15 },
+];
+
+function qaSectionText(report, sectionTitle) {
+  const lines = [];
+  let active = false;
+  for (const entry of report || []) {
+    if (entry.kind === "section") {
+      active = entry.text === sectionTitle;
+      continue;
+    }
+    if (active && entry.kind === "line") {
+      lines.push(entry.text);
+    }
+  }
+  return lines.join("\n");
+}
+
+function buildQaRubric(profile) {
+  const scenario = profile.scenario;
+  const sourceIds = profile.reviewSource.observations.map(({ id }) => id);
+  const sourceRefs = (pattern, fallback = sourceIds) => {
+    const matched = sourceIds.filter((id) => pattern.test(id));
+    return matched.length ? matched : fallback;
+  };
+  const { alternativeExcellentAnswer: _example, ...reviewSource } = profile.reviewSource;
+  return {
+    scenarioId: scenario.scenarioId,
+    projectId: scenario.projectId,
+    ticketType: "qa",
+    qaType: scenario.qaType,
+    rubricVersion: `${scenario.scenarioId}.qa-v1`,
+    dimensions: qaDimensions,
+    reviewSource,
+    requiredFacts: {
+      subject: [{
+        id: "subject-question-target",
+        description: "題名だけで確認対象と判断してほしい論点が分かる",
+        importance: "important",
+        sourceRefs: sourceIds,
+      }],
+      question: [{
+        id: "question-single-decision",
+        description: "回答者が何を判断すればよいか、一つの主要論点として明確に質問する",
+        importance: "critical",
+        sourceRefs: sourceIds,
+      }],
+      situation: [{
+        id: "situation-confirmed-facts",
+        description: "確認した条件と事実を、推測や期待値と区別して示す",
+        importance: "critical",
+        sourceRefs: sourceRefs(/^situation|^comparison/),
+      }],
+      references: [{
+        id: "references-checked-materials",
+        description: "確認済みの仕様や関連情報と、そこに記載されていない点または矛盾点を示す",
+        importance: "important",
+        sourceRefs: sourceRefs(/^source/),
+      }],
+      interpretation: [{
+        id: "interpretation-current-understanding",
+        description: "現在の解釈を、確定仕様と断定せず根拠とともに示す",
+        importance: "important",
+        sourceRefs: sourceIds,
+      }],
+      impact: [{
+        id: "impact-decision-consequence",
+        description: "回答によって変わるテスト、バグ判定または業務上の判断を示す",
+        importance: "important",
+        sourceRefs: sourceRefs(/^impact/),
+      }],
+    },
+    factAssessmentPolicy: {
+      semanticEquivalence: true,
+      sourceMaterialRule: "reviewSourceに含まれる状況、確認済み事実、参照情報が事実判定の基準であり、writingExampleは判定に使用しない",
+      sectionFlexibilityRule: "必要な意味がQA起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション配置を減点しない",
+      standardOperationDetailRule: "チーム内で既知の標準操作は、操作経路そのものが質問の論点でない限り手順書レベルの詳細を要求しない",
+      unsupportedAdditionRule: "提示材料にない追加確認を事実として書いた場合は、矛盾と即断せず実施済みか推測かを記述確認として扱う",
+      trackingIdentifierRule: "追跡用IDは論点特定に必要な場合だけ求め、一律に本文への具体値記載を要求しない",
+      measuredValueRule: "金額、時刻、件数など質問成立に必要な値は提示材料と整合するか評価する",
+      evidenceRule: "添付資料は参照情報を補完できるが、主要な質問と現在の解釈の記載を代替しない",
+    },
+    reviewGuide: profile.reviewGuide,
+    forbiddenClaims: [
+      { id: "claim-unconfirmed-specification", description: "未確定の解釈を確認済み仕様として断定する", severity: "major" },
+      { id: "claim-unverified-cause", description: "提示材料で確認されていない実装原因を断定する", severity: "major" },
+      { id: "claim-unverified-scope", description: "確認していない環境や機能にも同じ判断が適用されると断定する", severity: "major" },
+    ],
+    optionalFacts: [
+      { id: "optional-answer-shortcut", description: "回答者が短時間で判断できる具体例や境界値を示す" },
+      { id: "optional-comparison", description: "類似仕様や比較条件を、同一仕様と断定せず補足する" },
+    ],
+    expectedTicketFields: {
+      severity: null,
+      priority: scenario.evaluation.priority || null,
+      category: scenario.evaluation.category || null,
+      version: scenario.evaluation.version || null,
+      environment: scenario.evaluation.environment || null,
+      assigneeId: scenario.evaluation.assignee || null,
+      watcherIds: scenario.evaluation.watchers || [],
+      dueDatePolicy: { mode: "unset" },
+    },
+    evidenceFiles: [],
+    writingExample: {
+      subject: scenario.subject.text,
+      sections: {
+        question: qaSectionText(scenario.report, "■質問"),
+        situation: qaSectionText(scenario.report, "■確認した状況・事実"),
+        references: qaSectionText(scenario.report, "■参照情報"),
+        interpretation: qaSectionText(scenario.report, "■現在の解釈"),
+        impact: qaSectionText(scenario.report, "■確認理由・影響"),
+        remarks: qaSectionText(scenario.report, "■周辺確認・補足"),
+      },
+    },
+    rubricNotes: [
+      "記載例は正解ではなく採点時の事実源にも使用しない",
+      "仕様の正誤ではなく回答者が判断しやすい質問になっているかを評価する",
+      "YesまたはNoだけを強制せず、必要な訂正を短く返せる質問を評価する",
+      "一つのQAへ複数の独立した判断事項を詰め込まない",
+      "質問者が確認できる資料の読み直しを回答者へ丸投げしない",
+    ],
+  };
+}
+
+const qaRubrics = Object.fromEntries(
+  Object.entries(qaAuthoringRegistry).map(([scenarioId, profile]) => [
+    scenarioId,
+    buildQaRubric(profile),
+  ])
+);
 
 export const DEFAULT_SCENARIO_ID = "customer-save-multiple-clicks-duplicate";
-export const SUPPORTED_SCENARIO_IDS = Object.freeze(Object.keys(rubricRegistry.scenarios));
-export const PROMPT_VERSION = "practice-review.v7";
+export const SUPPORTED_SCENARIO_IDS = Object.freeze([
+  ...Object.keys(rubricRegistry.scenarios),
+  ...Object.keys(qaRubrics),
+]);
+export const PROMPT_VERSION = "practice-review.v8";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
-const verdicts = ["開発着手可能", "追加確認を推奨", "再整理を推奨"];
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
 const factAssessmentStatuses = ["present", "missing", "contradicted"];
 
 export function getScenarioRubric(scenarioId) {
-  const rubric = rubricRegistry.scenarios[scenarioId];
+  const rubric = rubricRegistry.scenarios[scenarioId] || qaRubrics[scenarioId];
   if (!rubric) {
     return null;
   }
   return {
     ...rubric,
-    dimensions: rubricRegistry.dimensions,
+    dimensions: rubric.dimensions || rubricRegistry.dimensions,
   };
 }
 
 function getFactIds(rubric) {
   return Object.values(rubric.requiredFacts).flat().map((fact) => fact.id);
+}
+
+function getRubricVerdicts(rubric) {
+  return rubric.ticketType === "qa"
+    ? ["回答依頼可能", "追加整理を推奨", "質問の再整理を推奨"]
+    : ["開発着手可能", "追加確認を推奨", "再整理を推奨"];
 }
 
 export function buildModelOutputSchema(rubric) {
@@ -64,7 +219,7 @@ export function buildModelOutputSchema(rubric) {
     },
     verdict: {
       type: "string",
-      enum: verdicts,
+      enum: getRubricVerdicts(rubric),
     },
     overallAssessment: {
       type: "string",
@@ -99,7 +254,7 @@ export function buildModelOutputSchema(rubric) {
     },
     investigationAdvice: {
       type: "array",
-      minItems: 1,
+      minItems: rubric.ticketType === "qa" ? 0 : 1,
       maxItems: 4,
       items: {
         type: "object",
@@ -238,7 +393,7 @@ function normalizeTicketFields(value) {
     throw new Error("answer.ticketFields.progress must be a multiple of 10 from 0 to 100");
   }
   return {
-    tracker: optionalEnum(fields.tracker ?? "bug", ["bug", "feature", "support"], "answer.ticketFields.tracker"),
+    tracker: optionalEnum(fields.tracker ?? "bug", ["bug", "qa", "feature", "support"], "answer.ticketFields.tracker"),
     private: Boolean(fields.private),
     status: optionalEnum(fields.status ?? "new", ["new", "in-progress", "resolved", "closed", "on-hold"], "answer.ticketFields.status"),
     severity: optionalEnum(fields.severity, ["s1", "s2", "s3", "s4"], "answer.ticketFields.severity"),
@@ -320,6 +475,37 @@ export function buildScoringPrompt(attempt) {
     writingExample: _writingExample,
     ...scoringRubric
   } = rubric;
+  if (rubric.ticketType === "qa") {
+    return [
+      "あなたは、開発者または仕様作成者としてQA起票を受け取り、判断するシニア担当者です。",
+      "評価対象は仕様の正解ではなく、回答者が短時間で論点を理解し、判断または訂正できる質問になっているかです。AI自身が仕様回答を決めてはいけません。",
+      "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、reviewSourceと受講者のQA起票を照合してください。",
+      "質問をYesまたはNoだけに制限する必要はありません。必要なら回答者が正しい条件を短く補足でき、不要な聞き返しが生じにくいことを評価してください。",
+      "一つのQAに独立した複数の判断事項が混在している場合は、どの回答がどの論点に対応するか曖昧になる点を指摘してください。",
+      "仕様どおりかという事実確認と、その動作を許容するかという判断依頼を混同していないか確認してください。",
+      "確認した事実、参照資料の記載、現在の解釈、未確定事項を区別できているか評価してください。未確定の解釈を確定仕様として扱ってはいけません。",
+      "回答者へ仕様書の読み直しや状況整理を丸投げしている場合は指摘してください。一方、回答者しか判断できない仕様決定そのものを質問者の不足にしてはいけません。",
+      "チーム内で既知の標準操作は、その操作経路自体が論点でない限り手順書レベルの詳細を要求しないでください。",
+      "reviewSourceにない追加記述は、矛盾しない限りただちに誤りとせず、必要なら『記述確認』として実施済みかを尋ねてください。",
+      "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使い、記述確認または調査提案はnot-applicableにしてください。",
+      "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含めてください。presentまたはcontradictedでは受講者の回答から短く正確に引用し、missingでは空文字にしてください。",
+      "readerQuestions、ambiguityRisks、rewriteSuggestionsは必要な場合だけ返し、件数を満たすために作らないでください。",
+      "investigationAdviceは0〜4件です。起票前に質問者自身が確認できること、または回答後に行う判断が本当にある場合だけ返してください。",
+      "rewriteSuggestionsは受講者の有効な文章を残した最小修正とし、記載例のコピーに置き換えないでください。",
+      "strengthsは0〜3件です。『質問欄がある』『項目が埋まっている』などフォーム上当然のことを評価せず、このQA固有の論点整理が回答負荷をどう減らすかを示してください。",
+      "verdictは、十分なら『回答依頼可能』、軽微な追加整理が有効なら『追加整理を推奨』、主要論点を読み取れないなら『質問の再整理を推奨』を使用してください。",
+      "各評価軸は0〜100の整数で採点してください。",
+      "",
+      "採点基準:",
+      JSON.stringify(scoringRubric),
+      "",
+      "受講者の回答:",
+      JSON.stringify({
+        answer: attempt.answer,
+        selectedEvidenceIds: attempt.selectedEvidenceIds || [],
+      }),
+    ].join("\n");
+  }
   return [
     "あなたは、不具合票を受け取って調査を始めるシニア開発者兼QAリードです。",
     "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、提示された観測記録、仕様、証跡と受講者の起票内容に照らして評価してください。",
@@ -373,6 +559,7 @@ function isGenericStructurePraise(evaluation, whyItHelps) {
     /再現(?:回数|性).{0,30}(数値|明記|記載)/u,
     /操作手順.{0,30}(具体|記載|用意|ある)/u,
     /(?:項目|フォーム).{0,30}(埋|分け|構造|形式)/u,
+    /質問(?:欄|項目).{0,30}(ある|埋|分け|構造|形式)/u,
     /形式面|枠組み/u,
   ].some((pattern) => pattern.test(text));
 }
@@ -512,7 +699,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   }
   return {
     dimensions,
-    verdict: requireEnum(rawOutput.verdict, verdicts, "verdict"),
+    verdict: requireEnum(rawOutput.verdict, getRubricVerdicts(rubric), "verdict"),
     overallAssessment: requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment"),
     readerQuestions,
     ambiguityRisks,

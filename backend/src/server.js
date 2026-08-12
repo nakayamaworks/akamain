@@ -158,6 +158,7 @@ function toTicketSummary(attempt) {
     projectId: attempt.projectId,
     scenarioId: attempt.scenarioId,
     subject: attempt.answer?.subject || "",
+    tracker: ticketFields.tracker || "bug",
     priority: ticketFields.priority || null,
     assigneeId: ticketFields.assigneeId || null,
     reviewStatus: result?.status || (isScoringSupported(attempt.scenarioId) ? "pending" : "not_supported"),
@@ -353,6 +354,9 @@ const server = http.createServer(async (request, response) => {
         limit: url.searchParams.get("limit"),
         cursor: url.searchParams.get("cursor"),
         projectId: url.searchParams.get("projectId") || "",
+        tracker: new Set(["bug", "qa"]).has(url.searchParams.get("tracker"))
+          ? url.searchParams.get("tracker")
+          : "",
         authoringMode: "practice",
       });
       sendJson(response, 200, {

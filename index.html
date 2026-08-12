@@ -72,7 +72,8 @@
             </div>
             <div class="ticket-page-actions">
               <button id="resumeDraftButton" class="secondary-button hidden" type="button" title="このブラウザに保存した下書きを再開します">下書きを再開</button>
-              <button id="startButton" class="primary-button" type="button">チケット作成</button>
+              <button id="startButton" class="primary-button" type="button">バグ起票</button>
+              <button id="qaStartButton" class="qa-primary-button" type="button">QA起票</button>
             </div>
           </div>
 
@@ -84,11 +85,17 @@
             <div id="ticketListStatus" class="ticket-list-state has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
 
             <div id="ticketListContent" class="hidden">
+            <div class="ticket-type-filter" role="group" aria-label="チケット種別で絞り込む">
+              <button class="is-active" type="button" data-ticket-type-filter="all" aria-pressed="true">すべて</button>
+              <button type="button" data-ticket-type-filter="bug" aria-pressed="false">バグ</button>
+              <button type="button" data-ticket-type-filter="qa" aria-pressed="false">QA</button>
+            </div>
             <div class="ticket-list-table-wrap">
               <table class="ticket-list-table">
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>種別</th>
                     <th>AIレビュー</th>
                     <th>優先度</th>
                     <th>題名</th>
@@ -243,7 +250,7 @@
         <section id="scenarioIntroView" class="scenario-intro-view hidden">
           <div class="ticket-page-head">
             <div class="ticket-page-copy">
-              <h1>バグシナリオ</h1>
+              <h1 id="scenarioIntroTitle">バグシナリオ</h1>
             </div>
           </div>
 
@@ -280,7 +287,7 @@
                 <p><strong>低め</strong> 影響が軽微で、対応時期の制約がない</p>
               </div>
             </details>
-            <details class="scenario-rules">
+            <details id="scenarioIntroSeverityRules" class="scenario-rules">
               <summary>障害レベルの判断基準</summary>
               <div class="scenario-rule-list">
                 <p><strong>S1</strong> 人命・安全、情報漏洩、不正決済、復旧不能なデータ消失</p>
@@ -319,6 +326,7 @@
                 <div class="ticket-form-control ticket-form-control-tracker">
                   <select id="trackerSelect" disabled aria-label="トラッカー（バグ固定）">
                     <option value="bug">バグ</option>
+                    <option value="qa">QA</option>
                     <option value="feature">機能</option>
                     <option value="support">サポート</option>
                   </select>
@@ -363,7 +371,7 @@
 
               <div class="ticket-form-details">
                 <div class="ticket-form-column">
-                  <label class="ticket-field">
+                  <label id="severityField" class="ticket-field">
                     <span>障害レベル</span>
                     <select id="severitySelect">
                       <option value="">--- 選択してください ---</option>
@@ -479,10 +487,10 @@
             <button id="createButton" class="primary-button" type="button" disabled>作成</button>
           </div>
           </div>
-          <aside class="scenario-panel" aria-label="バグシナリオ">
+          <aside id="scenarioPanel" class="scenario-panel" aria-label="バグシナリオ">
             <div class="scenario-panel-head">
               <div>
-                <h2>バグシナリオ</h2>
+              <h2 id="scenarioPanelTitle">バグシナリオ</h2>
               </div>
               <div class="scenario-panel-status">
                 <span id="scenarioPanelMode" class="scenario-mode-badge">記載例入力</span>
@@ -513,7 +521,7 @@
                   <p><strong>低め</strong> 軽微で日程上の制約なし</p>
                 </div>
               </details>
-              <details class="scenario-rules">
+              <details id="scenarioPanelSeverityRules" class="scenario-rules">
                 <summary>障害レベルの判断基準</summary>
                 <div class="scenario-rule-list">
                   <p><strong>S1</strong> 人命・安全、情報漏洩、不正決済、復旧不能なデータ消失</p>
@@ -662,12 +670,12 @@
                       points="180,160 180,160 180,160 180,160 180,160 180,160"
                     ></polygon>
                     <g class="result-radar-labels">
-                      <text x="180" y="17" text-anchor="middle">事実性<tspan id="practiceRadarFactual" x="180" dy="15">0</tspan></text>
-                      <text x="298" y="87" text-anchor="middle">情報充足<tspan id="practiceRadarCoverage" x="298" dy="15">0</tspan></text>
-                      <text x="300" y="242" text-anchor="middle">再現性<tspan id="practiceRadarReproducibility" x="300" dy="15">0</tspan></text>
-                      <text x="180" y="298" text-anchor="middle">期待・実績<tspan id="practiceRadarSeparation" x="180" dy="15">0</tspan></text>
-                      <text x="60" y="242" text-anchor="middle">解釈明瞭<tspan id="practiceRadarClarity" x="60" dy="15">0</tspan></text>
-                      <text x="62" y="87" text-anchor="middle">切り分け<tspan id="practiceRadarInvestigation" x="62" dy="15">0</tspan></text>
+                      <text x="180" y="17" text-anchor="middle"><tspan id="practiceRadarLabelFactual">事実性</tspan><tspan id="practiceRadarFactual" x="180" dy="15">0</tspan></text>
+                      <text x="298" y="87" text-anchor="middle"><tspan id="practiceRadarLabelCoverage">情報充足</tspan><tspan id="practiceRadarCoverage" x="298" dy="15">0</tspan></text>
+                      <text x="300" y="242" text-anchor="middle"><tspan id="practiceRadarLabelReproducibility">再現性</tspan><tspan id="practiceRadarReproducibility" x="300" dy="15">0</tspan></text>
+                      <text x="180" y="298" text-anchor="middle"><tspan id="practiceRadarLabelSeparation">期待・実績</tspan><tspan id="practiceRadarSeparation" x="180" dy="15">0</tspan></text>
+                      <text x="60" y="242" text-anchor="middle"><tspan id="practiceRadarLabelClarity">解釈明瞭</tspan><tspan id="practiceRadarClarity" x="60" dy="15">0</tspan></text>
+                      <text x="62" y="87" text-anchor="middle"><tspan id="practiceRadarLabelInvestigation">切り分け</tspan><tspan id="practiceRadarInvestigation" x="62" dy="15">0</tspan></text>
                     </g>
                   </svg>
                 </div>
@@ -686,8 +694,8 @@
                 <h3>誤解される可能性がある表現</h3>
                 <div id="practiceScoringAmbiguityRisks" class="practice-ai-review-list"></div>
               </article>
-              <article>
-                <h3>次に確認・切り分けすること</h3>
+              <article id="practiceScoringInvestigationSection">
+                <h3 id="practiceScoringInvestigationTitle">次に確認・切り分けすること</h3>
                 <ol id="practiceScoringInvestigationAdvice" class="practice-ai-action-list"></ol>
               </article>
               <article id="practiceScoringRewriteSection">
@@ -799,8 +807,9 @@
     <script src="./scenario-authoring-library.js?v=20260811c"></script>
     <script src="./scenario-library.js?v=20260810a"></script>
     <script src="./scenario-briefing-library.js?v=20260810a"></script>
+    <script src="./qa-scenario-authoring-library.js?v=20260812a"></script>
     <script src="./evidence-library.js?v=20260805a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260811d"></script>
+    <script src="./main.js?v=20260812a"></script>
   </body>
 </html>

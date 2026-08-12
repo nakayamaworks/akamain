@@ -133,6 +133,7 @@ export class MemoryStorageRepository extends StorageRepository {
       .filter((attempt) => attempt.userId === userId)
       .filter((attempt) => !options.authoringMode || attempt.authoringMode === options.authoringMode)
       .filter((attempt) => !options.projectId || attempt.projectId === options.projectId)
+      .filter((attempt) => !options.tracker || attempt.answer?.ticketFields?.tracker === options.tracker)
       .sort((left, right) =>
         right.completedAt.localeCompare(left.completedAt)
         || right.attemptId.localeCompare(left.attemptId)
@@ -157,6 +158,7 @@ export class MemoryStorageRepository extends StorageRepository {
       .filter((attempt) => attempt.userId === userId)
       .filter((attempt) => !options.authoringMode || attempt.authoringMode === options.authoringMode)
       .filter((attempt) => !options.projectId || attempt.projectId === options.projectId)
+      .filter((attempt) => !options.tracker || attempt.answer?.ticketFields?.tracker === options.tracker)
       .forEach((attempt) => {
         const ticketId = ticketIdOf(attempt);
         const current = grouped.get(ticketId) || [];

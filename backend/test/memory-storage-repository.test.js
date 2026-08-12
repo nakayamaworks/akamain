@@ -143,6 +143,31 @@ test("progress and leaderboard use each scenario's best successful score", async
   assert.equal(JSON.stringify(leaderboard).includes("非公開名"), false);
 });
 
+test("QA scores stay out of the bug-ticket leaderboard", async () => {
+  const repository = new MemoryStorageRepository();
+  await repository.upsertUser({ userId: "user-1", displayName: "非公開名" });
+  await repository.updateRankingProfile("user-1", {
+    rankingName: "公開A",
+    rankingOptIn: true,
+  });
+  const bugAttempt = attempt({
+    answer: { subject: "バグ", sections: {}, ticketFields: { tracker: "bug" } },
+  });
+  const qaAttempt = attempt({
+    attemptId: crypto.randomUUID(),
+    scenarioId: "qa-scenario-one",
+    answer: { subject: "QA", sections: {}, ticketFields: { tracker: "qa" } },
+  });
+  await repository.appendAttempt(bugAttempt);
+  await repository.appendAttempt(qaAttempt);
+  await repository.appendScoringResult(scoringResult(bugAttempt.attemptId, 70));
+  await repository.appendScoringResult(scoringResult(qaAttempt.attemptId, 95));
+
+  const leaderboard = await repository.getLeaderboard({ viewerUserId: "user-1" });
+  assert.equal(leaderboard.items[0].achievementPoints, 70);
+  assert.equal(leaderboard.items[0].scoredScenarioCount, 1);
+});
+
 test("history is user-scoped and paginated with an opaque cursor", async () => {
   const repository = new MemoryStorageRepository();
   const older = attempt();
@@ -207,6 +232,23 @@ test("ticket history filters by project and practice mode before pagination", as
   assert.equal(result.items.length, 1);
   assert.equal(result.items[0].projectId, "customer");
   assert.equal(result.items[0].authoringMode, "practice");
+});
+
+test("ticket list can filter bug and QA trackers", async () => {
+  const repository = new MemoryStorageRepository();
+  await repository.appendAttempt(attempt({
+    answer: { subject: "バグ", sections: {}, ticketFields: { tracker: "bug" } },
+  }));
+  await repository.appendAttempt(attempt({
+    attemptId: crypto.randomUUID(),
+    answer: { subject: "QA", sections: {}, ticketFields: { tracker: "qa" } },
+  }));
+  const qaTickets = await repository.listTicketsByUser("user-1", {
+    authoringMode: "practice",
+    tracker: "qa",
+  });
+  assert.equal(qaTickets.items.length, 1);
+  assert.equal(qaTickets.items[0].answer.subject, "QA");
 });
 
 test("ticket numbers are numeric, sequential, and stable across idempotent writes", async () => {

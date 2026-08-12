@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 
 const authoringSource = fs.readFileSync("scenario-authoring-library.js", "utf8");
+const qaAuthoringSource = fs.readFileSync("qa-scenario-authoring-library.js", "utf8");
 const source = fs.readFileSync("scenario-library.js", "utf8");
 const briefingSource = fs.readFileSync("scenario-briefing-library.js", "utf8");
 const evidenceSource = fs.readFileSync("evidence-library.js", "utf8");
@@ -45,6 +46,10 @@ const scoringFixtureRegistryFile = JSON.parse(
 const context = { window: {} };
 vm.runInNewContext(authoringSource, context, { filename: "scenario-authoring-library.js" });
 vm.runInNewContext(source, context, { filename: "scenario-library.js" });
+const qaContext = { window: {} };
+vm.runInNewContext(qaAuthoringSource, qaContext, {
+  filename: "qa-scenario-authoring-library.js",
+});
 const briefingContext = { window: {} };
 vm.runInNewContext(authoringSource, briefingContext, { filename: "scenario-authoring-library.js" });
 vm.runInNewContext(briefingSource, briefingContext, {
@@ -57,6 +62,8 @@ vm.runInNewContext(scoringPreviewSource, scoringPreviewContext, {
 
 const scenarios = context.window.TYPING_WORKBENCH_SCENARIOS;
 const authoredScenarios = context.window.TYPING_WORKBENCH_SCENARIO_AUTHORING || {};
+const qaAuthoredScenarios = qaContext.window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING || {};
+const qaScenarios = qaContext.window.TYPING_WORKBENCH_QA_SCENARIOS || [];
 const authoredSubjectSet = new Set(
   Object.values(authoredScenarios).map((profile) => profile.scenario?.subject).filter(Boolean)
 );
@@ -315,8 +322,11 @@ if (
 ) {
   errors.push("the separate authoring mode panel must stay removed");
 }
-if (!indexSource.includes('<button id="startButton" class="primary-button" type="button">チケット作成</button>')) {
-  errors.push("the ticket list must provide one neutral ticket creation button");
+if (
+  !indexSource.includes('<button id="startButton" class="primary-button" type="button">バグ起票</button>')
+  || !indexSource.includes('<button id="qaStartButton" class="qa-primary-button" type="button">QA起票</button>')
+) {
+  errors.push("the ticket list must provide separate bug and QA creation buttons");
 }
 if (indexSource.includes('id="practiceStartButton"')) {
   errors.push("the ticket list must not ask users to choose an authoring mode");
@@ -365,7 +375,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v7"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v8"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問")
@@ -685,6 +695,89 @@ Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
     errors.push(`${scenarioId}: review facts must be defined independently from the writing example`);
   }
 });
+
+const qaScenarioIds = Object.keys(qaAuthoredScenarios);
+const requiredQaSections = [
+  "■質問",
+  "■確認した状況・事実",
+  "■参照情報",
+  "■現在の解釈",
+  "■確認理由・影響",
+  "■周辺確認・補足",
+];
+const requiredQaTypes = new Set(["specification", "behavior", "conflict"]);
+if (
+  qaScenarioIds.length !== 3
+  || qaScenarios.length !== 3
+  || new Set(qaScenarioIds).size !== 3
+  || new Set(qaScenarios.map((scenario) => scenario.qaType)).size !== 3
+  || qaScenarios.some((scenario) => !requiredQaTypes.has(scenario.qaType))
+) {
+  errors.push("QA authoring registry must contain one scenario for each of the three QA types");
+}
+
+Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
+  const scenario = profile.scenario;
+  const report = scenario?.report || [];
+  const sectionNames = report
+    .filter((entry) => entry.kind === "section")
+    .map((entry) => entry.text);
+  const reportLines = report.filter((entry) => entry.kind === "line");
+  const briefing = profile.briefing;
+  const reviewSource = profile.reviewSource;
+  const guide = profile.reviewGuide;
+  if (
+    profile.schemaVersion !== "qa-scenario-authoring.v1"
+    || scenario?.scenarioId !== scenarioId
+    || scenario?.ticketType !== "qa"
+    || !requiredQaTypes.has(scenario?.qaType)
+    || scenario?.evaluation?.tracker !== "qa"
+    || scenario?.evaluation?.severity !== null
+    || !scenario?.evaluation?.assignee
+    || !Array.isArray(scenario?.evaluation?.watchers)
+    || scenario.evaluation.watchers.length < 1
+  ) {
+    errors.push(`${scenarioId}: QA scenario metadata and ticket settings must be complete`);
+  }
+  if (
+    sectionNames.join(",") !== requiredQaSections.join(",")
+    || reportLines.length !== requiredQaSections.length
+    || reportLines.some((entry) => !entry.text || !Array.isArray(entry.answers) || entry.answers.length < 1)
+    || reportLines.some((entry) => entry.answers.some((answer) => !/^[a-z0-9 .,:/%-]+$/.test(answer)))
+  ) {
+    errors.push(`${scenarioId}: QA report must provide the six QA sections and typeable answers`);
+  }
+  if (
+    !briefing?.testTarget
+    || !Array.isArray(briefing?.notes)
+    || briefing.notes.length < 3
+    || scenario?.evaluation?.context?.workMemo?.includes("作成してください")
+  ) {
+    errors.push(`${scenarioId}: QA briefing must describe the unresolved situation without instructing the learner to create a test case`);
+  }
+  if (
+    reviewSource?.schemaVersion !== "scenario-review-source.v1"
+    || reviewSource?.sourceType !== "qa-materials"
+    || !Array.isArray(reviewSource?.observations)
+    || reviewSource.observations.length < 3
+    || !reviewSource?.specificationReference
+    || !reviewSource?.alternativeExcellentAnswer?.subject
+    || !reviewSource?.alternativeExcellentAnswer?.sections
+  ) {
+    errors.push(`${scenarioId}: QA review facts must be independent from the writing example`);
+  }
+  if (
+    !guide?.sourceBoundary
+    || guide.sourceBoundary.includes("見本")
+    || !Array.isArray(guide?.strengthCriteria)
+    || guide.strengthCriteria.length < 2
+    || !Array.isArray(guide?.disallowedGenericPraise)
+    || guide.disallowedGenericPraise.length < 3
+  ) {
+    errors.push(`${scenarioId}: QA review guide must define source boundaries and scenario-specific praise`);
+  }
+});
+
 const judgementProfiles = Object.values(authoredScenarios).map((profile) => profile.judgement);
 const specificationReferences = Object.values(authoredScenarios).map(
   (profile) => profile.specificationReference

@@ -2042,6 +2042,70 @@ button {
   box-shadow: var(--shadow);
 }
 
+.qa-primary-button {
+  min-height: 38px;
+  padding: 8px 16px;
+  border: 1px solid #315d86;
+  border-radius: 4px;
+  background: #3f739f;
+  color: #fff;
+  font-weight: 700;
+}
+
+.qa-primary-button:hover:not(:disabled) {
+  background: #315d86;
+}
+
+.qa-primary-button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.ticket-type-filter {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ticket-type-filter button {
+  min-width: 72px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: #fff;
+  color: #3f5368;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ticket-type-filter button.is-active {
+  border-color: #315d86;
+  background: #e9f0f7;
+  color: #225b8b;
+}
+
+.ticket-type-pill {
+  display: inline-flex;
+  min-width: 44px;
+  justify-content: center;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.ticket-type-pill.is-bug {
+  background: #fdeaea;
+  color: #a91e28;
+}
+
+.ticket-type-pill.is-qa {
+  background: #e6f0fa;
+  color: #245f91;
+}
+
 .ticket-list-toolbar {
   padding: 6px 0 2px;
 }

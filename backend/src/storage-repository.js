@@ -132,6 +132,7 @@ export function buildLeaderboard(users, attempts, scoringResults, viewerUserId =
     .filter((attempt) =>
       attempt.authoringMode === "practice"
       && (attempt.revisionNumber || 1) === 1
+      && attempt.answer?.ticketFields?.tracker !== "qa"
     )
     .forEach((attempt) => {
       const current = attemptsByUser.get(attempt.userId) || [];

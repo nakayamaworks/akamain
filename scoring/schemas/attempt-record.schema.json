@@ -88,7 +88,7 @@
             "watcherIds"
           ],
           "properties": {
-            "tracker": { "enum": ["bug", "feature", "support"] },
+            "tracker": { "enum": ["bug", "qa", "feature", "support"] },
             "private": { "type": "boolean" },
             "status": { "enum": ["new", "in-progress", "resolved", "closed", "on-hold"] },
             "severity": { "type": ["string", "null"] },

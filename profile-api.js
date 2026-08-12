@@ -83,6 +83,9 @@
       limit: String(options.limit || 20),
       projectId: String(options.projectId || ""),
     });
+    if (options.tracker) {
+      params.set("tracker", String(options.tracker));
+    }
     if (options.cursor) {
       params.set("cursor", options.cursor);
     }

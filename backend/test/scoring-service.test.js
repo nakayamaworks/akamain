@@ -75,11 +75,18 @@ const completeModelOutput = {
 };
 
 function completeOutputForScenario(scenarioId) {
-  const factIds = Object.values(getScenarioRubric(scenarioId).requiredFacts)
+  const rubric = getScenarioRubric(scenarioId);
+  const factIds = Object.values(rubric.requiredFacts)
     .flat()
     .map((fact) => fact.id);
+  const dimensions = Object.fromEntries(
+    rubric.dimensions.map(({ id }) => [id, 80])
+  );
   return {
     ...completeModelOutput,
+    dimensions,
+    verdict: rubric.ticketType === "qa" ? "回答依頼可能" : completeModelOutput.verdict,
+    investigationAdvice: rubric.ticketType === "qa" ? [] : completeModelOutput.investigationAdvice,
     readerQuestions: completeModelOutput.readerQuestions.map((question) => ({
       ...question,
       classification: "調査提案",
@@ -227,8 +234,8 @@ test("all registered scenarios can be stored and reviewed", async () => {
   assert.equal(normalized.scenarioId, "customer-context-menu-not-shown");
   assert.equal(normalized.answer.ticketFields.tracker, "bug");
   assert.equal(isScoringSupported(normalized.scenarioId), true);
-  assert.equal(SUPPORTED_SCENARIO_IDS.length, 27);
-  assert.equal(new Set(SUPPORTED_SCENARIO_IDS).size, 27);
+  assert.equal(SUPPORTED_SCENARIO_IDS.length, 30);
+  assert.equal(new Set(SUPPORTED_SCENARIO_IDS).size, 30);
   assert.equal(SUPPORTED_SCENARIO_IDS.every(isScoringSupported), true);
   assert.equal(isScoringSupported("unknown-scenario"), false);
   await assert.rejects(
@@ -240,7 +247,7 @@ test("all registered scenarios can be stored and reviewed", async () => {
   );
 });
 
-test("all 27 rubrics produce scenario-specific structured-output schemas", () => {
+test("all registered rubrics produce scenario-specific structured-output schemas", () => {
   SUPPORTED_SCENARIO_IDS.forEach((scenarioId) => {
     const rubric = getScenarioRubric(scenarioId);
     const schema = buildModelOutputSchema(rubric);
@@ -261,7 +268,10 @@ test("all 27 rubrics produce scenario-specific structured-output schemas", () =>
       schema.properties.readerQuestions.items.properties.classification.enum,
       ["不足情報", "記述確認", "調査提案"]
     );
-    assert.equal(schema.properties.investigationAdvice.minItems, 1);
+    assert.equal(
+      schema.properties.investigationAdvice.minItems,
+      rubric.ticketType === "qa" ? 0 : 1
+    );
     assert.equal(schema.properties.investigationAdvice.maxItems, 4);
     assert.equal(schema.properties.strengths.minItems, 0);
     assert.equal(schema.properties.strengths.maxItems, 3);
@@ -270,6 +280,52 @@ test("all 27 rubrics produce scenario-specific structured-output schemas", () =>
       ["evidenceQuote", "evaluation", "whyItHelps"]
     );
   });
+});
+
+test("QA scenarios use a question-focused rubric and never ask the model to decide the specification", () => {
+  const scenarioId = "customer-qa-search-state-after-back";
+  const rubric = getScenarioRubric(scenarioId);
+  assert.equal(rubric.ticketType, "qa");
+  assert.equal(rubric.qaType, "behavior");
+  assert.deepEqual(
+    rubric.dimensions.map(({ id }) => id),
+    [
+      "questionFocus",
+      "answerability",
+      "sourceGrounding",
+      "factInterpretationSeparation",
+      "impactClarity",
+      "responseEfficiency",
+    ]
+  );
+  const prompt = buildScoringPrompt({
+    scenarioId,
+    answer: rubric.writingExample,
+    selectedEvidenceIds: [],
+  });
+  assert.match(prompt, /AI自身が仕様回答を決めてはいけません/);
+  assert.match(prompt, /不要な聞き返し/);
+  assert.match(prompt, /回答依頼可能/);
+  assert.doesNotMatch(prompt, /不具合票を受け取って調査を始める/);
+});
+
+test("QA attempts accept the QA tracker and QA verdicts", () => {
+  const scenarioId = "ec-qa-free-shipping-after-coupon";
+  const rubric = getScenarioRubric(scenarioId);
+  const normalizedAttempt = validateAttemptInput({
+    scenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      ...rubric.writingExample,
+      ticketFields: { tracker: "qa", progress: 0 },
+    },
+  });
+  assert.equal(normalizedAttempt.answer.ticketFields.tracker, "qa");
+  const normalizedOutput = normalizeModelOutput(
+    completeOutputForScenario(scenarioId),
+    scenarioId
+  );
+  assert.equal(normalizedOutput.verdict, "回答依頼可能");
 });
 
 test("the mobile data-loss prompt rewards scenario-specific analysis without scoring future research", () => {

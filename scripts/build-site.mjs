@@ -56,6 +56,7 @@ const publicFiles = [
   "guide.css",
   "main.js",
   "profile-api.js",
+  "qa-scenario-authoring-library.js",
   "runtime-config.js",
   "scenario-authoring-library.js",
   "scenario-briefing-library.js",

@@ -8,6 +8,7 @@ RUN cd backend && npm ci --omit=dev
 
 COPY backend ./backend
 COPY scoring ./scoring
+COPY qa-scenario-authoring-library.js ./qa-scenario-authoring-library.js
 
 WORKDIR /app/backend
 USER node
