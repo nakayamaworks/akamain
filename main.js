@@ -1807,6 +1807,17 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function getReportSectionDisplayLabel(value) {
+  const label = String(value || "");
+  if (label === "■備考") {
+    return "■周辺確認・補足";
+  }
+  if (label === "備考") {
+    return "周辺確認・補足";
+  }
+  return label;
+}
+
 function normalizeLineText(value) {
   return value.normalize("NFKC").replace(/\r/g, "");
 }
@@ -2869,7 +2880,7 @@ function renderPracticeReport() {
   elements.reportDocument.classList.add("is-practice");
   elements.reportDocument.innerHTML = getPracticeSectionGroups()
     .map((group) => {
-      const heading = escapeHtml(group.title);
+      const heading = escapeHtml(getReportSectionDisplayLabel(group.title));
       const fixedReference = group.fixedReferences.length > 0
         ? `<p class="practice-section-reference">${escapeHtml(group.fixedReferences.join("\n"))}</p>`
         : "";
@@ -2929,7 +2940,7 @@ function renderReport() {
     elements.reportDocument.classList.remove("is-practice");
     const rows = state.scenario.reportEntries.map((entry) => {
       if (entry.kind === "section") {
-        return `<div class="report-line section">${escapeHtml(entry.text)}</div>`;
+        return `<div class="report-line section">${escapeHtml(getReportSectionDisplayLabel(entry.text))}</div>`;
       }
       if (entry.kind === "reference") {
         return `<div class="report-line reference">${escapeHtml(entry.text)}</div>`;
@@ -3972,7 +3983,7 @@ function renderPracticeComparison() {
         if (!text) {
           return "";
         }
-        return `<section><strong>${escapeHtml(group.title)}</strong><p>${escapeHtml(text)}</p></section>`;
+        return `<section><strong>${escapeHtml(getReportSectionDisplayLabel(group.title))}</strong><p>${escapeHtml(text)}</p></section>`;
       })
       .join("");
     return `<section><strong>題名</strong><p>${escapeHtml(subject)}</p></section>${sections}`;
@@ -4084,7 +4095,7 @@ function renderPracticeRewriteSuggestions(items) {
   elements.practiceScoringRewriteSuggestions.innerHTML = items
     .map((item) => `
       <div class="practice-ai-review-item practice-ai-rewrite-item">
-        <span>${escapeHtml(item.section)}</span>
+        <span>${escapeHtml(getReportSectionDisplayLabel(item.section))}</span>
         <p class="is-original"><strong>元の表現：</strong>${escapeHtml(item.original)}</p>
         <p class="is-suggested"><strong>改善例：</strong>${escapeHtml(item.suggested)}</p>
         <small>${escapeHtml(item.reason)}</small>
@@ -4721,7 +4732,7 @@ function renderTicketDetail() {
   const sections = Object.entries(ticket.answer?.sections || {})
     .map(([title, value]) => `
       <section class="ticket-detail-description-section">
-        <h3>${escapeHtml(String(title))}</h3>
+        <h3>${escapeHtml(getReportSectionDisplayLabel(title))}</h3>
         <p>${escapeHtml(String(value || "（未入力）"))}</p>
       </section>
     `)
@@ -4744,7 +4755,7 @@ function renderTicketDetail() {
     .map((item) => `<li><strong>「${escapeHtml(String(item.quote || ""))}」</strong><span>${escapeHtml(String(item.risk || ""))}${item.advice ? ` — ${escapeHtml(String(item.advice))}` : ""}</span></li>`)
     .join("");
   const rewrites = (result?.rewriteSuggestions || [])
-    .map((item) => `<li><strong>${escapeHtml(String(item.section || ""))}</strong><span>${escapeHtml(String(item.suggested || ""))}${item.reason ? ` — ${escapeHtml(String(item.reason))}` : ""}</span></li>`)
+    .map((item) => `<li><strong>${escapeHtml(getReportSectionDisplayLabel(item.section))}</strong><span>${escapeHtml(String(item.suggested || ""))}${item.reason ? ` — ${escapeHtml(String(item.reason))}` : ""}</span></li>`)
     .join("");
   const hasImprovementSuggestions = Boolean(questions || ambiguityRisks || rewrites);
   const verdictPresentation = getScoringVerdictPresentation(result?.verdict);

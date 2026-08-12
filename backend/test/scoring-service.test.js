@@ -205,6 +205,19 @@ test("a rewrite for a missing section gets a readable original placeholder", () 
   assert.equal(normalized.rewriteSuggestions[0].original, "（未記載）");
 });
 
+test("the internal remarks section uses the public surrounding-checks label", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    rewriteSuggestions: [{
+      section: "備考",
+      original: "（未記載）",
+      suggested: "Android端末では未確認です。",
+      reason: "周辺環境の確認状況を明確にするため。",
+    }],
+  });
+  assert.equal(normalized.rewriteSuggestions[0].section, "周辺確認・補足");
+});
+
 test("all registered scenarios can be stored and reviewed", async () => {
   const normalized = validateAttemptInput({
     scenarioId: "customer-context-menu-not-shown",

@@ -397,7 +397,7 @@ a:focus-visible {
 }
 
 .learning-copy > p {
-  margin: 16px 0 0;
+  margin: 16px auto 0;
   color: var(--muted);
   font-size: 0.94rem;
   line-height: 1.9;
@@ -561,7 +561,6 @@ a:focus-visible {
     gap: 14px;
   }
 
-  .header-links a:first-child,
   .contact-link {
     display: none;
   }

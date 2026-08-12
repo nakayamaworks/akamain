@@ -345,6 +345,7 @@ export function buildScoringPrompt(attempt) {
     "investigationAdviceは起票の不足とは分けて1〜4件示してください。",
     "文章が十分明確な場合は無理に欠点を作らず、調査開始後に読み手が確認したくなる点を調査提案として示してください。",
     "rewriteSuggestionsは本当に改善効果がある場合だけ返してください。受講者の有効な表現を残した最小限の修正とし、記載例を丸ごと再現した文章へ置き換えないでください。",
+    "受講者向けの表示では『備考』欄を『周辺確認・補足』と呼びます。レビュー本文やrewriteSuggestionsのsectionでこの欄を指す場合も『周辺確認・補足』と表記してください。",
     "strengthsは0〜3件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
     "フォームの構造上当然となる『期待結果と実際の動作が分かれている』『再現回数が数値で書かれている』『操作手順がある』『項目が埋まっている』だけをstrengthsとして評価してはいけません。再現性を評価する場合は、具体的な比較条件と結果から何を絞り込めるかまで述べてください。",
     "採点基準にreviewGuideがある場合、strengthCriteriaは内容固有の着眼点として使い、disallowedGenericPraiseは単独の称賛として使用しないでください。nonScoringInvestigationIdeasは不足情報や減点理由ではなく、今後の調査提案としてのみ扱ってください。",
@@ -378,6 +379,11 @@ function isGenericStructurePraise(evaluation, whyItHelps) {
 
 function normalizedQuoteText(value) {
   return String(value || "").normalize("NFKC").replace(/\s+/gu, "");
+}
+
+function normalizePublicSectionLabel(value) {
+  const label = String(value || "");
+  return label === "備考" || label === "■備考" ? "周辺確認・補足" : label;
 }
 
 function createAttemptEvidenceChecker(attempt) {
@@ -459,7 +465,9 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     }));
   const rewriteSuggestions = requireArray(rawOutput.rewriteSuggestions, "rewriteSuggestions")
     .map((item, index) => ({
-      section: requireNonEmptyString(item.section, `rewriteSuggestions[${index}].section`),
+      section: normalizePublicSectionLabel(
+        requireNonEmptyString(item.section, `rewriteSuggestions[${index}].section`)
+      ),
       original: optionalString(item.original, `rewriteSuggestions[${index}].original`)
         || "（未記載）",
       suggested: requireNonEmptyString(item.suggested, `rewriteSuggestions[${index}].suggested`),
