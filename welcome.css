@@ -159,15 +159,15 @@ a:focus-visible {
 }
 
 .hero-kicker {
-  display: inline-flex;
-  margin: 24px 0 0;
-  padding: 7px 13px;
-  color: var(--red-dark);
-  background: var(--red-soft);
-  border-radius: 999px;
-  font-size: 0.78rem;
+  position: relative;
+  z-index: 1;
+  margin: 0 0 38px;
+  color: var(--ink);
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.055em;
+  line-height: 1.45;
+  animation: settle-in 720ms cubic-bezier(0.2, 0.75, 0.22, 1) both;
 }
 
 .hero h1 {
@@ -602,8 +602,10 @@ a:focus-visible {
   }
 
   .hero-kicker {
-    margin-top: 20px;
-    font-size: 0.7rem;
+    max-width: 310px;
+    margin: 0 auto 30px;
+    font-size: clamp(1.18rem, 6vw, 1.45rem);
+    line-height: 1.55;
   }
 
   .lead {
@@ -685,6 +687,7 @@ a:focus-visible {
   }
 
   .hero-visual-wrap,
+  .hero-kicker,
   .hero-copy,
   .auth-panel {
     animation: none;
