@@ -103,6 +103,9 @@ const requiredWelcomeFragments = [
   'href="./app.html"',
   'href="https://akamain.com/"',
   'content="https://akamain.com/assets/images/brand/akamain-main-visual.png"',
+  'テストエンジニアのための起票トレーニング',
+  '問いと気づきに、<strong>伝わる技術</strong>を。',
+  '現場でそのまま使える仕様確認と不具合報告の力',
 ];
 for (const fragment of requiredWelcomeFragments) {
   if (!welcomeHtml.includes(fragment)) {
