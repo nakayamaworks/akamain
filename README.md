@@ -18,6 +18,8 @@ typing_workbench/
   index.html
   styles.css
   main.js
+  scenario-authoring-library.js
+  scenario-briefing-library.js
   scenario-library.js
   evidence-library.js
   scoring-preview.js
@@ -31,6 +33,25 @@ typing_workbench/
     fixtures/
   docs/
     spec/
+```
+
+## シナリオの手修正
+
+全27シナリオは `scenario-authoring-library.js` で、次の内容をまとめて編集できる。
+
+- `scenario.subject`: 題名とタイピング入力候補
+- `scenario.report`: 記載例入力の詳細、前提条件、操作手順、期待結果、実際の動作、備考、再現性
+- `briefing`: 受講者へ提示する確認内容、比較条件、仕様情報
+- `reviewSource`: AIレビューが事実判定に使う観測記録、環境、仕様根拠（記載例とは独立）
+- `specificationReference`: 仕様根拠
+- `judgement`: 障害レベル、影響範囲、回避策、復旧方法、リスク
+- `reviewGuide`: 内容固有の評価観点、減点しない追加調査、禁止する定型的な称賛
+
+`scoring/rubrics/scenario-rubrics.json` と `scoring/fixtures/scenario-fixtures.json` は生成物のため、直接編集しない。編集後は次を実行して採点データを更新する。
+
+```sh
+node validate-scenarios.js --write-scoring-rubrics
+npm run verify
 ```
 
 ## 検証

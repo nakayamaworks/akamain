@@ -18,7 +18,7 @@ const fixtureSet = registry.scenarios[scenarioId];
 const rubric = getScenarioRubric(scenarioId);
 
 test("fixture attempts isolate writing quality with correct ticket fields and evidence", () => {
-  const fixture = fixtureSet.fixtures.find((item) => item.fixtureId === "excellent");
+  const fixture = fixtureSet.fixtures.find((item) => item.fixtureId === "example-complete");
   const attempt = createFixtureAttempt({ fixtureSet, fixture, rubric });
   assert.equal(attempt.scenarioId, scenarioId);
   assert.equal(attempt.answer.ticketFields.dueDate, "2026-08-09");
@@ -27,6 +27,14 @@ test("fixture attempts isolate writing quality with correct ticket fields and ev
     attempt.selectedEvidenceIds,
     rubric.evidenceFiles.filter((file) => file.required).map((file) => file.id)
   );
+});
+
+test("fixtures include a high-quality answer that is not copied from the writing example", () => {
+  const fixture = fixtureSet.fixtures.find((item) => item.fixtureId === "alternative-excellent");
+  assert.ok(fixture);
+  assert.notDeepEqual(fixture.answer, rubric.writingExample);
+  assert.equal(fixture.expected.scoreMin, 85);
+  assert.deepEqual(fixture.expected.missingFactIds, []);
 });
 
 test("fixture evaluation checks score, findings, and feedback shape", () => {
@@ -57,7 +65,7 @@ test("fixture evaluation reports specific mismatches", () => {
     totalScore: 90,
     rubricVersion: fixtureSet.rubricVersion,
     overallAssessment: "問題ありません。",
-    readerQuestions: [{}],
+    readerQuestions: [{}, {}, {}, {}, {}],
     investigationAdvice: [{}, {}],
     rubricFindings: {
       missingCriticalFactIds: [],

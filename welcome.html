@@ -3,28 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="あかマインは、現場で通用するバグ起票力を育てるトレーニングツールです。" />
+    <meta name="description" content="あかマインは、QA・テスター・開発者向けのバグ起票トレーニングサービスです。実務に近いシナリオとAIレビューで、伝わる不具合報告の書き方を練習できます。" />
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
-    <title>あかマイン｜バグ報告を、伝わる技術に。</title>
+    <title>バグ起票・不具合報告の書き方を実践練習｜あかマイン</title>
     <meta name="theme-color" content="#cf2026" />
     <link rel="canonical" href="https://akamain.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ja_JP" />
     <meta property="og:site_name" content="あかマイン" />
-    <meta property="og:title" content="あかマイン｜バグ報告を、伝わる技術に。" />
-    <meta property="og:description" content="現場で通用するバグ起票力を育てるトレーニングツール" />
+    <meta property="og:title" content="バグ起票・不具合報告の書き方を実践練習｜あかマイン" />
+    <meta property="og:description" content="実務に近いシナリオとAIレビューで、伝わる不具合報告の書き方を練習できます。" />
     <meta property="og:url" content="https://akamain.com/" />
     <meta property="og:image" content="https://akamain.com/assets/images/brand/akamain-main-visual.png" />
     <meta property="og:image:alt" content="あかマイン" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="あかマイン｜バグ報告を、伝わる技術に。" />
-    <meta name="twitter:description" content="現場で通用するバグ起票力を育てるトレーニングツール" />
+    <meta name="twitter:title" content="バグ起票・不具合報告の書き方を実践練習｜あかマイン" />
+    <meta name="twitter:description" content="実務に近いシナリオとAIレビューで、伝わる不具合報告の書き方を練習できます。" />
     <meta name="twitter:image" content="https://akamain.com/assets/images/brand/akamain-main-visual.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="./assets/images/brand/akamain-favicon-48.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./welcome.css?v=20260806a" />
+    <link rel="stylesheet" href="./welcome.css?v=20260812a" />
   </head>
   <body>
     <div class="page-shell">
@@ -34,7 +34,9 @@
           <span><b>あか</b>マイン</span>
         </a>
 
-        <nav class="header-links" aria-label="サポートメニュー">
+        <nav class="header-links" aria-label="メインメニュー">
+          <a href="#features">できること</a>
+          <a href="./bug-report-writing">バグ報告の書き方</a>
           <a class="contact-link" href="https://nakayamaworks.jp/#cta-final" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
         </nav>
       </header>
@@ -50,9 +52,9 @@
           </div>
 
           <div class="hero-copy">
-            <h1 id="welcomeTitle"><span>あか</span>マイン</h1>
-            <p class="tagline">バグ報告を、<strong>伝わる技術</strong>に。</p>
-            <p class="lead">現場で通用するバグ起票力を育てるトレーニングツール</p>
+            <p class="hero-brand-name"><span>あか</span>マイン</p>
+            <h1 id="welcomeTitle">バグ報告を、<strong>伝わる技術</strong>に。</h1>
+            <p class="lead">実務に近いシナリオとAIレビューで、現場で通用するバグ起票力を育てます。</p>
           </div>
 
           <div class="auth-panel" aria-labelledby="authPanelTitle">
@@ -94,8 +96,12 @@
           </div>
         </section>
 
-        <section class="features" aria-labelledby="featureTitle">
-          <h2 id="featureTitle" class="visually-hidden">あかマインで身につくこと</h2>
+        <section id="features" class="features" aria-labelledby="featureTitle">
+          <div class="section-heading">
+            <p class="section-kicker">PRACTICE</p>
+            <h2 id="featureTitle">実務に近い練習で、起票の判断力を身につける</h2>
+            <p>見本を暗記するのではなく、観測した事実を整理し、読み手が調査を始められる報告へ組み立てます。</p>
+          </div>
 
           <div class="feature-grid">
             <article class="feature-card">
@@ -131,6 +137,32 @@
             </article>
           </div>
         </section>
+
+        <section class="learning-section" aria-labelledby="learningTitle">
+          <div class="learning-copy">
+            <p class="section-kicker">GUIDE</p>
+            <h2 id="learningTitle">まずは、伝わるバグ報告の基本から</h2>
+            <p>件名、再現手順、期待結果、実際の動作。何を書けばよいかだけでなく、なぜその情報が調査に必要なのかを、具体的なチケット例で解説します。</p>
+            <a class="text-link" href="./bug-report-writing">バグ報告の書き方を読む <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="learning-ticket" aria-label="改善されたバグチケットの例">
+            <div class="learning-ticket-bar">
+              <span>#1024</span>
+              <span class="ticket-status">新規</span>
+            </div>
+            <h3>プッシュ通知から開くと、別のお知らせが表示されることがある</h3>
+            <dl>
+              <div>
+                <dt>期待結果</dt>
+                <dd>タップした通知に対応するお知らせが表示される</dd>
+              </div>
+              <div>
+                <dt>実際の動作</dt>
+                <dd>1つ前に受信したお知らせが表示されることがある</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
       </main>
 
       <footer class="site-footer">
@@ -149,7 +181,7 @@
         "name": "あかマイン",
         "url": "https://akamain.com/",
         "image": "https://akamain.com/assets/images/brand/akamain-main-visual.png",
-        "description": "現場で通用するバグ起票力を育てるトレーニングツール",
+        "description": "実務に近いシナリオとAIレビューで、伝わる不具合報告の書き方を練習できるバグ起票トレーニングサービス",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web",
         "creator": {

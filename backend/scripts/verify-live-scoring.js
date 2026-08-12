@@ -24,8 +24,8 @@ for (const scenarioId of scenarioIds) {
     scenarioId,
     projectId: rubric.projectId,
     answer: {
-      subject: rubric.referenceAnswer.subject,
-      sections: rubric.referenceAnswer.sections,
+      subject: rubric.writingExample.subject,
+      sections: rubric.writingExample.sections,
       ticketFields: {
         tracker: "bug",
         private: false,

@@ -325,6 +325,24 @@
   font-weight: 800;
 }
 
+.ticket-detail-verdict-description {
+  margin-top: -4px;
+  color: #53697d;
+  font-size: 0.88rem;
+}
+
+.ticket-detail-no-improvements,
+.practice-ai-no-improvements {
+  padding: 12px 14px;
+  border: 1px solid #cde3d5;
+  border-radius: 8px;
+  background: #f0f8f3;
+  color: #28623d;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.65;
+}
+
 .ticket-detail-scoring-basis,
 .practice-ai-scoring-basis {
   padding: 10px 12px;
@@ -529,12 +547,20 @@ button {
 .rm-project-tools {
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 8px;
+}
+
+.rm-project-switcher-label {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 .rm-project-switcher {
-  min-width: min(290px, 34vw);
-  height: 36px;
+  min-width: min(320px, 38vw);
+  height: 40px;
   padding: 0 10px 0 12px;
   display: inline-flex;
   align-items: center;
@@ -544,7 +570,9 @@ button {
   border: 1px solid #c6ccd4;
   background: linear-gradient(180deg, #fff 0%, #f1f3f6 100%);
   color: #4b5866;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
@@ -1213,6 +1241,16 @@ button {
   justify-content: flex-end;
 }
 
+.draft-save-status {
+  color: #426044;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.draft-save-status.is-error {
+  color: #a33f3b;
+}
+
 .ticket-state-pill {
   display: inline-flex;
   align-items: center;
@@ -1620,7 +1658,7 @@ button {
 }
 
 .ticket-form-row-tracker {
-  grid-template-columns: 118px max-content 1fr;
+  grid-template-columns: 118px max-content;
   align-items: center;
 }
 
@@ -1662,25 +1700,6 @@ button {
   background: #fff;
   color: var(--text);
   max-width: none;
-}
-
-.ticket-private-toggle {
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 30px;
-  color: #404852;
-  font-size: 0.88rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.ticket-private-toggle input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: #4f82c1;
 }
 
 .ticket-form-row-subject .report-editor {
@@ -1832,16 +1851,6 @@ button {
   box-shadow: 0 0 0 2px #e5bf32;
 }
 
-.ticket-watchers.is-guided-focus::after {
-  content: "主担当と関連担当者を選択";
-  position: absolute;
-  right: 8px;
-  top: -10px;
-  color: #806600;
-  font-size: 0.65rem;
-  font-weight: 700;
-}
-
 .ticket-attachments.is-guided-focus {
   position: relative;
   background: #fff4b8;
@@ -1910,15 +1919,6 @@ button {
   height: 15px;
   margin: 0;
   accent-color: #3d78b4;
-}
-
-.watcher-search-link {
-  margin: 10px 0 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--link);
-  font-size: 0.82rem;
 }
 
 .ticket-attachments {
@@ -2671,6 +2671,7 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 }
 
 .primary-button:disabled,
+.secondary-button:disabled,
 .danger-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -3263,6 +3264,13 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   font-weight: 700;
 }
 
+.practice-ai-verdict-description {
+  margin: 9px 0 0;
+  color: #53697d;
+  font-size: 0.76rem;
+  line-height: 1.65;
+}
+
 .practice-ai-overall-assessment {
   margin: 16px 0 0;
   color: #293c4d;
@@ -3331,6 +3339,10 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   gap: 0;
 }
 
+.practice-ai-no-improvements {
+  margin: 18px 2px 4px;
+}
+
 .practice-ai-advice > article {
   padding: 18px 2px 4px;
 }
@@ -3377,6 +3389,11 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 .practice-ai-review-meta small.is-missing {
   background: #fbe5e3;
   color: #8b3e37;
+}
+
+.practice-ai-review-meta small.is-confirmation {
+  background: #fff2ce;
+  color: #795b0f;
 }
 
 .practice-ai-review-meta small.is-suggestion {
@@ -3923,6 +3940,21 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 }
 
 @media (max-width: 720px) {
+  .rm-topbar-project {
+    flex-wrap: wrap;
+  }
+
+  .rm-project-tools {
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+
+  .rm-project-switcher {
+    min-width: 0;
+    flex: 1;
+  }
+
   .my-page-summary-grid {
     grid-template-columns: 1fr;
   }

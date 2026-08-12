@@ -283,21 +283,22 @@ AIを単なる点数付けには使わず、開発・QAが不具合票を受け�
     notes: [],
     environment: []
   },
-  referenceAnswer: {},
+  writingExample: {},
+  reviewSource: {},
   scoringRubric: {}
 }
 ```
 
 モードごとの利用方法：
 
-- 見本入力は `referenceAnswer` を入力対象として表示する
-- 実践起票は `referenceAnswer` を隠し、`fieldReport.notes` を文章化の材料として表示する
-- AI採点は `scoringRubric` を基準として使用する
+- 記載例入力は `writingExample` を入力対象として表示する
+- 実践起票は `writingExample` を隠し、`fieldReport.notes` を文章化の材料として表示する
+- AI採点は `writingExample` を除外し、`reviewSource` と `scoringRubric` を基準として使用する
 - 両モードとも、`templateId` に対応する同じプロジェクトテンプレートを使用する
 
-これにより、見本回答と採点基準の内容がモード間でずれることを防ぐ。
+記載例は唯一の正解ではない。AIレビューの事実源は、観測記録・仕様・証跡から独立して定義した `reviewSource` とする。
 
-`fieldReport.notes` は `referenceAnswer` から画面表示時に自動生成しない。現場チャット、追加確認、仕様情報などの断片としてシナリオごとに作成し、利用者が必要な事実を選んで題名と各セクションへ再構成できるようにする。
+`fieldReport.notes` と `reviewSource` は `writingExample` から画面表示時に自動生成しない。現場チャット、追加確認、仕様情報などの断片としてシナリオごとに作成し、利用者が必要な事実を選んで題名と各セクションへ再構成できるようにする。
 
 ### 5.2 項目ごとの学習支援
 

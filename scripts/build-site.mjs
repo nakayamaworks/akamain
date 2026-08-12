@@ -31,6 +31,12 @@ welcomeHtml = replaceRequired(
 );
 await writeFile(join(outputDirectory, "index.html"), welcomeHtml);
 
+await mkdir(join(outputDirectory, "bug-report-writing"), { recursive: true });
+await cp(
+  join(rootDirectory, "bug-report-writing", "index.html"),
+  join(outputDirectory, "bug-report-writing", "index.html")
+);
+
 let appHtml = await readFile(join(rootDirectory, "index.html"), "utf8");
 appHtml = replaceRequired(
   appHtml,
@@ -47,9 +53,11 @@ await writeFile(join(outputDirectory, "site.webmanifest"), manifest);
 const publicFiles = [
   "auth-client.js",
   "evidence-library.js",
+  "guide.css",
   "main.js",
   "profile-api.js",
   "runtime-config.js",
+  "scenario-authoring-library.js",
   "scenario-briefing-library.js",
   "scenario-library.js",
   "scoring-api.js",

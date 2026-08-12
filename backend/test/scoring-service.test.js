@@ -37,7 +37,7 @@ const completeModelOutput = {
       question: "保存ボタンを何回クリックしましたか？",
       whyItMatters: "発生条件を確定するためです。",
       classification: "不足情報",
-      factId: "steps-click-save-three-times",
+      factId: "steps-reproducible",
     },
     {
       reader: "QA担当者",
@@ -61,7 +61,11 @@ const completeModelOutput = {
     },
   ],
   rewriteSuggestions: [],
-  strengths: ["期待結果と実際の動作を分けています。"],
+  strengths: [{
+    evidenceQuote: "保存ボタンを3回クリックする",
+    evaluation: "応答待ち中の連続操作という発生条件を特定できています",
+    whyItHelps: "開発担当者が多重送信の再現条件をそろえられます。",
+  }],
   factAssessments: pilotFactIds.map((factId) => ({
     factId,
     status: "present",
@@ -95,7 +99,14 @@ test("weighted total follows the pilot rubric weights", () => {
 });
 
 test("inconsistent question classifications are normalized conservatively", () => {
-  assert.deepEqual(normalizeModelOutput(completeModelOutput), completeModelOutput);
+  const normalizedComplete = normalizeModelOutput(completeModelOutput);
+  assert.deepEqual(normalizedComplete.strengths, [
+    "「保存ボタンを3回クリックする」という記述から、応答待ち中の連続操作という発生条件を特定できています。開発担当者が多重送信の再現条件をそろえられます。",
+  ]);
+  assert.deepEqual(
+    { ...normalizedComplete, strengths: completeModelOutput.strengths },
+    completeModelOutput
+  );
   const missingWithoutFact = normalizeModelOutput({
       ...completeModelOutput,
       readerQuestions: [{
@@ -108,10 +119,77 @@ test("inconsistent question classifications are normalized conservatively", () =
       ...completeModelOutput,
       readerQuestions: [{
         ...completeModelOutput.readerQuestions[1],
-        factId: "steps-click-save-three-times",
+        factId: "steps-reproducible",
       }],
-    });
+  });
   assert.equal(suggestionWithFact.readerQuestions[0].factId, "not-applicable");
+  const confirmationWithFact = normalizeModelOutput({
+    ...completeModelOutput,
+    readerQuestions: [{
+      ...completeModelOutput.readerQuestions[0],
+      classification: "記述確認",
+      factId: "steps-reproducible",
+    }],
+  });
+  assert.equal(confirmationWithFact.readerQuestions[0].classification, "記述確認");
+  assert.equal(confirmationWithFact.readerQuestions[0].factId, "not-applicable");
+});
+
+test("a complete ticket can return no reader questions", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    readerQuestions: [],
+  });
+  assert.deepEqual(normalized.readerQuestions, []);
+});
+
+test("a ticket with no evidence-based strengths can return an empty strengths list", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    strengths: [],
+  });
+  assert.deepEqual(normalized.strengths, []);
+});
+
+test("feedback cannot quote review-source text as if the learner wrote it", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    strengths: [
+      ...completeModelOutput.strengths,
+      {
+        evidenceQuote: "同一端末で3回検証しました",
+        evaluation: "比較確認ができています",
+        whyItHelps: "発生範囲を絞れます。",
+      },
+    ],
+  }, pilotScenarioId, {
+    answer: {
+      subject: "保存ボタンを3回クリックする",
+      sections: { detail: "応答待ち中に保存ボタンを3回クリックする" },
+    },
+    selectedEvidenceIds: [],
+  });
+  assert.deepEqual(normalized.strengths, [
+    "「保存ボタンを3回クリックする」という記述から、応答待ち中の連続操作という発生条件を特定できています。開発担当者が多重送信の再現条件をそろえられます。",
+  ]);
+});
+
+test("generic praise for filling the form is removed even when its quote exists", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    strengths: [{
+      evidenceQuote: "期待結果: あい, 実際の動作: あい",
+      evaluation: "期待する動作と実際の動作を分ける形式面の枠組みがあります",
+      whyItHelps: "項目ごとの分離の意識は基本に沿っています。",
+    }],
+  }, pilotScenarioId, {
+    answer: {
+      subject: "ウェイ",
+      sections: { expected: "あい", actual: "あい", raw: "期待結果: あい, 実際の動作: あい" },
+    },
+    selectedEvidenceIds: [],
+  });
+  assert.deepEqual(normalized.strengths, []);
 });
 
 test("a rewrite for a missing section gets a readable original placeholder", () => {
@@ -164,11 +242,91 @@ test("all 27 rubrics produce scenario-specific structured-output schemas", () =>
       schema.properties.dimensions.required,
       rubric.dimensions.map((dimension) => dimension.id)
     );
-    assert.equal(schema.properties.readerQuestions.minItems, 2);
+    assert.equal(schema.properties.readerQuestions.minItems, 0);
     assert.equal(schema.properties.readerQuestions.maxItems, 4);
-    assert.equal(schema.properties.investigationAdvice.minItems, 2);
+    assert.deepEqual(
+      schema.properties.readerQuestions.items.properties.classification.enum,
+      ["不足情報", "記述確認", "調査提案"]
+    );
+    assert.equal(schema.properties.investigationAdvice.minItems, 1);
     assert.equal(schema.properties.investigationAdvice.maxItems, 4);
+    assert.equal(schema.properties.strengths.minItems, 0);
+    assert.equal(schema.properties.strengths.maxItems, 3);
+    assert.deepEqual(
+      schema.properties.strengths.items.required,
+      ["evidenceQuote", "evaluation", "whyItHelps"]
+    );
   });
+});
+
+test("the mobile data-loss prompt rewards scenario-specific analysis without scoring future research", () => {
+  const scenarioId = "mobile-background-sync-data-lost";
+  const rubric = getScenarioRubric(scenarioId);
+  const prompt = buildScoringPrompt({
+    scenarioId,
+    answer: {
+      subject: rubric.writingExample.subject,
+      sections: rubric.writingExample.sections,
+    },
+    selectedEvidenceIds: rubric.evidenceFiles
+      .filter((file) => file.required)
+      .map((file) => file.id),
+  });
+  assert.match(prompt, /同じ発生条件では1\/25、メモリ解放なしでは0\/25/);
+  assert.match(prompt, /低頻度のため、iOS固有または3\.4\.0でのデグレとはまだ断定していません/);
+  assert.match(prompt, /nonScoringInvestigationIdeasは不足情報や減点理由ではなく/);
+  assert.match(prompt, /期待結果と実際の動作が分かれている/);
+  assert.match(prompt, /唯一の正解文はありません/);
+  assert.match(prompt, /記載例より有効な比較確認や切り分け/);
+  assert.match(prompt, /strengthsは0〜3件/);
+  assert.doesNotMatch(prompt, /"writingExample"/);
+});
+
+test("semantic rubric policy does not require trace identifiers in ticket prose", () => {
+  const rubric = getScenarioRubric("ec-payment-notification-double-order");
+  assert.equal(rubric.factAssessmentPolicy.semanticEquivalence, true);
+  assert.match(rubric.factAssessmentPolicy.sourceMaterialRule, /writingExampleは判定に使用しない/);
+  assert.match(
+    rubric.reviewSource.observations.map(({ text }) => text).join("\n"),
+    /同一の決済IDおよび通知ID/
+  );
+
+  const prompt = buildScoringPrompt({
+    scenarioId: rubric.scenarioId,
+    answer: {
+      subject: "決済通知を再送すると同一決済の注文が重複作成される",
+      sections: {
+        detail: "初回処理済みの通知を同じ通知IDと決済IDで再送すると、異なる注文番号が2件作成された。",
+      },
+    },
+    selectedEvidenceIds: ["webhook-replay-log", "duplicate-orders", "order-admin-screen"],
+  });
+  assert.match(prompt, /追跡用識別子/);
+  assert.match(prompt, /本文に具体値がなくても不足にしない/);
+});
+
+test("notification review treats standard delivery operations as known and unsupported additions as confirmation", () => {
+  const scenarioId = "mobile-notification-opens-wrong-news";
+  const rubric = getScenarioRubric(scenarioId);
+  const prompt = buildScoringPrompt({
+    scenarioId,
+    answer: {
+      subject: "プッシュ通知から直接開くと一つ前のお知らせを表示することがある",
+      sections: {
+        preconditions: "検証データ初期状態",
+        steps: "1. NEWS-101をプッシュ通知する\n2. 届いた通知を開く\n3. NEWS-102をプッシュ通知する\n4. 届いた通知を開く",
+        expected: "NEWS-102の内容が表示されること",
+        actual: "NEWS-101が表示されることがある",
+      },
+    },
+    selectedEvidenceIds: ["notification-payload", "notification-video", "navigation-log"],
+  });
+  assert.equal(rubric.rubricVersion, "mobile-notification-opens-wrong-news.v4");
+  assert.match(prompt, /NEWS-101を送信して開封した端末/);
+  assert.match(prompt, /手順書レベルの詳細を不足扱いしない/);
+  assert.match(prompt, /実施済みの事実か、再現のために補った推測か/);
+  assert.match(prompt, /classificationを『記述確認』/);
+  assert.match(prompt, /受講者へ提示されていない情報を答えさせる質問/);
 });
 
 test("each scenario uses its own rubric, ticket fields, and evidence requirements", () => {
@@ -187,9 +345,9 @@ test("each scenario uses its own rubric, ticket fields, and evidence requirement
     completedAt: "2026-08-05T01:30:00.000Z",
   };
   const prompt = buildScoringPrompt(attempt);
-  assert.match(prompt, /customer-search-nonexistent-name-all-results\.v1/);
+  assert.match(prompt, /customer-search-nonexistent-name-all-results\.v3/);
   assert.match(prompt, /selectedEvidenceIds/);
-  assert.match(prompt, /検索結果が0件/);
+  assert.match(prompt, /検索結果は0件/);
 });
 
 test("a non-pilot scenario is scored with its own rubric version and findings", async () => {
@@ -220,8 +378,8 @@ test("a non-pilot scenario is scored with its own rubric version and findings", 
     }),
   });
   assert.equal(result.schemaVersion, "scoring-result.v3");
-  assert.equal(result.rubricVersion, `${scenarioId}.v1`);
-  assert.equal(result.rubricFindings.factAssessments.length, 11);
+  assert.equal(result.rubricVersion, `${scenarioId}.v3`);
+  assert.equal(result.rubricFindings.factAssessments.length, 7);
   assert.equal(result.rubricFindings.evidenceCheck.matched, false);
 });
 

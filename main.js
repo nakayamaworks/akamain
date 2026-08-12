@@ -1,170 +1,4 @@
-const scenarioBank = [
-  {
-    scenarioId: "customer-context-menu-not-shown",
-    projectId: "customer",
-    difficulty: "beginner",
-    environment: [
-      { text: "App version: 2.3.1" },
-      { text: "Google Chrome 126.0.6478.127" },
-      { text: "Windows 11 23H2" },
-    ],
-    subject: {
-      text: "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
-      answers: [
-        "kokyakuitiranngamenndemigikurikkushitemokontekisutomenyu-gahyoujisarenai",
-        "migikurikkushitemomenyu-gahyoujisarenai",
-        "migikurikkushitemomenyuugahyoujisarenai",
-        "migikurikkushitemomenyu-gahyouzisarenai",
-        "migikurikkushitemomenyuugahyouzisarenai",
-      ],
-    },
-    report: [
-      { kind: "section", text: "■詳細" },
-      {
-        kind: "line",
-        text: "顧客一覧画面で右クリックしても",
-        answers: ["kokyakuitiranngamenndemigikurikkushitemo"],
-      },
-      {
-        kind: "line",
-        text: "コンテキストメニューが表示されず仕様と異なる",
-        answers: [
-          "kontekisutomenyu-gahyoujisarezushiyoutokotonaru",
-          "kontekisutomenyu-gahyoujisarenaijoutaininatteshimau",
-          "kontekisutomenyu-gahyouzisarenaijoutaininatteshimau",
-        ],
-      },
-      { kind: "section", text: "■前提条件" },
-      {
-        kind: "line",
-        text: "管理者ユーザーでログインしていること",
-        answers: ["kannrishayu-za-deroguinnshiteirukoto", "kannrishayu-za-deroguinnsiteirukoto"],
-      },
-      { kind: "section", text: "■操作手順" },
-      { kind: "line", text: "1. 顧客一覧画面を開く", answers: ["1kokyakuitiranngamennwohiraku"] },
-      { kind: "line", text: "2. 任意の顧客を選択する", answers: ["2ninninokokyakuwosentakusuru"] },
-      { kind: "line", text: "3. 右クリックを実行する", answers: ["3migikurikkuwojikkousuru", "3migikurikkuwozikkousuru"] },
-      { kind: "section", text: "■期待結果" },
-      {
-        kind: "line",
-        text: "コンテキストメニューが表示されること",
-        answers: [
-          "kontekisutomenyu-gahyoujisarerukoto",
-          "kontekisutomenyuugahyoujisarerukoto",
-          "kontekisutomenyu-gahyouzisarerukoto",
-          "kontekisutomenyuugahyouzisarerukoto",
-        ],
-      },
-      { kind: "section", text: "■実際の動作" },
-      { kind: "line", text: "コンテキストメニューが表示されない", answers: ["kontekisutomenyu-gahyoujisarenai"] },
-      { kind: "section", text: "■備考" },
-      {
-        kind: "line",
-        trainingRole: "remark",
-        text: "左クリックで顧客詳細を開く操作は正常に行えることを確認",
-        answers: ["hidarikurikkudekokyakushousaiwohirakusousahaseijouniokonaerukotowokakunin"],
-      },
-      { kind: "section", text: "■再現性" },
-      { kind: "line", text: "3/3", answers: ["3/3"] },
-    ],
-  },
-  {
-    scenarioId: "customer-search-nonexistent-name-all-results",
-    projectId: "customer",
-    difficulty: "beginner",
-    environment: [
-      { text: "Web release: 2026.07.24" },
-      { text: "Microsoft Edge 126.0.2592.102" },
-      { text: "Windows 11 23H2" },
-    ],
-    subject: {
-      text: "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
-      answers: ["kokyakuitiranngamenndesonzaishinaishimeiwokensakusurutokokyakugazennkennhyoujisareteshimau"],
-    },
-    report: [
-      { kind: "section", text: "■詳細" },
-      {
-        kind: "line",
-        text: "顧客一覧画面の氏名欄に「ZZZZZZ」を入力して検索すると",
-        answers: ["kokyakuitiranngamennnoshimeirannnizzzzzzwo nyuuryokushitekensakusuruto"],
-      },
-      {
-        kind: "line",
-        text: "該当する顧客が存在しないにもかかわらず、登録済みの顧客248件が表示されてしまう",
-        answers: ["gaitousurukokyakugasonzaishinainimokakawarazu tourokuzuminokokyaku248kenngahyoujisareteshimau"],
-      },
-      { kind: "section", text: "■前提条件" },
-      { kind: "line", text: "一般ユーザーでログインしていること", answers: ["ippanyu-za- de roguin shiteiru koto", "ippanyu-za- de roguin siteiru koto"] },
-      { kind: "section", text: "■操作手順" },
-      { kind: "line", text: "1. 顧客一覧画面を開く", answers: ["1kokyakuitiranngamennwohiraku"] },
-      { kind: "line", text: "2. 検索欄に「ZZZZZZ」と入力する", answers: ["2 kensakurann ni zzzzzz to nyuuryoku suru"] },
-      { kind: "line", text: "3. 検索ボタンをクリックする", answers: ["3kensakubotanwokurikkusuru"] },
-      { kind: "section", text: "■期待結果" },
-      { kind: "line", text: "検索結果が0件と表示されること", answers: ["kensakukekka ga 0 ken to hyouji sareru koto"] },
-      { kind: "section", text: "■実際の動作" },
-      { kind: "line", text: "検索前と同じ248件が表示される", answers: ["kensakumaetoonaji248kenngahyoujisareru"] },
-      { kind: "section", text: "■備考" },
-      {
-        kind: "line",
-        trainingRole: "remark",
-        text: "顧客番号を指定した検索では対象の1件だけが表示されることを確認",
-        answers: ["kokyakubangouwoshiteishitakensakudehataishouno1kenndakegahyoujisarerukotowokakunin"],
-      },
-      { kind: "section", text: "■再現性" },
-      { kind: "line", text: "3/3", answers: ["3/3"] },
-    ],
-  },
-  {
-    scenarioId: "customer-save-multiple-clicks-duplicate",
-    projectId: "customer",
-    difficulty: "intermediate",
-    environment: [
-      { text: "Build 2.3.1-20260724.1" },
-      { text: "Firefox 128.0" },
-      { text: "macOS 15.5" },
-    ],
-    subject: {
-      text: "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
-      answers: ["kokyakutourokugamendehozonbotanworenzokukurikkusurutoonajikokyakude-tagatyouhukutourokusareteshimau"],
-    },
-    report: [
-      { kind: "section", text: "■詳細" },
-      {
-        kind: "line",
-        text: "顧客登録画面で保存ボタンを素早く3回クリックすると",
-        answers: ["kokyakutourokugamendehozonbotanwosubayaku3kaikurikkusuruto"],
-      },
-      {
-        kind: "line",
-        text: "同じ氏名・電話番号の顧客データが異なる顧客IDで3件登録されてしまう",
-        answers: ["onajishimeidenwabangounokokyakude-tagakotonarukokyaku id de3kenntourokusareteshimau"],
-      },
-      { kind: "section", text: "■前提条件" },
-      { kind: "line", text: "管理者ユーザーでログインしていること", answers: ["kannrishayu-za- de roguin shiteiru koto", "kannrishayu-za- de roguin siteiru koto"] },
-      { kind: "section", text: "■操作手順" },
-      { kind: "line", text: "1. 顧客登録画面を開く", answers: ["1kokyakutourokugamenwohiraku"] },
-      { kind: "line", text: "2. 必須項目を入力する", answers: ["2hissukoumokuwonyuuryokusuru"] },
-      { kind: "line", text: "3. 保存ボタンを素早く3回クリックする", answers: ["3hozonbotanwosubayaku3kaikurikkusuru"] },
-      { kind: "section", text: "■期待結果" },
-      {
-        kind: "line",
-        text: "保存ボタンを連続クリックしても顧客データが1件だけ登録されること",
-        answers: ["hozonbotanworenzokukurikkushitemokokyakude-taga1kenndaketourokusarerukoto"],
-      },
-      { kind: "section", text: "■実際の動作" },
-      { kind: "line", text: "同じ顧客データが異なる顧客IDで3件登録される", answers: ["onajikokyakude-tagakotonarukokyaku id de3kenntourokusareru"] },
-      { kind: "section", text: "■備考" },
-      {
-        kind: "line",
-        trainingRole: "remark",
-        text: "重複した3件にはそれぞれ異なる顧客IDが採番されていることを確認",
-        answers: ["tyouhukushita3kennnihasorezorekotonarukokyaku id gasaibannsareteirukotowokakunin"],
-      },
-      { kind: "section", text: "■再現性" },
-      { kind: "line", text: "3/3", answers: ["3/3"] },
-    ],
-  },
-];
+const scenarioBank = [];
 
 const projectEnvironments = {
   attendance: [
@@ -295,325 +129,16 @@ const environmentLabelRules = [
   [/^Database schema$/i, "DBスキーマ"],
 ];
 
-const projectReportPreconditions = {
-  attendance: {
-    text: "テスト対象の従業員と勤務予定が登録されていること",
-    answers: ["tesutotaishounojuugyouinntokinnmuyoteigatourokusareteirukoto"],
-  },
-  salon: {
-    text: "対象店舗の担当者と予約枠が登録されていること",
-    answers: ["taishoutenponotanntoushatoyoyakuwakugatourokusareteirukoto"],
-  },
-  ec: {
-    text: "テスト商品と購入者アカウントが登録されていること",
-    answers: ["tesutoshouhinntokounyuushakaunntogatourokusareteirukoto"],
-  },
-  inventory: {
-    text: "対象商品の在庫とロットが登録されていること",
-    answers: ["taishoushouhinnnozaikotorottogatourokusareteirukoto"],
-  },
-  mobile: {
-    text: "テスト端末に対象ビルドがインストールされていること",
-    answers: ["tesutotannmatunitaishoubirudogainn-suto-rusareteirukoto"],
-  },
-  automotive: {
-    text: "CANoeをテスト車両へ接続していること",
-    answers: ["canoe wotesutosharyouhesetsuzokushiteirukoto"],
-  },
-  payment: {
-    text: "Sandbox環境でテスト加盟店を利用できること",
-    answers: ["sandbox kannkyoude tesuto kameitennwo riyou dekiru koto"],
-  },
-  medical: {
-    text: "テスト患者と検査・処方データが登録されていること",
-    answers: ["tesutokannjatokensashohoude-tagatourokusareteirukoto"],
-  },
-};
-
-const scenarioReportOperations = [
-  [/退勤時刻/, "勤務開始と退勤時刻を同じ日付で登録する", "kinnmukaisitotaikinnjikokuwoonajihizukedetourokusuru"],
-  [/日をまたぐ休憩時間/, "日付をまたぐ勤務に翌日分の休憩を登録する", "hizukewomatagukinnmuniyokujitubunnnokyuukeiwotourokusuru"],
-  [/月末処理中の同時打刻/, "月末処理中に複数端末から同時に打刻する", "getumatushorichuunifukusuutanmatukaradoujinidakokusuru"],
-  [/予約済みの時間帯/, "予約済みの担当者と時間帯を選択して予約を確定する", "yoyakuzuminotanntoushatojikanntaiwosenntakushiteyoyakuwokakuteisuru"],
-  [/予約をキャンセル/, "確定済みの予約をキャンセルして対象時間帯を再表示する", "kakuteizuminoyoyakuwokyannserushitetaishounojikanntaiwosaihyoujisuru"],
-  [/同時予約/, "別端末から同じ担当者と時間帯の予約を同時に確定する", "betutannmatukaraonajitanntoushatojikanntainoyoyakuwodoujinikakuteisuru"],
-  [/在庫切れの商品/, "在庫数を0にした商品をカートへ追加する", "zaikosuwo0nishitashouhinnwoka-tonituikasuru"],
-  [/税込価格の端数/, "同じ税率を設定した複数商品の税込価格を表示する", "onajizeirituwosetteishitafukusuushouhinnnozeikomikakakuwohyoujisuru"],
-  [/決済通知.*再送/, "同じ決済通知を注文APIへ再送する", "onajikessaitsuuchiwochuumonn api hesaisousuru"],
-  [/在庫数を超える出庫数/, "現在庫を超える出庫数を入力して登録する", "gennzaikowokoerushukkosuuwonyuuryokushitetourokusuru"],
-  [/期限切れのロット/, "期限切れロットを含む商品の出庫候補を表示する", "kigengirerottowohukumushouhinnnoshukkokouhowohyoujisuru"],
-  [/同時出庫/, "複数端末から同じ商品の出庫を同時に確定する", "fukusuutanmatukaraonajishouhinnnoshukkowodoujinikakuteisuru"],
-  [/画面回転/, "入力フォームへ内容を入力したまま端末を回転する", "nyuuryokufo-muhenaiyouwonyuuryokushitamamatanmatuwokaitennsuru"],
-  [/通知から開く/, "テスト通知を送信して端末の通知をタップする", "tesutotsuuchiwosoushinnshitetannmatunotsuuchiwotappusuru"],
-  [/バックグラウンド復帰/, "未送信データを作成してメモリ解放後にアプリへ復帰する", "misoushinnde-tawosakuseishitememorikaihougoniapurihefukkisuru"],
-  [/速度表示/, "CANoeから車速信号を変更してメーター表示を確認する", "canoe karashasokushinngouwohennkoushiteme-ta-hyoujiwokakuninsuru"],
-  [/CAN信号.*DBC定義/, "CANoeから既知のCAN信号を送信して復号値を確認する", "canoe karakichino can shinngouwosoushinnshitefukugouchiwokakuninsuru"],
-  [/Bus-Off/, [
-    ["CANoeでADAS ECUに送信エラーを連続発生させる", "canoe deadas ecu nisoushinnera-worennzokuhasseisaseru"],
-    ["ADAS ECUがBus-Offへ遷移したことを確認する", "adas ecu ga bus-off hesennishitakotowokakuninsuru"],
-    ["送信エラーを解除する", "soushinnera-wokaijosuru"],
-    ["規定のBus-Off復帰処理を実行する", "kiteino bus-off fukkishoriwojikkousuru"],
-  ]],
-  [/決済失敗時/, "失敗応答となるテスト決済を実行して売上データを確認する", "shippaioutoutonarutesutokessaiwojikkoushiteuriagede-tawokakuninsuru"],
-  [/同じ冪等キー/, "同じ冪等キーで決済APIを再試行する", "onajibekitouki-dekessai api wosaishikousuru"],
-  [/タイムアウト後/, "応答をタイムアウトさせて取引と与信の状態を確認する", "outouwotaimuautosase-tetorihikitoyoshinnnojoutaiwokakuninsuru"],
-  [/別の患者の検査結果/, "患者Aの検査結果を表示した後に患者Bへ切り替える", "kannja a no kensakekka wo hyouji shita ato ni kannja b he kirikaeru"],
-  [/体重の単位変換/, "グラム単位の体重を連携して投薬量を自動計算する", "guramutannitaijuuworenkeishitetouyakuryouwojidoukeisansuru"],
-  [/検査結果.*再送/, "同じ検査結果IDの連携データを再送する", "onajikensakekka id norennkeide-tawosaisousuru"],
-];
-
-const scenarioReportRemarks = [
-  [/退勤時刻/, "勤務日を手動で戻すと給与集計は正しい値になることを確認", "kinnmubiwoshudoudemodosutokyuuyoshuukeihatadashiichininarukotowokakunin"],
-  [/日をまたぐ休憩時間/, "同日内で完結する休憩は正しく控除されることを確認", "doujitsunaidekannketsusurukyuukeihatadashikukoujosarerukotowokakunin"],
-  [/月末処理中の同時打刻/, "1台の端末から打刻した場合は二重計上されないことを確認", "1dainotanmatukaradakokushitabaaihanijuukeijousarenaikotowokakunin"],
-  [/予約済みの時間帯/, "別の担当者または別の時間帯では重複しないことを確認", "betunotanntoushamatawabetunojikanntaidehatyouhukushinaikotowokakunin"],
-  [/予約をキャンセル/, "予約一覧からは削除されているが空き枠APIでは予約済みのままであることを確認", "yoyakuitirannkarahasakujosareteirugaakiwaku api dehayoyakuzuminomamadearukotowokakunin"],
-  [/同時予約/, "2件は異なる予約番号だが担当者と開始時刻は同じであることを確認", "2kennhakotonaruyoyakubangoudagatanntoushatokaisijikokuhaonajidearukotowokakunin"],
-  [/在庫切れの商品/, "商品APIが返す在庫数は0でカート追加後も変化していないことを確認", "shouhinn api gakaesuzaikosuha0deka-totuikagomohennkashiteinaikotowokakunin"],
-  [/税込価格の端数/, "カート合計は115円で商品一覧の表示だけが116円であることを確認", "ka-togoukeiha115enndeshouhinnitiran no hyoujidakega116enndearukotowokakunin"],
-  [/決済通知.*再送/, "再送前後の通知IDと決済IDは同一であることを確認", "saisouzenngonotsuuchi id tokessai id hadouitsudearukotowokakunin"],
-  [/在庫数を超える出庫数/, "登録後の在庫数はマイナス3と表示されることを確認", "tourokugonozaikosuhamainasu3tohyoujisarerukotowokakunin"],
-  [/期限切れのロット/, "期限判定に使用するサーバー日時は2026年7月27日であることを確認", "kigennhanntenishiyousurusa-ba-nichijiha2026nen7gatu27nichidearukotowokakunin"],
-  [/同時出庫/, "2件の出庫履歴はいずれも処理前在庫1個として記録されていることを確認", "2kennoshukkorirekihaizuremoshorimaezaiko1kotoshitekirokusareteirukotowokakunin"],
-  [/画面回転/, "回転前の入力内容はサーバーへ送信されていないことを確認", "kaitennmaenonyuuryokunaiyouhasa-ba-hesoushinsareteinaikotowokakunin"],
-  [/通知から開く/, "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認", "apurinainooshiraseitiran karanews-102wohirakusousahaseijouniokonaerukotowokakunin"],
-  [/バックグラウンド復帰/, "サーバーログには未送信データ3件の同期要求が記録されていないことを確認", "sa-ba-rogunihamisoushinde-ta3kenn nodoukiyoukyuugakirokusareteinaikotowokakunin"],
-  [/速度表示/, "CANログ上では車速信号が即時に80km/hへ更新されていることを確認", "can rogujoudehashasokushinngougasokujini80km/hhekoushinsareteirukotowokakunin"],
-  [/CAN信号.*DBC定義/, "CANoeの送信フレームはDBC定義と一致していることを確認", "canoe nosoushinfure-muhadbcteigitoittishiteirukotowokakunin"],
-  [/Bus-Off/, "他のECUは通信を継続しイグニッションOFF/ONでADAS ECUの受信が再開することを確認", "hokano ecu hatsuushinwokeizokushiigunisshon off/on deadas ecu nojushingasaikaisurukotowokakunin"],
-  [/決済失敗時/, "決済ゲートウェイは失敗を返しており顧客への請求は発生していないことを確認", "kessaige-towei hashippaiwokaeshiteorikokyakuhe noseikyuuhahasseishiteinaikotowokakunin"],
-  [/同じ冪等キー/, "2回のリクエストで冪等キーと決済内容は一致していることを確認", "2kainorikuesutodebekitouki-tokessainaiyouhaittishiteirukotowokakunin"],
-  [/タイムアウト後/, "売上確定と売上取消は発生せず与信だけが残っていることを確認", "uriagekakuteitouriagetorikesihahasseisezu yoshinndakeganokotteirukotowokakunin"],
-  [/別の患者の検査結果/, "APIは患者Bの結果を返しているが画面には患者Aの検査結果が残っていることを確認", "api hakannja b nokekkawokaeshiteirugagamennnihakannja a nokensakekkaganokotteirukotowokakunin"],
-  [/体重の単位変換/, "連携元からは体重18000gが正しい単位情報付きで送信されていることを確認", "renkeimotokarahataijuu18000gagatadashiitannijouhoutukidesoushinsareteirukotowokakunin"],
-  [/検査結果.*再送/, "重複した2件は検査結果IDと測定時刻が同一であることを確認", "tyouhukushita2kennhakensakekka id tosokuteijikokugadouitsudearukotowokakunin"],
-];
-
-const scenarioSpecificationReferences = [
-  [/右クリック.*コンテキストメニュー/, "顧客管理システム画面仕様書 Rev.2.3「3.4.2 顧客一覧のコンテキストメニュー」"],
-  [/存在しない氏名/, "顧客検索機能仕様書 Rev.1.8「2.3.1 氏名検索」"],
-  [/保存ボタンを連続クリック/, "顧客データ管理要件書 Rev.1.5「2.2 レコード一意性」"],
-  [/退勤時刻.*翌日の18:00/, "勤怠計算仕様書 Rev.4.12「3.1.2 勤務日の確定」"],
-  [/日をまたぐ休憩時間/, "勤怠計算仕様書 Rev.4.12「3.2.4 日跨ぎ勤務の休憩控除」"],
-  [/月末処理中の同時打刻/, "打刻処理設計書 Rev.4.6「5.3.2 重複打刻の排除」"],
-  [/予約済みの時間帯/, "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」"],
-  [/予約をキャンセル/, "予約状態遷移仕様書 Rev.2026.07「3.2 キャンセル後の空き枠反映」"],
-  [/同時予約/, "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」"],
-  [/在庫切れの商品/, "商品在庫連携仕様書 Rev.8.4「4.1.3 カート追加可否」"],
-  [/税込価格の端数/, "価格計算仕様書 Rev.8.4「2.2.1 消費税の端数処理」"],
-  [/決済通知.*再送/, "注文連携API仕様書 Rev.8.4「6.3 決済通知の再送制御」"],
-  [/在庫数を超える出庫数/, "出庫業務仕様書 Rev.5.7「3.1.4 出庫可能数の検証」"],
-  [/期限切れのロット/, "ロット管理仕様書 Rev.5.7「4.2.2 有効期限と出庫優先順位」"],
-  [/同時出庫/, "在庫更新設計書 Rev.5.7「5.1.3 同時出庫の排他制御」"],
-  [/画面回転/, "モバイル画面状態保持仕様書 Rev.3.4「2.5 端末回転時の入力保持」"],
-  [/通知から開く/, "通知ディープリンク仕様書 Rev.3.4「3.2 お知らせIDの引き渡し」"],
-  [/バックグラウンド復帰/, "オフライン同期設計書 Rev.3.4「4.3 未送信データの永続化」"],
-  [/速度表示/, "メーター表示機能仕様書 Rev.5.12「4.2.3 車速表示更新周期」"],
-  [/CAN信号.*DBC定義/, "ADAS通信仕様書 Rev.5.12「6.3.2 BatteryVoltage（Intel / Little Endian）」"],
-  [/Bus-Off/, "ADAS ECU通信制御仕様書 Rev.5.12「7.4 Bus-Off復帰処理」"],
-  [/決済失敗時/, "売上連携API仕様書 Rev.2024-06「3.3 決済失敗時の売上制御」"],
-  [/同じ冪等キー/, "決済API仕様書 Rev.2024-06「2.4 冪等キー」"],
-  [/タイムアウト後/, "与信管理仕様書 Rev.2024-06「5.2 タイムアウト時の与信取消」"],
-  [/別の患者の検査結果/, "診療情報表示仕様書 Rev.4.8「3.1.5 患者切替時の表示更新」"],
-  [/体重の単位変換/, "投薬量計算仕様書 Rev.4.8「4.2.1 体重単位の換算」"],
-  [/検査結果.*再送/, "検査結果連携仕様書 Rev.4.8「6.1.3 検査結果IDによる重複防止」"],
-];
-
 function getScenarioSpecificationReference(rawScenario) {
-  const subject = rawScenario.subject?.text || "";
-  return scenarioSpecificationReferences.find(([pattern]) => pattern.test(subject))?.[1] || "";
-}
-
-function getScenarioReportProcedure(projectId, subjectText) {
-  const defaultPrecondition = projectReportPreconditions[projectId] || {
-    text: "テストデータが登録されていること",
-    answers: ["tesutode-tagatourokusareteirukoto"],
-  };
-  const precondition = /Bus-Off/.test(subjectText)
-    ? {
-        text: "CANoeを接続しCANバスを高負荷状態にしていること",
-        answers: ["canoe wosetsuzokushi can basuwokoufukajoutainishiteirukoto"],
-      }
-    : defaultPrecondition;
-  const matchedOperation = scenarioReportOperations.find(([pattern]) => pattern.test(subjectText));
-  if (!matchedOperation) {
-    throw new Error(`Report procedure is not configured: ${subjectText}`);
-  }
-  const matchedRemark = scenarioReportRemarks.find(([pattern]) => pattern.test(subjectText));
-  if (!matchedRemark) {
-    throw new Error(`Report remark is not configured: ${subjectText}`);
-  }
-  const operationSteps = Array.isArray(matchedOperation[1])
-    ? matchedOperation[1]
-    : [[matchedOperation[1], matchedOperation[2]]];
-  const operations = operationSteps.map(([text, answer]) => ({ text, answers: [answer] }));
-  const remark = { text: matchedRemark[1], answers: [matchedRemark[2]] };
-  return { precondition, operations, remark };
-}
-
-function createProjectScenario(
-  projectId,
-  subjectText,
-  subjectAnswer,
-  detailText,
-  detailAnswer,
-  expectedText,
-  expectedAnswer,
-  options = {}
-) {
-  const environmentLines = projectEnvironments[projectId] || [];
-  const procedure = getScenarioReportProcedure(projectId, subjectText);
-  const reproducibility = options.reproducibility || "3/3";
-  const [reproducedCount, attemptedCount] = reproducibility.split("/").map(Number);
-  const isIntermittent =
-    Number.isFinite(reproducedCount) &&
-    Number.isFinite(attemptedCount) &&
-    attemptedCount > 0 &&
-    reproducedCount < attemptedCount;
-  const displayedSubjectText =
-    isIntermittent && !subjectText.endsWith("ことがある") ? `${subjectText}ことがある` : subjectText;
-  const displayedSubjectAnswer =
-    isIntermittent && !subjectAnswer.endsWith("kotogaaru") ? `${subjectAnswer}kotogaaru` : subjectAnswer;
-  const displayedDetailText =
-    isIntermittent && !detailText.endsWith("ことがある") ? `${detailText}ことがある` : detailText;
-  const displayedDetailAnswer =
-    isIntermittent && !detailAnswer.endsWith("kotogaaru") ? `${detailAnswer}kotogaaru` : detailAnswer;
-  const actualText = options.actualText || displayedSubjectText;
-  const actualAnswer = options.actualAnswer || displayedSubjectAnswer;
-  const detailEntries = [{ text: displayedDetailText, answers: [displayedDetailAnswer] }];
-
-  return {
-    scenarioId: options.scenarioId,
-    projectId,
-    difficulty: options.difficulty || "beginner",
-    environment: environmentLines,
-    subject: { text: displayedSubjectText, answers: [displayedSubjectAnswer] },
-    report: [
-      { kind: "section", text: "■詳細" },
-      ...detailEntries.map((entry) => ({ kind: "line", ...entry })),
-      { kind: "section", text: "■前提条件" },
-      { kind: "line", ...procedure.precondition },
-      { kind: "section", text: "■操作手順" },
-      ...procedure.operations.map((operation, index) => ({
-        kind: "line",
-        text: `${index + 1}. ${operation.text}`,
-        answers: operation.answers.map((answer) => `${index + 1}.${answer}`),
-      })),
-      { kind: "section", text: "■期待結果" },
-      { kind: "line", text: expectedText, answers: [expectedAnswer] },
-      { kind: "section", text: "■実際の動作" },
-      { kind: "line", text: actualText, answers: [actualAnswer] },
-      { kind: "section", text: "■備考" },
-      { kind: "line", trainingRole: "remark", ...procedure.remark },
-      { kind: "section", text: "■再現性" },
-      { kind: "line", text: reproducibility, answers: [reproducibility] },
-    ],
-  };
+  return window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[rawScenario.scenarioId]
+    ?.specificationReference || "";
 }
 
 scenarioBank.push(
-  createProjectScenario(
-    "attendance",
-    "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
-    "kinntaijissekitourokudetaikinnjikokugayokujitsuno18:00toshitehozonsareteshimau",
-    "同日の09:00から18:00までの勤務実績を登録すると、退勤時刻が翌日の18:00として保存されてしまう",
-    "doujitsuno09:00kara18:00madenokinnmujissekiwotourokusuruto taikinnjikokugayokujitsuno18:00toshitehozonsareteshimau",
-    "勤務開始日と同じ日付で退勤時刻が登録されること",
-    "kinnmukaisibitoonajihizukedetaikinnjikokugatourokusarerukoto",
-    { scenarioId: "attendance-clock-out-next-day", actualText: "退勤時刻が翌日の18:00として保存される", actualAnswer: "taikinnjikokugayokujitsuno18:00toshitehozonsareru" }
-  ),
-  createProjectScenario(
-    "salon",
-    "予約登録画面で予約済みの時間帯を重複予約できてしまう",
-    "yoyakutourokugamenndeyoyakuzuminojikanntaiwotyouhukuyoyakudekiteshimau",
-    "同じ担当者の14:00枠に予約が登録済みの状態でも、2件目の予約を確定できてしまう",
-    "onajitanntoushano14:00wakuniyoyakugatourokuzuminojoutaidemo 2kennmenoyoyakuwokakuteidekiteshimau",
-    "予約済みの時間帯は選択できないこと",
-    "yoyakuzuminojikanntaihasenntakudekinaikoto",
-    { scenarioId: "salon-duplicate-reservation", actualText: "予約済みの14:00枠に2件目の予約が登録される", actualAnswer: "yoyakuzumino14:00wakuni2kennmenoyoyakugatourokusareru" }
-  ),
-  createProjectScenario(
-    "ec",
-    "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
-    "shouhinnshousaigamenndezaikogirenoshouhinnwoka-tonituikadekiteshimau",
-    "在庫数が0の商品で「カートに追加」を押すと追加に成功し、注文確認画面まで進めてしまう",
-    "zaikosuga0noshouhinndeka-tonituikawoosutotuikaniseikoushi chuumonnkakuninngamennmadesusumeteshimau",
-    "在庫切れの商品はカートに追加できないこと",
-    "zaikogirenoshouhinnhaka-tonituikadekinaikoto",
-    { scenarioId: "ec-out-of-stock-cart", actualText: "在庫切れの商品がカートに追加され、注文確認画面まで進める", actualAnswer: "zaikogirenoshouhinngaka-tonituikasare chuumonnkakuninngamennmadesusumeru" }
-  ),
-  createProjectScenario(
-    "inventory",
-    "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
-    "shukkotourokugamenndezaikosuwokoerushukkosuuwotourokudekiteshimau",
-    "現在庫が5個の商品に出庫数8個を入力しても在庫不足エラーが表示されず、出庫を登録できてしまう",
-    "gennzaikoga5konoshouhinnnishukkosuu8kowonyuuryokushitemozaikobusokuera-gahyoujisarezu shukkowotourokudekiteshimau",
-    "在庫数を超える出庫はエラーになること",
-    "zaikosuwokoerushukkohaera-ninarukoto",
-    { scenarioId: "inventory-over-shipment", actualText: "在庫数5個に対して出庫数8個の登録が成功する", actualAnswer: "zaikosuu5konitaishiteshukkosuu8konotourokugaseikousuru" }
-  ),
-  createProjectScenario(
-    "mobile",
-    "問い合わせフォームで画面回転後に入力内容が消えてしまう",
-    "toiawasefo-mudegamennkaitenngoninyuuryokunaiyougakieteshimau",
-    "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう",
-    "toiawasefo-muni120mojinyuuryokushitajoutaidetannmatuwotatemukikarayokomukihekaitennsuruto nyuuryokunaiyougasubetekieteshimau",
-    "画面回転後も入力内容が保持されること",
-    "gamennkaitenngomonyuuryokunaiyougahojisare rukoto",
-    { scenarioId: "mobile-rotation-clears-input", actualText: "画面回転後、入力済みの120文字がすべて消える", actualAnswer: "gamennkaitenngo nyuuryokuzumino120mojigasubetekieru" }
-  ),
-  createProjectScenario(
-    "automotive",
-    "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
-    "shasaime-ta-deshasokuhennkougonosokudohyoujigasaidai1.2byouokureteshimau",
-    "車速信号を60km/hから80km/hへ変更しても、メーターは最大1.2秒間60km/hを表示し続けてしまう",
-    "shasokushinngouwo60km/hkara80km/hhehennkoushitemo me-ta-hasaidai1.2byoukann60km/hwohyoujishituzuketeshimau",
-    "車速信号の変更から200ms以内にメーター速度表示が更新されること",
-    "shasokushinngounohennkoukara200msinainime-ta-sokudohyoujigakoushinnsarerukoto",
-    { scenarioId: "automotive-speed-display-delay", actualText: "車速信号の変更から表示更新まで最大1.2秒かかる", actualAnswer: "shasokushinngounohennkoukarahyoujikoushinnmadesaidai1.2byoukakaru" }
-  ),
-  createProjectScenario(
-    "payment",
-    "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
-    "kessaishippaijinimokameitennnonitijiuriageheuriagede-tagakeijousareteshimau",
-    "12,800円のテスト決済が失敗応答となったにもかかわらず、加盟店の日次売上へ同額の売上データが計上されてしまう",
-    "12,800ennnotesutokessaigashippaioutoutonattaninimokakawarazu kameitennnonitijiuriagehedougakunouriagede-tagakeijousareteshimau",
-    "決済失敗時は売上が計上されないこと",
-    "kessaishippaijihauriagegakeijousarenaikoto",
-    { scenarioId: "payment-failed-payment-sales-record", actualText: "決済失敗後も12,800円の売上データが作成される", actualAnswer: "kessaishippaigomo12,800ennnouriagede-tagasakuseisareru" }
-  ),
-  createProjectScenario(
-    "medical",
-    "患者切替後も別の患者の検査結果が表示されてしまう",
-    "kannjakirikaegomobetunokannjanokensakekkagahyoujisareteshimau",
-    "患者Aの検査結果を表示した後に患者Bへ切り替えても、画面に患者Aの検査結果3件が表示されてしまう",
-    "kannja a nokensakekkawohyoujishitaatonikannja b hekirikaetemo gamennnikannja a nokensakekka3kenngahyoujisareteshimau",
-    "選択した患者の検査結果だけが表示されること",
-    "senntakushitakannjanokensakekkadakegahyoujisarerukoto",
-    { scenarioId: "medical-cross-patient-results", actualText: "患者Bへ切替後も患者Aの検査結果3件が表示される", actualAnswer: "kannja b hekirikaegomokannja a nokensakekka3kenngahyoujisareru" }
+  ...Object.values(window.TYPING_WORKBENCH_SCENARIO_AUTHORING || {}).map(
+    ({ scenario }) => scenario
   )
 );
-
-for (const scenario of window.TYPING_WORKBENCH_SCENARIOS || []) {
-  scenarioBank.push(
-    createProjectScenario(
-      scenario.projectId,
-      scenario.subject,
-      scenario.subjectAnswer,
-      scenario.detail,
-      scenario.detailAnswer,
-      scenario.expected,
-      scenario.expectedAnswer,
-      {
-        scenarioId: scenario.scenarioId,
-        difficulty: scenario.difficulty,
-        reproducibility: scenario.reproducibility,
-        actualText: scenario.actual,
-        actualAnswer: scenario.actualAnswer,
-      }
-    )
-  );
-}
 
 const projectCatalog = [
   {
@@ -1266,228 +791,14 @@ function getScenarioWorkMemo(rawScenario, profile) {
   ].filter(Boolean).join("\n\n");
 }
 
-const scenarioJudgementProfiles = [
-  {
-    match: /右クリック.*コンテキストメニュー/,
-    severity: "s3",
-    scope: "影響を受けるのは、Chromeで顧客一覧を利用する管理者です。顧客詳細の表示や登録データには影響しません。",
-    workaround: "修正までは、顧客を左クリックして詳細画面を開き、画面内の操作ボタンを使用します。",
-    recovery: "ページを再読み込みしてもメニューは戻りません。恒久的な復旧には画面の修正が必要です。",
-    risk: "編集や履歴確認を右クリック操作で開始できないため、操作に余分な手間がかかります。誤更新やデータ消失は確認されていません。",
-  },
-  {
-    match: /存在しない氏名/,
-    severity: "s3",
-    scope: "影響を受けるのは、顧客一覧で氏名検索を利用する一般ユーザーです。",
-    workaround: "修正までは、顧客番号など正常に動作する別の検索条件を使用します。",
-    recovery: "検索条件をクリアすると通常の一覧へ戻せますが、氏名検索の不具合自体は解消しません。",
-    risk: "検索条件に一致しない場合でも検索対象の顧客が全件表示されるため、検索結果を正しいと誤認して別の顧客を選択してしまう可能性があります。なお、権限外データの表示は確認されていません。",
-  },
-  {
-    match: /保存ボタンを連続クリック/,
-    severity: "s3",
-    scope: "影響を受けるのは、顧客登録画面で保存ボタンを連続して押下した場合に作成される顧客データです。同じ内容の顧客レコードが複数作成されます。",
-    workaround: "修正までは、保存ボタンを一度だけ押し、完了表示が出るまで再操作しません。",
-    recovery: "作成されたレコードを照合し、重複分だけを管理画面から削除します。",
-    risk: "同じ顧客への連絡や集計が重複する可能性があります。入力した元データの消失は確認されていません。",
-  },
-  {
-    match: /退勤時刻.*翌日の18:00/,
-    severity: "s3",
-    scope: "影響を受けるのは、同じ日に出勤と退勤を行う従業員の勤務実績です。対象日の勤怠集計と承認画面にも誤った日付が反映されます。",
-    workaround: "修正までは、承認前に退勤側の勤務日を当日へ手動で戻します。",
-    recovery: "誤って保存された勤務日を修正し、対象日の勤怠集計を再実行します。",
-    risk: "誤った勤務時間や給与額で確定される可能性があります。承認前であれば勤務実績を修正できます。",
-  },
-  {
-    match: /日をまたぐ休憩時間/,
-    severity: "s2",
-    scope: "影響を受けるのは、夜勤など日付をまたぎ、翌日側に休憩を登録した勤務実績です。勤怠集計と給与計算にも影響します。",
-    workaround: "修正までは、給与確定前に休憩時間と実労働時間を確認し、誤りがあれば手動で補正します。",
-    recovery: "対象勤務の実労働時間を修正し、勤怠集計と給与計算を再実行します。",
-    risk: "実労働時間が過大に記録され、賃金の過払いまたは労働時間管理の誤りにつながる可能性があります。",
-  },
-  {
-    match: /月末処理中の同時打刻/,
-    severity: "s2",
-    scope: "影響を受けるのは、月末集計中に複数端末から同時に退勤を記録した従業員です。残業時間が二重計上され、対象月の給与計算にも影響します。",
-    workaround: "修正までは、月末集計中の退勤記録を1台の端末に限定します。",
-    recovery: "重複した退勤記録を除外し、対象月の残業集計と給与計算を再実行します。",
-    risk: "残業代の過払いと、労働時間記録の不整合が発生する可能性があります。",
-  },
-  {
-    match: /予約済みの時間帯を重複/,
-    severity: "s3",
-    scope: "影響を受けるのは、同じ店舗・担当者・時間帯を指定した予約です。ほかの店舗や時間帯への影響は確認されていません。",
-    workaround: "修正までは、予約を確定する直前に管理画面で最新の空き状況を確認します。",
-    recovery: "後から登録された予約を取り消し、該当する顧客へ別の時間帯を案内します。",
-    risk: "同じ担当者に2件の予約が入り、来店時の対応遅延や予約変更が発生する可能性があります。",
-  },
-  {
-    match: /予約をキャンセル.*対象時間帯/,
-    severity: "s3",
-    scope: "影響を受けるのは、キャンセルした予約と同じ店舗・担当者・時間帯の枠です。ほかの予約枠への影響は確認されていません。",
-    workaround: "修正までは、店舗管理者が対象枠を管理画面から手動で空き状態へ変更します。",
-    recovery: "対象枠の状態を再計算し、新規予約画面へ予約可能な枠として反映します。",
-    risk: "実際には空いている時間帯を販売できず、新しい予約を受け付けられない可能性があります。",
-  },
-  {
-    match: /同時予約.*同じ担当者/,
-    severity: "s3",
-    scope: "影響を受けるのは、同じ担当者と時間帯に対してほぼ同時に確定された2件の予約です。",
-    workaround: "修正までは、確定直前に予約枠を再読み込みし、ほかの予約が入っていないことを確認します。",
-    recovery: "後から確定した予約を取り消し、該当する顧客へ別の担当者または時間帯を案内します。",
-    risk: "担当者が対応できない二重予約となり、顧客への予約変更や謝罪が必要になる可能性があります。",
-  },
-  {
-    match: /在庫切れの商品をカート/,
-    severity: "s3",
-    scope: "影響を受けるのは、在庫数が0の商品と、その商品をカートへ追加した購入者です。ほかの商品への影響は確認されていません。",
-    workaround: "修正までは、対象商品を販売停止にするか、注文確定前に在庫の有無を確認します。",
-    recovery: "対象商品をカートから削除します。すでに注文が確定している場合は、注文をキャンセルして購入者へ連絡します。",
-    risk: "在庫のない商品を受注し、注文のキャンセル、返金または配送遅延が発生する可能性があります。",
-  },
-  {
-    match: /税込価格の端数/,
-    severity: "s3",
-    scope: "影響を受けるのは、消費税計算で1円未満の端数が発生する商品です。商品一覧の表示、注文金額、会計連携の間で1円の差が生じます。",
-    workaround: "修正までは、注文確定前に正しい税込価格を確認し、必要に応じて商品価格を手動で調整します。",
-    recovery: "端数処理の設定をそろえ、対象商品の税込価格を再計算して表示と注文金額を更新します。",
-    risk: "画面の表示価格と請求額が一致せず、購入者への案内や会計照合に差異が生じる可能性があります。",
-  },
-  {
-    match: /決済通知.*再送.*注文が二重/,
-    severity: "s2",
-    scope: "影響を受けるのは、決済事業者から同じ決済通知が再送された注文です。同じ通知に対して複数の注文番号が発行されます。",
-    workaround: "修正までは、再送された通知の通知IDと決済IDを確認し、同じ決済に対する注文処理を手動で停止します。",
-    recovery: "重複して作成された注文をキャンセルし、関連する出荷処理と売上連携を取り消します。",
-    risk: "同じ決済に対して、商品の二重出荷や売上の重複計上が発生する可能性があります。",
-  },
-  {
-    match: /在庫数を超える出庫数/,
-    severity: "s2",
-    scope: "影響を受けるのは、現在庫を超える数量で出庫登録した商品です。対象商品の在庫台帳と出庫実績に誤った数量が記録されます。",
-    workaround: "修正までは、登録前に実在庫を確認し、出庫数を現在庫以下へ変更します。",
-    recovery: "誤って登録された出庫を取り消し、棚卸結果を基に対象商品の在庫数を補正します。",
-    risk: "在庫台帳と実在庫が一致しなくなり、欠品商品の引当てや誤出荷が発生する可能性があります。",
-  },
-  {
-    match: /期限切れのロット/,
-    severity: "s2",
-    scope: "影響を受けるのは、期限切れロットと期限内ロットが混在する商品の出庫候補です。対象倉庫でのロット選定に影響します。",
-    workaround: "修正までは、出庫担当者が有効期限を確認し、期限内のロットを手動で選択します。",
-    recovery: "期限切れロットを出庫対象から外し、対象商品の出庫候補を再生成します。",
-    risk: "期限切れの商品を誤って出荷し、品質事故や規制違反につながる可能性があります。",
-  },
-  {
-    match: /同時出庫で在庫数がマイナス/,
-    severity: "s2",
-    scope: "影響を受けるのは、複数端末から同時に出庫された同一商品です。対象商品の在庫台帳と、その後の出庫処理に影響します。",
-    workaround: "修正までは、同じ商品の出庫を1台の端末で順番に処理します。",
-    recovery: "対象商品の出庫履歴を照合し、成立しない出庫を取り消して在庫数を実在庫に合わせます。",
-    risk: "実際には存在しない在庫を後続処理で引き当て、欠品や誤出荷が発生する可能性があります。",
-  },
-  {
-    match: /画面回転後に入力内容/,
-    severity: "s3",
-    scope: "影響を受けるのは、Androidの対象画面で端末回転前に保存していない入力内容です。保存済みデータへの影響は確認されていません。",
-    workaround: "修正までは、入力内容を送信または保存するまで端末を回転しません。",
-    recovery: "消えた入力内容は復元できないため、利用者が同じ内容を再入力します。",
-    risk: "未保存の入力内容が失われ、入力作業のやり直しが発生します。サーバー上の保存済みデータは失われません。",
-  },
-  {
-    match: /通知から開くと別のお知らせ/,
-    severity: "s3",
-    scope: "影響を受けるのは、対象バージョンのiOSアプリで通知をタップした利用者です。通知本文は正しいものの、一つ前のお知らせが開きます。",
-    workaround: "修正までは通知をタップせず、アプリ内のお知らせ一覧から通知に対応するお知らせを選択します。",
-    recovery: "誤ったお知らせが開いた場合は一覧へ戻り、通知に対応するお知らせを開き直します。アプリの再起動は不要です。",
-    risk: "表示された古いお知らせを最新情報だと誤認し、誤った案内に従う可能性があります。",
-  },
-  {
-    match: /バックグラウンド復帰後.*未送信データ/,
-    severity: "s2",
-    scope: "影響を受けるのは、OSによるメモリ解放が発生したiOS端末上の未送信データです。送信済みデータには影響しません。",
-    workaround: "修正までは、送信完了を確認するまでアプリをバックグラウンドへ移しません。",
-    recovery: "消失した未送信データは復元できないため、元の記録を確認して再入力します。",
-    risk: "未送信の業務記録が失われ、記録の欠落や再入力が発生する可能性があります。",
-  },
-  {
-    match: /車速変更後.*速度表示が最大1\.2秒遅れ/,
-    severity: "s2",
-    scope: "影響を受けるのは、メーターECU v5.12.3を搭載した試験車両の速度表示です。走行制御ECUが受信する車速値に遅延は確認されていません。",
-    workaround: "走行中に利用できる回避策はありません。修正版を適用するまで、対象車両の試験走行を停止します。",
-    recovery: "イグニッションをOFFにして再度ONにすると表示遅延は一時的に解消しますが、その後も再発します。",
-    risk: "運転者が実際の速度を誤認するほか、速度計表示に関する法規要件へ抵触する可能性があります。",
-  },
-  {
-    match: /CAN信号.*DBC定義/,
-    severity: "s3",
-    scope: "影響を受けるのは、メーターECUが表示に使用するバッテリー電圧信号です。車両制御は別経路の信号を使用しています。",
-    workaround: "修正までは、診断ツールで実際の電圧を確認し、メーター上の電圧表示を判断に使用しません。",
-    recovery: "正しいDBC定義を適用してECUを再起動すると、バッテリー電圧が正しい値で表示されます。",
-    risk: "運転者や整備担当者がバッテリー状態を誤認する可能性があります。走行制御への直接的な影響は確認されていません。",
-  },
-  {
-    match: /Bus-Off復帰後/,
-    severity: "s2",
-    scope: "影響を受けるのは、高負荷試験でBus-Offから復帰したADAS ECU v5.12.3です。車輪速とブレーキ状態の受信が停止しますが、ほかのECUは通信を継続します。",
-    workaround: "走行中に受信を再開させる回避策はありません。警告灯が点灯した場合は、安全な場所へ停車します。",
-    recovery: "車両を停止してイグニッションをOFFにし、再度ONにするとADAS ECUのCAN受信が再開します。",
-    risk: "衝突被害軽減ブレーキなどの運転支援機能が利用できない状態が続きます。基本制動は独立した系統で動作します。",
-  },
-  {
-    match: /決済失敗時にも.*売上データが計上/,
-    severity: "s2",
-    scope: "影響を受けるのは、決済に失敗した取引の売上データと加盟店の日次集計です。顧客への請求は発生していません。",
-    workaround: "修正までは、日次締めの前に決済結果と売上データを照合し、失敗した取引を集計から除外します。",
-    recovery: "誤って作成された売上データを取り消し、そのデータを除外して加盟店の日次集計を再作成します。",
-    risk: "加盟店の売上額と会計データが実際より多く計上され、照合や精算に差異が生じる可能性があります。",
-  },
-  {
-    match: /同じ冪等キー.*売上が二重/,
-    severity: "s1",
-    scope: "影響を受けるのは、タイムアウト後に同じ冪等キーで再試行された決済です。対象顧客へ同額の請求が二重に発生します。",
-    workaround: "修正までは、決済を再試行する前に取引照会を行い、最初の決済が成立していないことを確認します。",
-    recovery: "二重に成立した決済を照合し、2件目の決済を取り消すか返金します。",
-    risk: "顧客に金銭的な被害が生じるほか、加盟店への信用低下と決済データの不整合につながります。",
-  },
-  {
-    match: /タイムアウト後.*与信枠/,
-    severity: "s2",
-    scope: "影響を受けるのは、処理がタイムアウトしたカード取引です。売上は確定していませんが、確保された与信枠が顧客のカードに残ります。",
-    workaround: "修正までは、再決済する前に取引照会を行い、残っている与信の有無を確認します。",
-    recovery: "決済事業者へ与信の取消要求を送り、顧客のカードに残った利用枠を解放します。",
-    risk: "顧客の利用可能額が一時的に減少し、同じ取引を再試行すると与信が二重に確保される可能性があります。",
-  },
-  {
-    match: /別の患者の検査結果/,
-    severity: "s1",
-    scope: "影響を受けるのは、同じ端末で患者を続けて切り替えた医療従事者です。切替前の患者の検査結果が画面に残ります。",
-    workaround: "修正までは、患者を切り替えるたびに画面を再読み込みし、患者IDと氏名を照合してから検査結果を参照します。",
-    recovery: "誤表示を確認した場合は画面を閉じ、再ログインして正しい患者情報を表示します。あわせて表示履歴を監査します。",
-    risk: "別の患者の検査結果に基づく誤診や誤処置のほか、要配慮個人情報の漏えいにつながります。",
-  },
-  {
-    match: /体重の単位変換.*投薬量/,
-    severity: "s1",
-    scope: "影響を受けるのは、体重をグラム単位で受信した患者の自動投薬量計算です。同じ条件で作成される処方候補すべてに影響します。",
-    workaround: "修正までは自動計算を使用せず、医療従事者が体重をkgへ換算して投薬量を計算します。",
-    recovery: "誤った投薬量の処方候補を破棄し、正しい体重単位で再計算したうえで再承認します。",
-    risk: "誤った投薬量を承認すると、過量投与によって患者の生命や身体へ重大な危害を与える可能性があります。",
-  },
-  {
-    match: /検査結果.*再送.*重複登録/,
-    severity: "s2",
-    scope: "影響を受けるのは、検査連携から同じ検査結果IDを再受信した患者記録です。同じ測定結果が診療画面へ重複して表示されます。",
-    workaround: "修正までは、検査結果IDと測定時刻を照合し、重複した行を除外して参照します。",
-    recovery: "重複して登録された検査結果を削除し、患者記録と監査ログに不整合がないことを確認します。",
-    risk: "検査の実施回数や結果の時系列を誤認し、診療判断を誤る可能性があります。",
-  },
-];
-
 function getScenarioJudgementProfile(rawScenario) {
-  const subject = rawScenario.subject?.text || "";
-  return scenarioJudgementProfiles.find((profile) => profile.match.test(subject)) || null;
+  const authoredProfile = window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[
+    rawScenario.scenarioId
+  ]?.judgement;
+  if (authoredProfile) {
+    return authoredProfile;
+  }
+  return null;
 }
 
 function formatJapaneseDate(dateValue) {
@@ -1821,12 +1132,16 @@ function beginTicketRevision(ticket) {
 
 const elements = {
   homeNavButton: document.getElementById("homeNavButton"),
+  ticketNavButton: document.getElementById("ticketNavButton"),
   myPageNavButton: document.getElementById("myPageNavButton"),
   rmProjectHeader: document.getElementById("rmProjectHeader"),
   rmMyPageHeader: document.getElementById("rmMyPageHeader"),
   rmMyPageNavigation: document.getElementById("rmMyPageNavigation"),
   typingInput: document.getElementById("typingInput"),
   startButton: document.getElementById("startButton"),
+  resumeDraftButton: document.getElementById("resumeDraftButton"),
+  draftSaveButton: document.getElementById("draftSaveButton"),
+  draftSaveStatus: document.getElementById("draftSaveStatus"),
   stopButton: document.getElementById("stopButton"),
   createButton: document.getElementById("createButton"),
   practiceWritingCompleteButton: document.getElementById("practiceWritingCompleteButton"),
@@ -1840,7 +1155,6 @@ const elements = {
   subjectDocument: document.getElementById("subjectDocument"),
   subjectLineClearCue: document.getElementById("subjectLineClearCue"),
   trackerSelect: document.getElementById("trackerSelect"),
-  privateCheckbox: document.getElementById("privateCheckbox"),
   statusSelect: document.getElementById("statusSelect"),
   prioritySelect: document.getElementById("prioritySelect"),
   assigneeSelect: document.getElementById("assigneeSelect"),
@@ -1899,15 +1213,18 @@ const elements = {
   practiceScoringResult: document.getElementById("practiceScoringResult"),
   practiceScoringPreviewTotal: document.getElementById("practiceScoringPreviewTotal"),
   practiceScoringVerdict: document.getElementById("practiceScoringVerdict"),
+  practiceScoringVerdictDescription: document.getElementById("practiceScoringVerdictDescription"),
   practiceScoringOverallAssessment: document.getElementById("practiceScoringOverallAssessment"),
   practiceScoringBasis: document.getElementById("practiceScoringBasis"),
   practiceScoringPreviewStrengths: document.getElementById("practiceScoringPreviewStrengths"),
   practiceScoringReaderQuestions: document.getElementById("practiceScoringReaderQuestions"),
+  practiceScoringReaderQuestionsSection: document.getElementById("practiceScoringReaderQuestionsSection"),
   practiceScoringAmbiguitySection: document.getElementById("practiceScoringAmbiguitySection"),
   practiceScoringAmbiguityRisks: document.getElementById("practiceScoringAmbiguityRisks"),
   practiceScoringInvestigationAdvice: document.getElementById("practiceScoringInvestigationAdvice"),
   practiceScoringRewriteSection: document.getElementById("practiceScoringRewriteSection"),
   practiceScoringRewriteSuggestions: document.getElementById("practiceScoringRewriteSuggestions"),
+  practiceScoringNoImprovements: document.getElementById("practiceScoringNoImprovements"),
   practiceScoringRadar: document.getElementById("practiceScoringRadar"),
   practiceScoringRadarValue: document.getElementById("practiceScoringRadarValue"),
   practiceRadarFactual: document.getElementById("practiceRadarFactual"),
@@ -2063,6 +1380,83 @@ function saveListPreferences() {
   }
 }
 
+const practiceDraftStorageKey = "typing-workbench:practice-drafts:v1";
+const practiceDraftSchemaVersion = "practice-drafts.v1";
+
+function normalizePracticeDraft(rawDraft) {
+  if (!rawDraft || typeof rawDraft !== "object") {
+    return null;
+  }
+  const scenario = scenarioBank.find(({ scenarioId }) => scenarioId === rawDraft.scenarioId);
+  if (!scenario || scenario.projectId !== rawDraft.projectId) {
+    return null;
+  }
+  const sections = rawDraft.answer?.sections;
+  const ticketFields = rawDraft.answer?.ticketFields;
+  if (
+    typeof rawDraft.answer?.subject !== "string" ||
+    !sections || typeof sections !== "object" || Array.isArray(sections) ||
+    !ticketFields || typeof ticketFields !== "object" || Array.isArray(ticketFields)
+  ) {
+    return null;
+  }
+  return {
+    schemaVersion: "practice-draft.v1",
+    scenarioId: rawDraft.scenarioId,
+    projectId: rawDraft.projectId,
+    savedAt: typeof rawDraft.savedAt === "string" ? rawDraft.savedAt : "",
+    startedAt: typeof rawDraft.startedAt === "string" ? rawDraft.startedAt : "",
+    practiceWritingComplete: Boolean(rawDraft.practiceWritingComplete),
+    answer: {
+      subject: rawDraft.answer.subject,
+      sections: Object.fromEntries(
+        Object.entries(sections)
+          .filter(([key, value]) => typeof key === "string" && typeof value === "string")
+      ),
+      ticketFields: { ...ticketFields, private: false },
+    },
+    selectedEvidenceIds: Array.isArray(rawDraft.selectedEvidenceIds)
+      ? rawDraft.selectedEvidenceIds.filter((fileId) => typeof fileId === "string")
+      : [],
+  };
+}
+
+function loadPracticeDrafts() {
+  try {
+    const storedValue = window.localStorage.getItem(practiceDraftStorageKey);
+    if (!storedValue) {
+      return {};
+    }
+    const parsedValue = JSON.parse(storedValue);
+    if (parsedValue?.schemaVersion !== practiceDraftSchemaVersion) {
+      return {};
+    }
+    return Object.fromEntries(
+      Object.values(parsedValue.drafts || {})
+        .map(normalizePracticeDraft)
+        .filter(Boolean)
+        .map((draft) => [draft.scenarioId, draft])
+    );
+  } catch {
+    return {};
+  }
+}
+
+function persistPracticeDrafts(drafts) {
+  try {
+    window.localStorage.setItem(
+      practiceDraftStorageKey,
+      JSON.stringify({
+        schemaVersion: practiceDraftSchemaVersion,
+        drafts,
+      })
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const initialListPreferences = loadListPreferences();
 
 const guestExperienceRequested = /(?:^|[?&])guest=1(?:&|$)/.test(window.location?.search || "");
@@ -2078,6 +1472,8 @@ const state = {
   scenario: buildScenario(scenarioBank[0]),
   scenarioQueue: [],
   scenarioSelectionPending: false,
+  practiceDrafts: loadPracticeDrafts(),
+  draftSaveStatusTimerId: null,
   sessionPracticeAttemptsByScenario: {},
   ticketSortKey: initialListPreferences.sortKey,
   ticketSortDirection: initialListPreferences.sortDirection,
@@ -2146,7 +1542,6 @@ function getLocalDateInputValue(date = new Date()) {
 const ticketDefaults = {
   subject: "右クリックメニューが表示されない",
   tracker: "bug",
-  private: false,
   status: "new",
   priority: "",
   severity: "",
@@ -2158,7 +1553,7 @@ const ticketDefaults = {
 
 const authoringModeConfig = {
   reference: {
-    label: "見本入力",
+    label: "記載例入力",
   },
   practice: {
     label: "実践起票",
@@ -2400,6 +1795,7 @@ function handleProjectChange(event) {
   state.ticketListItems = [];
   state.ticketListNextCursor = null;
   renderProject();
+  syncControls();
 }
 
 function escapeHtml(value) {
@@ -2671,10 +2067,14 @@ function setView(view) {
   elements.rmProjectHeader?.classList.toggle("hidden", showMyPageNavigation);
   elements.rmMyPageHeader?.classList.toggle("hidden", !showMyPageNavigation);
   elements.rmMyPageNavigation?.classList.toggle("hidden", !showMyPageNavigation);
-  elements.homeNavButton?.classList.toggle("is-active", view !== "mypage");
+  elements.homeNavButton?.classList.remove("is-active");
+  elements.ticketNavButton?.classList.toggle("is-active", view !== "mypage");
   elements.myPageNavButton?.classList.toggle("is-active", view === "mypage");
   if (elements.homeNavButton) {
-    elements.homeNavButton.toggleAttribute("aria-current", view !== "mypage");
+    elements.homeNavButton.removeAttribute("aria-current");
+  }
+  if (elements.ticketNavButton) {
+    elements.ticketNavButton.toggleAttribute("aria-current", view !== "mypage");
   }
   if (elements.myPageNavButton) {
     elements.myPageNavButton.toggleAttribute("aria-current", view === "mypage");
@@ -2684,9 +2084,6 @@ function setView(view) {
 function applyTicketDefaults() {
   renderEnvironmentOptions();
   setControlValue(elements.trackerSelect, ticketDefaults.tracker);
-  if (elements.privateCheckbox) {
-    elements.privateCheckbox.checked = ticketDefaults.private;
-  }
   setControlValue(elements.statusSelect, ticketDefaults.status);
   setControlValue(elements.prioritySelect, ticketDefaults.priority);
   setControlValue(elements.severitySelect, ticketDefaults.severity);
@@ -2705,9 +2102,6 @@ function applyTicketDefaults() {
 function applyTicketFieldValues(fields = {}) {
   renderEnvironmentOptions();
   setControlValue(elements.trackerSelect, fields.tracker || ticketDefaults.tracker);
-  if (elements.privateCheckbox) {
-    elements.privateCheckbox.checked = Boolean(fields.private);
-  }
   setControlValue(elements.statusSelect, fields.status || ticketDefaults.status);
   setControlValue(elements.prioritySelect, fields.priority || "");
   setControlValue(elements.severitySelect, fields.severity || "");
@@ -4039,6 +3433,7 @@ function resetSession() {
   }
   elements.evidencePickerOverlay?.classList.add("hidden");
   clearPracticeWritingStatus();
+  clearDraftSaveStatus();
   renderEvidenceAttachment();
   setView("list");
 
@@ -4150,7 +3545,7 @@ const fieldValueLabels = {
 function getSelectedTicketFields() {
   return {
     tracker: elements.trackerSelect?.value,
-    private: Boolean(elements.privateCheckbox?.checked),
+    private: false,
     severity: elements.severitySelect?.value,
     priority: elements.prioritySelect?.value,
     status: elements.statusSelect?.value,
@@ -4164,6 +3559,130 @@ function getSelectedTicketFields() {
     watchers: [...(elements.ticketWatchersList?.querySelectorAll('input[name="watchers"]:checked') || [])]
       .map((checkbox) => checkbox.value),
   };
+}
+
+function getPracticeTicketFieldPayload(selected = getSelectedTicketFields()) {
+  return {
+    tracker: selected.tracker || "bug",
+    private: false,
+    status: selected.status || "new",
+    severity: selected.severity || null,
+    priority: selected.priority || null,
+    assigneeId: selected.assignee || null,
+    category: selected.category || null,
+    version: selected.version || null,
+    environment: selected.environment || null,
+    startDate: selected.startDate || null,
+    dueDate: selected.dueDate || null,
+    progress: selected.progress,
+    watcherIds: selected.watchers,
+  };
+}
+
+function getLatestPracticeDraft(projectId = state.projectId) {
+  return Object.values(state.practiceDrafts)
+    .filter((draft) => draft.projectId === projectId)
+    .sort((left, right) => String(right.savedAt).localeCompare(String(left.savedAt)))[0] || null;
+}
+
+function clearDraftSaveStatus() {
+  if (state.draftSaveStatusTimerId) {
+    window.clearTimeout(state.draftSaveStatusTimerId);
+    state.draftSaveStatusTimerId = null;
+  }
+  setTextContent(elements.draftSaveStatus, "");
+  elements.draftSaveStatus?.classList.add("hidden");
+}
+
+function showDraftSaveStatus(message, isError = false) {
+  clearDraftSaveStatus();
+  setTextContent(elements.draftSaveStatus, message);
+  elements.draftSaveStatus?.classList.remove("hidden");
+  elements.draftSaveStatus?.classList.toggle("is-error", isError);
+  state.draftSaveStatusTimerId = window.setTimeout(() => {
+    clearDraftSaveStatus();
+  }, 5000);
+}
+
+function buildCurrentPracticeDraft() {
+  return {
+    schemaVersion: "practice-draft.v1",
+    scenarioId: state.scenario.scenarioId,
+    projectId: state.projectId,
+    savedAt: new Date().toISOString(),
+    startedAt: state.sessionStartAt
+      ? new Date(state.sessionStartAt).toISOString()
+      : "",
+    practiceWritingComplete: state.practiceWritingComplete,
+    answer: {
+      subject: state.practiceSubject,
+      sections: { ...state.practiceSections },
+      ticketFields: getPracticeTicketFieldPayload(),
+    },
+    selectedEvidenceIds: [...state.selectedEvidenceIds],
+  };
+}
+
+function saveCurrentPracticeDraft() {
+  if (
+    !isPracticeMode() ||
+    state.view !== "create" ||
+    (!state.running && !state.awaitingCreate) ||
+    state.revisionTicketId
+  ) {
+    return false;
+  }
+  const draft = buildCurrentPracticeDraft();
+  const nextDrafts = {
+    ...state.practiceDrafts,
+    [draft.scenarioId]: draft,
+  };
+  if (!persistPracticeDrafts(nextDrafts)) {
+    showDraftSaveStatus("保存できませんでした", true);
+    return false;
+  }
+  state.practiceDrafts = nextDrafts;
+  showDraftSaveStatus("このブラウザに保存しました");
+  syncControls();
+  return true;
+}
+
+function deletePracticeDraft(scenarioId) {
+  if (!state.practiceDrafts[scenarioId]) {
+    return;
+  }
+  const nextDrafts = { ...state.practiceDrafts };
+  delete nextDrafts[scenarioId];
+  state.practiceDrafts = nextDrafts;
+  persistPracticeDrafts(nextDrafts);
+  syncControls();
+}
+
+function resumePracticeDraft(draft) {
+  if (
+    state.authStatus !== "signed_in" ||
+    !draft ||
+    !selectAuthoringMode("practice") ||
+    !selectScenarioById(draft.scenarioId)
+  ) {
+    return false;
+  }
+  resetSession();
+  state.practiceSubject = draft.answer.subject;
+  state.practiceSections = { ...draft.answer.sections };
+  state.selectedEvidenceIds = draft.selectedEvidenceIds.filter((fileId) => getEvidenceFile(fileId));
+  applyTicketFieldValues(draft.answer.ticketFields);
+  renderEvidenceAttachment();
+  activateCreateSession();
+  if (draft.practiceWritingComplete) {
+    state.practiceWritingComplete = true;
+    state.completedLines = state.scenario.totalEditableLines;
+    state.currentEditableOrder = state.scenario.totalEditableLines;
+    finishSetupFlow();
+  }
+  showDraftSaveStatus("下書きを復元しました");
+  syncControls();
+  return true;
 }
 
 function addCalendarDays(dateValue, days) {
@@ -4473,13 +3992,13 @@ function renderPracticeComparison() {
   }
 }
 
-function renderPracticeScoringPreviewList(element, items) {
+function renderPracticeScoringPreviewList(element, items, emptyLabel = "該当なし") {
   if (!element) {
     return;
   }
   element.innerHTML = items.length > 0
     ? items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
-    : "<li class=\"is-empty\">該当なし</li>";
+    : `<li class="is-empty">${escapeHtml(emptyLabel)}</li>`;
 }
 
 function renderPracticeScoringRadar(preview) {
@@ -4503,15 +4022,25 @@ function renderPracticeScoringRadar(preview) {
 }
 
 function renderPracticeReaderQuestions(items) {
+  elements.practiceScoringReaderQuestionsSection?.classList.toggle("hidden", items.length === 0);
   if (!elements.practiceScoringReaderQuestions) {
     return;
   }
+  const classificationClass = (classification) => {
+    if (classification === "不足情報") {
+      return "is-missing";
+    }
+    if (classification === "記述確認") {
+      return "is-confirmation";
+    }
+    return "is-suggestion";
+  };
   elements.practiceScoringReaderQuestions.innerHTML = items
     .map((item) => `
       <div class="practice-ai-review-item">
         <div class="practice-ai-review-meta">
           <span>${escapeHtml(item.reader)}</span>
-          <small class="${item.classification === "不足情報" ? "is-missing" : "is-suggestion"}">${escapeHtml(item.classification)}</small>
+          <small class="${classificationClass(item.classification)}">${escapeHtml(item.classification)}</small>
         </div>
         <strong>${escapeHtml(item.question)}</strong>
         <p>${escapeHtml(item.whyItMatters)}</p>
@@ -4579,6 +4108,28 @@ function getRubricFindingsSummary(result) {
   return `判定根拠：必須情報 ${presentFacts}/${factAssessments.length}、チケット設定 ${matchedTicketFields}/${ticketChecks.length}、添付証跡 ${evidenceMatched}。${capText}`;
 }
 
+const scoringVerdictPresentation = {
+  "開発着手可能": {
+    label: "調査・修正に着手可能",
+    description: "開発担当者が原因調査と修正検討に着手できる情報が揃っています。",
+  },
+  "追加確認を推奨": {
+    label: "追加確認を推奨",
+    description: "調査は開始できますが、判断精度を上げるために追加確認を推奨します。",
+  },
+  "再整理を推奨": {
+    label: "起票内容の再整理を推奨",
+    description: "調査を始める前に、発生条件や実際の結果を整理する必要があります。",
+  },
+};
+
+function getScoringVerdictPresentation(verdict) {
+  return scoringVerdictPresentation[verdict] || {
+    label: verdict || "判定なし",
+    description: "",
+  };
+}
+
 function renderPracticeScoringPreview() {
   const preview = state.practiceScoringResult;
   const showPreview = isPracticeMode();
@@ -4615,8 +4166,10 @@ function renderPracticeScoringPreview() {
     return;
   }
 
+  const verdictPresentation = getScoringVerdictPresentation(preview.verdict);
   setTextContent(elements.practiceScoringPreviewTotal, String(preview.totalScore));
-  setTextContent(elements.practiceScoringVerdict, preview.verdict);
+  setTextContent(elements.practiceScoringVerdict, verdictPresentation.label);
+  setTextContent(elements.practiceScoringVerdictDescription, verdictPresentation.description);
   setTextContent(elements.practiceScoringOverallAssessment, preview.overallAssessment);
   const findingsSummary = getRubricFindingsSummary(preview);
   setTextContent(elements.practiceScoringBasis, findingsSummary);
@@ -4627,16 +4180,23 @@ function renderPracticeScoringPreview() {
   renderPracticeScoringRadar(preview);
   renderPracticeScoringPreviewList(
     elements.practiceScoringPreviewStrengths,
-    preview.strengths
+    preview.strengths,
+    "明確に評価できる記述はありません"
   );
-  renderPracticeReaderQuestions(preview.readerQuestions);
-  renderPracticeAmbiguityRisks(preview.ambiguityRisks);
+  const readerQuestions = preview.readerQuestions || [];
+  const ambiguityRisks = preview.ambiguityRisks || [];
+  const rewriteSuggestions = preview.rewriteSuggestions || [];
+  elements.practiceScoringNoImprovements?.classList.toggle(
+    "hidden",
+    readerQuestions.length + ambiguityRisks.length + rewriteSuggestions.length > 0
+  );
+  renderPracticeReaderQuestions(readerQuestions);
+  renderPracticeAmbiguityRisks(ambiguityRisks);
   renderPracticeInvestigationAdvice(preview.investigationAdvice);
-  renderPracticeRewriteSuggestions(preview.rewriteSuggestions);
+  renderPracticeRewriteSuggestions(rewriteSuggestions);
 }
 
 function getPracticeAttemptPayload() {
-  const selected = getSelectedTicketFields();
   return {
     attemptId: state.currentAttemptId || createClientAttemptId(),
     scenarioId: state.scenario.scenarioId,
@@ -4652,21 +4212,7 @@ function getPracticeAttemptPayload() {
             state.practiceSections[group.key] || "",
           ])
       ),
-      ticketFields: {
-        tracker: selected.tracker || "bug",
-        private: selected.private,
-        status: selected.status || "new",
-        severity: selected.severity || null,
-        priority: selected.priority || null,
-        assigneeId: selected.assignee || null,
-        category: selected.category || null,
-        version: selected.version || null,
-        environment: selected.environment || null,
-        startDate: selected.startDate || null,
-        dueDate: selected.dueDate || null,
-        progress: selected.progress,
-        watcherIds: selected.watchers,
-      },
+      ticketFields: getPracticeTicketFieldPayload(),
     },
     selectedEvidenceIds: [...state.selectedEvidenceIds],
     startedAt: state.sessionStartAt
@@ -4716,6 +4262,9 @@ async function requestPracticeScoring() {
       }
       state.currentAttemptId = saved.attempt?.attemptId || payload.attemptId;
       state.currentAttemptSaved = true;
+      if (!state.revisionTicketId) {
+        deletePracticeDraft(state.scenario.scenarioId);
+      }
       setTextContent(
         elements.resultTitle,
         state.revisionTicketId ? "修正版を保存しました" : "実践起票を保存しました"
@@ -4805,6 +4354,7 @@ function renderAuthState(authState) {
   if (state.view === "detail" && signedIn && previousStatus !== "signed_in") {
     loadTicketDetail(state.ticketDetailId);
   }
+  syncControls();
 }
 
 const myPageTabs = new Set(["progress", "history", "ranking"]);
@@ -5015,7 +4565,7 @@ function renderMyPageHistory() {
           <td>${escapeHtml(formatMyPageDate(attempt.completedAt))}</td>
           <td>${escapeHtml(getProjectLabel(attempt.projectId))}</td>
           <td>${escapeHtml(getScenarioLabel(attempt.scenarioId))}</td>
-          <td>${attempt.authoringMode === "practice" ? "実践起票" : "見本入力"}</td>
+          <td>${attempt.authoringMode === "practice" ? "実践起票" : "記載例入力"}</td>
           <td><span class="my-page-score-pill">${escapeHtml(getHistoryScoreLabel(attempt))}</span></td>
           <td><a class="my-page-detail-button" href="#/tickets/${encodeURIComponent(attempt.attemptId)}">起票を見る</a></td>
         </tr>
@@ -5196,6 +4746,8 @@ function renderTicketDetail() {
   const rewrites = (result?.rewriteSuggestions || [])
     .map((item) => `<li><strong>${escapeHtml(String(item.section || ""))}</strong><span>${escapeHtml(String(item.suggested || ""))}${item.reason ? ` — ${escapeHtml(String(item.reason))}` : ""}</span></li>`)
     .join("");
+  const hasImprovementSuggestions = Boolean(questions || ambiguityRisks || rewrites);
+  const verdictPresentation = getScoringVerdictPresentation(result?.verdict);
   const reviewStatus = result?.status || (ticket.scoringSupported ? "pending" : "not_supported");
   const trackerLabel = ticketFieldLabel({ bug: "バグ", feature: "機能", support: "サポート" }, fields.tracker);
   const authorName = elements.authUserName?.textContent?.trim() || "ログインユーザー";
@@ -5270,10 +4822,12 @@ function renderTicketDetail() {
       </div>
       ${result?.status === "succeeded" ? `
         ${scoreComparison}
-        <p class="ticket-detail-verdict">${escapeHtml(String(result.verdict || ""))}</p>
+        <p class="ticket-detail-verdict">${escapeHtml(verdictPresentation.label)}</p>
+        ${verdictPresentation.description ? `<p class="ticket-detail-verdict-description">${escapeHtml(verdictPresentation.description)}</p>` : ""}
         <p>${escapeHtml(String(result.overallAssessment || ""))}</p>
         ${findingsSummary ? `<p class="ticket-detail-scoring-basis">${escapeHtml(findingsSummary)}</p>` : ""}
         ${strengths ? `<h3>良かった点</h3><ul>${strengths}</ul>` : ""}
+        ${hasImprovementSuggestions ? "" : '<p class="ticket-detail-no-improvements">優先して修正が必要な表現や不足情報はありません。</p>'}
         ${questions ? `<h3>読み手が疑問に思うこと</h3><ul>${questions}</ul>` : ""}
         ${ambiguityRisks ? `<h3>曖昧さ・誤解のリスク</h3><ul class="ticket-detail-advice">${ambiguityRisks}</ul>` : ""}
         ${advice ? `<h3>次に確認・切り分けすること</h3><ol class="ticket-detail-advice">${advice}</ol>` : ""}
@@ -5541,7 +5095,7 @@ function finishSession() {
   setLoadingIndicator(elements.resultTitle, practiceMode);
   setTextContent(
     elements.retryButton,
-    practiceMode ? "同じシナリオに再挑戦" : "もう一度見本入力"
+    practiceMode ? "同じシナリオに再挑戦" : "もう一度記載例を入力"
   );
   if (practiceMode) {
     const hasUnattemptedScenario = getUnattemptedScenarioEntries(state.projectId).length > 0;
@@ -5710,6 +5264,25 @@ function syncControls() {
     elements.startButton.disabled = !canStart;
   }
 
+  if (elements.resumeDraftButton) {
+    const hasProjectDraft = Boolean(getLatestPracticeDraft(state.projectId));
+    elements.resumeDraftButton.classList.toggle(
+      "hidden",
+      state.view !== "list" || !hasProjectDraft || state.authStatus !== "signed_in"
+    );
+    elements.resumeDraftButton.disabled = !canStart || state.authStatus !== "signed_in";
+  }
+
+  if (elements.draftSaveButton) {
+    const showDraftSave =
+      isPracticeMode() &&
+      state.view === "create" &&
+      !state.revisionTicketId;
+    elements.draftSaveButton.classList.toggle("hidden", !showDraftSave);
+    elements.draftSaveButton.disabled =
+      !showDraftSave || (!state.running && !state.awaitingCreate);
+  }
+
   if (elements.stopButton) {
     elements.stopButton.disabled = !state.running && !(
       state.view === "create" && state.awaitingCreate
@@ -5761,6 +5334,9 @@ function syncControls() {
   if (elements.homeNavButton) {
     elements.homeNavButton.disabled = !canUseGlobalNavigation;
   }
+  if (elements.ticketNavButton) {
+    elements.ticketNavButton.disabled = !canUseGlobalNavigation;
+  }
   if (elements.myPageNavButton) {
     elements.myPageNavButton.disabled = !canUseGlobalNavigation;
   }
@@ -5780,6 +5356,15 @@ function handleStartButton() {
   if (!state.running && !state.awaitingCreate) {
     startSession();
   }
+}
+
+function handleResumeDraftButton() {
+  const draft = getLatestPracticeDraft(state.projectId);
+  if (!draft) {
+    syncControls();
+    return;
+  }
+  resumePracticeDraft(draft);
 }
 
 function handleTicketSort(event) {
@@ -5877,7 +5462,14 @@ function handleExitButton() {
 }
 
 on(elements.startButton, "click", handleStartButton);
-on(elements.homeNavButton, "click", () => navigateToHash("#/tickets"));
+on(elements.resumeDraftButton, "click", handleResumeDraftButton);
+on(elements.draftSaveButton, "click", saveCurrentPracticeDraft);
+on(elements.homeNavButton, "click", () => {
+  const currentPath = window.location?.pathname || "";
+  const welcomeUrl = currentPath.endsWith("/app.html") ? "./" : "./welcome.html";
+  window.location.assign(welcomeUrl);
+});
+on(elements.ticketNavButton, "click", () => navigateToHash("#/tickets"));
 on(elements.myPageNavButton, "click", () => navigateToHash(`#/mypage/${state.myPageTab}`));
 on(elements.rmProjectSwitcher, "change", handleProjectChange);
 elements.ticketSortButtons.forEach((button) => on(button, "click", handleTicketSort));

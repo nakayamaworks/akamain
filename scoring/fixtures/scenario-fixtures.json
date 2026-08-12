@@ -3,11 +3,11 @@
   "scenarios": {
     "customer-context-menu-not-shown": {
       "scenarioId": "customer-context-menu-not-shown",
-      "rubricVersion": "customer-context-menu-not-shown.v1",
+      "rubricVersion": "customer-context-menu-not-shown.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "顧客一覧画面で右クリックしてもコンテキストメニューが表示されない",
             "sections": {
@@ -28,6 +28,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "顧客一覧でC-2048を選択後、対象行上で右クリックを実行しました、行の選択状態は変わりましたが、操作メニューは表示されませんでした",
+            "sections": {
+              "detail": "顧客一覧でC-2048を選択後、対象行上で右クリックを実行しました。行の選択状態は変わりましたが、操作メニューは表示されませんでした。",
+              "preconditions": "確認環境：App version: 2.3.1、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "顧客一覧でC-2048を選択後、対象行上で右クリックを実行しました",
+              "expected": "顧客管理システム画面仕様書 Rev.2.3「3.4.2 顧客一覧のコンテキストメニュー」\n画面仕様書の3.4.2には、一覧の選択行から編集や履歴確認を呼び出すメニューを表示する旨が記載されています。なお、同じマウスを使用した別画面の右クリック操作は正常です。",
+              "actual": "行の選択状態は変わりましたが、操作メニューは表示されませんでした",
+              "remarks": "左クリックによる顧客詳細画面への遷移は正常です。",
+              "reproducibility": "管理者アカウントで再ログインし、一覧表示から同一手順を3回実施しました。いずれも同じ状態でした。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -38,10 +60,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "detail-2",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -118,11 +139,11 @@
     },
     "customer-search-nonexistent-name-all-results": {
       "scenarioId": "customer-search-nonexistent-name-all-results",
-      "rubricVersion": "customer-search-nonexistent-name-all-results.v1",
+      "rubricVersion": "customer-search-nonexistent-name-all-results.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "顧客一覧画面で存在しない氏名を検索すると顧客が全件表示されてしまう",
             "sections": {
@@ -143,6 +164,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "一般ユーザーアカウントで顧客一覧を開き、氏名欄に「ZZZZZZ」を入力して検索しました、該当する顧客は存在しませんが、検索前と同じ248件が表示されました",
+            "sections": {
+              "detail": "一般ユーザーアカウントで顧客一覧を開き、氏名欄に「ZZZZZZ」を入力して検索しました。該当する顧客は存在しませんが、検索前と同じ248件が表示されました。",
+              "preconditions": "確認環境：Web release: 2026.07.24、Microsoft Edge 126.0.2592.102、Windows 11 23H2",
+              "steps": "一般ユーザーアカウントで顧客一覧を開き、氏名欄に「ZZZZZZ」を入力して検索しました",
+              "expected": "顧客検索機能仕様書 Rev.1.8「2.3.1 氏名検索」\n氏名検索の仕様では、一致する顧客が存在しない場合、検索結果は0件となる規定です。なお、前日に248件のCSV取込を実施していますが、取込処理自体は正常終了しています。",
+              "actual": "該当する顧客は存在しませんが、検索前と同じ248件が表示されました",
+              "remarks": "一方、顧客番号「C-1001」を指定して検索した場合は、対象の1件のみが正しく表示されます。",
+              "reproducibility": "検索条件をクリアしたうえで同一手順を3回試しましたが、表示件数は変わりませんでした。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -153,10 +196,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "detail-2",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -233,11 +275,11 @@
     },
     "customer-save-multiple-clicks-duplicate": {
       "scenarioId": "customer-save-multiple-clicks-duplicate",
-      "rubricVersion": "customer-save-multiple-clicks-duplicate.v3",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v5",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "顧客登録画面で保存ボタンを連続クリックすると同じ顧客データが重複登録されてしまう",
             "sections": {
@@ -258,6 +300,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "管理者アカウントで顧客登録画面を開き、氏名「山田テスト」、電話番号「090-0000-0000」を入力しました、保存処理の応答が遅かったため、保存ボタンを短時間に3回押下しました",
+            "sections": {
+              "detail": "管理者アカウントで顧客登録画面を開き、氏名「山田テスト」、電話番号「090-0000-0000」を入力しました。保存処理の応答が遅かったため、保存ボタンを短時間に3回押下しました。",
+              "preconditions": "確認環境：Build 2.3.1-20260724.1、Firefox 128.0、macOS 15.5",
+              "steps": "管理者アカウントで顧客登録画面を開き、氏名「山田テスト」、電話番号「090-0000-0000」を入力しました",
+              "expected": "顧客データ管理要件書 Rev.1.5「2.2 レコード一意性」\n保存ボタンを1回だけ押下した場合は、1件のみ作成されます。顧客データ管理要件には、1回の登録操作につき1レコードを作成する旨が記載されています。原因箇所は現時点で特定できていません。",
+              "actual": "保存処理の応答が遅かったため、保存ボタンを短時間に3回押下しました",
+              "remarks": "登録後の一覧には、同じ氏名と電話番号のデータが3件表示され、IDはC-3012、C-3013、C-3014でした。",
+              "reproducibility": "入力データを初期化して同一手順を3回実施したところ、毎回3件作成されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -268,12 +332,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "subject-condition",
-              "subject-phenomenon",
-              "detail-three-records",
-              "steps-click-save-three-times",
-              "expected-single-record",
-              "actual-three-records"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -350,11 +411,11 @@
     },
     "attendance-clock-out-next-day": {
       "scenarioId": "attendance-clock-out-next-day",
-      "rubricVersion": "attendance-clock-out-next-day.v1",
+      "rubricVersion": "attendance-clock-out-next-day.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "勤怠実績登録で退勤時刻が翌日の18:00として保存されてしまう",
             "sections": {
@@ -375,6 +436,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "日勤予定の従業員E-042について、勤務開始09:00、退勤18:00を同日の勤務実績として登録しました、保存後、退勤側の日付のみ翌日に変更されていました",
+            "sections": {
+              "detail": "日勤予定の従業員E-042について、勤務開始09:00、退勤18:00を同日の勤務実績として登録しました。保存後、退勤側の日付のみ翌日に変更されていました。",
+              "preconditions": "確認環境：Web version: 4.12.0、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "日勤予定の従業員E-042について、勤務開始09:00、退勤18:00を同日の勤務実績として登録しました",
+              "expected": "勤怠計算仕様書 Rev.4.12「3.1.2 勤務日の確定」\n勤怠計算仕様書では、日をまたがない勤務の開始と終了は同一勤務日として扱います。対象者は先月まで夜勤チームに所属していましたが、今回使用した勤務予定は09:00〜18:00の日勤です。",
+              "actual": "保存後、退勤側の日付のみ翌日に変更されていました",
+              "remarks": "勤務日を当日に手動修正した場合、給与集計は正しい値になります。",
+              "reproducibility": "勤務予定と対象従業員のデータを再作成し、同一手順を3回実施しました。いずれも同じ表示および保存結果でした。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -385,9 +468,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -464,11 +547,11 @@
     },
     "salon-duplicate-reservation": {
       "scenarioId": "salon-duplicate-reservation",
-      "rubricVersion": "salon-duplicate-reservation.v1",
+      "rubricVersion": "salon-duplicate-reservation.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "予約登録画面で予約済みの時間帯を重複予約できてしまう",
             "sections": {
@@ -489,6 +572,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "那覇店の担当者S-12には、14:00開始の予約が登録済みです、別顧客の予約で同じ担当者と14:00を選択したところ、確認画面から予約確定まで完了しました",
+            "sections": {
+              "detail": "那覇店の担当者S-12には、14:00開始の予約が登録済みです。別顧客の予約で同じ担当者と14:00を選択したところ、確認画面から予約確定まで完了しました。",
+              "preconditions": "確認環境：Release 2026.07.2、Safari 18.5、macOS 15.5",
+              "steps": "那覇店の担当者S-12には、14:00開始の予約が登録済みです",
+              "expected": "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」\n予約枠管理仕様では、予約確定済みの担当者および時間帯を、新規予約の選択対象から除外します。なお、2人目の顧客は初回来店クーポンを選択していましたが、料金計算は正常です。",
+              "actual": "別顧客の予約で同じ担当者と14:00を選択したところ、確認画面から予約確定まで完了しました",
+              "remarks": "登録後、異なる予約番号のデータが2件表示されました。担当者と開始時刻は同一です。別担当者または15:00枠では競合しません。",
+              "reproducibility": "予約データを初期状態に戻して3回検証したところ、いずれも2件目の予約が作成されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -499,9 +604,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -578,11 +683,11 @@
     },
     "ec-out-of-stock-cart": {
       "scenarioId": "ec-out-of-stock-cart",
-      "rubricVersion": "ec-out-of-stock-cart.v1",
+      "rubricVersion": "ec-out-of-stock-cart.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "商品詳細画面で在庫切れの商品をカートに追加できてしまう",
             "sections": {
@@ -603,6 +708,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "商品SKU-884の在庫数を管理画面で0に設定後、購入者アカウントで商品詳細画面を開きました、カートへの追加が成功し、注文内容確認画面まで遷移できました",
+            "sections": {
+              "detail": "商品SKU-884の在庫数を管理画面で0に設定後、購入者アカウントで商品詳細画面を開きました。カートへの追加が成功し、注文内容確認画面まで遷移できました。",
+              "preconditions": "確認環境：Storefront v8.4.2、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "商品SKU-884の在庫数を管理画面で0に設定後、購入者アカウントで商品詳細画面を開きました",
+              "expected": "商品在庫連携仕様書 Rev.8.4「4.1.3 カート追加可否」\n商品在庫連携仕様では、利用可能在庫がない商品はカートへの追加を受け付けません。なお、前日に商品画像を差し替えていますが、変更前の画像へ戻しても挙動は変わりませんでした。",
+              "actual": "カートへの追加が成功し、注文内容確認画面まで遷移できました",
+              "remarks": "商品APIが返す在庫数は操作前後とも0です。別の在庫あり商品は正常に購入できます。",
+              "reproducibility": "在庫数を0に戻し、同一条件で3回検証したところ、いずれも同じ結果でした。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -613,9 +740,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -692,11 +819,11 @@
     },
     "inventory-over-shipment": {
       "scenarioId": "inventory-over-shipment",
-      "rubricVersion": "inventory-over-shipment.v1",
+      "rubricVersion": "inventory-over-shipment.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "出庫登録画面で在庫数を超える出庫数を登録できてしまう",
             "sections": {
@@ -717,6 +844,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "倉庫W-01の商品P-204は、画面上の現在庫が5個です、出庫数に8個を指定して登録したところ、エラーは表示されず、処理完了メッセージが表示されました",
+            "sections": {
+              "detail": "倉庫W-01の商品P-204は、画面上の現在庫が5個です。出庫数に8個を指定して登録したところ、エラーは表示されず、処理完了メッセージが表示されました。",
+              "preconditions": "確認環境：Client 5.7.0 (Build 1842)、Microsoft Edge 126.0.2592.102、Windows 10 22H2",
+              "steps": "倉庫W-01の商品P-204は、画面上の現在庫が5個です",
+              "expected": "出庫業務仕様書 Rev.5.7「3.1.4 出庫可能数の検証」\n出庫業務仕様では、指定した出庫数が利用可能在庫を上回る場合、登録を中止して入力者へ通知します。別商品で現在庫以下の数量を指定した場合は、正常に登録できます。",
+              "actual": "出庫数に8個を指定して登録したところ、エラーは表示されず、処理完了メッセージが表示されました",
+              "remarks": "処理後の在庫数はマイナス3と表示されます。なお、同日の棚卸は予定されていますが、検証時点では開始していません。",
+              "reproducibility": "現在庫を5個に戻し、同一条件で3回検証したところ、いずれも登録できました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -727,9 +876,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -806,20 +955,42 @@
     },
     "mobile-rotation-clears-input": {
       "scenarioId": "mobile-rotation-clears-input",
-      "rubricVersion": "mobile-rotation-clears-input.v1",
+      "rubricVersion": "mobile-rotation-clears-input.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
             "sections": {
               "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう",
-              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "preconditions": "NEWS-101を受信・開封済みのテスト端末に対象ビルドがインストールされていること",
               "steps": "1. 入力フォームへ内容を入力したまま端末を回転する",
               "expected": "画面回転後も入力内容が保持されること",
               "actual": "画面回転後、入力済みの120文字がすべて消える",
               "remarks": "回転前の入力内容はサーバーへ送信されていないことを確認",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "問い合わせフォームの未送信文が端末の横向き切替で消失する",
+            "sections": {
+              "detail": "App 3.4.0 (34018)／Android 15／Pixel 9で、問い合わせフォームへ約120文字を入力して端末を横向きにすると、入力欄が空になりました。",
+              "preconditions": "Pixel 9へApp 3.4.0 (34018)をインストールし、問い合わせフォームを開いていること",
+              "steps": "1. 問い合わせフォームへ送信前の文章を約120文字入力する\n2. 端末を縦向きから横向きへ回転する",
+              "expected": "画面が再構成されても、未送信の入力内容が保持されること",
+              "actual": "回転直後に約120文字の入力内容が消失し、入力欄が空になる",
+              "remarks": "縦向きのまま送信する操作と保存済み内容の表示は正常です。文字サイズを標準に変更しても再現しました。",
               "reproducibility": "3/3"
             }
           },
@@ -841,9 +1012,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -855,7 +1026,7 @@
             "subject": "実装不備により問い合わせフォームで画面回転後に入力内容が消えてしまう",
             "sections": {
               "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう\n原因は実装不備であることを確認しました。",
-              "preconditions": "テスト端末に対象ビルドがインストールされていること",
+              "preconditions": "NEWS-101を受信・開封済みのテスト端末に対象ビルドがインストールされていること",
               "steps": "1. 入力フォームへ内容を入力したまま端末を回転する",
               "expected": "画面回転後も入力内容が保持されること",
               "actual": "画面回転後、入力済みの120文字がすべて消える",
@@ -878,7 +1049,7 @@
           "answer": {
             "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
             "sections": {
-              "detail": "テスト端末に対象ビルドがインストールされていること",
+              "detail": "NEWS-101を受信・開封済みのテスト端末に対象ビルドがインストールされていること",
               "preconditions": "1. 入力フォームへ内容を入力したまま端末を回転する",
               "steps": "画面回転後も入力内容が保持されること",
               "expected": "画面回転後、入力済みの120文字がすべて消える",
@@ -901,7 +1072,7 @@
             "subject": "問い合わせフォームで画面回転後に入力内容が消えてしまう",
             "sections": {
               "detail": "問い合わせフォームに120文字入力した状態で端末を縦向きから横向きへ回転すると、入力内容がすべて消えてしまう\n上記について継続して確認が必要です。",
-              "preconditions": "テスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
+              "preconditions": "NEWS-101を受信・開封済みのテスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
               "steps": "1. 入力フォームへ内容を入力したまま端末を回転する\n上記について継続して確認が必要です。",
               "expected": "画面回転後も入力内容が保持されること\n上記について継続して確認が必要です。",
               "actual": "画面回転後、入力済みの120文字がすべて消える\n上記について継続して確認が必要です。",
@@ -920,11 +1091,11 @@
     },
     "automotive-speed-display-delay": {
       "scenarioId": "automotive-speed-display-delay",
-      "rubricVersion": "automotive-speed-display-delay.v1",
+      "rubricVersion": "automotive-speed-display-delay.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "車載メーターで車速変更後の速度表示が最大1.2秒遅れてしまう",
             "sections": {
@@ -945,6 +1116,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "試験車両TEST-02で、CANoeから送信する車速値を60km/hから80km/hへ変更しました、CANログは直ちに80km/hへ変化しましたが、メーターは最大約1.2秒間、60km/hの表示を継続しました",
+            "sections": {
+              "detail": "試験車両TEST-02で、CANoeから送信する車速値を60km/hから80km/hへ変更しました。CANログは直ちに80km/hへ変化しましたが、メーターは最大約1.2秒間、60km/hの表示を継続しました。",
+              "preconditions": "確認環境：ECU Software: v5.12.3、Hardware Rev: C、Vehicle profile: TEST-02",
+              "steps": "試験車両TEST-02で、CANoeから送信する車速値を60km/hから80km/hへ変更しました",
+              "expected": "メーター表示機能仕様書 Rev.5.12「4.2.3 車速表示更新周期」\nメーター表示機能仕様では、車速信号の受信から表示反映まで200ms以内と定められています。なお、ナビ案内およびオーディオを停止しても、測定結果は変わりませんでした。",
+              "actual": "CANログは直ちに80km/hへ変化しましたが、メーターは最大約1.2秒間、60km/hの表示を継続しました",
+              "remarks": "走行制御ECUが受信する車速値に遅延はありません。",
+              "reproducibility": "車速信号の変更を3回実施し、いずれも表示の追従遅延を確認しました。イグニッションを再投入した後も再現します。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -955,9 +1148,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1034,11 +1227,11 @@
     },
     "payment-failed-payment-sales-record": {
       "scenarioId": "payment-failed-payment-sales-record",
-      "rubricVersion": "payment-failed-payment-sales-record.v1",
+      "rubricVersion": "payment-failed-payment-sales-record.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "決済失敗時にも加盟店の日次売上へ売上データが計上されてしまう",
             "sections": {
@@ -1059,6 +1252,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "Sandbox環境で、失敗応答となる12,800円のカード決済を実行しました、決済画面には失敗と表示されましたが、加盟店の日次売上一覧には同額の売上データが追加されました",
+            "sections": {
+              "detail": "Sandbox環境で、失敗応答となる12,800円のカード決済を実行しました。決済画面には失敗と表示されましたが、加盟店の日次売上一覧には同額の売上データが追加されました。",
+              "preconditions": "確認環境：API version: 2024-06-20、Environment: Sandbox、Gateway build: 7.18.4",
+              "steps": "Sandbox環境で、失敗応答となる12,800円のカード決済を実行しました",
+              "expected": "売上連携API仕様書 Rev.2024-06「3.3 決済失敗時の売上制御」\n売上連携API仕様では、決済成功が確定した取引のみを売上計上の対象とします。現時点で顧客への請求は発生しておらず、加盟店側の集計値のみ過大となっています。",
+              "actual": "決済画面には失敗と表示されましたが、加盟店の日次売上一覧には同額の売上データが追加されました",
+              "remarks": "決済ゲートウェイ側の請求はなく、顧客への決済完了メールも送信されていません。",
+              "reproducibility": "作成された売上データを取り消し、同一条件で3回検証したところ、いずれも売上データが1件作成されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1069,9 +1284,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1148,11 +1363,11 @@
     },
     "medical-cross-patient-results": {
       "scenarioId": "medical-cross-patient-results",
-      "rubricVersion": "medical-cross-patient-results.v1",
+      "rubricVersion": "medical-cross-patient-results.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "患者切替後も別の患者の検査結果が表示されてしまう",
             "sections": {
@@ -1173,6 +1388,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "患者Aの検査結果を3件表示した後、同一画面で患者Bへ切り替えました、ヘッダーの患者名はBへ更新されましたが、結果一覧には患者Aの3件が残存していました",
+            "sections": {
+              "detail": "患者Aの検査結果を3件表示した後、同一画面で患者Bへ切り替えました。ヘッダーの患者名はBへ更新されましたが、結果一覧には患者Aの3件が残存していました。",
+              "preconditions": "確認環境：Client version: 4.8.2、Database schema: 2026.07、Windows 11 Enterprise 23H2",
+              "steps": "患者Aの検査結果を3件表示した後、同一画面で患者Bへ切り替えました",
+              "expected": "診療情報表示仕様書 Rev.4.8「3.1.5 患者切替時の表示更新」\n診療情報表示仕様では、患者切替時に切替前の表示内容を破棄し、選択した患者のデータへ更新します。なお、患者Aと患者Bは同じ診療科ですが、担当医および氏名は異なります。",
+              "actual": "ヘッダーの患者名はBへ更新されましたが、結果一覧には患者Aの3件が残存していました",
+              "remarks": "API応答には患者Bの結果が含まれており、画面を再読み込みすると患者Bの結果一覧が表示されます。",
+              "reproducibility": "患者情報および検査データを初期状態に戻し、同一条件で3回検証しました。いずれも同じ表示となりました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1183,9 +1420,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1262,11 +1499,11 @@
     },
     "attendance-overnight-break-not-deducted": {
       "scenarioId": "attendance-overnight-break-not-deducted",
-      "rubricVersion": "attendance-overnight-break-not-deducted.v1",
+      "rubricVersion": "attendance-overnight-break-not-deducted.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "勤怠実績登録で日をまたぐ休憩時間が勤務時間から控除されないことがある",
             "sections": {
@@ -1287,6 +1524,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "E-042の勤務を22:00開始、翌07:00終了で登録し、翌日の01:00〜02:00を休憩時間として設定しました、実績画面では、実労働時間が9時間と表示されました",
+            "sections": {
+              "detail": "E-042の勤務を22:00開始、翌07:00終了で登録し、翌日の01:00〜02:00を休憩時間として設定しました。実績画面では、実労働時間が9時間と表示されました。",
+              "preconditions": "確認環境：Web version: 4.12.0、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "E-042の勤務を22:00開始、翌07:00終了で登録し、翌日の01:00〜02:00を休憩時間として設定しました",
+              "expected": "勤怠計算仕様書 Rev.4.12「3.2.4 日跨ぎ勤務の休憩控除」\n日跨ぎ勤務の休憩控除については、翌日側の休憩も勤務区間内であれば控除対象とする記載があります。なお、確認途中でブラウザを終了しましたが、再ログイン後も入力値は保持されていました。",
+              "actual": "実績画面では、実労働時間が9時間と表示されました",
+              "remarks": "同日内に設定した休憩は正しく控除されます。",
+              "reproducibility": "勤務時間9時間から休憩1時間を控除した8時間を期待していましたが、同一条件で5回検証したうち2回で9時間と集計されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1297,9 +1556,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1376,11 +1635,11 @@
     },
     "attendance-simultaneous-clock-out-double-overtime": {
       "scenarioId": "attendance-simultaneous-clock-out-double-overtime",
-      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v1",
+      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "月末処理中の同時打刻で残業時間が二重計上されてしまうことがある",
             "sections": {
@@ -1401,6 +1660,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "月末集計の実行中、同一従業員の退勤情報を端末Aと端末Bからほぼ同時に送信しました、集計前は30分だった残業時間が、集計後は60分となりました",
+            "sections": {
+              "detail": "月末集計の実行中、同一従業員の退勤情報を端末Aと端末Bからほぼ同時に送信しました。集計前は30分だった残業時間が、集計後は60分となりました。",
+              "preconditions": "確認環境：Web version: 4.12.0、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "月末集計の実行中、同一従業員の退勤情報を端末Aと端末Bからほぼ同時に送信しました",
+              "expected": "打刻処理設計書 Rev.4.6「5.3.2 重複打刻の排除」\n打刻処理設計書では、同一人物・同一勤務日の重複した退勤情報は1件として扱います。なお、食堂端末の利用記録など、同日に記録された別種別の打刻に異常はありません。",
+              "actual": "集計前は30分だった残業時間が、集計後は60分となりました",
+              "remarks": "単一端末から退勤を記録した場合、残業時間は増加しません。両端末の時刻は同期済みです。",
+              "reproducibility": "2台の端末を使用して同一条件で20回検証したところ、1回のみ再現しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1411,9 +1692,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1490,11 +1771,11 @@
     },
     "salon-cancelled-slot-remains-booked": {
       "scenarioId": "salon-cancelled-slot-remains-booked",
-      "rubricVersion": "salon-cancelled-slot-remains-booked.v1",
+      "rubricVersion": "salon-cancelled-slot-remains-booked.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "予約をキャンセルした後も対象時間帯が予約済みのままになってしまう",
             "sections": {
@@ -1515,6 +1796,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "那覇店の14:00予約を管理画面からキャンセルしました、予約一覧から対象行は消失していましたが、新規予約画面では同じ担当者の14:00枠が予約済みのままでした",
+            "sections": {
+              "detail": "那覇店の14:00予約を管理画面からキャンセルしました。予約一覧から対象行は消失していましたが、新規予約画面では同じ担当者の14:00枠が予約済みのままでした。",
+              "preconditions": "確認環境：Release 2026.07.2、Safari 18.5、macOS 15.5",
+              "steps": "那覇店の14:00予約を管理画面からキャンセルしました",
+              "expected": "予約状態遷移仕様書 Rev.2026.07「3.2 キャンセル後の空き枠反映」\n予約状態遷移仕様には、キャンセル完了後、対応する枠を予約可能な状態へ戻す処理が記載されています。なお、顧客へのキャンセル通知メールは毎回1通のみ送信されています。",
+              "actual": "予約一覧から対象行は消失していましたが、新規予約画面では同じ担当者の14:00枠が予約済みのままでした",
+              "remarks": "事象発生時は空き枠APIもbookedを返しており、ページの再読み込みでは解消しません。管理画面から枠状態を手動更新すると、再度選択できる状態になります。",
+              "reproducibility": "同一条件で5回検証したところ、3回再現しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1525,9 +1828,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1604,11 +1907,11 @@
     },
     "salon-simultaneous-double-booking": {
       "scenarioId": "salon-simultaneous-double-booking",
-      "rubricVersion": "salon-simultaneous-double-booking.v1",
+      "rubricVersion": "salon-simultaneous-double-booking.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "複数端末からの同時予約で同じ担当者の予約が二重登録されてしまうことがある",
             "sections": {
@@ -1629,6 +1932,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "空き状態の担当者S-12の14:00枠について、受付端末とバックヤード端末から同時に予約を確定しました、両画面に成功と表示され、それぞれ異なる予約番号が発行されました",
+            "sections": {
+              "detail": "空き状態の担当者S-12の14:00枠について、受付端末とバックヤード端末から同時に予約を確定しました。両画面に成功と表示され、それぞれ異なる予約番号が発行されました。",
+              "preconditions": "確認環境：Release 2026.07.2、Safari 18.5、macOS 15.5",
+              "steps": "空き状態の担当者S-12の14:00枠について、受付端末とバックヤード端末から同時に予約を確定しました",
+              "expected": "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」\n予約枠管理仕様では、同じ担当者および開始時刻に対する確定処理は、同時に1件のみ受け付けます。なお、片方の端末のみダークモードでしたが、画面テーマを統一しても発生条件は変わりませんでした。",
+              "actual": "両画面に成功と表示され、それぞれ異なる予約番号が発行されました",
+              "remarks": "各端末から順番に操作した場合は、後から操作した端末に予約不可と表示されます。",
+              "reproducibility": "確定操作の開始時刻差を300ms以内として10回検証したところ、1回のみ予約が2件作成されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1639,9 +1964,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1718,11 +2043,11 @@
     },
     "ec-tax-rounding-inconsistent": {
       "scenarioId": "ec-tax-rounding-inconsistent",
-      "rubricVersion": "ec-tax-rounding-inconsistent.v1",
+      "rubricVersion": "ec-tax-rounding-inconsistent.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "商品一覧画面で税込価格の端数処理が商品ごとに異なってしまう",
             "sections": {
@@ -1743,6 +2068,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "税抜価格105円、税率10%の同一条件で商品Aと商品Bを登録し、商品一覧に表示しました、税込価格は、商品Aが115円、商品Bが116円と表示されました",
+            "sections": {
+              "detail": "税抜価格105円、税率10%の同一条件で商品Aと商品Bを登録し、商品一覧に表示しました。税込価格は、商品Aが115円、商品Bが116円と表示されました。",
+              "preconditions": "確認環境：Storefront v8.4.2、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "税抜価格105円、税率10%の同一条件で商品Aと商品Bを登録し、商品一覧に表示しました",
+              "expected": "価格計算仕様書 Rev.8.4「2.2.1 消費税の端数処理」\n価格計算仕様では、商品ごとに小数点以下を切り捨てる設定です。なお、商品Bの説明文には全角記号が含まれていますが、説明文を削除しても表示金額は変わりませんでした。",
+              "actual": "税込価格は、商品Aが115円、商品Bが116円と表示されました",
+              "remarks": "カート追加後の合計金額では、商品Bも115円として計算されます。",
+              "reproducibility": "商品データを再作成し、同一条件で3回検証したところ、いずれも1円の差が発生しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1753,9 +2100,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1832,11 +2179,11 @@
     },
     "ec-payment-notification-double-order": {
       "scenarioId": "ec-payment-notification-double-order",
-      "rubricVersion": "ec-payment-notification-double-order.v1",
+      "rubricVersion": "ec-payment-notification-double-order.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "注文連携で決済通知を再送すると注文が二重確定されてしまうことがある",
             "sections": {
@@ -1857,6 +2204,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "決済事業者の検証画面から通知ID PAY-4821を1回送信後、同じ内容を再送しました、管理画面には、異なる注文番号の注文が2件作成されました",
+            "sections": {
+              "detail": "決済事業者の検証画面から通知ID PAY-4821を1回送信後、同じ内容を再送しました。管理画面には、異なる注文番号の注文が2件作成されました。",
+              "preconditions": "確認環境：Storefront v8.4.2、Google Chrome 126.0.6478.127、Windows 11 23H2",
+              "steps": "決済事業者の検証画面から通知ID PAY-4821を1回送信後、同じ内容を再送しました",
+              "expected": "注文連携API仕様書 Rev.8.4「6.3 決済通知の再送制御」\n注文連携API仕様では、処理済みの通知IDを再受信した場合、初回の注文結果を返します。原因が注文API側にあるのか、周辺処理側にあるのかは、現時点で切り分けできていません。",
+              "actual": "管理画面には、異なる注文番号の注文が2件作成されました",
+              "remarks": "顧客への通知メールは1通のみで、決済側の売上も1件です。",
+              "reproducibility": "同一の決済IDおよび通知IDを使用して15回検証したところ、1回のみ注文が2件作成されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1867,9 +2236,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -1946,11 +2315,11 @@
     },
     "inventory-expired-lot-fifo": {
       "scenarioId": "inventory-expired-lot-fifo",
-      "rubricVersion": "inventory-expired-lot-fifo.v1",
+      "rubricVersion": "inventory-expired-lot-fifo.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "出庫登録画面で期限切れのロットが出庫候補に表示されてしまう",
             "sections": {
@@ -1971,6 +2340,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "商品P-310の出庫候補を表示したところ、有効期限が7月26日のロットL-01が、8月31日のロットL-02より上位に表示されました、確認日は7月27日です",
+            "sections": {
+              "detail": "商品P-310の出庫候補を表示したところ、有効期限が7月26日のロットL-01が、8月31日のロットL-02より上位に表示されました。確認日は7月27日です。",
+              "preconditions": "確認環境：Client 5.7.0 (Build 1842)、Microsoft Edge 126.0.2592.102、Windows 10 22H2",
+              "steps": "商品P-310の出庫候補を表示したところ、有効期限が7月26日のロットL-01が、8月31日のロットL-02より上位に表示されました",
+              "expected": "ロット管理仕様書 Rev.5.7「4.2.2 有効期限と出庫優先順位」\nロット管理仕様では、期限切れロットを候補から除外したうえで、使用可能なロットを入庫日の古い順に表示します。サーバー日時は7月27日であり、時刻のずれは確認されていません。",
+              "actual": "確認日は7月27日です",
+              "remarks": "画面表示言語を日本語から英語へ変更しても、並び順は同じです。",
+              "reproducibility": "候補一覧を更新し、同一条件で3回検証しましたが、いずれもL-01が先頭に表示されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -1981,9 +2372,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2060,11 +2451,11 @@
     },
     "inventory-simultaneous-shipment-negative-stock": {
       "scenarioId": "inventory-simultaneous-shipment-negative-stock",
-      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v1",
+      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "複数端末からの同時出庫で在庫数がマイナスになってしまうことがある",
             "sections": {
@@ -2085,6 +2476,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "在庫数が1個の商品P-550について、端末Aと端末Bから1個ずつの出庫を同時に確定しました、両方の処理が成功し、処理後の在庫数はマイナス1となりました",
+            "sections": {
+              "detail": "在庫数が1個の商品P-550について、端末Aと端末Bから1個ずつの出庫を同時に確定しました。両方の処理が成功し、処理後の在庫数はマイナス1となりました。",
+              "preconditions": "確認環境：Client 5.7.0 (Build 1842)、Microsoft Edge 126.0.2592.102、Windows 10 22H2",
+              "steps": "在庫数が1個の商品P-550について、端末Aと端末Bから1個ずつの出庫を同時に確定しました",
+              "expected": "在庫更新設計書 Rev.5.7「5.1.3 同時出庫の排他制御」\n在庫更新設計では、同一商品の在庫更新を並行処理せず、先に確定した結果を後続処理が参照します。なお、端末Aは有線、端末BはWi-Fi接続ですが、両方の要求がサーバーへ到達しています。",
+              "actual": "両方の処理が成功し、処理後の在庫数はマイナス1となりました",
+              "remarks": "出庫履歴では、2件とも処理前在庫が1個として記録されています。各端末から順番に処理した場合、2件目は在庫不足となります。",
+              "reproducibility": "同時確定を30回実施したところ、2回再現しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -2095,9 +2508,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2174,21 +2587,43 @@
     },
     "mobile-notification-opens-wrong-news": {
       "scenarioId": "mobile-notification-opens-wrong-news",
-      "rubricVersion": "mobile-notification-opens-wrong-news.v1",
+      "rubricVersion": "mobile-notification-opens-wrong-news.v4",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
             "sections": {
               "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある",
               "preconditions": "テスト端末に対象ビルドがインストールされていること",
-              "steps": "1. テスト通知を送信して端末の通知をタップする",
+              "steps": "1. 既定の検証用通知配信ツールからNEWS-102を送信する\n2. 端末で受信したNEWS-102の通知をタップする",
               "expected": "タップした通知に対応するお知らせを表示すること",
               "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
               "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
               "reproducibility": "2/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "NEWS-101開封後にNEWS-102の通知をタップするとNEWS-101が表示されることがある",
+            "sections": {
+              "detail": "NEWS-101を開封済みの端末でNEWS-102のプッシュ通知をタップすると、NEWS-102ではなくNEWS-101が表示されることがあります。",
+              "preconditions": "App 3.4.0 (34018)をインストールしたiPhone 15（iOS 18.5）で、NEWS-101の通知を受信して開封済みであること",
+              "steps": "1. 既定の検証用通知配信ツールからNEWS-102を送信する\n2. 端末で受信したNEWS-102の通知をタップする",
+              "expected": "通知ディープリンク仕様書 Rev.3.4「3.2 お知らせIDの引き渡し」\n通知ディープリンク仕様では、通知に含まれるお知らせIDを遷移先画面へ引き渡します。通知音、バッジ件数および通知本文は、いずれもNEWS-102の内容と一致しています。",
+              "actual": "NEWS-102の通知をタップしたにもかかわらず、直前に開封したNEWS-101が表示されました。",
+              "remarks": "アプリ内のお知らせ一覧からNEWS-102を選択した場合は、正しい内容が表示されます。",
+              "reproducibility": "同じ通知順序と条件で5回確認し、2回再現しました。"
             }
           },
           "expected": {
@@ -2209,9 +2644,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2224,7 +2659,7 @@
             "sections": {
               "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある\n原因は実装不備であることを確認しました。",
               "preconditions": "テスト端末に対象ビルドがインストールされていること",
-              "steps": "1. テスト通知を送信して端末の通知をタップする",
+              "steps": "1. 既定の検証用通知配信ツールからNEWS-102を送信する\n2. 端末で受信したNEWS-102の通知をタップする",
               "expected": "タップした通知に対応するお知らせを表示すること",
               "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
               "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
@@ -2247,7 +2682,7 @@
             "subject": "プッシュ通知から開くと別のお知らせが表示されてしまうことがある",
             "sections": {
               "detail": "テスト端末に対象ビルドがインストールされていること",
-              "preconditions": "1. テスト通知を送信して端末の通知をタップする",
+              "preconditions": "1. 既定の検証用通知配信ツールからNEWS-102を送信する\n2. 端末で受信したNEWS-102の通知をタップする",
               "steps": "タップした通知に対応するお知らせを表示すること",
               "expected": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される",
               "actual": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認",
@@ -2270,7 +2705,7 @@
             "sections": {
               "detail": "お知らせID「NEWS-102」のプッシュ通知をタップすると、対象ではなく一つ前の「NEWS-101」が表示されてしまうことがある\n上記について継続して確認が必要です。",
               "preconditions": "テスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
-              "steps": "1. テスト通知を送信して端末の通知をタップする\n上記について継続して確認が必要です。",
+              "steps": "1. 既定の検証用通知配信ツールからNEWS-102を送信する\n2. 端末で受信したNEWS-102の通知をタップする\n上記について継続して確認が必要です。",
               "expected": "タップした通知に対応するお知らせを表示すること\n上記について継続して確認が必要です。",
               "actual": "通知対象のNEWS-102ではなく、一つ前のNEWS-101が表示される\n上記について継続して確認が必要です。",
               "remarks": "アプリ内のお知らせ一覧からNEWS-102を開く操作は正常に行えることを確認\n上記について継続して確認が必要です。",
@@ -2288,21 +2723,43 @@
     },
     "mobile-background-sync-data-lost": {
       "scenarioId": "mobile-background-sync-data-lost",
-      "rubricVersion": "mobile-background-sync-data-lost.v1",
+      "rubricVersion": "mobile-background-sync-data-lost.v4",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
             "sections": {
               "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある",
-              "preconditions": "テスト端末に対象ビルドがインストールされていること",
-              "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+              "preconditions": "App 3.4.0のiPhone 15をオフラインにしていること",
+              "steps": "1. 現場記録を3件作成し未送信表示を確認する\n2. アプリをバックグラウンドへ移す\n3. OSのメモリ解放後にアプリへ戻る\n4. 未送信一覧と端末内キューを確認する",
               "expected": "未送信データを保持して復帰後に同期すること",
               "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
-              "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+              "remarks": "サーバーに同期要求がなく復帰後の端末内キューが0件であることを確認\nメモリ解放なしとApp 3.3.2とAndroid 15では各0/25であることを確認\n低頻度のためiOS固有またはApp 3.4.0のデグレとは現時点で断定していない",
               "reproducibility": "1/25"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "App 3.4.0、iOS 18.5、iPhone 15をオフラインにし、現場記録3件を未送信のままバックグラウンドへ移しました、OSによるメモリ解放後に戻ると、3件すべてが一覧から消失しました",
+            "sections": {
+              "detail": "App 3.4.0、iOS 18.5、iPhone 15をオフラインにし、現場記録3件を未送信のままバックグラウンドへ移しました。OSによるメモリ解放後に戻ると、3件すべてが一覧から消失しました。",
+              "preconditions": "確認環境：App 3.4.0 (34018)、iOS 18.5、iPhone 15",
+              "steps": "App 3.4.0、iOS 18.5、iPhone 15をオフラインにし、現場記録3件を未送信のままバックグラウンドへ移しました",
+              "expected": "オフライン同期設計書 Rev.3.4「4.3 未送信データの永続化」\nサーバーログに3件の同期要求はなく、送信済みデータは残っています。復帰後の端末内キューは0件でした。設計上、未送信データは永続領域へ保存し、メモリ解放後も同期対象として復元します。端末の空き容量は42GBで容量警告はありません。",
+              "actual": "OSによるメモリ解放後に戻ると、3件すべてが一覧から消失しました",
+              "remarks": "低頻度のため、iOS固有または3.4.0でのデグレとはまだ断定していません。",
+              "reproducibility": "同じ発生条件では1/25、メモリ解放なしでは0/25でした。同じiPhone 15とiOS 18.5のApp 3.3.2では0/25、App 3.4.0のAndroid 15／Pixel 9では0/25です。"
             }
           },
           "expected": {
@@ -2323,9 +2780,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2337,11 +2794,11 @@
             "subject": "実装不備によりバックグラウンド復帰後に未送信データが消えてしまうことがある",
             "sections": {
               "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある\n原因は実装不備であることを確認しました。",
-              "preconditions": "テスト端末に対象ビルドがインストールされていること",
-              "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+              "preconditions": "App 3.4.0のiPhone 15をオフラインにしていること",
+              "steps": "1. 現場記録を3件作成し未送信表示を確認する\n2. アプリをバックグラウンドへ移す\n3. OSのメモリ解放後にアプリへ戻る\n4. 未送信一覧と端末内キューを確認する",
               "expected": "未送信データを保持して復帰後に同期すること",
               "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
-              "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+              "remarks": "サーバーに同期要求がなく復帰後の端末内キューが0件であることを確認\nメモリ解放なしとApp 3.3.2とAndroid 15では各0/25であることを確認\n低頻度のためiOS固有またはApp 3.4.0のデグレとは現時点で断定していない",
               "reproducibility": "1/25"
             }
           },
@@ -2360,11 +2817,11 @@
           "answer": {
             "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
             "sections": {
-              "detail": "テスト端末に対象ビルドがインストールされていること",
-              "preconditions": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する",
+              "detail": "App 3.4.0のiPhone 15をオフラインにしていること",
+              "preconditions": "1. 現場記録を3件作成し未送信表示を確認する\n2. アプリをバックグラウンドへ移す\n3. OSのメモリ解放後にアプリへ戻る\n4. 未送信一覧と端末内キューを確認する",
               "steps": "未送信データを保持して復帰後に同期すること",
               "expected": "アプリ復帰後、未送信データ3件がすべて一覧から消失する",
-              "actual": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認",
+              "actual": "サーバーに同期要求がなく復帰後の端末内キューが0件であることを確認\nメモリ解放なしとApp 3.3.2とAndroid 15では各0/25であることを確認\n低頻度のためiOS固有またはApp 3.4.0のデグレとは現時点で断定していない",
               "remarks": "1/25",
               "reproducibility": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある"
             }
@@ -2383,11 +2840,11 @@
             "subject": "バックグラウンド復帰後に未送信データが消えてしまうことがある",
             "sections": {
               "detail": "未送信データ3件が残っている状態でOSによるメモリ解放が発生すると、アプリ復帰後に3件すべてが一覧から消えてしまうことがある\n上記について継続して確認が必要です。",
-              "preconditions": "テスト端末に対象ビルドがインストールされていること\n上記について継続して確認が必要です。",
-              "steps": "1. 未送信データを作成してメモリ解放後にアプリへ復帰する\n上記について継続して確認が必要です。",
+              "preconditions": "App 3.4.0のiPhone 15をオフラインにしていること\n上記について継続して確認が必要です。",
+              "steps": "1. 現場記録を3件作成し未送信表示を確認する\n2. アプリをバックグラウンドへ移す\n3. OSのメモリ解放後にアプリへ戻る\n4. 未送信一覧と端末内キューを確認する\n上記について継続して確認が必要です。",
               "expected": "未送信データを保持して復帰後に同期すること\n上記について継続して確認が必要です。",
               "actual": "アプリ復帰後、未送信データ3件がすべて一覧から消失する\n上記について継続して確認が必要です。",
-              "remarks": "サーバーログには未送信データ3件の同期要求が記録されていないことを確認\n上記について継続して確認が必要です。",
+              "remarks": "サーバーに同期要求がなく復帰後の端末内キューが0件であることを確認\nメモリ解放なしとApp 3.3.2とAndroid 15では各0/25であることを確認\n低頻度のためiOS固有またはApp 3.4.0のデグレとは現時点で断定していない\n上記について継続して確認が必要です。",
               "reproducibility": "1/25\n上記について継続して確認が必要です。"
             }
           },
@@ -2402,11 +2859,11 @@
     },
     "automotive-can-byte-order-reversed": {
       "scenarioId": "automotive-can-byte-order-reversed",
-      "rubricVersion": "automotive-can-byte-order-reversed.v1",
+      "rubricVersion": "automotive-can-byte-order-reversed.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "車載メーターでCAN信号がDBC定義と異なる値で表示されてしまう",
             "sections": {
@@ -2427,6 +2884,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "CANoeからBatteryVoltageの生値0x0BB8を送信しました、期待値は30.00Vですが、メーター診断画面には471.15Vと表示されました",
+            "sections": {
+              "detail": "CANoeからBatteryVoltageの生値0x0BB8を送信しました。期待値は30.00Vですが、メーター診断画面には471.15Vと表示されました。",
+              "preconditions": "確認環境：ECU Software: v5.12.3、Hardware Rev: C、Vehicle profile: TEST-02",
+              "steps": "CANoeからBatteryVoltageの生値0x0BB8を送信しました",
+              "expected": "ADAS通信仕様書 Rev.5.12「6.3.2 BatteryVoltage（Intel / Little Endian）」\nADAS通信仕様では、対象信号はIntel形式で定義されています。CANoeの送信フレームはDBC定義と一致しており、診断ツールでは30.00Vとして復号されています。",
+              "actual": "期待値は30.00Vですが、メーター診断画面には471.15Vと表示されました",
+              "remarks": "同一フレーム内の1バイト長信号は正常であり、複数バイトで構成されるBatteryVoltageに限って事象を確認しています。",
+              "reproducibility": "同一フレームを3回送信し、いずれも同じ表示値となりました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -2437,9 +2916,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2516,11 +2995,11 @@
     },
     "automotive-bus-off-recovery-receive-stopped": {
       "scenarioId": "automotive-bus-off-recovery-receive-stopped",
-      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v1",
+      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "ADAS ECUでBus-Off復帰後もCAN受信が再開されないことがある",
             "sections": {
@@ -2541,6 +3020,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "CANバス負荷率を90%以上とし、送信エラーを連続して発生させた結果、ADAS ECUがBus-Offへ遷移しました、エラー解除および規定の復帰操作後も、当該ECUの受信カウンタのみ更新されませんでした",
+            "sections": {
+              "detail": "CANバス負荷率を90%以上とし、送信エラーを連続して発生させた結果、ADAS ECUがBus-Offへ遷移しました。エラー解除および規定の復帰操作後も、当該ECUの受信カウンタのみ更新されませんでした。",
+              "preconditions": "確認環境：ECU Software: v5.12.3、Hardware Rev: C、Vehicle profile: TEST-02",
+              "steps": "CANバス負荷率を90%以上とし、送信エラーを連続して発生させた結果、ADAS ECUがBus-Offへ遷移しました",
+              "expected": "ADAS ECU通信制御仕様書 Rev.5.12「7.4 Bus-Off復帰処理」\n通信制御仕様では、Bus-Off解除後500ms以内に受信処理を再開します。なお、計測PCの省電力設定は無効であり、別CANチャンネルの記録にも中断はありません。",
+              "actual": "エラー解除および規定の復帰操作後も、当該ECUの受信カウンタのみ更新されませんでした",
+              "remarks": "他のECUは通信を継続しており、イグニッションOFF/ON後はADAS ECUの受信も再開します。",
+              "reproducibility": "同一条件で50回検証したところ、復帰操作から30秒経過後も車輪速とブレーキ状態を受信しない事象が1回発生しました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -2551,9 +3052,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2630,11 +3131,11 @@
     },
     "payment-idempotency-key-double-charge": {
       "scenarioId": "payment-idempotency-key-double-charge",
-      "rubricVersion": "payment-idempotency-key-double-charge.v1",
+      "rubricVersion": "payment-idempotency-key-double-charge.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "決済APIで同じ冪等キーを再利用すると売上が二重確定されてしまうことがある",
             "sections": {
@@ -2655,6 +3156,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "Sandbox環境で5,000円の決済要求を送信し、10秒後に同一の冪等キーおよびJSON本文で再試行しました、2回とも成功し、それぞれ異なる取引IDが発行されました",
+            "sections": {
+              "detail": "Sandbox環境で5,000円の決済要求を送信し、10秒後に同一の冪等キーおよびJSON本文で再試行しました。2回とも成功し、それぞれ異なる取引IDが発行されました。",
+              "preconditions": "確認環境：API version: 2024-06-20、Environment: Sandbox、Gateway build: 7.18.4",
+              "steps": "Sandbox環境で5,000円の決済要求を送信し、10秒後に同一の冪等キーおよびJSON本文で再試行しました",
+              "expected": "決済API仕様書 Rev.2024-06「2.4 冪等キー」\n決済API仕様では、同一加盟店から同じ冪等キーを受信した場合、処理を追加せず、初回の結果を返します。なお、2回目の送信時のみ画面幅を変更しましたが、送信内容は同一です。",
+              "actual": "2回とも成功し、それぞれ異なる取引IDが発行されました",
+              "remarks": "再試行前の取引照会では、初回取引はすでに成功状態でした。",
+              "reproducibility": "同一条件で10回検証したところ、2回は売上が2件確定し、検証用カードにも同額の請求が2件記録されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -2665,9 +3188,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2744,11 +3267,11 @@
     },
     "payment-timeout-authorization-remains": {
       "scenarioId": "payment-timeout-authorization-remains",
-      "rubricVersion": "payment-timeout-authorization-remains.v1",
+      "rubricVersion": "payment-timeout-authorization-remains.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "決済APIのタイムアウト後もカードの与信枠が残ってしまうことがある",
             "sections": {
@@ -2769,6 +3292,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "Sandbox環境で50,000円の取引要求を送信し、クライアント側で30秒後にタイムアウトさせました、取引照会では失敗状態でしたが、カードの利用可能額は50,000円減少した状態でした",
+            "sections": {
+              "detail": "Sandbox環境で50,000円の取引要求を送信し、クライアント側で30秒後にタイムアウトさせました。取引照会では失敗状態でしたが、カードの利用可能額は50,000円減少した状態でした。",
+              "preconditions": "確認環境：API version: 2024-06-20、Environment: Sandbox、Gateway build: 7.18.4",
+              "steps": "Sandbox環境で50,000円の取引要求を送信し、クライアント側で30秒後にタイムアウトさせました",
+              "expected": "与信管理仕様書 Rev.2024-06「5.2 タイムアウト時の与信取消」\n与信管理仕様では、取引照会によって決済失敗が確定した場合、5分以内に与信を取り消します。なお、別のカードブランドでも同様にタイムアウトが発生しました。",
+              "actual": "取引照会では失敗状態でしたが、カードの利用可能額は50,000円減少した状態でした",
+              "remarks": "売上確定および売上取消の履歴はなく、与信のみ残存しています。",
+              "reproducibility": "同一条件で40回検証したところ、1回は15分経過後も与信枠が解放されませんでした。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -2779,9 +3324,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2858,11 +3403,11 @@
     },
     "medical-weight-conversion-dose-thousandfold": {
       "scenarioId": "medical-weight-conversion-dose-thousandfold",
-      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v1",
+      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "投薬量計算で体重の単位変換が行われず投薬量が1000倍になってしまう",
             "sections": {
@@ -2883,6 +3428,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "検査システムから体重18,000gの患者データを連携し、10mg/kgの薬剤で投薬量を自動計算しました、処方候補欄には180,000mgと表示されました",
+            "sections": {
+              "detail": "検査システムから体重18,000gの患者データを連携し、10mg/kgの薬剤で投薬量を自動計算しました。処方候補欄には180,000mgと表示されました。",
+              "preconditions": "確認環境：Client version: 4.8.2、Database schema: 2026.07、Windows 11 Enterprise 23H2",
+              "steps": "検査システムから体重18,000gの患者データを連携し、10mg/kgの薬剤で投薬量を自動計算しました",
+              "expected": "投薬量計算仕様書 Rev.4.8「4.2.1 体重単位の換算」\n投薬量計算仕様では、受信した体重をkgへ換算した後に用量を乗算します。対象患者の換算後体重は18kgです。なお、誤った投薬量の処方候補は承認していません。",
+              "actual": "処方候補欄には180,000mgと表示されました",
+              "remarks": "送信元データには体重単位としてgが設定されています。画面倍率を125%から100%へ変更しても、計算結果は変わりませんでした。",
+              "reproducibility": "連携データを再作成し、同一条件で3回検証したところ、いずれも同じ計算結果となりました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -2893,9 +3460,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }
@@ -2972,11 +3539,11 @@
     },
     "medical-lab-result-resend-duplicate": {
       "scenarioId": "medical-lab-result-resend-duplicate",
-      "rubricVersion": "medical-lab-result-resend-duplicate.v1",
+      "rubricVersion": "medical-lab-result-resend-duplicate.v3",
       "fixtures": [
         {
-          "fixtureId": "excellent",
-          "label": "見本と同等の必要情報がそろった回答",
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
           "answer": {
             "subject": "検査結果連携で同じ検査結果を再送すると患者記録が重複登録されてしまうことがある",
             "sections": {
@@ -2997,6 +3564,28 @@
           }
         },
         {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "患者P-903へ検査結果ID LAB-9031を連携した後、同一メッセージを再送しました、診療画面には、測定時刻と測定値が同一の検査結果が2件表示されました",
+            "sections": {
+              "detail": "患者P-903へ検査結果ID LAB-9031を連携した後、同一メッセージを再送しました。診療画面には、測定時刻と測定値が同一の検査結果が2件表示されました。",
+              "preconditions": "確認環境：Client version: 4.8.2、Database schema: 2026.07、Windows 11 Enterprise 23H2",
+              "steps": "患者P-903へ検査結果ID LAB-9031を連携した後、同一メッセージを再送しました",
+              "expected": "検査結果連携仕様書 Rev.4.8「6.1.3 検査結果IDによる重複防止」\n検査結果連携仕様では、登録済みの検査結果IDを再受信した場合も、患者記録を追加しません。なお、再送時に検査装置の画面テーマを変更しましたが、連携メッセージの本文は初回送信時と同一です。",
+              "actual": "診療画面には、測定時刻と測定値が同一の検査結果が2件表示されました",
+              "remarks": "DB上の2レコードも検査結果IDおよび測定時刻が一致しています。初回送信のみの場合は1件です。",
+              "reproducibility": "同一メッセージの再送を30回実施したところ、1回のみ検査結果が2件表示されました。"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
           "fixtureId": "missing-critical-facts",
           "label": "現象だけを記載し重要な条件と結果が不足した回答",
           "answer": {
@@ -3007,9 +3596,9 @@
             "scoreMin": 0,
             "scoreMax": 79,
             "missingFactIds": [
-              "detail-1",
-              "expected-1",
-              "actual-1"
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
             ],
             "forbiddenClaimIds": []
           }

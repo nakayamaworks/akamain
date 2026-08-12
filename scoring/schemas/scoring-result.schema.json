@@ -68,7 +68,7 @@
           "reader": { "type": "string" },
           "question": { "type": "string" },
           "whyItMatters": { "type": "string" },
-          "classification": { "enum": ["不足情報", "調査提案"] },
+          "classification": { "enum": ["不足情報", "記述確認", "調査提案"] },
           "factId": { "type": "string" }
         }
       }

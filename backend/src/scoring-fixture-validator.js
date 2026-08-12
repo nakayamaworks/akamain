@@ -122,17 +122,17 @@ export function evaluateFixtureResult({ fixtureSet, fixture, scoringResult }) {
     check(
       "reader-questions",
       Array.isArray(scoringResult?.readerQuestions)
-        && scoringResult.readerQuestions.length >= 2
+        && scoringResult.readerQuestions.length >= 0
         && scoringResult.readerQuestions.length <= 4,
-      "2..4",
+      "0..4",
       Array.isArray(scoringResult?.readerQuestions) ? scoringResult.readerQuestions.length : null
     ),
     check(
       "investigation-advice",
       Array.isArray(scoringResult?.investigationAdvice)
-        && scoringResult.investigationAdvice.length >= 2
+        && scoringResult.investigationAdvice.length >= 1
         && scoringResult.investigationAdvice.length <= 4,
-      "2..4",
+      "1..4",
       Array.isArray(scoringResult?.investigationAdvice)
         ? scoringResult.investigationAdvice.length
         : null

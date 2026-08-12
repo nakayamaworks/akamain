@@ -10,14 +10,15 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260805a" />
+    <link rel="stylesheet" href="./styles.css?v=20260811c" />
   </head>
   <body>
     <div class="redmine-shell">
       <header class="rm-topbar">
         <div class="rm-topbar-meta">
           <nav class="rm-meta-nav" aria-label="グローバルメニュー">
-            <button id="homeNavButton" class="rm-meta-link is-interactive is-active" type="button" aria-current="page">ホーム</button>
+            <button id="homeNavButton" class="rm-meta-link is-interactive" type="button">ホーム</button>
+            <button id="ticketNavButton" class="rm-meta-link is-interactive is-active" type="button" aria-current="page">チケット</button>
             <button id="myPageNavButton" class="rm-meta-link is-interactive" type="button">マイページ</button>
           </nav>
           <div class="rm-meta-user">
@@ -31,7 +32,8 @@
         <div id="rmProjectHeader" class="rm-topbar-project">
           <div id="rmProjectTitle" class="rm-project-title">顧客管理システム</div>
           <div class="rm-project-tools">
-            <select id="rmProjectSwitcher" class="rm-project-switcher" aria-label="プロジェクトの移動">
+            <label class="rm-project-switcher-label" for="rmProjectSwitcher">プロジェクト：</label>
+            <select id="rmProjectSwitcher" class="rm-project-switcher" aria-label="問題ドメインとして扱うプロジェクトの切り替え">
               <optgroup label="一般業務">
                 <option value="customer">顧客管理システム</option>
                 <option value="attendance">勤怠管理システム</option>
@@ -69,6 +71,7 @@
               <h1>作成したチケット</h1>
             </div>
             <div class="ticket-page-actions">
+              <button id="resumeDraftButton" class="secondary-button hidden" type="button" title="このブラウザに保存した下書きを再開します">下書きを再開</button>
               <button id="startButton" class="primary-button" type="button">チケット作成</button>
             </div>
           </div>
@@ -259,7 +262,7 @@
                 <dl id="scenarioIntroDecision" class="scenario-brief scenario-brief-wide"></dl>
               </section>
             </div>
-            <details class="scenario-rules scenario-category-rules" open>
+            <details class="scenario-rules scenario-category-rules">
               <summary>カテゴリの判断基準</summary>
               <div class="scenario-rule-list">
                 <p><strong>画面・UI</strong> 表示、レイアウト、画面遷移、操作後の表示状態</p>
@@ -268,7 +271,7 @@
                 <p><strong>外部連携・API</strong> 送受信、再送、通知、データ変換</p>
               </div>
             </details>
-            <details class="scenario-rules scenario-priority-rules" open>
+            <details class="scenario-rules scenario-priority-rules">
               <summary>優先度の判断基準</summary>
               <div class="scenario-rule-list">
                 <p><strong>緊急</strong> 即時判断が必要。緊急リリースや当日対応を予定</p>
@@ -277,7 +280,7 @@
                 <p><strong>低め</strong> 影響が軽微で、対応時期の制約がない</p>
               </div>
             </details>
-            <details class="scenario-rules" open>
+            <details class="scenario-rules">
               <summary>障害レベルの判断基準</summary>
               <div class="scenario-rule-list">
                 <p><strong>S1</strong> 人命・安全、情報漏洩、不正決済、復旧不能なデータ消失</p>
@@ -290,7 +293,7 @@
 
           <div class="scenario-intro-actions">
             <button id="scenarioIntroBackButton" class="secondary-button" type="button">一覧へ戻る</button>
-            <button id="scenarioIntroStartButton" class="primary-button reference-mode-button" type="button">見本入力を開始</button>
+            <button id="scenarioIntroStartButton" class="primary-button reference-mode-button" type="button">記載例を入力</button>
             <button id="scenarioIntroPracticeButton" class="primary-button" type="button">実践起票を開始</button>
           </div>
         </section>
@@ -301,6 +304,8 @@
               <h1 id="ticketCreateTitle">新しいチケット</h1>
             </div>
             <div class="ticket-page-actions">
+              <span id="draftSaveStatus" class="draft-save-status hidden" role="status" aria-live="polite"></span>
+              <button id="draftSaveButton" class="secondary-button hidden" type="button" disabled title="AIレビューやチケット作成を行わず、このブラウザに保存します">一時保存</button>
               <button id="stopButton" class="danger-button" type="button" disabled>中止</button>
             </div>
           </div>
@@ -318,10 +323,6 @@
                     <option value="support">サポート</option>
                   </select>
                 </div>
-                <label class="ticket-private-toggle">
-                  <input id="privateCheckbox" type="checkbox" />
-                  <span>プライベート</span>
-                </label>
               </div>
 
               <div class="ticket-form-row ticket-form-row-subject">
@@ -471,7 +472,6 @@
               <fieldset class="ticket-watchers">
                 <legend>ウォッチャー</legend>
                 <div id="ticketWatchersList" class="ticket-watchers-list"></div>
-                <button class="watcher-search-link" type="button" aria-disabled="true" tabindex="-1">⊕ ウォッチャーを検索して追加</button>
               </fieldset>
             </div>
           </article>
@@ -485,7 +485,7 @@
                 <h2>バグシナリオ</h2>
               </div>
               <div class="scenario-panel-status">
-                <span id="scenarioPanelMode" class="scenario-mode-badge">見本入力</span>
+                <span id="scenarioPanelMode" class="scenario-mode-badge">記載例入力</span>
                 <span id="scenarioReferenceHint" class="scenario-reference-hint hidden"></span>
               </div>
             </div>
@@ -625,6 +625,7 @@
                     <strong id="practiceScoringPreviewTotal">--</strong><small> / 100</small>
                   </span>
                 </div>
+                <p id="practiceScoringVerdictDescription" class="practice-ai-verdict-description"></p>
                 <p id="practiceScoringOverallAssessment" class="practice-ai-overall-assessment"></p>
                 <p id="practiceScoringBasis" class="practice-ai-scoring-basis hidden"></p>
                 <div class="practice-ai-strengths">
@@ -674,7 +675,10 @@
             </div>
 
             <div class="practice-ai-advice">
-              <article>
+              <p id="practiceScoringNoImprovements" class="practice-ai-no-improvements hidden">
+                優先して修正が必要な表現や不足情報はありません。
+              </p>
+              <article id="practiceScoringReaderQuestionsSection">
                 <h3>読み手が疑問に思うこと</h3>
                 <div id="practiceScoringReaderQuestions" class="practice-ai-review-list"></div>
               </article>
@@ -758,15 +762,14 @@
 
         <section id="practiceResultSection" class="practice-result-section hidden">
           <details class="practice-comparison-details">
-            <summary>見本回答を確認する</summary>
-            <p>必要なときだけ、自分の文章と見本回答を見比べられます。</p>
+            <summary>記載例を確認する</summary>
             <div class="practice-result-columns">
               <article>
                 <h3>あなたの起票</h3>
                 <div id="practiceResultAnswer" class="practice-result-document"></div>
               </article>
               <article>
-                <h3>見本回答</h3>
+                <h3>記載例</h3>
                 <div id="practiceReferenceAnswer" class="practice-result-document"></div>
               </article>
             </div>
@@ -793,10 +796,11 @@
     <script src="./auth-client.js?v=20260804a"></script>
     <script src="./scoring-api.js?v=20260801a"></script>
     <script src="./profile-api.js?v=20260803b"></script>
-    <script src="./scenario-library.js?v=20260805b"></script>
-    <script src="./scenario-briefing-library.js?v=20260805a"></script>
+    <script src="./scenario-authoring-library.js?v=20260811c"></script>
+    <script src="./scenario-library.js?v=20260810a"></script>
+    <script src="./scenario-briefing-library.js?v=20260810a"></script>
     <script src="./evidence-library.js?v=20260805a"></script>
-    <script src="./scoring-preview.js?v=20260805a"></script>
-    <script src="./main.js?v=20260805c"></script>
+    <script src="./scoring-preview.js?v=20260811a"></script>
+    <script src="./main.js?v=20260811d"></script>
   </body>
 </html>

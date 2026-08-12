@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const vm = require("node:vm");
 
+const authoringSource = fs.readFileSync("scenario-authoring-library.js", "utf8");
 const source = fs.readFileSync("scenario-library.js", "utf8");
 const briefingSource = fs.readFileSync("scenario-briefing-library.js", "utf8");
 const evidenceSource = fs.readFileSync("evidence-library.js", "utf8");
@@ -42,8 +43,10 @@ const scoringFixtureRegistryFile = JSON.parse(
   fs.readFileSync("scoring/fixtures/scenario-fixtures.json", "utf8")
 );
 const context = { window: {} };
+vm.runInNewContext(authoringSource, context, { filename: "scenario-authoring-library.js" });
 vm.runInNewContext(source, context, { filename: "scenario-library.js" });
 const briefingContext = { window: {} };
+vm.runInNewContext(authoringSource, briefingContext, { filename: "scenario-authoring-library.js" });
 vm.runInNewContext(briefingSource, briefingContext, {
   filename: "scenario-briefing-library.js",
 });
@@ -53,6 +56,10 @@ vm.runInNewContext(scoringPreviewSource, scoringPreviewContext, {
 });
 
 const scenarios = context.window.TYPING_WORKBENCH_SCENARIOS;
+const authoredScenarios = context.window.TYPING_WORKBENCH_SCENARIO_AUTHORING || {};
+const authoredSubjectSet = new Set(
+  Object.values(authoredScenarios).map((profile) => profile.scenario?.subject).filter(Boolean)
+);
 const projectIds = [
   "attendance",
   "salon",
@@ -63,7 +70,9 @@ const projectIds = [
   "payment",
   "medical",
 ];
+const validProjectIds = new Set(["customer", ...projectIds]);
 const difficulties = new Set(["intermediate", "advanced"]);
+const allowedDifficulties = new Set(["beginner", ...difficulties]);
 const requiredFields = [
   "scenarioId",
   "projectId",
@@ -78,6 +87,19 @@ const requiredFields = [
 ];
 const errors = [];
 
+if (/<details class="scenario-rules[^"]*" open>/u.test(indexSource)) {
+  errors.push("scenario decision criteria must be collapsed on initial display");
+}
+
+[
+  "⊕ ウォッチャーを検索して追加",
+  "主担当と関連担当者を選択",
+].forEach((obsoleteWatcherCopy) => {
+  if (indexSource.includes(obsoleteWatcherCopy) || stylesSource.includes(obsoleteWatcherCopy)) {
+    errors.push(`obsolete watcher helper copy remains: ${obsoleteWatcherCopy}`);
+  }
+});
+
 const applicationHeaderSource = indexSource.slice(
   indexSource.indexOf('<header class="rm-topbar">'),
   indexSource.indexOf("</header>")
@@ -89,7 +111,6 @@ const removedNavigationLabels = [
   "概要",
   "活動",
   "ロードマップ",
-  "チケット",
   "作業時間",
   "ガントチャート",
   "カレンダー",
@@ -112,6 +133,7 @@ if (
 }
 if (
   !applicationHeaderSource.includes('id="homeNavButton"') ||
+  !applicationHeaderSource.includes('id="ticketNavButton"') ||
   !applicationHeaderSource.includes('id="myPageNavButton"') ||
   !applicationHeaderSource.includes('id="rmProjectSwitcher"') ||
   !applicationHeaderSource.includes('aria-label="マイページナビゲーション"')
@@ -134,6 +156,8 @@ if (
   errors.push("evidence library must load after scenarios and before main.js");
 }
 if (
+  !indexSource.includes('src="./scenario-authoring-library.js') ||
+  indexSource.indexOf("scenario-authoring-library.js") > indexSource.indexOf("scenario-library.js") ||
   !indexSource.includes('src="./scenario-briefing-library.js') ||
   indexSource.indexOf("scenario-briefing-library.js") < indexSource.indexOf("scenario-library.js") ||
   indexSource.indexOf("scenario-briefing-library.js") > indexSource.indexOf("main.js")
@@ -161,6 +185,18 @@ if (/仕様では/.test(`${mainSource}\n${source}`)) {
 if (!/id="statusSelect"\s+disabled/.test(indexSource)) {
   errors.push("new-ticket status must remain fixed and disabled");
 }
+const ticketCreateSource = indexSource.slice(
+  indexSource.indexOf('id="ticketCreateView"'),
+  indexSource.indexOf('id="resultOverlay"')
+);
+if (
+  ticketCreateSource.includes('id="privateCheckbox"') ||
+  ticketCreateSource.includes("プライベート") ||
+  stylesSource.includes(".ticket-private-toggle") ||
+  mainSource.includes("privateCheckbox")
+) {
+  errors.push("new-ticket form must not expose the unused private setting");
+}
 if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="statusSelect"')) {
   errors.push("severity must appear above status in the ticket form");
 }
@@ -179,6 +215,9 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
 });
 [
   "startButton",
+  "resumeDraftButton",
+  "draftSaveButton",
+  "draftSaveStatus",
   "scenarioIntroStartButton",
   "scenarioIntroPracticeButton",
   "practiceWritingCompleteButton",
@@ -196,12 +235,14 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
   "practiceScoringResult",
   "practiceScoringPreviewTotal",
   "practiceScoringVerdict",
+  "practiceScoringVerdictDescription",
   "practiceScoringOverallAssessment",
   "practiceScoringPreviewStrengths",
   "practiceScoringReaderQuestions",
   "practiceScoringAmbiguityRisks",
   "practiceScoringInvestigationAdvice",
   "practiceScoringRewriteSuggestions",
+  "practiceScoringNoImprovements",
   "practiceScoringRadarValue",
   "practiceRadarFactual",
   "practiceRadarCoverage",
@@ -280,7 +321,7 @@ if (!indexSource.includes('<button id="startButton" class="primary-button" type=
 if (indexSource.includes('id="practiceStartButton"')) {
   errors.push("the ticket list must not ask users to choose an authoring mode");
 }
-if ((indexSource.match(/見本入力を開始/g) || []).length !== 1) {
+if ((indexSource.match(/記載例を入力/g) || []).length !== 1) {
   errors.push("reference mode must be selected only on the scenario intro");
 }
 if ((indexSource.match(/実践起票を開始/g) || []).length !== 1) {
@@ -317,9 +358,19 @@ if (
   !scoringResultSchema?.required?.includes("rubricVersion") ||
   !scoringResultSchema?.required?.includes("promptVersion") ||
   !scoringResultSchema?.required?.includes("modelId") ||
-  !scoringResultSchema?.required?.includes("rubricFindings")
+  !scoringResultSchema?.required?.includes("rubricFindings") ||
+  !scoringResultSchema?.properties?.readerQuestions?.items?.properties?.classification?.enum?.includes("記述確認")
 ) {
   errors.push("scoring result schema must preserve grading provenance");
+}
+
+if (
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v7"') ||
+  !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
+  !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
+  !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問")
+) {
+  errors.push("AI review prompt must distinguish standard operations, unsupported additions, and true missing facts");
 }
 
 const rubricDimensionIds = new Set(
@@ -403,7 +454,7 @@ const scoringPreviewDimensionScore = (pilotRubric.dimensions || []).reduce(
 );
 if (
   scoringPreview?.schemaVersion !== "scoring-result.v3" ||
-  scoringPreview?.rubricVersion !== "customer-save-multiple-clicks-duplicate.v3" ||
+  scoringPreview?.rubricVersion !== "customer-save-multiple-clicks-duplicate.v4" ||
   scoringPreview?.modelId !== "mock-structured-result" ||
   scoringPreview?.totalScore !== Math.round(scoringPreviewDimensionScore)
 ) {
@@ -476,7 +527,7 @@ if (!setupFieldsSource.includes("versionSelect") || !setupFieldsSource.includes(
 const environmentConfigSource = mainSource
   .slice(
     mainSource.indexOf("const projectEnvironments = {"),
-    mainSource.indexOf("const projectReportPreconditions = {")
+    mainSource.indexOf("function getScenarioSpecificationReference")
   )
   .replace("const projectEnvironments", "var projectEnvironments")
   .replace("const projectEnvironmentChoices", "var projectEnvironmentChoices");
@@ -519,10 +570,10 @@ if (!Array.isArray(scenarios)) {
       }
     });
 
-    if (!projectIds.includes(scenario.projectId)) {
+    if (!validProjectIds.has(scenario.projectId)) {
       errors.push(`scenario ${index + 1}: unknown projectId "${scenario.projectId}"`);
     }
-    if (!difficulties.has(scenario.difficulty)) {
+    if (!allowedDifficulties.has(scenario.difficulty)) {
       errors.push(`scenario ${index + 1}: invalid difficulty "${scenario.difficulty}"`);
     }
     if (!/^\d+\/\d+$/.test(scenario.reproducibility)) {
@@ -546,51 +597,16 @@ if (!Array.isArray(scenarios)) {
   });
 }
 
-const initialSubjects = [...mainSource.matchAll(/subject:\s*\{\s*text:\s*"([^"]+)"/g)].map((match) => match[1]);
-const generatedSubjects = [...mainSource.matchAll(/createProjectScenario\(\s*"[^"]+",\s*"([^"]+)"/g)].map(
-  (match) => match[1]
-);
-const generatedScenarioRefs = [
-  ...mainSource.matchAll(/createProjectScenario\(\s*"([^"]+)",\s*"([^"]+)"/g),
-].map((match) => ({ projectId: match[1], subject: match[2] }));
-const generatedDetails = [
-  ...mainSource.matchAll(
-    /createProjectScenario\(\s*"[^"]+",\s*"[^"]+",\s*"[^"]+",\s*"([^"]+)"/g
-  ),
-].map((match) => match[1]);
-generatedDetails.forEach((detail, index) => {
-});
-
-const manualDetailTexts = [
-  ...mainSource.matchAll(/text:\s*"■詳細"([\s\S]*?)text:\s*"■前提条件"/g),
-].flatMap((match) => {
-  const detailLines = [...match[1].matchAll(/text:\s*"([^"]+)"/g)].map((lineMatch) => lineMatch[1]);
-  return detailLines.length > 0 ? [detailLines[detailLines.length - 1]] : [];
-});
-if (manualDetailTexts.length !== initialSubjects.length) {
-  errors.push("every manual scenario must contain detail text");
-}
-
-const allScenarioRefs = [
-  ...initialSubjects.map((subject) => ({ projectId: "customer", subject })),
-  ...generatedScenarioRefs,
-  ...(Array.isArray(scenarios)
-    ? scenarios.map((scenario) => ({ projectId: scenario.projectId, subject: scenario.subject }))
-    : []),
-];
-const allSubjects = [
-  ...initialSubjects,
-  ...generatedSubjects,
-  ...(Array.isArray(scenarios) ? scenarios.map((scenario) => scenario.subject) : []),
-];
+const allScenarioRefs = scenarios.map((scenario) => ({
+  projectId: scenario.projectId,
+  subject: scenario.subject,
+}));
+const allSubjects = scenarios.map((scenario) => scenario.subject);
 const briefingProfiles = briefingContext.window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS || {};
-const allScenarioIds = [
-  ...mainSource.matchAll(/scenarioId:\s*"([a-z0-9-]+)"/g),
-  ...(Array.isArray(scenarios)
-    ? scenarios.map((scenario) => [null, scenario.scenarioId])
-    : []),
-].map((match) => match[1]);
-const uniqueScenarioIds = [...new Set(allScenarioIds)];
+const uniqueScenarioIds = Object.keys(authoredScenarios);
+if (uniqueScenarioIds.length !== 27 || scenarios.length !== 27) {
+  errors.push("authoring registry and compatibility view must both contain 27 scenarios");
+}
 
 uniqueScenarioIds.forEach((scenarioId) => {
   const briefing = briefingProfiles[scenarioId];
@@ -616,68 +632,79 @@ Object.keys(briefingProfiles).forEach((scenarioId) => {
     errors.push(`${scenarioId}: briefing exists for an unknown scenario`);
   }
 });
-const profileSource = mainSource
-  .slice(
-    mainSource.indexOf("const scenarioJudgementProfiles = ["),
-    mainSource.indexOf("function getScenarioJudgementProfile")
-  )
-  .replace("const scenarioJudgementProfiles", "var scenarioJudgementProfiles");
-const profileContext = {};
-vm.runInNewContext(profileSource, profileContext, { filename: "main.js#scenarioJudgementProfiles" });
-const judgementProfiles = profileContext.scenarioJudgementProfiles || [];
-
-allSubjects.forEach((subject) => {
-  const matches = judgementProfiles.filter((profile) => profile.match.test(subject));
-  if (matches.length !== 1) {
-    errors.push(`${subject}: expected one judgement profile, found ${matches.length}`);
+Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
+  const report = profile.scenario?.report || [];
+  const guide = profile.reviewGuide;
+  const reviewSource = profile.reviewSource;
+  const sectionNames = report
+    .filter((entry) => entry.kind === "section")
+    .map((entry) => entry.text);
+  const operationStart = sectionNames.indexOf("■操作手順");
+  const operationEnd = report.findIndex(
+    (entry) => entry.kind === "section" && entry.text === "■期待結果"
+  );
+  const operationStartIndex = report.findIndex(
+    (entry) => entry.kind === "section" && entry.text === "■操作手順"
+  );
+  const operationCount = report.slice(operationStartIndex + 1, operationEnd)
+    .filter((entry) => entry.kind === "line").length;
+  if (
+    profile.schemaVersion !== "scenario-authoring.v2"
+    || profile.scenario?.scenarioId !== scenarioId
+    || JSON.stringify(briefingProfiles[scenarioId]) !== JSON.stringify(profile.briefing)
+    || sectionNames.join(",") !== "■詳細,■前提条件,■操作手順,■期待結果,■実際の動作,■備考,■再現性"
+    || operationStart < 0
+    || operationCount < 1
+    || operationCount > 4
+    || !/Rev\.[^「]+「[^」]+」/.test(profile.specificationReference || "")
+  ) {
+    errors.push(`${scenarioId}: authored scenario and reference report must be complete`);
+  }
+  if (
+    !guide?.sourceBoundary
+    || guide.sourceBoundary.includes("見本")
+    || !Array.isArray(guide.strengthCriteria)
+    || guide.strengthCriteria.length < 2
+    || !Array.isArray(guide.nonScoringInvestigationIdeas)
+    || !Array.isArray(guide.disallowedGenericPraise)
+    || guide.disallowedGenericPraise.length < 3
+  ) {
+    errors.push(`${scenarioId}: review guide must define a source boundary and specific feedback policy`);
+  }
+  if (
+    reviewSource?.schemaVersion !== "scenario-review-source.v1"
+    || reviewSource?.sourceType !== "scenario-observations"
+    || reviewSource?.testTarget !== profile.briefing?.testTarget
+    || !Array.isArray(reviewSource?.observations)
+    || reviewSource.observations.length < 3
+    || reviewSource.observations.some(({ id, text }) => !id || !text)
+    || !reviewSource?.specificationReference
+    || !reviewSource?.alternativeExcellentAnswer?.subject
+    || !reviewSource?.alternativeExcellentAnswer?.sections
+  ) {
+    errors.push(`${scenarioId}: review facts must be defined independently from the writing example`);
   }
 });
+const judgementProfiles = Object.values(authoredScenarios).map((profile) => profile.judgement);
+const specificationReferences = Object.values(authoredScenarios).map(
+  (profile) => profile.specificationReference
+);
 
-judgementProfiles.forEach((profile, index) => {
+Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
+  const judgement = profile.judgement;
   ["severity", "scope", "workaround", "recovery", "risk"].forEach((field) => {
-    if (typeof profile[field] !== "string" || profile[field].trim() === "") {
-      errors.push(`judgement profile ${index + 1}: ${field} is required`);
+    if (typeof judgement?.[field] !== "string" || judgement[field].trim() === "") {
+      errors.push(`${scenarioId}: judgement.${field} is required`);
     }
   });
-  ["scope", "workaround", "recovery", "risk"].forEach((field) => {
-    const value = profile[field];
-    if (typeof value === "string" && (!value.endsWith("。") || value.length < 25 || value.length > 90)) {
-      errors.push(`judgement profile ${index + 1}: ${field} must be a complete, concise Japanese sentence`);
-    }
-  });
-  if (typeof profile.scope === "string" && !profile.scope.startsWith("影響を受けるのは、")) {
-    errors.push(`judgement profile ${index + 1}: scope must clearly identify the affected target`);
+  if (!new Set(["s1", "s2", "s3", "s4"]).has(judgement?.severity)) {
+    errors.push(`${scenarioId}: invalid severity "${judgement?.severity}"`);
   }
-  if (new Set([profile.scope, profile.workaround, profile.recovery, profile.risk]).size !== 4) {
-    errors.push(`judgement profile ${index + 1}: scope, risk, recovery, and workaround must be distinct`);
+  if (!judgement?.scope?.startsWith("影響を受けるのは、")) {
+    errors.push(`${scenarioId}: scope must identify the affected target`);
   }
-  if (!new Set(["s1", "s2", "s3", "s4"]).has(profile.severity)) {
-    errors.push(`judgement profile ${index + 1}: invalid severity "${profile.severity}"`);
-  }
-});
-
-const specificationSource = mainSource
-  .slice(
-    mainSource.indexOf("const scenarioSpecificationReferences = ["),
-    mainSource.indexOf("function getScenarioReportProcedure")
-  )
-  .replace("const scenarioSpecificationReferences", "var scenarioSpecificationReferences");
-const specificationContext = {};
-vm.runInNewContext(specificationSource, specificationContext, {
-  filename: "main.js#scenarioSpecificationReferences",
-});
-const specificationReferences = specificationContext.scenarioSpecificationReferences || [];
-
-allSubjects.forEach((subject) => {
-  const matches = specificationReferences.filter(([pattern]) => pattern.test(subject));
-  if (matches.length !== 1) {
-    errors.push(`${subject}: expected one specification reference, found ${matches.length}`);
-  }
-});
-
-specificationReferences.forEach(([, reference], index) => {
-  if (!/Rev\.[^「]+「[^」]+」/.test(reference)) {
-    errors.push(`specification reference ${index + 1}: document revision and section are required`);
+  if (!/Rev\.[^「]+「[^」]+」/.test(profile.specificationReference || "")) {
+    errors.push(`${scenarioId}: specification reference must include revision and section`);
   }
 });
 
@@ -765,100 +792,36 @@ allScenarioRefs.forEach(({ projectId, subject }) => {
   }
 });
 
-const procedureSource = mainSource
-  .slice(
-    mainSource.indexOf("const projectReportPreconditions = {"),
-    mainSource.indexOf("function createProjectScenario")
-  )
-  .replace("const projectReportPreconditions", "var projectReportPreconditions")
-  .replace("const scenarioReportOperations", "var scenarioReportOperations")
-  .replace("const scenarioReportRemarks", "var scenarioReportRemarks");
-const procedureContext = {};
-vm.runInNewContext(procedureSource, procedureContext, { filename: "main.js#scenarioReportOperations" });
-const procedureOperations = procedureContext.scenarioReportOperations || [];
-const reportRemarks = procedureContext.scenarioReportRemarks || [];
-const generatedAndExternalSubjects = [
-  ...generatedSubjects,
-  ...(Array.isArray(scenarios) ? scenarios.map((scenario) => scenario.subject) : []),
-];
-
-generatedAndExternalSubjects.forEach((subject) => {
-  const matches = procedureOperations.filter(([pattern]) => pattern.test(subject));
-  if (matches.length !== 1) {
-    errors.push(`${subject}: expected one report procedure, found ${matches.length}`);
-  }
-  const remarkMatches = reportRemarks.filter(([pattern]) => pattern.test(subject));
-  if (remarkMatches.length !== 1) {
-    errors.push(`${subject}: expected one report remark, found ${remarkMatches.length}`);
-  }
-});
-
-procedureOperations.forEach((operationConfig, index) => {
-  const configuredSteps = Array.isArray(operationConfig[1])
-    ? operationConfig[1]
-    : [[operationConfig[1], operationConfig[2]]];
-  if (configuredSteps.length < 1 || configuredSteps.length > 4) {
-    errors.push(`report procedure ${index + 1}: expected 1 to 4 operation steps`);
-  }
-  configuredSteps.forEach(([text, answer], stepIndex) => {
-    if (typeof text !== "string" || text.trim() === "") {
-      errors.push(`report procedure ${index + 1}, step ${stepIndex + 1}: text is required`);
+let reportProcedureCount = 0;
+let reportRemarkCount = 0;
+Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
+  const report = profile.scenario.report || [];
+  let currentSection = "";
+  report.forEach((entry) => {
+    if (entry.kind === "section") {
+      currentSection = entry.text;
+      return;
     }
-    if (typeof answer !== "string" || answer.trim() === "") {
-      errors.push(`report procedure ${index + 1}, step ${stepIndex + 1}: answer is required`);
+    if (entry.kind !== "line") {
+      return;
     }
-    if (text.length > 30) {
-      errors.push(`report procedure ${index + 1}, step ${stepIndex + 1}: split operation text longer than 30 characters`);
+    if (!entry.text || !Array.isArray(entry.answers) || entry.answers.length < 1) {
+      errors.push(`${scenarioId}: every reference-answer line needs text and typing answers`);
+    }
+    if (currentSection === "■操作手順") {
+      reportProcedureCount += 1;
+      if (!/^\d+\. /.test(entry.text)) {
+        errors.push(`${scenarioId}: operation steps must be numbered`);
+      }
+    }
+    if (currentSection === "■備考") {
+      reportRemarkCount += 1;
+      if (entry.trainingRole !== "remark") {
+        errors.push(`${scenarioId}: remarks must keep the training role`);
+      }
     }
   });
 });
-
-reportRemarks.forEach(([, text, answer], index) => {
-  if (typeof text !== "string" || text.trim() === "") {
-    errors.push(`report remark ${index + 1}: text is required`);
-  }
-  if (!text.endsWith("ことを確認")) {
-    errors.push(`report remark ${index + 1}: text must state that the fact was confirmed`);
-  }
-  if (typeof answer !== "string" || answer.trim() === "") {
-    errors.push(`report remark ${index + 1}: answer is required`);
-  }
-});
-
-const manualRemarkSectionCount = [...mainSource.matchAll(/text:\s*"■備考"/g)].length - 1;
-if (manualRemarkSectionCount !== initialSubjects.length) {
-  errors.push(`expected ${initialSubjects.length} manual report remarks, found ${manualRemarkSectionCount}`);
-}
-
-const manualRemarkTexts = [
-  ...mainSource.matchAll(/trainingRole:\s*"remark",\s*text:\s*"([^"]+)"/g),
-].map((match) => match[1]);
-if (
-  manualRemarkTexts.length !== initialSubjects.length
-  || manualRemarkTexts.some((text) => !text.endsWith("ことを確認"))
-) {
-  errors.push("every manual report remark must state that the fact was confirmed");
-}
-
-const sectionsAfterExpected = [
-  ...mainSource.matchAll(/text:\s*"■期待結果"[\s\S]*?text:\s*"■([^"]+)"/g),
-].map((match) => match[1]);
-if (
-  sectionsAfterExpected.length !== initialSubjects.length + 1
-  || sectionsAfterExpected.some((sectionName) => sectionName !== "実際の動作")
-) {
-  errors.push("every report must place the actual result immediately after the expected result");
-}
-
-const sectionsAfterActual = [
-  ...mainSource.matchAll(/text:\s*"■実際の動作"[\s\S]*?text:\s*"■([^"]+)"/g),
-].map((match) => match[1]);
-if (
-  sectionsAfterActual.length !== initialSubjects.length + 1
-  || sectionsAfterActual.some((sectionName) => sectionName !== "備考")
-) {
-  errors.push("every report must place remarks immediately after the actual result");
-}
 
 if (/pa-sennto|pa-sento/.test(`${source}\n${mainSource}`)) {
   errors.push("type percentage signs as % instead of spelling out percent in typing answers");
@@ -948,6 +911,8 @@ try {
     querySelector() { return null; },
     closest() { return null; },
     setAttribute() {},
+    removeAttribute() {},
+    toggleAttribute() {},
     focus() {},
     getBoundingClientRect() {
       return { width: 1000, height: 240, top: 0, left: 0, right: 1000 };
@@ -963,7 +928,12 @@ try {
     },
     querySelectorAll() { return []; },
   };
-  const storage = { getItem() { return null; }, setItem() {} };
+  const storageValues = new Map();
+  const storage = {
+    getItem(key) { return storageValues.has(key) ? storageValues.get(key) : null; },
+    setItem(key, value) { storageValues.set(key, String(value)); },
+    removeItem(key) { storageValues.delete(key); },
+  };
   const smokeWindow = {
     localStorage: storage,
     sessionStorage: storage,
@@ -989,8 +959,13 @@ try {
     RegExp,
     JSON,
     Intl,
+    setInterval: smokeWindow.setInterval,
+    clearInterval: smokeWindow.clearInterval,
+    setTimeout: smokeWindow.setTimeout,
+    clearTimeout: smokeWindow.clearTimeout,
   };
   vm.createContext(smokeContext);
+  vm.runInContext(authoringSource, smokeContext, { filename: "scenario-authoring-library.js" });
   vm.runInContext(source, smokeContext, { filename: "scenario-library.js" });
   vm.runInContext(briefingSource, smokeContext, { filename: "scenario-briefing-library.js" });
   vm.runInContext(evidenceSource, smokeContext, { filename: "evidence-library.js" });
@@ -1057,10 +1032,98 @@ try {
           summary: file.summary,
           required: evidenceProfile.requiredIds.includes(file.id),
         })),
+        reviewGuide: window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[
+          rawScenario.scenarioId
+        ]?.reviewGuide || null,
       };
     })`,
     smokeContext
   );
+  const scenarioAuthoringRegistry = vm.runInContext(
+    `Object.fromEntries(scenarioBank.map((rawScenario) => {
+      const briefing = window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS[rawScenario.scenarioId];
+      const existingProfile = window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[
+        rawScenario.scenarioId
+      ];
+      const baseReviewSource = existingProfile?.reviewSource || {
+        schemaVersion: "scenario-review-source.v1",
+        sourceType: "scenario-observations",
+        testTarget: briefing.testTarget,
+        environment: briefing.environment || rawScenario.environment.map((item) => item.text),
+        observations: briefing.notes.map((text, index) => ({
+          id: "observation-" + (index + 1),
+          role: index === 0 ? "primary-observation" : index === 1 ? "comparison-check" : "specification-and-context",
+          text,
+        })),
+        specificationReference: getScenarioSpecificationReference(rawScenario),
+      };
+      const primarySentences = baseReviewSource.observations[0].text.split("。").filter(Boolean);
+      const comparisonSentences = baseReviewSource.observations[1].text.split("。").filter(Boolean);
+      const reproductionSentences = comparisonSentences.filter((text) => /[0-9０-９]+回|[0-9０-９]+\\\/[0-9０-９]+|再現|いずれも/.test(text));
+      const boundarySentences = comparisonSentences.filter((text) => !reproductionSentences.includes(text));
+      const generatedAlternativeAnswer = {
+        subject: baseReviewSource.observations[0].text.replaceAll("。", "、").replace(/、$/, ""),
+        sections: {
+          detail: baseReviewSource.observations[0].text,
+          preconditions: "確認環境：" + baseReviewSource.environment.join("、"),
+          steps: primarySentences.slice(0, -1).join("。") || primarySentences[0],
+          expected: baseReviewSource.specificationReference + "\\n" + baseReviewSource.observations[2].text,
+          actual: primarySentences.at(-1),
+          remarks: (boundarySentences.length ? boundarySentences : comparisonSentences).join("。") + "。",
+          reproducibility: (reproductionSentences.length ? reproductionSentences : comparisonSentences).join("。") + "。",
+        },
+      };
+      const mobileRotationAlternative = {
+        subject: "問い合わせフォームの未送信文が端末の横向き切替で消失する",
+        sections: {
+          detail: "App 3.4.0 (34018)／Android 15／Pixel 9で、問い合わせフォームへ約120文字を入力して端末を横向きにすると、入力欄が空になりました。",
+          preconditions: "Pixel 9へApp 3.4.0 (34018)をインストールし、問い合わせフォームを開いていること",
+          steps: "1. 問い合わせフォームへ送信前の文章を約120文字入力する\\n2. 端末を縦向きから横向きへ回転する",
+          expected: "画面が再構成されても、未送信の入力内容が保持されること",
+          actual: "回転直後に約120文字の入力内容が消失し、入力欄が空になる",
+          remarks: "縦向きのまま送信する操作と保存済み内容の表示は正常です。文字サイズを標準に変更しても再現しました。",
+          reproducibility: "3/3",
+        },
+      };
+      const reviewSource = {
+        ...baseReviewSource,
+        alternativeExcellentAnswer: existingProfile?.reviewSource?.alternativeExcellentAnswer
+          || (rawScenario.scenarioId === "mobile-rotation-clears-input"
+            ? mobileRotationAlternative
+            : generatedAlternativeAnswer),
+      };
+      const reviewGuide = {
+        sourceBoundary: "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        strengthCriteria: [
+          "観測記録『" + reviewSource.observations[0].text + "』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『" + reviewSource.observations[1].text + "』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『" + reviewSource.observations[2].text + "』について、期待動作と確認済み事実を推測から分けているか評価する",
+        ],
+        nonScoringInvestigationIdeas: existingProfile?.reviewGuide?.nonScoringInvestigationIdeas || [],
+        disallowedGenericPraise: existingProfile?.reviewGuide?.disallowedGenericPraise || [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている",
+        ],
+      };
+      return [rawScenario.scenarioId, {
+        schemaVersion: "scenario-authoring.v2",
+        scenario: rawScenario,
+        briefing,
+        specificationReference: getScenarioSpecificationReference(rawScenario),
+        judgement: getScenarioJudgementProfile(rawScenario),
+        reviewSource,
+        reviewGuide,
+      }];
+    }))`,
+    smokeContext
+  );
+  scoringRubricSeeds.forEach((seed) => {
+    const authoringProfile = scenarioAuthoringRegistry[seed.scenarioId];
+    seed.reviewSource = authoringProfile.reviewSource;
+    seed.reviewGuide = authoringProfile.reviewGuide;
+  });
   const sectionDefinitions = [
     ["detail", "■詳細", "critical"],
     ["preconditions", "■前提条件", "supporting"],
@@ -1087,6 +1150,16 @@ try {
       severity: "major",
     },
   ];
+  const factAssessmentPolicy = {
+    semanticEquivalence: true,
+    sourceMaterialRule: "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+    sectionFlexibilityRule: "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+    standardOperationDetailRule: "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+    unsupportedAdditionRule: "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+    trackingIdentifierRule: "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+    measuredValueRule: "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+    evidenceRule: "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+  };
   const scoringRubricRegistry = {
     schemaVersion: "scenario-rubric-registry.v1",
     dimensions: pilotRubric.dimensions,
@@ -1101,28 +1174,66 @@ try {
       const generatedRequiredFacts = {
         subject: [{
           id: "subject-main",
-          description: seed.subject,
+          description: "題名だけで対象機能と主要な異常を特定できる",
           importance: "critical",
+          sourceRefs: ["observation-1"],
         }],
-        ...Object.fromEntries(sectionDefinitions
-          .map(([key, sectionTitle, importance]) => [
-            key,
-            (seed.sections[sectionTitle] || []).map((description, index) => ({
-              id: `${key}-${index + 1}`,
-              description,
-              importance,
-            })),
-          ])
-          .filter(([, facts]) => facts.length > 0)),
+        detail: [{
+          id: "detail-observation",
+          description: "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+          importance: "critical",
+          sourceRefs: ["observation-1"],
+        }],
+        steps: [{
+          id: "steps-reproducible",
+          description: "第三者が主要事象を再現できる操作の流れを示す",
+          importance: "important",
+          sourceRefs: ["observation-1"],
+        }],
+        expected: [{
+          id: "expected-from-specification",
+          description: "提示された仕様または期待動作を、観測結果と分けて説明する",
+          importance: "critical",
+          sourceRefs: ["observation-3"],
+        }],
+        actual: [{
+          id: "actual-observed-result",
+          description: "実際に観測した結果を、原因の推測を交えず説明する",
+          importance: "critical",
+          sourceRefs: ["observation-1"],
+        }],
+        reproducibility: [{
+          id: "reproducibility-observed",
+          description: "実施済みの再現確認回数と結果を説明する",
+          importance: "important",
+          sourceRefs: ["observation-2"],
+        }],
+        boundary: [{
+          id: "boundary-confirmed-comparison",
+          description: "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+          importance: "important",
+          sourceRefs: ["observation-2"],
+        }],
       };
       const isPilot = seed.scenarioId === pilotRubric.scenarioId;
+      const {
+        alternativeExcellentAnswer: _alternativeExcellentAnswer,
+        ...reviewSourceForScoring
+      } = seed.reviewSource;
       return [seed.scenarioId, {
         scenarioId: seed.scenarioId,
         projectId: seed.projectId,
         rubricVersion: isPilot
-          ? "customer-save-multiple-clicks-duplicate.v3"
-          : `${seed.scenarioId}.v1`,
-        requiredFacts: isPilot ? pilotRubric.requiredFacts : generatedRequiredFacts,
+          ? "customer-save-multiple-clicks-duplicate.v5"
+          : seed.scenarioId === "mobile-background-sync-data-lost"
+            ? "mobile-background-sync-data-lost.v4"
+            : seed.scenarioId === "mobile-notification-opens-wrong-news"
+              ? "mobile-notification-opens-wrong-news.v4"
+            : `${seed.scenarioId}.v3`,
+        reviewSource: reviewSourceForScoring,
+        requiredFacts: generatedRequiredFacts,
+        factAssessmentPolicy,
+        reviewGuide: seed.reviewGuide,
         forbiddenClaims: isPilot
           ? [...pilotRubric.forbiddenClaims, ...genericForbiddenClaims]
           : genericForbiddenClaims,
@@ -1138,14 +1249,18 @@ try {
             : { mode: "days-after-attempt", offsetDays: dueDateOffsetDays },
         },
         evidenceFiles: seed.evidenceFiles,
-        referenceAnswer: {
+        writingExample: {
           subject: seed.subject,
           sections: Object.fromEntries(sectionDefinitions
             .map(([key, sectionTitle]) => [key, (seed.sections[sectionTitle] || []).join("\n")])
             .filter(([, value]) => value)),
         },
         rubricNotes: [
-          "参考回答との表現一致は要求しない",
+          "記載例は正解ではなく、採点時の事実源にも使用しない",
+          "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+          "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+          "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+          "追跡用の固有IDは本文、備考、選択済み証跡のいずれかから対象を追跡できればよい",
           "原因の仮説と確認済み事実を区別する",
           "事実誤認は文章の拙さより重く扱う",
           "同じ事実を複数セクションへ重複記載しても加点しない",
@@ -1157,8 +1272,11 @@ try {
   const scoringFixtureRegistry = {
     schemaVersion: "scenario-scoring-fixtures.v1",
     scenarios: Object.fromEntries(Object.values(scoringRubricRegistry.scenarios).map((rubric) => {
-      const referenceSections = rubric.referenceAnswer.sections;
-      const sectionEntries = Object.entries(referenceSections);
+      const exampleSections = rubric.writingExample.sections;
+      const sectionEntries = Object.entries(exampleSections);
+      const alternativeAnswer = scenarioAuthoringRegistry[
+        rubric.scenarioId
+      ].reviewSource.alternativeExcellentAnswer;
       const criticalFactIds = Object.values(rubric.requiredFacts)
         .flat()
         .filter((fact) => fact.importance === "critical")
@@ -1172,16 +1290,22 @@ try {
         rubricVersion: rubric.rubricVersion,
         fixtures: [
           {
-            fixtureId: "excellent",
-            label: "見本と同等の必要情報がそろった回答",
-            answer: rubric.referenceAnswer,
+            fixtureId: "example-complete",
+            label: "記載例に必要情報がそろっている回答",
+            answer: rubric.writingExample,
+            expected: { scoreMin: 85, scoreMax: 100, missingFactIds: [], forbiddenClaimIds: [] },
+          },
+          {
+            fixtureId: "alternative-excellent",
+            label: "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+            answer: alternativeAnswer,
             expected: { scoreMin: 85, scoreMax: 100, missingFactIds: [], forbiddenClaimIds: [] },
           },
           {
             fixtureId: "missing-critical-facts",
             label: "現象だけを記載し重要な条件と結果が不足した回答",
             answer: {
-              subject: rubric.referenceAnswer.subject,
+              subject: rubric.writingExample.subject,
               sections: {},
             },
             expected: {
@@ -1195,10 +1319,10 @@ try {
             fixtureId: "unsupported-root-cause",
             label: "未確認の実装原因を断定した回答",
             answer: {
-              subject: `実装不備により${rubric.referenceAnswer.subject}`,
+              subject: `実装不備により${rubric.writingExample.subject}`,
               sections: {
-                ...referenceSections,
-                detail: `${referenceSections.detail || "現象を確認しました。"}\n原因は実装不備であることを確認しました。`,
+                ...exampleSections,
+                detail: `${exampleSections.detail || "現象を確認しました。"}\n原因は実装不備であることを確認しました。`,
               },
             },
             expected: {
@@ -1211,14 +1335,14 @@ try {
           {
             fixtureId: "misplaced-sections",
             label: "必要情報はあるが記載場所が入れ替わった回答",
-            answer: { subject: rubric.referenceAnswer.subject, sections: rotatedSections },
+            answer: { subject: rubric.writingExample.subject, sections: rotatedSections },
             expected: { scoreMin: 0, scoreMax: 75, missingFactIds: [], forbiddenClaimIds: [] },
           },
           {
             fixtureId: "verbose",
             label: "必要情報はあるが重複表現が多い回答",
             answer: {
-              subject: rubric.referenceAnswer.subject,
+              subject: rubric.writingExample.subject,
               sections: Object.fromEntries(sectionEntries.map(([key, value]) => [
                 key,
                 `${value}\n上記について継続して確認が必要です。`,
@@ -1244,12 +1368,25 @@ try {
   Object.values(scoringRubricRegistry.scenarios).forEach((rubric) => {
     const facts = Object.values(rubric.requiredFacts).flat();
     const factIds = new Set(facts.map((fact) => fact.id));
+    const reviewSourceIds = new Set(
+      (rubric.reviewSource?.observations || []).map((observation) => observation.id)
+    );
     const requiredEvidenceIds = rubric.evidenceFiles
       .filter((file) => file.required)
       .map((file) => file.id);
     if (
       facts.length < 7
       || factIds.size !== facts.length
+      || reviewSourceIds.size < 3
+      || Object.hasOwn(rubric.reviewSource || {}, "alternativeExcellentAnswer")
+      || facts.some((fact) => !Array.isArray(fact.sourceRefs)
+        || fact.sourceRefs.some((sourceRef) => !reviewSourceIds.has(sourceRef)))
+      || rubric.factAssessmentPolicy?.semanticEquivalence !== true
+      || !rubric.factAssessmentPolicy?.sourceMaterialRule
+      || !rubric.factAssessmentPolicy?.sectionFlexibilityRule
+      || !rubric.factAssessmentPolicy?.standardOperationDetailRule
+      || !rubric.factAssessmentPolicy?.unsupportedAdditionRule
+      || !rubric.writingExample?.subject
       || requiredEvidenceIds.length < 2
       || !rubric.expectedTicketFields.severity
       || !rubric.expectedTicketFields.priority
@@ -1271,11 +1408,12 @@ try {
       const rubric = scoringRubricRegistry.scenarios[scenarioId];
       return !rubric
         || fixtureSet.rubricVersion !== rubric.rubricVersion
-        || fixtureSet.fixtures.length !== 5
-        || new Set(fixtureSet.fixtures.map(({ fixtureId }) => fixtureId)).size !== 5;
+        || fixtureSet.fixtures.length !== 6
+        || new Set(fixtureSet.fixtures.map(({ fixtureId }) => fixtureId)).size !== 6
+        || !fixtureSet.fixtures.some(({ fixtureId }) => fixtureId === "alternative-excellent");
     })
   ) {
-    errors.push("scoring fixture registry must contain five fixtures for all 27 rubrics");
+    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 27 rubrics");
   }
   fixtureScenarioIds.forEach((scenarioId) => {
     const rubric = scoringRubricRegistry.scenarios[scenarioId];
@@ -1285,6 +1423,14 @@ try {
     const validClaimIds = new Set(
       (rubric?.forbiddenClaims || []).map((claim) => claim.id)
     );
+    const alternativeFixture = scoringFixtureRegistry.scenarios[scenarioId].fixtures
+      .find(({ fixtureId }) => fixtureId === "alternative-excellent");
+    if (
+      !alternativeFixture
+      || JSON.stringify(alternativeFixture.answer) === JSON.stringify(rubric.writingExample)
+    ) {
+      errors.push(`${scenarioId}: alternative excellent fixture must differ from the writing example`);
+    }
     scoringFixtureRegistry.scenarios[scenarioId].fixtures.forEach((fixture) => {
       if (
         fixture.expected.scoreMin < 0
@@ -1314,6 +1460,12 @@ try {
     fs.writeFileSync(
       "scoring/fixtures/scenario-fixtures.json",
       `${JSON.stringify(scoringFixtureRegistry, null, 2)}\n`
+    );
+  }
+  if (process.argv.includes("--write-authoring-library")) {
+    fs.writeFileSync(
+      "scenario-authoring-library.js",
+      `(() => {\n  // 問題文・記載例・観測事実・AIレビュー方針の単一ソース。生成済みrubricは直接編集しない。\n  const scenarios = ${JSON.stringify(scenarioAuthoringRegistry, null, 2)};\n\n  window.TYPING_WORKBENCH_SCENARIO_AUTHORING = Object.freeze(scenarios);\n})();\n`
     );
   }
   workMemos.forEach(({ scenarioId, workMemo, targetIntro, requiredFragments, inferenceFragments }) => {
@@ -1351,10 +1503,12 @@ try {
     "未送信データ同期のテスト中に確認した内容です",
     "アプリをバックグラウンドへ移さない運用",
     "この対応を行うきっかけとなった現象",
-    "作成した3件が一覧から消失していました",
-    "同一条件で25回検証を行ったところ",
-    "消失した3件は端末側にも残っていません",
-    "未送信データを端末の永続領域に保存し",
+    "3件すべてが一覧から消失しました",
+    "メモリ解放なしでは0/25",
+    "Android 15／Pixel 9では0/25",
+    "デグレとはまだ断定していません",
+    "復帰後の端末内キューは0件でした",
+    "未送信データは永続領域へ保存し",
   ].forEach((phrase) => {
     if (!backgroundSyncMemo.includes(phrase)) {
       errors.push(`background-sync work memo must include natural QA wording: ${phrase}`);
@@ -1553,6 +1707,8 @@ try {
         ),
         scoringPreviewRendered:
           elements.practiceScoringPreviewTotal.textContent === "77" &&
+          elements.practiceScoringVerdict.textContent === "追加確認を推奨" &&
+          elements.practiceScoringVerdictDescription.textContent.includes("追加確認") &&
           elements.practiceRadarFactual.textContent === "78" &&
           elements.practiceScoringReaderQuestions.innerHTML.includes("保存API") &&
           elements.practiceScoringAmbiguityRisks.innerHTML.includes("DBの排他制御"),
@@ -1588,6 +1744,108 @@ try {
     errors.push(
       `runtime smoke test expected practice authoring to render, complete, and compare answers: ${JSON.stringify(
         practiceAuthoringPrototype
+      )}`
+    );
+  }
+  const practiceDraftRoundTrip = vm.runInContext(
+    `(() => {
+      const previous = {
+        authStatus: state.authStatus,
+        authoringMode: state.authoringMode,
+        projectId: state.projectId,
+        scenario: state.scenario,
+      };
+      const target = scenarioBank.find((scenario) =>
+        scenario.scenarioId === "customer-save-multiple-clicks-duplicate"
+      );
+      state.authStatus = "signed_in";
+      state.authoringMode = "practice";
+      state.projectId = target.projectId;
+      state.scenario = buildScenario(target);
+      resetSession();
+      activateCreateSession();
+      state.practiceSubject = "途中保存した利用者の題名";
+      const groups = getPracticeSectionGroups().filter(
+        (group) => group.referenceLines.length > 0
+      );
+      groups.forEach((group, index) => {
+        state.practiceSections[group.key] = "利用者が入力した本文" + (index + 1);
+      });
+      elements.prioritySelect.value = "high";
+      elements.environmentSelect.value = "Chrome 139 / macOS 15.6";
+      const evidenceId = getCurrentEvidenceProfile().files[0].id;
+      state.selectedEvidenceIds = [evidenceId];
+      const savedWhileWriting = saveCurrentPracticeDraft();
+      state.practiceSubject = "消去対象";
+      state.practiceSections = {};
+      state.selectedEvidenceIds = [];
+      const resumedWhileWriting = resumePracticeDraft(
+        getLatestPracticeDraft(target.projectId)
+      );
+      const writingState = {
+        savedWhileWriting,
+        resumedWhileWriting,
+        subject: state.practiceSubject,
+        sectionCount: Object.keys(state.practiceSections).length,
+        expectedSectionCount: groups.length,
+        priority: elements.prioritySelect.value,
+        evidenceRestored: state.selectedEvidenceIds.includes(evidenceId),
+        privateValue: getSelectedTicketFields().private,
+        running: state.running,
+        awaitingCreate: state.awaitingCreate,
+        scoringStatus: state.practiceScoringStatus,
+        attemptSaved: state.currentAttemptSaved,
+      };
+      state.practiceWritingComplete = true;
+      state.running = false;
+      state.awaitingCreate = true;
+      const savedAfterWriting = saveCurrentPracticeDraft();
+      resetSession();
+      const resumedAfterWriting = resumePracticeDraft(
+        getLatestPracticeDraft(target.projectId)
+      );
+      const completedState = {
+        savedAfterWriting,
+        resumedAfterWriting,
+        writingComplete: state.practiceWritingComplete,
+        running: state.running,
+        awaitingCreate: state.awaitingCreate,
+      };
+      deletePracticeDraft(target.scenarioId);
+      const removedAfterFinalSave = !getLatestPracticeDraft(target.projectId) &&
+        !JSON.parse(window.localStorage.getItem(practiceDraftStorageKey)).drafts[target.scenarioId];
+      state.authStatus = previous.authStatus;
+      state.authoringMode = previous.authoringMode;
+      state.projectId = previous.projectId;
+      state.scenario = previous.scenario;
+      resetSession();
+      return { writingState, completedState, removedAfterFinalSave };
+    })()`,
+    smokeContext
+  );
+  if (
+    !practiceDraftRoundTrip.writingState.savedWhileWriting ||
+    !practiceDraftRoundTrip.writingState.resumedWhileWriting ||
+    practiceDraftRoundTrip.writingState.subject !== "途中保存した利用者の題名" ||
+    practiceDraftRoundTrip.writingState.sectionCount !==
+      practiceDraftRoundTrip.writingState.expectedSectionCount ||
+    practiceDraftRoundTrip.writingState.priority !== "high" ||
+    !practiceDraftRoundTrip.writingState.evidenceRestored ||
+    practiceDraftRoundTrip.writingState.privateValue !== false ||
+    !practiceDraftRoundTrip.writingState.running ||
+    practiceDraftRoundTrip.writingState.awaitingCreate ||
+    practiceDraftRoundTrip.writingState.scoringStatus !== "idle" ||
+    practiceDraftRoundTrip.writingState.attemptSaved ||
+    !practiceDraftRoundTrip.completedState.savedAfterWriting ||
+    !practiceDraftRoundTrip.completedState.resumedAfterWriting ||
+    !practiceDraftRoundTrip.completedState.writingComplete ||
+    practiceDraftRoundTrip.completedState.running ||
+    !practiceDraftRoundTrip.completedState.awaitingCreate ||
+    !practiceDraftRoundTrip.removedAfterFinalSave
+  ) {
+    errors.push(
+      `practice drafts must save and resume locally without creating or reviewing a ticket: ${JSON.stringify(
+        practiceDraftRoundTrip
       )}`
     );
   }
@@ -2119,6 +2377,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated runtime startup, ${scenarios.length} external scenarios, ${uniqueScenarioIds.length} QA work memos and test targets, ${judgementProfiles.length} judgement profiles, ${specificationReferences.length} specification references, ${allSubjects.length} categories, assignments, and environment selections, ${allSubjects.length} schedules, ${procedureOperations.length} report procedures, ${reportRemarks.length + manualRemarkSectionCount} report remarks, and typing score bounds across ${projectIds.length} projects.`
+    `Validated ${scenarios.length} unified scenarios, ${uniqueScenarioIds.length} QA work memos and test targets, ${judgementProfiles.length} judgement profiles, ${specificationReferences.length} specification references, ${allSubjects.length} categories, assignments, and environment selections, ${allSubjects.length} schedules, ${reportProcedureCount} report steps, ${reportRemarkCount} report remarks, and typing score bounds across ${projectIds.length} projects.`
   );
 }

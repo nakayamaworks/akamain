@@ -12,11 +12,11 @@ const rubricRegistry = JSON.parse(fs.readFileSync(rubricRegistryPath, "utf8"));
 
 export const DEFAULT_SCENARIO_ID = "customer-save-multiple-clicks-duplicate";
 export const SUPPORTED_SCENARIO_IDS = Object.freeze(Object.keys(rubricRegistry.scenarios));
-export const PROMPT_VERSION = "practice-review.v3";
+export const PROMPT_VERSION = "practice-review.v7";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const verdicts = ["開発着手可能", "追加確認を推奨", "再整理を推奨"];
-const questionClassifications = ["不足情報", "調査提案"];
+const questionClassifications = ["不足情報", "記述確認", "調査提案"];
 const factAssessmentStatuses = ["present", "missing", "contradicted"];
 
 export function getScenarioRubric(scenarioId) {
@@ -71,7 +71,7 @@ export function buildModelOutputSchema(rubric) {
     },
     readerQuestions: {
       type: "array",
-      minItems: 2,
+      minItems: 0,
       maxItems: 4,
       items: {
         type: "object",
@@ -99,7 +99,7 @@ export function buildModelOutputSchema(rubric) {
     },
     investigationAdvice: {
       type: "array",
-      minItems: 2,
+      minItems: 1,
       maxItems: 4,
       items: {
         type: "object",
@@ -125,7 +125,17 @@ export function buildModelOutputSchema(rubric) {
     },
     strengths: {
       type: "array",
-      items: { type: "string" },
+      minItems: 0,
+      maxItems: 3,
+      items: {
+        type: "object",
+        required: ["evidenceQuote", "evaluation", "whyItHelps"],
+        properties: {
+          evidenceQuote: { type: "string" },
+          evaluation: { type: "string" },
+          whyItHelps: { type: "string" },
+        },
+      },
     },
     factAssessments: {
       type: "array",
@@ -305,22 +315,39 @@ export function buildScoringPrompt(attempt) {
     error.code = "SCENARIO_NOT_SUPPORTED";
     throw error;
   }
-  const { referenceAnswer: _referenceAnswer, ...scoringRubric } = rubric;
+  const {
+    referenceAnswer: _legacyReferenceAnswer,
+    writingExample: _writingExample,
+    ...scoringRubric
+  } = rubric;
   return [
     "あなたは、不具合票を受け取って調査を始めるシニア開発者兼QAリードです。",
-    "参考回答との文面一致ではなく、採点基準と入力材料に照らして評価してください。",
+    "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、提示された観測記録、仕様、証跡と受講者の起票内容に照らして評価してください。",
+    "記載例と異なる表現や構成でも、事実に根差し、読み手が調査を始めやすい内容なら同等以上に評価してください。記載例より有効な比較確認や切り分けが含まれる場合は積極的に評価してください。",
     "点数だけでなく、実際の読み手が疑問に思うこと、誤解される表現、有効な切り分けを具体的に助言してください。",
     "回答にない事実を断定してはいけません。確認できない原因や影響を推測で補完しないでください。",
     "一般論だけの助言は禁止です。受講者の記述を引用し、この不具合に即して説明してください。",
     "確定した不足と、調査を進めるための追加提案を混同しないでください。",
-    "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用し、調査提案の場合はfactIdをnot-applicableにしてください。",
+    "reviewSourceが評価の事実源です。requiredFactsはreviewSourceのどの意味を読み手へ伝える必要があるかを示すもので、特定の文面や記載欄を指定する正解ではありません。語句、文順、セクション配置の一致を要求しないでください。",
+    "チーム内で既知と考えられる標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリック、コマンド、API実行方法など手順書レベルの詳細を不足扱いしないでください。第三者が主要な操作と順序を理解できれば十分です。",
+    "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、事実誤認や不足と即断しないでください。確認が必要ならclassificationを『記述確認』、factIdをnot-applicableとし、『実施済みの事実か、再現のために補った推測か』を尋ねてください。reviewSourceにない詳細そのものを教えるよう要求してはいけません。",
+    "追加記述がrequiredFactの意味を満たしている場合、reviewSourceと両立する限りfactAssessmentをcontradictedにしないでください。明確に両立しない場合だけcontradictedと判定してください。",
+    "提示された観測記録を説明するときは『実際の不具合は』と正解を断定せず、『提示された観測記録では』『今回の確認内容では』と表現してください。",
+    "通知ID、注文番号、患者ID、商品名などの追跡用識別子は、同一性や差異が説明され、選択済み証跡から対象を追跡できるなら、本文に具体値がなくても不足にしないでください。",
+    "金額、時刻、件数、再現回数、仕様閾値は一律に例示扱いせず、発生条件・期待値・実測結果を成立させる値かを判断してください。入力材料と異なる値の記載は矛盾として扱ってください。",
+    "添付証跡は追跡用識別子や証跡確認の事実を補完できますが、題名、主要な発生条件、期待結果、実際の動作そのものの記載を代替しません。",
+    "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用してください。記述確認または調査提案の場合はfactIdをnot-applicableにしてください。受講者へ提示されていない情報を答えさせる質問を、不足情報として生成してはいけません。",
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
-    "presentまたはcontradictedの場合は、受講者の回答から根拠となる短い文言をevidenceQuoteへ入れてください。missingの場合は空文字にしてください。",
+    "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
     "forbiddenClaimsに該当する断定がある場合だけ、そのIDをforbiddenClaimIdsへ入れてください。",
     "expectedTicketFieldsとevidenceFilesも情報充足・切り分け支援の評価に含めてください。requiredがtrueの証跡が必要な証跡です。",
-    "readerQuestionsとinvestigationAdviceはそれぞれ2〜4件を目安にしてください。",
+    "readerQuestionsは確定した不足がなければ0件で構いません。最大4件とし、件数を満たすための質問を作らないでください。",
+    "investigationAdviceは起票の不足とは分けて1〜4件示してください。",
     "文章が十分明確な場合は無理に欠点を作らず、調査開始後に読み手が確認したくなる点を調査提案として示してください。",
-    "rewriteSuggestionsは本当に改善効果がある場合だけ返してください。",
+    "rewriteSuggestionsは本当に改善効果がある場合だけ返してください。受講者の有効な表現を残した最小限の修正とし、記載例を丸ごと再現した文章へ置き換えないでください。",
+    "strengthsは0〜3件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
+    "フォームの構造上当然となる『期待結果と実際の動作が分かれている』『再現回数が数値で書かれている』『操作手順がある』『項目が埋まっている』だけをstrengthsとして評価してはいけません。再現性を評価する場合は、具体的な比較条件と結果から何を絞り込めるかまで述べてください。",
+    "採点基準にreviewGuideがある場合、strengthCriteriaは内容固有の着眼点として使い、disallowedGenericPraiseは単独の称賛として使用しないでください。nonScoringInvestigationIdeasは不足情報や減点理由ではなく、今後の調査提案としてのみ扱ってください。",
     "各評価軸は0〜100の整数で採点してください。",
     "",
     "採点基準:",
@@ -334,7 +361,45 @@ export function buildScoringPrompt(attempt) {
   ].join("\n");
 }
 
-export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID) {
+function removeTerminalPunctuation(value) {
+  return value.replace(/[。．.！!？?]+$/u, "");
+}
+
+function isGenericStructurePraise(evaluation, whyItHelps) {
+  const text = `${evaluation} ${whyItHelps}`;
+  return [
+    /期待(?:結果|する動作).{0,30}実際(?:の動作|結果).{0,40}(分け|分離|枠組み|構造)/u,
+    /再現(?:回数|性).{0,30}(数値|明記|記載)/u,
+    /操作手順.{0,30}(具体|記載|用意|ある)/u,
+    /(?:項目|フォーム).{0,30}(埋|分け|構造|形式)/u,
+    /形式面|枠組み/u,
+  ].some((pattern) => pattern.test(text));
+}
+
+function normalizedQuoteText(value) {
+  return String(value || "").normalize("NFKC").replace(/\s+/gu, "");
+}
+
+function createAttemptEvidenceChecker(attempt) {
+  if (!attempt) {
+    return () => true;
+  }
+  const answerText = normalizedQuoteText(JSON.stringify(attempt.answer || {}));
+  const selectedEvidenceIds = new Set(attempt.selectedEvidenceIds || []);
+  return (quote) => {
+    const normalizedQuote = normalizedQuoteText(quote);
+    if (!normalizedQuote) {
+      return false;
+    }
+    const evidenceMatch = /^添付証跡[:：](.+)$/u.exec(normalizedQuote);
+    if (evidenceMatch) {
+      return selectedEvidenceIds.has(evidenceMatch[1]);
+    }
+    return answerText.includes(normalizedQuote);
+  };
+}
+
+export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID, attempt = null) {
   if (!rawOutput || typeof rawOutput !== "object") {
     throw new Error("Gemini output must be an object");
   }
@@ -344,6 +409,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   }
   const validFactIds = new Set(getFactIds(rubric));
   const factIdValues = ["not-applicable", ...validFactIds];
+  const isGroundedQuote = createAttemptEvidenceChecker(attempt);
   const dimensions = Object.fromEntries(
     rubric.dimensions.map((dimension) => [
       dimension.id,
@@ -365,7 +431,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       if (classification === "不足情報" && factId === "not-applicable") {
         classification = "調査提案";
       }
-      if (classification === "調査提案" && factId !== "not-applicable") {
+      if (classification !== "不足情報" && factId !== "not-applicable") {
         factId = "not-applicable";
       }
       return {
@@ -384,7 +450,8 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       quote: requireNonEmptyString(item.quote, `ambiguityRisks[${index}].quote`),
       risk: requireNonEmptyString(item.risk, `ambiguityRisks[${index}].risk`),
       advice: requireNonEmptyString(item.advice, `ambiguityRisks[${index}].advice`),
-    }));
+    }))
+    .filter((item) => isGroundedQuote(item.quote));
   const investigationAdvice = requireArray(rawOutput.investigationAdvice, "investigationAdvice")
     .map((item, index) => ({
       action: requireNonEmptyString(item.action, `investigationAdvice[${index}].action`),
@@ -397,22 +464,24 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         || "（未記載）",
       suggested: requireNonEmptyString(item.suggested, `rewriteSuggestions[${index}].suggested`),
       reason: requireNonEmptyString(item.reason, `rewriteSuggestions[${index}].reason`),
-    }));
+    }))
+    .filter((item) => item.original === "（未記載）" || isGroundedQuote(item.original));
   const factAssessments = requireArray(rawOutput.factAssessments, "factAssessments")
-    .map((item, index) => ({
-      factId: requireEnum(item.factId, [...validFactIds], `factAssessments[${index}].factId`),
-      status: requireEnum(
+    .map((item, index) => {
+      const factId = requireEnum(item.factId, [...validFactIds], `factAssessments[${index}].factId`);
+      const status = requireEnum(
         item.status,
         factAssessmentStatuses,
         `factAssessments[${index}].status`
-      ),
-      evidenceQuote: item.status === "missing"
+      );
+      const evidenceQuote = status === "missing"
         ? ""
         : requireNonEmptyString(
             item.evidenceQuote,
             `factAssessments[${index}].evidenceQuote`
-          ),
-    }));
+          );
+      return { factId, status, evidenceQuote };
+    });
   const assessedFactIds = new Set(factAssessments.map(({ factId }) => factId));
   if (
     assessedFactIds.size !== factAssessments.length
@@ -441,7 +510,29 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     ambiguityRisks,
     investigationAdvice,
     rewriteSuggestions,
-    strengths: normalizeStringArray(rawOutput.strengths, "strengths"),
+    strengths: requireArray(rawOutput.strengths, "strengths").map((item, index) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        throw new Error(`strengths[${index}] must be an object`);
+      }
+      const evidenceQuote = requireNonEmptyString(
+        item.evidenceQuote,
+        `strengths[${index}].evidenceQuote`
+      );
+      const evaluation = requireNonEmptyString(
+        item.evaluation,
+        `strengths[${index}].evaluation`
+      );
+      const whyItHelps = requireNonEmptyString(
+        item.whyItHelps,
+        `strengths[${index}].whyItHelps`
+      );
+      return { evidenceQuote, evaluation, whyItHelps };
+    }).filter((item) =>
+      isGroundedQuote(item.evidenceQuote)
+      && !isGenericStructurePraise(item.evaluation, item.whyItHelps)
+    ).map(({ evidenceQuote, evaluation, whyItHelps }) =>
+      `「${evidenceQuote}」という記述から、${removeTerminalPunctuation(evaluation)}。${whyItHelps}`
+    ),
     factAssessments,
     forbiddenClaimIds,
   };
@@ -676,7 +767,7 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
   }
   let normalized;
   try {
-    normalized = normalizeModelOutput(modelOutput, attempt.scenarioId);
+    normalized = normalizeModelOutput(modelOutput, attempt.scenarioId, attempt);
   } catch (cause) {
     const error = new Error("Gemini returned an invalid scoring result", { cause });
     error.code = "INVALID_MODEL_OUTPUT";
