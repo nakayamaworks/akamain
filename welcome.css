@@ -439,7 +439,7 @@ a:focus-visible {
 }
 
 .learning-section {
-  width: min(680px, calc(100% - 48px));
+  width: min(820px, calc(100% - 48px));
   margin: 0 auto;
   padding: 82px 0;
   text-align: center;
