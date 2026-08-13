@@ -1387,6 +1387,8 @@ const elements = {
   ticketListBody: document.getElementById("ticketListBody"),
   ticketListAuthGate: document.getElementById("ticketListAuthGate"),
   ticketListStatus: document.getElementById("ticketListStatus"),
+  ticketListRetry: document.getElementById("ticketListRetry"),
+  ticketListRetryButton: document.getElementById("ticketListRetryButton"),
   ticketListContent: document.getElementById("ticketListContent"),
   ticketListMoreButton: document.getElementById("ticketListMoreButton"),
   qaStartButton: document.getElementById("qaStartButton"),
@@ -1575,6 +1577,7 @@ const state = {
   ticketListItems: [],
   ticketListNextCursor: null,
   ticketListRequestId: 0,
+  ticketListLoadingKey: "",
   ticketListStatus: "idle",
   ticketDetail: null,
   ticketDetailId: "",
@@ -1787,6 +1790,40 @@ function renderTicketListState() {
     setLoadingIndicator(elements.ticketListStatus, isLoading);
   }
   elements.ticketListMoreButton?.classList.toggle("hidden", !state.ticketListNextCursor);
+  elements.ticketListRetry?.classList.toggle(
+    "hidden",
+    !signedIn || state.ticketListStatus !== "error"
+  );
+}
+
+function waitForTicketListRetry(delayMs) {
+  return new Promise((resolve) => window.setTimeout(resolve, delayMs));
+}
+
+function isRetryableTicketListError(error) {
+  return !error?.code || new Set([
+    "TIMEOUT",
+    "HTTP_502",
+    "HTTP_503",
+    "HTTP_504",
+    "STORAGE_UNAVAILABLE",
+  ]).has(error.code);
+}
+
+async function requestTicketList(options) {
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      return await window.TYPING_WORKBENCH_PROFILE_API.getTickets(options);
+    } catch (error) {
+      lastError = error;
+      if (attempt === 1 || !isRetryableTicketListError(error)) {
+        throw error;
+      }
+      await waitForTicketListRetry(900);
+    }
+  }
+  throw lastError;
 }
 
 async function loadTicketList(options = {}) {
@@ -1797,12 +1834,21 @@ async function loadTicketList(options = {}) {
     return;
   }
   const append = Boolean(options.append);
+  const loadingKey = [
+    state.projectId,
+    state.ticketTypeFilter,
+    append ? state.ticketListNextCursor || "more" : "first",
+  ].join(":");
+  if (state.ticketListStatus === "loading" && state.ticketListLoadingKey === loadingKey) {
+    return;
+  }
   const requestId = state.ticketListRequestId + 1;
   state.ticketListRequestId = requestId;
+  state.ticketListLoadingKey = loadingKey;
   state.ticketListStatus = "loading";
   renderTicketListState();
   try {
-    const response = await window.TYPING_WORKBENCH_PROFILE_API.getTickets({
+    const response = await requestTicketList({
       projectId: state.projectId,
       tracker: state.ticketTypeFilter === "all" ? "" : state.ticketTypeFilter,
       limit: 20,
@@ -1822,6 +1868,10 @@ async function loadTicketList(options = {}) {
       return;
     }
     state.ticketListStatus = "error";
+  } finally {
+    if (state.ticketListRequestId === requestId) {
+      state.ticketListLoadingKey = "";
+    }
   }
   renderTicketListState();
 }
@@ -5838,6 +5888,7 @@ elements.ticketSortButtons.forEach((button) => on(button, "click", handleTicketS
 on(elements.applyTicketFiltersButton, "click", handleApplyTicketFilters);
 on(elements.clearTicketFiltersButton, "click", handleClearTicketFilters);
 on(elements.ticketListMoreButton, "click", () => loadTicketList({ append: true }));
+on(elements.ticketListRetryButton, "click", () => loadTicketList());
 elements.ticketTypeFilterButtons.forEach((button) => on(button, "click", handleTicketTypeFilter));
 on(elements.ticketDetailBackButton, "click", () => navigateToHash("#/tickets"));
 on(elements.ticketDetailContent, "click", handleTicketDetailAction);

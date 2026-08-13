@@ -238,6 +238,7 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
   "practiceReferenceAnswer",
   "practiceScoringPreviewSection",
   "practiceScoringMessage",
+  "ticketListRetryButton",
   "practiceScoringRetryButton",
   "practiceScoringResult",
   "practiceScoringPreviewTotal",

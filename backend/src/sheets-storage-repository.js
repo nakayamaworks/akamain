@@ -236,6 +236,9 @@ export class SheetsStorageRepository extends StorageRepository {
     this.clientPromise = null;
     this.initializationPromise = null;
     this.writeQueue = Promise.resolve();
+    this.userCache = new Map();
+    this.userUpsertPromises = new Map();
+    this.userCacheTtlMs = 5 * 60 * 1000;
   }
 
   async initialize() {
@@ -250,7 +253,19 @@ export class SheetsStorageRepository extends StorageRepository {
   }
 
   async upsertUser(profile) {
-    return this.withWriteLock(async () => {
+    const cached = this.userCache.get(profile.userId);
+    const profileMatches = cached
+      && cached.user.displayName === (profile.displayName || "Googleユーザー")
+      && cached.user.email === (profile.email || null)
+      && cached.user.emailVerified === Boolean(profile.emailVerified);
+    if (profileMatches && Date.now() - cached.cachedAt < this.userCacheTtlMs) {
+      return cached.user;
+    }
+    const pending = this.userUpsertPromises.get(profile.userId);
+    if (pending) {
+      return pending;
+    }
+    const operation = this.withWriteLock(async () => {
       await this.initialize();
       const rows = await this.readDataRows("Users");
       const index = rows.findIndex((row) => row[1] === profile.userId);
@@ -277,6 +292,14 @@ export class SheetsStorageRepository extends StorageRepository {
       }
       return user;
     });
+    this.userUpsertPromises.set(profile.userId, operation);
+    try {
+      const user = await operation;
+      this.userCache.set(profile.userId, { user, cachedAt: Date.now() });
+      return user;
+    } finally {
+      this.userUpsertPromises.delete(profile.userId);
+    }
   }
 
   async getUser(userId) {
@@ -308,6 +331,7 @@ export class SheetsStorageRepository extends StorageRepository {
         updatedAt: this.now(),
       };
       await this.updateRow("Users", index + 2, userToRow(user));
+      this.userCache.set(userId, { user, cachedAt: Date.now() });
       return user;
     });
   }

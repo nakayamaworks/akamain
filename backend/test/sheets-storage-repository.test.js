@@ -64,3 +64,38 @@ test("Sheets migration backfills legacy rows and separates number collisions", a
     [40002, secondId, 1, ""],
   ]);
 });
+
+test("Sheets user synchronization is shared by concurrent read requests", async () => {
+  const repository = new SheetsStorageRepository({
+    spreadsheetId: "test-sheet",
+    auth: {},
+  });
+  const profile = {
+    userId: "user-1",
+    displayName: "テスト利用者",
+    email: "user@example.com",
+    emailVerified: true,
+  };
+  let reads = 0;
+  let writes = 0;
+  repository.initialize = async () => {};
+  repository.readDataRows = async () => {
+    reads += 1;
+    return [];
+  };
+  repository.appendRow = async () => {
+    writes += 1;
+  };
+
+  const [first, second] = await Promise.all([
+    repository.upsertUser(profile),
+    repository.upsertUser(profile),
+  ]);
+  const third = await repository.upsertUser(profile);
+
+  assert.equal(first.userId, "user-1");
+  assert.deepEqual(second, first);
+  assert.deepEqual(third, first);
+  assert.equal(reads, 1);
+  assert.equal(writes, 1);
+});

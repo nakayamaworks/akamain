@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260813c" />
+    <link rel="stylesheet" href="./styles.css?v=20260814a" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -83,6 +83,9 @@
               <p>ログインすると、保存済みの実践起票をこのプロジェクトごとに確認できます。</p>
             </div>
             <div id="ticketListStatus" class="ticket-list-state has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
+            <div id="ticketListRetry" class="ticket-list-retry hidden">
+              <button id="ticketListRetryButton" class="secondary-button" type="button">再読み込み</button>
+            </div>
 
             <div id="ticketListContent" class="hidden">
             <div class="ticket-type-filter" role="group" aria-label="チケット種別で絞り込む">
@@ -825,6 +828,6 @@
     <script src="./qa-scenario-authoring-library.js?v=20260813b"></script>
     <script src="./evidence-library.js?v=20260805a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260813c"></script>
+    <script src="./main.js?v=20260814a"></script>
   </body>
 </html>
