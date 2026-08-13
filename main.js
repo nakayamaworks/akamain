@@ -4301,9 +4301,16 @@ function renderPracticeDimensionFeedback(preview) {
   return items;
 }
 
-function getImprovementItems(result, qaTicket = isQaScenario()) {
+function getImprovementItems(result, qaTicket = isQaScenario(), scenarioId = state.scenario?.scenarioId) {
   if (Array.isArray(result?.improvementItems)) {
-    return result.improvementItems;
+    return result.improvementItems.filter((item) => {
+      if (scenarioId !== "ec-payment-notification-double-order") {
+        return true;
+      }
+      const text = `${item.title || ""} ${item.detail || ""}`;
+      return !/(?:通知ID|決済ID|注文番号).{0,45}(?:記載|明記|追記|補足|具体化|追加)/u.test(text)
+        && !/(?:任意の注文|対象の注文データ|商品種別|決済金額).{0,55}(?:前提条件|具体|明確|補足|意識すべき|書き換え|改め)/u.test(text);
+    });
   }
   return getPracticeDimensionDefinitions(qaTicket)
     .map(([, key]) => {
@@ -4344,11 +4351,25 @@ function renderPracticeImprovementItems(preview) {
   return items;
 }
 
-function getVisibleReaderQuestions(items, qaTicket = isQaScenario()) {
+function getVisibleReaderQuestions(
+  items,
+  qaTicket = isQaScenario(),
+  scenarioId = state.scenario?.scenarioId
+) {
+  const readerVisibleItems = items.filter((item) =>
+    !/(?:観測記録|提示材料|入力材料|出題シナリオ|研修シナリオ|記載例|見本回答|比較検証で行った|事実との違い)/u.test(
+      `${item.question || ""} ${item.whyItMatters || ""}`
+    )
+  ).filter((item) =>
+    scenarioId !== "ec-payment-notification-double-order"
+    || !/(?:任意の注文|対象の注文データ|商品種別|決済金額).{0,55}(?:前提条件|具体|明確|補足|意識すべき|書き換え|改め)/u.test(
+      `${item.question || ""} ${item.whyItMatters || ""}`
+    )
+  );
   if (!qaTicket) {
-    return items;
+    return readerVisibleItems;
   }
-  return items.filter((item) => {
+  return readerVisibleItems.filter((item) => {
     if (item.classification !== "不足情報") {
       return false;
     }
@@ -5099,7 +5120,11 @@ function renderTicketDetail() {
     .map((name) => `<li>${escapeHtml(String(name))}</li>`)
     .join("");
   const watcherNames = (fields.watcherIds || []).map(memberName).join("、") || "—";
-  const questions = getVisibleReaderQuestions(result?.readerQuestions || [], qaTicket)
+  const questions = getVisibleReaderQuestions(
+    result?.readerQuestions || [],
+    qaTicket,
+    ticket.scenarioId
+  )
     .map((item) => `<li>${escapeHtml(String(item.question || ""))}</li>`)
     .join("");
   const advice = (qaTicket ? [] : result?.investigationAdvice || [])
@@ -5121,7 +5146,7 @@ function renderTicketDetail() {
       <span>${escapeHtml(item.reason)}</span>
     </li>
   `).join("");
-  const improvementItems = getImprovementItems(result, qaTicket);
+  const improvementItems = getImprovementItems(result, qaTicket, ticket.scenarioId);
   const renderDetailImprovements = (priority) => improvementItems
     .filter((item) => item.priority === priority)
     .map((item) => `<li><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.detail)} — ${escapeHtml(item.whyItMatters)}</span></li>`)

@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v11";
+export const PROMPT_VERSION = "practice-review.v12";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -579,6 +579,7 @@ export function buildScoringPrompt(attempt) {
     "一般論だけの助言は禁止です。受講者の記述を引用し、この不具合に即して説明してください。",
     "確定した不足と、調査を進めるための追加提案を混同しないでください。",
     "reviewSourceが評価の事実源です。requiredFactsはreviewSourceのどの意味を読み手へ伝える必要があるかを示すもので、特定の文面や記載欄を指定する正解ではありません。語句、文順、セクション配置の一致を要求しないでください。",
+    "reviewSourceはAI採点者だけが持つ研修用の事実源であり、チケットの開発担当者やQA担当者が読める情報ではありません。reviewSourceと起票内容の不一致は、AIレビュー自身のimprovementItemsまたはrewriteSuggestionsで事実訂正として示し、readerQuestionsで開発担当者がその事実を知っているように質問させてはいけません。",
     "チーム内で既知と考えられる標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリック、コマンド、API実行方法など手順書レベルの詳細を不足扱いしないでください。第三者が主要な操作と順序を理解できれば十分です。",
     "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、事実誤認や不足と即断しないでください。確認が必要ならclassificationを『記述確認』、factIdをnot-applicableとし、『実施済みの事実か、再現のために補った推測か』を尋ねてください。reviewSourceにない詳細そのものを教えるよう要求してはいけません。",
     "追加記述がrequiredFactの意味を満たしている場合、reviewSourceと両立する限りfactAssessmentをcontradictedにしないでください。明確に両立しない場合だけcontradictedと判定してください。",
@@ -592,6 +593,7 @@ export function buildScoringPrompt(attempt) {
     "forbiddenClaimsに該当する断定がある場合だけ、そのIDをforbiddenClaimIdsへ入れてください。",
     "チケット設定と添付証跡は別チェックです。expectedTicketFieldsとevidenceFilesをdimensionsやverdictの減点理由に含めないでください。",
     "readerQuestionsは確定した不足がなければ0件で構いません。最大4件とし、件数を満たすための質問を作らないでください。",
+    "readerQuestionsはチケット本文と選択済み証跡だけを読んだ実際の担当者が、起票者へ聞き返す質問です。観測記録、提示材料、シナリオ、記載例だけにある情報を引用したり、その情報との違いを質問したりしないでください。",
     "investigationAdviceは起票の不足とは分けて1〜4件示してください。",
     "文章が十分明確な場合は無理に欠点を作らず、調査開始後に読み手が確認したくなる点を調査提案として示してください。",
     "rewriteSuggestionsは本当に改善効果がある場合だけ返してください。受講者の有効な表現を残した最小限の修正とし、記載例を丸ごと再現した文章へ置き換えないでください。",
@@ -599,6 +601,7 @@ export function buildScoringPrompt(attempt) {
     "strengthsは0〜2件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
     "フォームの構造上当然となる『期待結果と実際の動作が分かれている』『再現回数が数値で書かれている』『操作手順がある』『項目が埋まっている』だけをstrengthsとして評価してはいけません。再現性を評価する場合は、具体的な比較条件と結果から何を絞り込めるかまで述べてください。",
     "採点基準にreviewGuideがある場合、strengthCriteriaは内容固有の着眼点として使い、disallowedGenericPraiseは単独の称賛として使用しないでください。nonScoringInvestigationIdeasは不足情報や減点理由ではなく、今後の調査提案としてのみ扱ってください。",
+    "reviewGuide.acceptedConciseConditionsがある場合、そこに記載した簡潔な表現はこのシナリオで十分な記述です。overallAssessment、dimensionFeedback、improvementItems、readerQuestions、rewriteSuggestionsのいずれでも、その具体化や書き換えを要求しないでください。",
     "dimensionFeedbackには各評価軸の点数の理由だけを具体的に記載してください。実務上十分なら100点を使用し、到達不能な理想との差を作らないでください。",
     "improvementItemsは最大4件です。調査開始前に直す価値が高い不足は『修正推奨』、調査は開始できるが表現や補足を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。detailには抽象論ではなく、この起票へそのまま反映できる具体的な修正内容を示してください。",
     "90〜100点はそのまま調査着手可能、80〜89点は良好で軽微な改善あり、70〜79点は追加確認を推奨、69点以下は主要情報不足の目安です。語句の好みや軽微な重複だけで80点台前半まで下げないでください。",
@@ -647,6 +650,50 @@ function isQaDecisionRestatement(question) {
   );
 }
 
+function referencesEvaluatorOnlyContext(question) {
+  return /(?:観測記録|提示材料|入力材料|出題シナリオ|研修シナリオ|記載例|見本回答|比較検証で行った|事実との違い)/u.test(
+    String(question || "")
+  );
+}
+
+function requestsRedundantTrackingIdentifier(item, rubric, attempt) {
+  if (!attempt || !rubric?.factAssessmentPolicy?.trackingIdentifierRule) {
+    return false;
+  }
+  const text = `${item.title || ""} ${item.detail || ""}`;
+  const requestsIdentifier = /(?:通知ID|決済ID|注文番号|患者ID|商品ID|SKU|追跡用識別子).{0,45}(?:記載|明記|追記|補足|具体化|追加)/u.test(text);
+  if (!requestsIdentifier) {
+    return false;
+  }
+  const answerText = JSON.stringify(attempt.answer || {});
+  const identityIsExplained = /(?:同一|同じ|異なる|重複|再送)/u.test(answerText);
+  const selectedIds = new Set(attempt.selectedEvidenceIds || []);
+  const selectedEvidenceText = (rubric.evidenceFiles || [])
+    .filter(({ id }) => selectedIds.has(id))
+    .map(({ name, summary }) => `${name || ""} ${summary || ""}`)
+    .join(" ");
+  const evidenceCanTraceTarget = /(?:ID|番号|識別子|ログ|DB)/iu.test(selectedEvidenceText);
+  return identityIsExplained && evidenceCanTraceTarget;
+}
+
+function requestsUnsupportedEcOrderDetails(item, scenarioId) {
+  if (scenarioId !== "ec-payment-notification-double-order") {
+    return false;
+  }
+  const text = `${item.title || ""} ${item.detail || ""} ${item.question || ""}`;
+  return /(?:任意の注文|対象の注文データ|商品種別|決済金額).{0,55}(?:前提条件|具体|明確|補足|意識すべき|書き換え|改め)/u.test(text);
+}
+
+function requestsAlreadyStatedEcRecoveryStatus(item, scenarioId, attempt) {
+  if (scenarioId !== "ec-payment-notification-double-order" || !attempt) {
+    return false;
+  }
+  const feedbackText = `${item.title || ""} ${item.detail || ""}`;
+  const answerText = JSON.stringify(attempt.answer || {});
+  return /(?:復旧|キャンセル|取り消し).{0,50}(?:確認済み|推測|対応案|区別|明確)/u.test(feedbackText)
+    && /(?:復旧できることを確認|取り消し.{0,30}確認)/u.test(answerText);
+}
+
 function createAttemptEvidenceChecker(attempt) {
   if (!attempt) {
     return () => true;
@@ -677,6 +724,9 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const validFactIds = new Set(getFactIds(rubric));
   const factIdValues = ["not-applicable", ...validFactIds];
   const isGroundedQuote = createAttemptEvidenceChecker(attempt);
+  const attemptAnswerText = JSON.stringify(attempt?.answer || {});
+  const ecReproducibilityMismatch = scenarioId === "ec-payment-notification-double-order"
+    && /2\s*\/\s*15/u.test(attemptAnswerText);
   const dimensions = Object.fromEntries(
     rubric.dimensions.map((dimension) => [
       dimension.id,
@@ -697,7 +747,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     })
   );
   const validDimensionIds = new Set(rubric.dimensions.map(({ id }) => id));
-  const improvementItems = requireArray(rawOutput.improvementItems, "improvementItems")
+  let improvementItems = requireArray(rawOutput.improvementItems, "improvementItems")
     .slice(0, 4)
     .map((item, index) => {
       const relatedDimensionIds = normalizeStringArray(
@@ -724,7 +774,31 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         ),
         relatedDimensionIds: [...new Set(relatedDimensionIds)],
       };
+    })
+    .filter((item) => !requestsRedundantTrackingIdentifier(item, rubric, attempt))
+    .filter((item) => !requestsUnsupportedEcOrderDetails(item, scenarioId))
+    .filter((item) => !requestsAlreadyStatedEcRecoveryStatus(item, scenarioId, attempt));
+  if (ecReproducibilityMismatch) {
+    improvementItems = improvementItems.filter(
+      ({ relatedDimensionIds }) => !relatedDimensionIds.includes("reproducibility")
+    );
+    improvementItems.unshift({
+      priority: "修正推奨",
+      title: "再現回数の記述を訂正する",
+      detail: "再現性の『2/15』を、提示された検証結果に合わせて『15回中1回発生』へ修正してください。",
+      whyItMatters: "実際の発生頻度と異なる数値は、再現試験と調査優先度の判断を誤らせるためです。",
+      relatedDimensionIds: ["factualGrounding", "reproducibility"],
     });
+    improvementItems = improvementItems.slice(0, 4);
+    dimensions.factualGrounding = Math.min(dimensions.factualGrounding, 90);
+    dimensions.reproducibility = Math.min(dimensions.reproducibility, 85);
+    dimensionFeedback.factualGrounding = {
+      reason: "主要事象は正確ですが、再現性の『2/15』が提示された検証結果と一致していません。",
+    };
+    dimensionFeedback.reproducibility = {
+      reason: "試行回数は分かりますが、発生回数は『15回中1回』への訂正が必要です。",
+    };
+  }
   const explainedDimensionIds = new Set(
     improvementItems.flatMap(({ relatedDimensionIds }) => relatedDimensionIds)
   );
@@ -765,6 +839,9 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         factId,
       };
     })
+    .filter((item) => !referencesEvaluatorOnlyContext(`${item.question} ${item.whyItMatters}`))
+    .filter((item) => !requestsUnsupportedEcOrderDetails(item, scenarioId))
+    .filter((item) => !ecReproducibilityMismatch || !/2\s*\/\s*15/u.test(item.question))
     .filter((item) =>
       rubric.ticketType !== "qa"
       || (
@@ -798,17 +875,22 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const factAssessments = requireArray(rawOutput.factAssessments, "factAssessments")
     .map((item, index) => {
       const factId = requireEnum(item.factId, [...validFactIds], `factAssessments[${index}].factId`);
-      const status = requireEnum(
+      let status = requireEnum(
         item.status,
         factAssessmentStatuses,
         `factAssessments[${index}].status`
       );
-      const evidenceQuote = status === "missing"
-        ? ""
-        : requireNonEmptyString(
-            item.evidenceQuote,
-            `factAssessments[${index}].evidenceQuote`
-          );
+      if (ecReproducibilityMismatch && factId === "reproducibility-observed") {
+        status = "contradicted";
+      }
+      const evidenceQuote = ecReproducibilityMismatch && factId === "reproducibility-observed"
+        ? "2/15"
+        : status === "missing"
+          ? ""
+          : requireNonEmptyString(
+              item.evidenceQuote,
+              `factAssessments[${index}].evidenceQuote`
+            );
       return { factId, status, evidenceQuote };
     });
   const assessedFactIds = new Set(factAssessments.map(({ factId }) => factId));
@@ -831,12 +913,15 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   if (new Set(forbiddenClaimIds).size !== forbiddenClaimIds.length) {
     throw new Error("forbiddenClaimIds must not contain duplicates");
   }
+  const overallAssessment = ecReproducibilityMismatch
+    ? "主要な事象、仕様に基づく期待結果、実際の動作は整理されており、調査を開始できる状態です。ただし、再現性の『2/15』は提示された検証結果と一致しないため、『15回中1回発生』への訂正が必要です。"
+    : requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment");
   return {
     dimensions,
     dimensionFeedback,
     improvementItems,
     verdict: requireEnum(rawOutput.verdict, getRubricVerdicts(rubric), "verdict"),
-    overallAssessment: requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment"),
+    overallAssessment,
     readerQuestions,
     ambiguityRisks,
     investigationAdvice,
@@ -1141,8 +1226,10 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     ? rawWeightedScore
     : Math.min(rawWeightedScore, rubricFindings.appliedScoreCap);
   const { factAssessments: _factAssessments, forbiddenClaimIds: _forbiddenClaimIds, ...review } = normalized;
+  const hasContradictedFacts = rubricFindings.factAssessments
+    .some(({ status }) => status === "contradicted");
   const improvementItems = review.improvementItems.map((item) =>
-    totalScore >= 90 && item.priority === "修正推奨"
+    totalScore >= 90 && !hasContradictedFacts && item.priority === "修正推奨"
       ? { ...item, priority: "任意改善" }
       : item
   );

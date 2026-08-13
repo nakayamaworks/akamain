@@ -487,6 +487,48 @@ test("ready-to-send reviews do not label polish as a required correction", async
   );
 });
 
+test("a factual contradiction remains a required correction even above 90 points", async () => {
+  const scenarioId = "ec-payment-notification-double-order";
+  const rubric = getScenarioRubric(scenarioId);
+  const attempt = createAttemptRecord({
+    scenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      ...rubric.writingExample,
+      sections: { ...rubric.writingExample.sections, reproducibility: "2/15" },
+      ticketFields: { tracker: "bug", progress: 0 },
+    },
+    selectedEvidenceIds: rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id),
+  }, { userId: "verified-google-sub" });
+  const modelOutput = completeOutputForScenario(scenarioId);
+  modelOutput.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 95]));
+  modelOutput.improvementItems = [{
+    priority: "修正推奨",
+    title: "再現回数を訂正する",
+    detail: "2/15を1/15へ訂正してください。",
+    whyItMatters: "発生頻度を正確に伝えるためです。",
+    relatedDimensionIds: ["factualGrounding"],
+  }];
+  modelOutput.factAssessments = modelOutput.factAssessments.map((assessment) =>
+    assessment.factId === "reproducibility-observed"
+      ? { ...assessment, status: "contradicted", evidenceQuote: "2/15" }
+      : assessment
+  );
+  const result = await scoreAttemptRecordWithGemini(attempt, {
+    apiKey: "server-only-key",
+    fetchImplementation: async () => ({
+      ok: true,
+      async json() {
+        return { candidates: [{ content: { parts: [{ text: JSON.stringify(modelOutput) }] } }] };
+      },
+    }),
+  });
+  assert.ok(result.totalScore >= 90);
+  assert.ok(result.totalScore < 100);
+  assert.equal(result.improvementItems[0].priority, "修正推奨");
+  assert.match(result.overallAssessment, /15回中1回発生/);
+});
+
 test("the customer search-state QA accepts both UI and workflow categories while recommending UI", () => {
   const scenarioId = "customer-qa-search-state-after-back";
   const rubric = getScenarioRubric(scenarioId);
@@ -561,6 +603,68 @@ test("semantic rubric policy does not require trace identifiers in ticket prose"
   });
   assert.match(prompt, /追跡用識別子/);
   assert.match(prompt, /本文に具体値がなくても不足にしない/);
+  assert.match(prompt, /reviewSourceはAI採点者だけが持つ/);
+});
+
+test("bug reader questions never expose evaluator-only observations", () => {
+  const scenarioId = "ec-payment-notification-double-order";
+  const rubric = getScenarioRubric(scenarioId);
+  const output = completeOutputForScenario(scenarioId);
+  output.readerQuestions = [
+    {
+      reader: "バックエンドエンジニア",
+      question: "比較検証で行った15回中1回発生したという事実との違いを確認させてください。",
+      whyItMatters: "発生頻度を正確に把握するためです。",
+      classification: "記述確認",
+      factId: "not-applicable",
+    },
+    {
+      reader: "バックエンドエンジニア",
+      question: "2回発生した際は、いずれも同じ操作条件でしたか？",
+      whyItMatters: "発生条件を絞り込むためです。",
+      classification: "記述確認",
+      factId: "not-applicable",
+    },
+  ];
+  const normalized = normalizeModelOutput(output, scenarioId, {
+    answer: rubric.writingExample,
+    selectedEvidenceIds: rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id),
+  });
+  assert.deepEqual(
+    normalized.readerQuestions.map(({ question }) => question),
+    ["2回発生した際は、いずれも同じ操作条件でしたか？"]
+  );
+});
+
+test("trace identifiers are not requested when the ticket and evidence already identify the event", () => {
+  const scenarioId = "ec-payment-notification-double-order";
+  const output = completeOutputForScenario(scenarioId);
+  output.improvementItems = [
+    {
+      priority: "任意改善",
+      title: "検証時の通知IDや手順の具体化",
+      detail: "操作手順や詳細に、対象の通知ID（PAY-4821など）を補足してください。",
+      whyItMatters: "ログ調査を始めやすくするためです。",
+      relatedDimensionIds: ["informationCoverage"],
+    },
+    {
+      priority: "修正推奨",
+      title: "再現手順の具体化",
+      detail: "『任意の注文を確定する』手順を改め、同じ通知IDを再送する手順に書き換えてください。",
+      whyItMatters: "第三者が検証を始めやすくするためです。",
+      relatedDimensionIds: ["reproducibility"],
+    },
+  ];
+  const normalized = normalizeModelOutput(output, scenarioId, {
+    answer: {
+      subject: "同一の決済通知で注文が重複作成される",
+      sections: { detail: "同じ決済通知を再送すると異なる注文番号が2件作成される。" },
+    },
+    selectedEvidenceIds: ["webhook-replay-log", "duplicate-orders", "order-admin-screen"],
+  });
+  assert.deepEqual(normalized.improvementItems, []);
+  assert.equal(normalized.dimensions.informationCoverage, 100);
+  assert.equal(normalized.dimensions.reproducibility, 100);
 });
 
 test("notification review treats standard delivery operations as known and unsupported additions as confirmation", () => {

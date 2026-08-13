@@ -377,7 +377,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v11"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v12"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問")
@@ -1209,6 +1209,9 @@ try {
           "仕様・周辺情報『" + reviewSource.observations[2].text + "』について、期待動作と確認済み事実を推測から分けているか評価する",
         ],
         nonScoringInvestigationIdeas: existingProfile?.reviewGuide?.nonScoringInvestigationIdeas || [],
+        ...((existingProfile?.reviewGuide?.acceptedConciseConditions || []).length
+          ? { acceptedConciseConditions: existingProfile.reviewGuide.acceptedConciseConditions }
+          : {}),
         disallowedGenericPraise: existingProfile?.reviewGuide?.disallowedGenericPraise || [
           "期待結果と実際の動作が分離されている",
           "再現回数が数値で明記されている",

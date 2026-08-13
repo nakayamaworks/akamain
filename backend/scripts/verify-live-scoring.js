@@ -73,6 +73,7 @@ for (const scenarioId of scenarioIds) {
     overallAssessment: result.overallAssessment,
     dimensions: result.dimensions,
     improvementItems: result.improvementItems,
+    readerQuestions: result.readerQuestions,
     rubricVersion: result.rubricVersion,
     assessedFacts: result.rubricFindings.factAssessments.length,
     forbiddenClaims: result.rubricFindings.forbiddenClaimIds.length,
