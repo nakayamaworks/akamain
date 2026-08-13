@@ -29,6 +29,14 @@ const completeModelOutput = {
     interpretiveClarity: 80,
     investigationReadiness: 70,
   },
+  dimensionFeedback: {
+    factualGrounding: { reason: "観測事実はありますが、一部の表現が曖昧です。", improvement: "観測した対象を具体化してください。" },
+    informationCoverage: { reason: "主要情報の一部が不足しています。", improvement: "発生条件を一つ補足してください。" },
+    reproducibility: { reason: "操作回数を一意に読み取れません。", improvement: "クリック回数を明記してください。" },
+    expectedActualSeparation: { reason: "期待と実際は概ね区別されています。", improvement: "期待値の仕様根拠を明記してください。" },
+    interpretiveClarity: { reason: "原因の推測は抑えられています。", improvement: "確認済み範囲を補足してください。" },
+    investigationReadiness: { reason: "調査は始められますが条件が不足しています。", improvement: "通信記録との対応を補足してください。" },
+  },
   verdict: "追加確認を推奨",
   overallAssessment: "現象は伝わりますが、クリック回数の記載が不足しています。",
   readerQuestions: [
@@ -82,9 +90,16 @@ function completeOutputForScenario(scenarioId) {
   const dimensions = Object.fromEntries(
     rubric.dimensions.map(({ id }) => [id, 80])
   );
+  const dimensionFeedback = Object.fromEntries(
+    rubric.dimensions.map(({ id }) => [id, {
+      reason: "主要な内容は伝わります。",
+      improvement: "判断条件をもう一段具体化してください。",
+    }])
+  );
   return {
     ...completeModelOutput,
     dimensions,
+    dimensionFeedback,
     verdict: rubric.ticketType === "qa" ? "回答依頼可能" : completeModelOutput.verdict,
     investigationAdvice: rubric.ticketType === "qa" ? [] : completeModelOutput.investigationAdvice,
     readerQuestions: completeModelOutput.readerQuestions.map((question) => ({
@@ -262,6 +277,10 @@ test("all registered rubrics produce scenario-specific structured-output schemas
       schema.properties.dimensions.required,
       rubric.dimensions.map((dimension) => dimension.id)
     );
+    assert.deepEqual(
+      schema.properties.dimensionFeedback.required,
+      rubric.dimensions.map((dimension) => dimension.id)
+    );
     assert.equal(schema.properties.readerQuestions.minItems, 0);
     assert.equal(schema.properties.readerQuestions.maxItems, 4);
     assert.deepEqual(
@@ -306,6 +325,7 @@ test("QA scenarios use a question-focused rubric and never ask the model to deci
   });
   assert.match(prompt, /AI自身が仕様回答を決めてはいけません/);
   assert.match(prompt, /不要な聞き返し/);
+  assert.match(prompt, /改善点を説明できない評価軸は100点/);
   assert.match(prompt, /回答依頼可能/);
   assert.doesNotMatch(prompt, /不具合票を受け取って調査を始める/);
 });
@@ -334,6 +354,36 @@ test("QA attempts accept the QA tracker and QA verdicts", () => {
     selectedEvidenceIds: [],
   }, normalizedOutput, 88);
   assert.equal(findings.ticketFieldChecks.some(({ field }) => field === "severity"), false);
+});
+
+test("the customer search-state QA accepts both UI and workflow categories while recommending UI", () => {
+  const scenarioId = "customer-qa-search-state-after-back";
+  const rubric = getScenarioRubric(scenarioId);
+  const normalizedOutput = normalizeModelOutput(
+    completeOutputForScenario(scenarioId),
+    scenarioId
+  );
+  const findings = buildRubricFindings({
+    scenarioId,
+    completedAt: "2026-08-12T01:00:00.000Z",
+    answer: {
+      ticketFields: {
+        priority: "normal",
+        category: "workflow",
+        version: "App version: 2.3.1",
+        environment: "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        assigneeId: "tsunagi",
+        watcherIds: ["tsunagi", "kikuta"],
+        dueDate: null,
+      },
+    },
+    selectedEvidenceIds: [],
+  }, normalizedOutput, 100);
+  const categoryCheck = findings.ticketFieldChecks.find(({ field }) => field === "category");
+  assert.equal(categoryCheck.matched, true);
+  assert.equal(categoryCheck.recommendedMatch, false);
+  assert.equal(categoryCheck.recommended, "ui");
+  assert.deepEqual([...categoryCheck.accepted], ["ui", "workflow"]);
 });
 
 test("the mobile data-loss prompt rewards scenario-specific analysis without scoring future research", () => {

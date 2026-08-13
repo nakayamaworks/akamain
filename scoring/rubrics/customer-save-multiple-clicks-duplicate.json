@@ -5,32 +5,38 @@
     {
       "id": "factualGrounding",
       "label": "事実性",
-      "weight": 20
+      "weight": 20,
+      "guidance": "観測事実と提示資料に整合し、100点は未確認事項の断定や事実誤認がない状態"
     },
     {
       "id": "informationCoverage",
       "label": "情報充足",
-      "weight": 20
+      "weight": 20,
+      "guidance": "調査開始に必要な主要情報が揃い、100点は起票前に追加で聞くべき必須情報がない状態"
     },
     {
       "id": "reproducibility",
       "label": "再現性",
-      "weight": 20
+      "weight": 20,
+      "guidance": "主要な条件と操作順序を第三者が再現でき、100点は発生条件の解釈が一意な状態"
     },
     {
       "id": "expectedActualSeparation",
       "label": "期待・実績の分離",
-      "weight": 15
+      "weight": 15,
+      "guidance": "仕様上の期待と観測結果を分け、100点は両者の差が明確な状態"
     },
     {
       "id": "interpretiveClarity",
       "label": "解釈の明瞭さ",
-      "weight": 10
+      "weight": 10,
+      "guidance": "事実・推測・未確認範囲を区別し、100点は読み手が誤解する表現がない状態"
     },
     {
       "id": "investigationReadiness",
       "label": "切り分け支援",
-      "weight": 15
+      "weight": 15,
+      "guidance": "確認済みの比較条件や周辺確認が調査に役立ち、100点は起票時点で可能な切り分けが十分な状態"
     }
   ],
   "requiredFacts": {

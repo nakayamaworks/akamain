@@ -21,12 +21,12 @@ vm.runInNewContext(qaScenarioSource, qaScenarioContext, {
 const qaAuthoringRegistry = qaScenarioContext.window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING || {};
 
 const qaDimensions = [
-  { id: "questionFocus", label: "論点の焦点", weight: 20 },
-  { id: "answerability", label: "回答しやすさ", weight: 20 },
-  { id: "sourceGrounding", label: "根拠の明瞭さ", weight: 15 },
-  { id: "factInterpretationSeparation", label: "事実・解釈", weight: 15 },
-  { id: "impactClarity", label: "影響の明瞭さ", weight: 15 },
-  { id: "responseEfficiency", label: "やり取り削減", weight: 15 },
+  { id: "questionFocus", label: "論点の焦点", weight: 20, guidance: "一つの主要な判断事項が明確で、100点は題名と質問だけで回答対象を誤解なく特定できる状態" },
+  { id: "answerability", label: "回答しやすさ", weight: 20, guidance: "回答者が不足前提を聞き返さず判断または訂正でき、100点は短い回答で次の行動を確定できる状態" },
+  { id: "sourceGrounding", label: "根拠の明瞭さ", weight: 15, guidance: "確認済み資料と未記載・矛盾箇所が具体的で、100点は判断根拠を読み手が再確認できる状態" },
+  { id: "factInterpretationSeparation", label: "事実・解釈", weight: 15, guidance: "観測事実と質問者の解釈を分け、100点は未確定事項を確定仕様と誤認する余地がない状態" },
+  { id: "impactClarity", label: "影響の明瞭さ", weight: 15, guidance: "回答により変わるテストや不具合判定が具体的で、100点は回答後の行動が明確な状態" },
+  { id: "responseEfficiency", label: "やり取り削減", weight: 15, guidance: "判断に必要な比較・条件が過不足なく、100点は不要な往復が想定されない状態" },
 ];
 
 function qaSectionText(report, sectionTitle) {
@@ -120,7 +120,11 @@ function buildQaRubric(profile) {
     ],
     expectedTicketFields: {
       priority: scenario.evaluation.priority || null,
-      category: scenario.evaluation.category || null,
+      category: {
+        recommended: scenario.evaluation.category || null,
+        accepted: scenario.evaluation.acceptedCategories || [scenario.evaluation.category || null],
+        rationale: scenario.evaluation.categoryRationale || null,
+      },
       version: scenario.evaluation.version || null,
       environment: scenario.evaluation.environment || null,
       assigneeId: scenario.evaluation.assignee || null,
@@ -161,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v8";
+export const PROMPT_VERSION = "practice-review.v9";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -195,6 +199,7 @@ export function buildModelOutputSchema(rubric) {
   type: "object",
   required: [
     "dimensions",
+    "dimensionFeedback",
     "verdict",
     "overallAssessment",
     "readerQuestions",
@@ -213,6 +218,23 @@ export function buildModelOutputSchema(rubric) {
         rubric.dimensions.map((dimension) => [
           dimension.id,
           { type: "integer", minimum: 0, maximum: 100 },
+        ])
+      ),
+    },
+    dimensionFeedback: {
+      type: "object",
+      required: rubric.dimensions.map((dimension) => dimension.id),
+      properties: Object.fromEntries(
+        rubric.dimensions.map((dimension) => [
+          dimension.id,
+          {
+            type: "object",
+            required: ["reason", "improvement"],
+            properties: {
+              reason: { type: "string" },
+              improvement: { type: "string" },
+            },
+          },
         ])
       ),
     },
@@ -492,6 +514,8 @@ export function buildScoringPrompt(attempt) {
       "investigationAdviceは0〜4件です。起票前に質問者自身が確認できること、または回答後に行う判断が本当にある場合だけ返してください。",
       "rewriteSuggestionsは受講者の有効な文章を残した最小修正とし、記載例のコピーに置き換えないでください。",
       "strengthsは0〜3件です。『質問欄がある』『項目が埋まっている』などフォーム上当然のことを評価せず、このQA固有の論点整理が回答負荷をどう減らすかを示してください。",
+      "dimensionsはQA本文の品質だけを採点してください。チケット設定と添付証跡は別チェックであり、dimensionsやverdictの減点理由に含めないでください。",
+      "dimensionFeedbackには各評価軸の点数の理由を具体的に記載してください。100点未満ならimprovementへ満点に届かなかった理由と最小の改善を必ず記載し、改善点を説明できない評価軸は100点にしてください。100点ならimprovementは空文字にしてください。",
       "verdictは、十分なら『回答依頼可能』、軽微な追加整理が有効なら『追加整理を推奨』、主要論点を読み取れないなら『質問の再整理を推奨』を使用してください。",
       "各評価軸は0〜100の整数で採点してください。",
       "",
@@ -525,7 +549,7 @@ export function buildScoringPrompt(attempt) {
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
     "forbiddenClaimsに該当する断定がある場合だけ、そのIDをforbiddenClaimIdsへ入れてください。",
-    "expectedTicketFieldsとevidenceFilesも情報充足・切り分け支援の評価に含めてください。requiredがtrueの証跡が必要な証跡です。",
+    "チケット設定と添付証跡は別チェックです。expectedTicketFieldsとevidenceFilesをdimensionsやverdictの減点理由に含めないでください。",
     "readerQuestionsは確定した不足がなければ0件で構いません。最大4件とし、件数を満たすための質問を作らないでください。",
     "investigationAdviceは起票の不足とは分けて1〜4件示してください。",
     "文章が十分明確な場合は無理に欠点を作らず、調査開始後に読み手が確認したくなる点を調査提案として示してください。",
@@ -534,6 +558,7 @@ export function buildScoringPrompt(attempt) {
     "strengthsは0〜3件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
     "フォームの構造上当然となる『期待結果と実際の動作が分かれている』『再現回数が数値で書かれている』『操作手順がある』『項目が埋まっている』だけをstrengthsとして評価してはいけません。再現性を評価する場合は、具体的な比較条件と結果から何を絞り込めるかまで述べてください。",
     "採点基準にreviewGuideがある場合、strengthCriteriaは内容固有の着眼点として使い、disallowedGenericPraiseは単独の称賛として使用しないでください。nonScoringInvestigationIdeasは不足情報や減点理由ではなく、今後の調査提案としてのみ扱ってください。",
+    "dimensionFeedbackには各評価軸の点数の理由を具体的に記載してください。100点未満ならimprovementへ満点に届かなかった理由と最小の改善を必ず記載し、改善点を説明できない評価軸は100点にしてください。100点ならimprovementは空文字にしてください。",
     "各評価軸は0〜100の整数で採点してください。",
     "",
     "採点基準:",
@@ -607,6 +632,26 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       dimension.id,
       requireScore(rawOutput.dimensions?.[dimension.id], `dimensions.${dimension.id}`),
     ])
+  );
+  const dimensionFeedback = Object.fromEntries(
+    rubric.dimensions.map((dimension) => {
+      const feedback = rawOutput.dimensionFeedback?.[dimension.id];
+      if (!feedback || typeof feedback !== "object" || Array.isArray(feedback)) {
+        throw new Error(`dimensionFeedback.${dimension.id} must be an object`);
+      }
+      const reason = requireNonEmptyString(
+        feedback.reason,
+        `dimensionFeedback.${dimension.id}.reason`
+      );
+      const improvement = optionalString(
+        feedback.improvement,
+        `dimensionFeedback.${dimension.id}.improvement`
+      ) || "";
+      if (dimensions[dimension.id] < 100 && !improvement) {
+        throw new Error(`dimensionFeedback.${dimension.id}.improvement is required below 100`);
+      }
+      return [dimension.id, { reason, improvement }];
+    })
   );
   const readerQuestions = requireArray(rawOutput.readerQuestions, "readerQuestions")
     .map((item, index) => {
@@ -698,6 +743,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   }
   return {
     dimensions,
+    dimensionFeedback,
     verdict: requireEnum(rawOutput.verdict, getRubricVerdicts(rubric), "verdict"),
     overallAssessment: requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment"),
     readerQuestions,
@@ -793,6 +839,24 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
         expected: expectedDueDate,
         actual: actualDueDate,
         matched: expectedDueDate === actualDueDate,
+      };
+    }
+    if (
+      expected
+      && typeof expected === "object"
+      && !Array.isArray(expected)
+      && Array.isArray(expected.accepted)
+    ) {
+      const actual = actualFields[field] ?? null;
+      return {
+        field,
+        expected: expected.recommended ?? null,
+        recommended: expected.recommended ?? null,
+        accepted: expected.accepted,
+        rationale: expected.rationale ?? null,
+        actual,
+        matched: expected.accepted.includes(actual),
+        recommendedMatch: actual === expected.recommended,
       };
     }
     const actual = actualFields[field] ?? null;
@@ -898,6 +962,7 @@ export function createFailedScoringResult(attempt, error, options = {}) {
     dimensions: Object.fromEntries(
       (rubric?.dimensions || rubricRegistry.dimensions).map((dimension) => [dimension.id, null])
     ),
+    dimensionFeedback: {},
     verdict: null,
     overallAssessment: null,
     readerQuestions: [],

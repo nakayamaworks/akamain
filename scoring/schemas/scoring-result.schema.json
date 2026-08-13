@@ -11,6 +11,7 @@
     "status",
     "totalScore",
     "dimensions",
+    "dimensionFeedback",
     "verdict",
     "overallAssessment",
     "readerQuestions",
@@ -69,6 +70,24 @@
         "factInterpretationSeparation": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
         "impactClarity": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
         "responseEfficiency": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+      }
+    },
+    "dimensionFeedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "factualGrounding": { "$ref": "#/$defs/dimensionFeedback" },
+        "informationCoverage": { "$ref": "#/$defs/dimensionFeedback" },
+        "reproducibility": { "$ref": "#/$defs/dimensionFeedback" },
+        "expectedActualSeparation": { "$ref": "#/$defs/dimensionFeedback" },
+        "interpretiveClarity": { "$ref": "#/$defs/dimensionFeedback" },
+        "investigationReadiness": { "$ref": "#/$defs/dimensionFeedback" },
+        "questionFocus": { "$ref": "#/$defs/dimensionFeedback" },
+        "answerability": { "$ref": "#/$defs/dimensionFeedback" },
+        "sourceGrounding": { "$ref": "#/$defs/dimensionFeedback" },
+        "factInterpretationSeparation": { "$ref": "#/$defs/dimensionFeedback" },
+        "impactClarity": { "$ref": "#/$defs/dimensionFeedback" },
+        "responseEfficiency": { "$ref": "#/$defs/dimensionFeedback" }
       }
     },
     "verdict": {
@@ -174,7 +193,11 @@
               "field": { "type": "string" },
               "expected": {},
               "actual": {},
-              "matched": { "type": "boolean" }
+              "matched": { "type": "boolean" },
+              "recommended": {},
+              "accepted": { "type": "array" },
+              "rationale": { "type": ["string", "null"] },
+              "recommendedMatch": { "type": "boolean" }
             }
           }
         },
@@ -217,5 +240,16 @@
     "modelId": { "type": "string" },
     "scoredAt": { "type": "string", "format": "date-time" },
     "errorCode": { "type": ["string", "null"] }
+  },
+  "$defs": {
+    "dimensionFeedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "improvement"],
+      "properties": {
+        "reason": { "type": "string" },
+        "improvement": { "type": "string" }
+      }
+    }
   }
 }

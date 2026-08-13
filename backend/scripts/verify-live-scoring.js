@@ -19,6 +19,7 @@ for (const scenarioId of scenarioIds) {
     throw new Error(`unknown scenarioId: ${scenarioId}`);
   }
   const expected = rubric.expectedTicketFields;
+  const expectedCategory = expected.category?.recommended ?? expected.category;
   const timestamp = new Date().toISOString();
   const attempt = createAttemptRecord({
     scenarioId,
@@ -27,13 +28,13 @@ for (const scenarioId of scenarioIds) {
       subject: rubric.writingExample.subject,
       sections: rubric.writingExample.sections,
       ticketFields: {
-        tracker: "bug",
+        tracker: rubric.ticketType === "qa" ? "qa" : "bug",
         private: false,
         status: "new",
         severity: expected.severity,
         priority: expected.priority,
         assigneeId: expected.assigneeId,
-        category: expected.category,
+        category: expectedCategory,
         version: expected.version,
         environment: expected.environment,
         startDate: null,

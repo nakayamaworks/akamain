@@ -169,6 +169,8 @@
           priority: "normal",
           status: "new",
           category: "ui",
+          acceptedCategories: ["ui", "workflow"],
+          categoryRationale: "検索条件の保持は画面状態に関するため「画面・UI」を推奨しますが、画面遷移の業務フローとして扱うチームでは「業務ロジック」も許容します。",
           version: "App version: 2.3.1",
           environment: "Google Chrome 126.0.6478.127 / Windows 11 23H2",
           progress: "0",
