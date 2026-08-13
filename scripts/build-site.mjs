@@ -36,6 +36,11 @@ await cp(
   join(rootDirectory, "bug-report-writing", "index.html"),
   join(outputDirectory, "bug-report-writing", "index.html")
 );
+await mkdir(join(outputDirectory, "qa-question-writing"), { recursive: true });
+await cp(
+  join(rootDirectory, "qa-question-writing", "index.html"),
+  join(outputDirectory, "qa-question-writing", "index.html")
+);
 
 let appHtml = await readFile(join(rootDirectory, "index.html"), "utf8");
 appHtml = replaceRequired(

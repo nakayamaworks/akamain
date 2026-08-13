@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="回答者に伝わるQA確認の書き方を、質問・確認済み事実・参照情報・現在の解釈・影響など6つの項目と具体的な記載例で解説します。" />
+    <title>QA確認の書き方｜仕様確認・動作確認を伝える6項目と記載例｜あかマイン</title>
+    <meta name="theme-color" content="#cf2026" />
+    <link rel="canonical" href="https://akamain.com/qa-question-writing" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:site_name" content="あかマイン" />
+    <meta property="og:title" content="QA確認の書き方｜仕様確認・動作確認を伝える6項目と記載例" />
+    <meta property="og:description" content="仕様確認や動作確認を、開発者・仕様作成者が回答しやすい質問へ整理する方法を解説します。" />
+    <meta property="og:url" content="https://akamain.com/qa-question-writing" />
+    <meta property="og:image" content="https://akamain.com/assets/images/brand/akamain-main-visual.png" />
+    <meta property="og:image:alt" content="あかマイン" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="QA確認の書き方｜仕様確認・動作確認を伝える6項目と記載例" />
+    <meta name="twitter:description" content="仕様確認や動作確認を、開発者・仕様作成者が回答しやすい質問へ整理する方法を解説します。" />
+    <meta name="twitter:image" content="https://akamain.com/assets/images/brand/akamain-main-visual.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/images/brand/akamain-favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/images/brand/akamain-site-icon-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/brand/akamain-apple-touch-icon-180.png" />
+    <link rel="stylesheet" href="/welcome.css?v=20260813a" />
+    <link rel="stylesheet" href="/guide.css?v=20260813a" />
+  </head>
+  <body>
+    <div class="page-shell guide-page">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="あかマイン Welcomeページ">
+          <img src="/assets/images/brand/akamain-main-visual.png" alt="" />
+          <span><b>あか</b>マイン</span>
+        </a>
+
+        <nav class="header-links" aria-label="メインメニュー">
+          <span aria-current="page">QA確認</span>
+          <a href="/bug-report-writing">不具合報告</a>
+        </nav>
+      </header>
+
+      <main>
+        <article>
+          <header class="article-hero">
+            <nav class="breadcrumb" aria-label="パンくずリスト">
+              <a href="/">ホーム</a>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">QA確認の書き方</span>
+            </nav>
+            <div class="article-title-row">
+              <h1>QA確認の書き方<br /><span>仕様確認・動作確認を伝える6項目と記載例</span></h1>
+              <div class="article-meta">
+                <span>公開日：2026年8月13日</span>
+                <span>読了目安：8分</span>
+              </div>
+            </div>
+            <p class="article-lead">よいQA確認は、相手に仕様書の読み直しを任せる質問ではありません。<br />確認した事実と現在の解釈を整理し、回答者が判断すべき論点をすぐ理解できる質問です。</p>
+          </header>
+
+          <div class="article-layout">
+            <aside class="table-of-contents" aria-labelledby="tocTitle">
+              <p id="tocTitle">この記事の内容</p>
+              <ol>
+                <li><a href="#goal">QA確認の目的</a></li>
+                <li><a href="#types">QA確認の3種類</a></li>
+                <li><a href="#six-items">基本の6項目</a></li>
+                <li><a href="#example">具体的な記載例</a></li>
+                <li><a href="#mistakes">よくある失敗</a></li>
+                <li><a href="#checklist">提出前チェック</a></li>
+              </ol>
+            </aside>
+
+            <div class="article-body">
+              <section id="goal">
+                <p class="section-number">01</p>
+                <h2>QA確認の目的は「答えを調べてもらうこと」ではない</h2>
+                <p>QA確認の目的は、テスト中に判断できなかった仕様や動作について、開発者・仕様作成者へ判断材料を渡し、必要な回答を得ることです。質問者が確認できる情報を整理せず、「これは仕様ですか？」だけで相手へ渡すと、状況確認の往復が増えてしまいます。</p>
+                <div class="principle-box">
+                  <strong>伝わるQA確認の原則</strong>
+                  <p>確認した事実、資料に書かれていること、現在の解釈、判断してほしい論点を分けて書く。</p>
+                </div>
+                <p>QA確認は、必ずYesかNoだけで答えられる必要はありません。回答者が「認識どおりです」または「正しくはこの条件です」と短く返せる状態を目指します。すでに期待結果が明確で、実際の動作が異なる場合は、<a href="/bug-report-writing">不具合報告として起票する方法</a>を検討します。</p>
+              </section>
+
+              <section id="types">
+                <p class="section-number">02</p>
+                <h2>QA確認で扱う3つのケース</h2>
+                <p>QA確認は仕様書の不足だけに限定されません。テスト中に判断が止まる代表的なケースは、次の3つです。</p>
+                <div class="mistake-grid">
+                  <section><h3>仕様確認</h3><p>仕様に書かれていない条件や境界値について、どの期待値を採用するか確認します。</p></section>
+                  <section><h3>動作確認</h3><p>観測した動作を正常として受け入れるか、不具合として扱うかを確認します。</p></section>
+                  <section><h3>仕様矛盾</h3><p>複数の仕様書で異なる内容が定義されている場合に、採用する仕様を確認します。</p></section>
+                </div>
+              </section>
+
+              <section id="six-items">
+                <p class="section-number">03</p>
+                <h2>まず押さえたい、QA確認の6項目</h2>
+                <p>長い説明より、質問と判断材料の役割を分けることが重要です。次の6項目を使うと、回答者が論点を追いやすくなります。</p>
+
+                <div class="item-list">
+                  <section>
+                    <span>1</span>
+                    <div><h3>質問</h3><p>誰に、何を判断してほしいかを一つの主要論点として書きます。複数の独立した質問は分けて起票します。</p></div>
+                  </section>
+                  <section>
+                    <span>2</span>
+                    <div><h3>確認した状況・事実</h3><p>条件、入力値、画面表示など、実際に確認したことを書きます。期待や原因の推測は混ぜません。</p></div>
+                  </section>
+                  <section>
+                    <span>3</span>
+                    <div><h3>参照情報</h3><p>確認した仕様書と章節に加え、該当箇所に何が書かれているか、何が書かれていないかを示します。</p></div>
+                  </section>
+                  <section>
+                    <span>4</span>
+                    <div><h3>現在の解釈</h3><p>現時点で妥当と考える期待値を、確定仕様と断定せず根拠とともに書きます。</p></div>
+                  </section>
+                  <section>
+                    <span>5</span>
+                    <div><h3>確認理由・影響</h3><p>回答によって変わるテスト結果、合否判定、表示内容、請求金額などを具体的に書きます。</p></div>
+                  </section>
+                  <section>
+                    <span>6</span>
+                    <div><h3>周辺確認・補足</h3><p>比較した条件や類似画面など、判断に役立つ確認結果を補足します。未確認の範囲も明示します。</p></div>
+                  </section>
+                </div>
+              </section>
+
+              <section id="example">
+                <p class="section-number">04</p>
+                <h2>具体例：クーポン適用時の送料無料判定</h2>
+                <p>次は、送料仕様とクーポン仕様の組み合わせから期待値を決められなかった場合の記載例です。金額例は、回答者が境界条件をすぐ理解するための判断材料として使っています。</p>
+
+                <div class="redmine-example" aria-label="Redmine風のQA確認チケット記載例">
+                  <h3 class="redmine-example-number">QA #2048</h3>
+                  <article class="redmine-example-card">
+                    <h4>定額クーポン適用時の送料無料判定額を確認したい</h4>
+                    <p class="redmine-example-created"><a href="#example">wataru nakayama</a> が 2026/08/13 10:30 に追加。初版</p>
+
+                    <div class="redmine-example-meta">
+                      <dl>
+                        <div><dt>ステータス:</dt><dd>新規</dd></div>
+                        <div><dt>優先度:</dt><dd>通常</dd></div>
+                        <div><dt>担当者:</dt><dd>割田 得</dd></div>
+                        <div><dt>カテゴリ:</dt><dd>業務ロジック</dd></div>
+                      </dl>
+                      <dl>
+                        <div><dt>確認バージョン:</dt><dd>Storefront v8.4.2</dd></div>
+                        <div><dt>質問種別:</dt><dd>仕様確認</dd></div>
+                        <div><dt>期日:</dt><dd>未設定</dd></div>
+                        <div><dt>確認環境・構成:</dt><dd>Chrome 126 / Windows 11</dd></div>
+                      </dl>
+                    </div>
+
+                    <section class="redmine-example-description">
+                      <h5>説明</h5>
+                      <section><h6>質問</h6><p>送料無料条件の5,000円は、定額クーポン値引き後の商品合計へ適用する認識でよいでしょうか。</p></section>
+                      <section><h6>確認した状況・事実</h6><p>商品合計5,200円に500円の定額クーポンを適用すると、値引き後の商品合計は4,700円になります。</p></section>
+                      <section><h6>参照情報</h6><p>送料仕様書 Rev.3.1「2.2」には「商品合計金額が5,000円以上の場合、送料を無料とする」、クーポン仕様書 Rev.2.4「4.1」には「定額クーポンは商品合計金額から値引きする」とあります。送料無料判定と値引きの処理順序は記載されていません。</p></section>
+                      <section><h6>現在の解釈</h6><p>値引き後の4,700円を判定額とし、送料600円が発生すると考えています。</p></section>
+                      <section><h6>確認理由・影響</h6><p>回答により、クーポン利用時の送料表示と請求金額の期待値が変わります。</p></section>
+                      <section><h6>周辺確認・補足</h6><p>クーポンを使用しない商品合計5,200円の注文は、送料無料になる想定で準備しています。</p></section>
+                    </section>
+                  </article>
+                </div>
+
+                <div class="why-it-works">
+                  <h3>この記載が回答しやすい理由</h3>
+                  <ul>
+                    <li>回答者が判断する論点を、値引き前後のどちらで判定するかに絞っている</li>
+                    <li>二つの仕様に書かれた内容と、記載されていない処理順序を分けている</li>
+                    <li>回答によって送料表示と請求金額の期待値が変わることを示している</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section id="mistakes">
+                <p class="section-number">05</p>
+                <h2>QA確認で起きやすい4つの失敗</h2>
+                <div class="mistake-grid">
+                  <section><h3>「これは仕様ですか？」だけで聞く</h3><p>対象の動作、確認条件、参照した仕様、判断してほしい点が分からず、聞き返しが必要になります。</p></section>
+                  <section><h3>複数の論点を一度に詰め込む</h3><p>送料、税、ポイントなど独立した質問を混ぜると、回答がどの論点に対応するか曖昧になります。</p></section>
+                  <section><h3>仕様書の確認を丸投げする</h3><p>文書名だけを示すのではなく、該当箇所の記載内容と不足している判断を整理します。</p></section>
+                  <section><h3>現在の解釈を確定仕様として書く</h3><p>「〜と考えています」と未確定であることを示し、回答者が訂正できる余地を残します。</p></section>
+                </div>
+              </section>
+
+              <section id="checklist">
+                <p class="section-number">06</p>
+                <h2>回答依頼前のチェックリスト</h2>
+                <ul class="check-list">
+                  <li>題名だけで、確認したい対象と論点が分かる</li>
+                  <li>質問者が確認できる資料と事実を整理している</li>
+                  <li>参照資料の章節だけでなく、具体的な記載内容を書いている</li>
+                  <li>確認済みの事実と現在の解釈を分けている</li>
+                  <li>回答によって何の判断や期待値が変わるか分かる</li>
+                  <li>回答者が短い判断または訂正で返せる論点になっている</li>
+                </ul>
+              </section>
+
+              <section class="article-cta" aria-labelledby="ctaTitle">
+                <img src="/assets/images/brand/akamain-main-visual.png" alt="" />
+                <div>
+                  <h2 id="ctaTitle">読んだら、実際にQA起票してみる</h2>
+                  <p>実務に近いQAシナリオを読み、自分の言葉で確認事項を整理できます。ゲスト体験はログイン不要です。</p>
+                  <a class="start-button" href="/app.html?guest=1">ログインせず体験する <span aria-hidden="true">→</span></a>
+                </div>
+              </section>
+            </div>
+          </div>
+        </article>
+      </main>
+
+      <footer class="site-footer">
+        <p>問いと気づきに、伝わる技術を。</p>
+        <small>© 2026 あかマイン <span aria-hidden="true">·</span> Developed by <a href="https://nakayamaworks.jp/" target="_blank" rel="noopener noreferrer">Nakayama Works</a></small>
+      </footer>
+    </div>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Article",
+            "headline": "QA確認の書き方｜仕様確認・動作確認を伝える6項目と記載例",
+            "description": "回答者に伝わるQA確認の書き方を、6つの項目と具体的な記載例で解説します。",
+            "datePublished": "2026-08-13",
+            "dateModified": "2026-08-13",
+            "inLanguage": "ja",
+            "mainEntityOfPage": "https://akamain.com/qa-question-writing",
+            "author": { "@type": "Organization", "name": "Nakayama Works", "url": "https://nakayamaworks.jp/" },
+            "publisher": { "@type": "Organization", "name": "Nakayama Works", "url": "https://nakayamaworks.jp/" },
+            "image": "https://akamain.com/assets/images/brand/akamain-main-visual.png"
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://akamain.com/" },
+              { "@type": "ListItem", "position": 2, "name": "QA確認の書き方", "item": "https://akamain.com/qa-question-writing" }
+            ]
+          }
+        ]
+      }
+    </script>
+  </body>
+</html>

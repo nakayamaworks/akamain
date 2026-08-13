@@ -28,7 +28,7 @@ const allowedTopLevelFiles = new Set([
   "welcome.css",
   "welcome.js",
 ]);
-const allowedTopLevelDirectories = new Set(["assets", "bug-report-writing"]);
+const allowedTopLevelDirectories = new Set(["assets", "bug-report-writing", "qa-question-writing"]);
 
 async function listFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -63,6 +63,7 @@ for (const absolutePath of files) {
 const welcomeHtml = await readFile(join(outputDirectory, "index.html"), "utf8");
 const appHtml = await readFile(join(outputDirectory, "app.html"), "utf8");
 const bugReportGuideHtml = await readFile(join(outputDirectory, "bug-report-writing", "index.html"), "utf8");
+const qaQuestionGuideHtml = await readFile(join(outputDirectory, "qa-question-writing", "index.html"), "utf8");
 const manifest = await readFile(join(outputDirectory, "site.webmanifest"), "utf8");
 
 async function verifyLocalReferences(html, sourceFile) {
@@ -96,6 +97,7 @@ async function verifyLocalReferences(html, sourceFile) {
 await verifyLocalReferences(welcomeHtml, "index.html");
 await verifyLocalReferences(appHtml, "app.html");
 await verifyLocalReferences(bugReportGuideHtml, "bug-report-writing/index.html");
+await verifyLocalReferences(qaQuestionGuideHtml, "qa-question-writing/index.html");
 
 const requiredWelcomeFragments = [
   'href="./"',
@@ -106,7 +108,10 @@ const requiredWelcomeFragments = [
   'テストエンジニアのための起票トレーニング',
   '問いと気づきに、<strong>伝わる技術</strong>を。',
   '現場でそのまま使えるQA確認と不具合報告の力',
-  '>不具合報告の書き方</a>',
+  'href="./qa-question-writing">QA確認</a>',
+  'href="./bug-report-writing">不具合報告</a>',
+  'QA確認の書き方を読む',
+  '不具合報告の書き方を読む',
 ];
 for (const fragment of requiredWelcomeFragments) {
   if (!welcomeHtml.includes(fragment)) {
@@ -128,9 +133,18 @@ if (!bugReportGuideHtml.includes('<link rel="canonical" href="https://akamain.co
 if (!bugReportGuideHtml.includes('href="/app.html?guest=1"')) {
   throw new Error("バグ報告ガイドからゲスト体験への導線がありません。");
 }
+if (!qaQuestionGuideHtml.includes('<link rel="canonical" href="https://akamain.com/qa-question-writing" />')) {
+  throw new Error("QA確認ガイドのcanonical設定がありません。");
+}
+if (!qaQuestionGuideHtml.includes('href="/app.html?guest=1"')) {
+  throw new Error("QA確認ガイドからゲスト体験への導線がありません。");
+}
 const sitemap = await readFile(join(outputDirectory, "sitemap.xml"), "utf8");
 if (!sitemap.includes("https://akamain.com/bug-report-writing")) {
   throw new Error("sitemapにバグ報告ガイドが登録されていません。");
+}
+if (!sitemap.includes("https://akamain.com/qa-question-writing")) {
+  throw new Error("sitemapにQA確認ガイドが登録されていません。");
 }
 if (!manifest.includes('"start_url": "./"')) {
   throw new Error("Webアプリの開始URLが公開トップになっていません。");

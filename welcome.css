@@ -88,7 +88,8 @@ a:focus-visible {
   font-size: 0.82rem;
 }
 
-.header-links a {
+.header-links a,
+.header-links span {
   color: var(--muted);
   font-weight: 700;
   text-decoration: none;
@@ -96,7 +97,8 @@ a:focus-visible {
 }
 
 .header-links a:hover,
-.header-links a[aria-current="page"] {
+.header-links a[aria-current="page"],
+.header-links span[aria-current="page"] {
   color: var(--red);
 }
 
@@ -473,6 +475,26 @@ a:focus-visible {
 }
 
 .text-link:hover {
+  color: var(--red);
+}
+
+.learning-links {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.learning-links .text-link {
+  margin-top: 0;
+}
+
+.learning-links .text-link.is-secondary {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.learning-links .text-link.is-secondary:hover {
   color: var(--red);
 }
 

@@ -501,8 +501,9 @@
 }
 
 @media (max-width: 640px) {
-  .guide-page .header-links a:first-child {
-    display: none;
+  .guide-page .header-links {
+    gap: 10px;
+    font-size: 0.7rem;
   }
 
   .guide-page .header-cta {
