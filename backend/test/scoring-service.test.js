@@ -323,7 +323,7 @@ test("all registered rubrics produce scenario-specific structured-output schemas
     );
     assert.equal(schema.properties.investigationAdvice.maxItems, 4);
     assert.equal(schema.properties.strengths.minItems, 0);
-    assert.equal(schema.properties.strengths.maxItems, 3);
+    assert.equal(schema.properties.strengths.maxItems, 2);
     assert.deepEqual(
       schema.properties.strengths.items.required,
       ["evidenceQuote", "evaluation", "whyItHelps"]
@@ -397,6 +397,32 @@ test("QA attempts accept the QA tracker and QA verdicts", () => {
   assert.equal(findings.ticketFieldChecks.some(({ field }) => field === "severity"), false);
 });
 
+test("QA reader questions keep only genuine answerer-to-author follow-ups", () => {
+  const scenarioId = "customer-qa-search-state-after-back";
+  const output = completeOutputForScenario(scenarioId);
+  output.readerQuestions = [
+    {
+      reader: "仕様担当者",
+      question: "検索条件を保持する修正を不具合として扱っても問題ありませんか？",
+      whyItMatters: "不具合として修正してよいか判断するため。",
+      classification: "不足情報",
+      factId: "question-single-decision",
+    },
+    {
+      reader: "仕様担当者",
+      question: "一覧へ戻る際に使用したのは画面内リンクですか？",
+      whyItMatters: "遷移経路を特定するため。",
+      classification: "不足情報",
+      factId: "situation-confirmed-facts",
+    },
+  ];
+  const normalized = normalizeModelOutput(output, scenarioId);
+  assert.deepEqual(
+    normalized.readerQuestions.map(({ question }) => question),
+    ["一覧へ戻る際に使用したのは画面内リンクですか？"]
+  );
+});
+
 test("QA verdicts follow the learner-facing score bands", async () => {
   const scenarioId = "customer-qa-search-state-after-back";
   const rubric = getScenarioRubric(scenarioId);
@@ -425,6 +451,40 @@ test("QA verdicts follow the learner-facing score bands", async () => {
   });
   assert.equal(result.totalScore, 85);
   assert.equal(result.verdict, "回答依頼可能（軽微な改善あり）");
+});
+
+test("ready-to-send reviews do not label polish as a required correction", async () => {
+  const scenarioId = "customer-qa-search-state-after-back";
+  const rubric = getScenarioRubric(scenarioId);
+  const attempt = createAttemptRecord({
+    scenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      ...rubric.writingExample,
+      ticketFields: { tracker: "qa", progress: 0 },
+    },
+  }, { userId: "verified-google-sub" });
+  const modelOutput = completeOutputForScenario(scenarioId);
+  modelOutput.dimensions = Object.fromEntries(
+    rubric.dimensions.map(({ id }) => [id, 95])
+  );
+  const result = await scoreAttemptRecordWithGemini(attempt, {
+    apiKey: "server-only-key",
+    fetchImplementation: async () => ({
+      ok: true,
+      async json() {
+        return {
+          candidates: [{ content: { parts: [{ text: JSON.stringify(modelOutput) }] } }],
+        };
+      },
+    }),
+  });
+  assert.equal(result.totalScore, 95);
+  assert.equal(result.verdict, "回答依頼可能");
+  assert.deepEqual(
+    result.improvementItems.map(({ priority }) => priority),
+    ["任意改善"]
+  );
 });
 
 test("the customer search-state QA accepts both UI and workflow categories while recommending UI", () => {
@@ -476,7 +536,7 @@ test("the mobile data-loss prompt rewards scenario-specific analysis without sco
   assert.match(prompt, /期待結果と実際の動作が分かれている/);
   assert.match(prompt, /唯一の正解文はありません/);
   assert.match(prompt, /記載例より有効な比較確認や切り分け/);
-  assert.match(prompt, /strengthsは0〜3件/);
+  assert.match(prompt, /strengthsは0〜2件/);
   assert.doesNotMatch(prompt, /"writingExample"/);
 });
 

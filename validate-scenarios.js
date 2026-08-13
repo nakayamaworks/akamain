@@ -242,8 +242,9 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
   "practiceScoringResult",
   "practiceScoringPreviewTotal",
   "practiceScoringVerdict",
-  "practiceScoringVerdictDescription",
   "practiceScoringOverallAssessment",
+  "practiceScoringDetails",
+  "practiceScoringImprovementSection",
   "practiceScoringPreviewStrengths",
   "practiceScoringReaderQuestions",
   "practiceScoringAmbiguityRisks",
@@ -375,7 +376,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v10"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v11"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問")
@@ -1815,7 +1816,6 @@ try {
         scoringPreviewRendered:
           elements.practiceScoringPreviewTotal.textContent === "77" &&
           elements.practiceScoringVerdict.textContent === "追加確認を推奨" &&
-          elements.practiceScoringVerdictDescription.textContent.includes("追加確認") &&
           elements.practiceRadarFactual.textContent === "78" &&
           elements.practiceScoringReaderQuestions.innerHTML.includes("保存API") &&
           elements.practiceScoringAmbiguityRisks.innerHTML.includes("DBの排他制御"),

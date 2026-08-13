@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v10";
+export const PROMPT_VERSION = "practice-review.v11";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -335,7 +335,7 @@ export function buildModelOutputSchema(rubric) {
     strengths: {
       type: "array",
       minItems: 0,
-      maxItems: 3,
+      maxItems: 2,
       items: {
         type: "object",
         required: ["evidenceQuote", "evaluation", "whyItHelps"],
@@ -542,17 +542,19 @@ export function buildScoringPrompt(attempt) {
       "チーム内で既知の標準操作は、その操作経路自体が論点でない限り手順書レベルの詳細を要求しないでください。",
       "reviewSourceにない追加記述は、矛盾しない限りただちに誤りとせず、必要なら『記述確認』として実施済みかを尋ねてください。",
       "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使い、記述確認または調査提案はnot-applicableにしてください。",
+      "QAのreaderQuestionsは、仕様担当者などの回答者が回答前に起票者へ聞き返さなければならない不足情報だけです。元のQA質問を回答者向けに言い換えたり、『不具合として扱ってよいか』『仕様を変更するか』を再質問したりしてはいけません。該当がなければ空配列にしてください。",
       "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含めてください。presentまたはcontradictedでは受講者の回答から短く正確に引用し、missingでは空文字にしてください。",
       "readerQuestions、ambiguityRisks、rewriteSuggestionsは必要な場合だけ返し、件数を満たすために作らないでください。",
       "investigationAdviceは0〜4件です。起票前に質問者自身が確認できること、または回答後に行う判断が本当にある場合だけ返してください。",
       "rewriteSuggestionsは受講者の有効な文章を残した最小修正とし、記載例のコピーに置き換えないでください。",
-      "strengthsは0〜3件です。『質問欄がある』『項目が埋まっている』などフォーム上当然のことを評価せず、このQA固有の論点整理が回答負荷をどう減らすかを示してください。",
+      "strengthsは0〜2件です。『質問欄がある』『項目が埋まっている』などフォーム上当然のことを評価せず、このQA固有の論点整理が回答負荷をどう減らすかを示してください。",
       "dimensionsはQA本文の品質だけを採点してください。チケット設定と添付証跡は別チェックであり、dimensionsやverdictの減点理由に含めないでください。",
       "仕様書の未記載、観測事実、比較根拠、利用者影響を整理したうえで『不具合として扱ってよいか』『現在の理解で合っているか』を仕様担当者へ確認することは、正当なQA確認です。仕様決定の丸投げとは評価しないでください。",
       "質問者に『仕様を変更するか現状維持か』などの設計選択肢を作らせないでください。QA担当者が仕様決定へ踏み込みすぎる場合があります。質問者が判断材料と現在の解釈を示していれば十分です。",
       "『考えています』『認識です』『相違ないでしょうか』は未確定の解釈を示す表現です。確定仕様の断定として扱わず、重複や冗長さがある場合は文章上の任意改善として扱ってください。",
+      "『不具合として起票すべきだと考えています』という現在の解釈は、質問欄で認識確認を行っている限り断定ではありません。『べきだと考え』の重複は、必要な修正ではなく任意の簡潔化として扱ってください。",
       "dimensionFeedbackには各評価軸の点数の理由だけを具体的に記載してください。実務上十分なら100点を使用し、到達不能な理想との差を作らないでください。",
-      "improvementItemsは最大4件です。回答前に直す価値が高い不足は『修正推奨』、回答は依頼できるが表現を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。",
+      "improvementItemsは最大4件です。回答前に直す価値が高い不足は『修正推奨』、回答は依頼できるが表現を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。detailには抽象論ではなく、この起票へそのまま反映できる具体的な修正内容を示してください。",
       "90〜100点はそのまま回答依頼可能、80〜89点は良好で軽微な改善あり、70〜79点は確認前の整理を推奨、69点以下は主要情報不足の目安です。語句の好みや軽微な重複だけで80点台前半まで下げないでください。",
       "点数を下げるのは、improvementItemsに挙げるだけの具体的な修正または任意改善がある評価軸だけです。relatedDimensionIdsに含まれない評価軸はシステムが100点として扱います。",
       "verdictは点数帯に合わせて選びますが、最終判定はシステム側で総合点から確定します。",
@@ -594,11 +596,11 @@ export function buildScoringPrompt(attempt) {
     "文章が十分明確な場合は無理に欠点を作らず、調査開始後に読み手が確認したくなる点を調査提案として示してください。",
     "rewriteSuggestionsは本当に改善効果がある場合だけ返してください。受講者の有効な表現を残した最小限の修正とし、記載例を丸ごと再現した文章へ置き換えないでください。",
     "受講者向けの表示では『備考』欄を『周辺確認・補足』と呼びます。レビュー本文やrewriteSuggestionsのsectionでこの欄を指す場合も『周辺確認・補足』と表記してください。",
-    "strengthsは0〜3件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
+    "strengthsは0〜2件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
     "フォームの構造上当然となる『期待結果と実際の動作が分かれている』『再現回数が数値で書かれている』『操作手順がある』『項目が埋まっている』だけをstrengthsとして評価してはいけません。再現性を評価する場合は、具体的な比較条件と結果から何を絞り込めるかまで述べてください。",
     "採点基準にreviewGuideがある場合、strengthCriteriaは内容固有の着眼点として使い、disallowedGenericPraiseは単独の称賛として使用しないでください。nonScoringInvestigationIdeasは不足情報や減点理由ではなく、今後の調査提案としてのみ扱ってください。",
     "dimensionFeedbackには各評価軸の点数の理由だけを具体的に記載してください。実務上十分なら100点を使用し、到達不能な理想との差を作らないでください。",
-    "improvementItemsは最大4件です。調査開始前に直す価値が高い不足は『修正推奨』、調査は開始できるが表現や補足を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。",
+    "improvementItemsは最大4件です。調査開始前に直す価値が高い不足は『修正推奨』、調査は開始できるが表現や補足を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。detailには抽象論ではなく、この起票へそのまま反映できる具体的な修正内容を示してください。",
     "90〜100点はそのまま調査着手可能、80〜89点は良好で軽微な改善あり、70〜79点は追加確認を推奨、69点以下は主要情報不足の目安です。語句の好みや軽微な重複だけで80点台前半まで下げないでください。",
     "点数を下げるのは、improvementItemsに挙げるだけの具体的な修正または任意改善がある評価軸だけです。relatedDimensionIdsに含まれない評価軸はシステムが100点として扱います。",
     "各評価軸は0〜100の整数で採点してください。",
@@ -637,6 +639,12 @@ function normalizedQuoteText(value) {
 function normalizePublicSectionLabel(value) {
   const label = String(value || "");
   return label === "備考" || label === "■備考" ? "周辺確認・補足" : label;
+}
+
+function isQaDecisionRestatement(question) {
+  return /(?:不具合|正常|仕様|修正).{0,35}(?:扱って|変更|維持|問題ありませんか|よいでしょうか|しますか)/u.test(
+    String(question || "")
+  );
 }
 
 function createAttemptEvidenceChecker(attempt) {
@@ -756,7 +764,14 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         classification,
         factId,
       };
-    });
+    })
+    .filter((item) =>
+      rubric.ticketType !== "qa"
+      || (
+        item.classification === "不足情報"
+        && !isQaDecisionRestatement(item.question)
+      )
+    );
   const ambiguityRisks = requireArray(rawOutput.ambiguityRisks, "ambiguityRisks")
     .map((item, index) => ({
       quote: requireNonEmptyString(item.quote, `ambiguityRisks[${index}].quote`),
@@ -848,7 +863,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       && !isGenericStructurePraise(item.evaluation, item.whyItHelps)
     ).map(({ evidenceQuote, evaluation, whyItHelps }) =>
       `「${evidenceQuote}」という記述から、${removeTerminalPunctuation(evaluation)}。${whyItHelps}`
-    ),
+    ).slice(0, 2),
     factAssessments,
     forbiddenClaimIds,
   };
@@ -1126,6 +1141,11 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     ? rawWeightedScore
     : Math.min(rawWeightedScore, rubricFindings.appliedScoreCap);
   const { factAssessments: _factAssessments, forbiddenClaimIds: _forbiddenClaimIds, ...review } = normalized;
+  const improvementItems = review.improvementItems.map((item) =>
+    totalScore >= 90 && item.priority === "修正推奨"
+      ? { ...item, priority: "任意改善" }
+      : item
+  );
   return {
     schemaVersion: "scoring-result.v3",
     scoringResultId: crypto.randomUUID(),
@@ -1133,6 +1153,7 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     status: "succeeded",
     totalScore,
     ...review,
+    improvementItems,
     verdict: verdictForScore(totalScore, rubric.ticketType),
     rubricFindings,
     rubricVersion: rubric.rubricVersion,

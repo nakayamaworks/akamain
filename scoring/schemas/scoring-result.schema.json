@@ -168,7 +168,7 @@
         }
       }
     },
-    "strengths": { "type": "array", "items": { "type": "string" } },
+    "strengths": { "type": "array", "maxItems": 2, "items": { "type": "string" } },
     "rubricFindings": {
       "type": ["object", "null"],
       "additionalProperties": false,

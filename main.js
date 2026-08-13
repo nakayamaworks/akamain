@@ -1274,9 +1274,8 @@ const elements = {
   practiceScoringResult: document.getElementById("practiceScoringResult"),
   practiceScoringPreviewTotal: document.getElementById("practiceScoringPreviewTotal"),
   practiceScoringVerdict: document.getElementById("practiceScoringVerdict"),
-  practiceScoringVerdictDescription: document.getElementById("practiceScoringVerdictDescription"),
   practiceScoringOverallAssessment: document.getElementById("practiceScoringOverallAssessment"),
-  practiceScoringBasis: document.getElementById("practiceScoringBasis"),
+  practiceScoringDetails: document.getElementById("practiceScoringDetails"),
   practiceScoringDimensionFeedbackSection: document.getElementById("practiceScoringDimensionFeedbackSection"),
   practiceScoringDimensionFeedbackTitle: document.getElementById("practiceScoringDimensionFeedbackTitle"),
   practiceScoringDimensionFeedback: document.getElementById("practiceScoringDimensionFeedback"),
@@ -1288,6 +1287,7 @@ const elements = {
   practiceScoringPreviewStrengths: document.getElementById("practiceScoringPreviewStrengths"),
   practiceScoringReaderQuestions: document.getElementById("practiceScoringReaderQuestions"),
   practiceScoringReaderQuestionsSection: document.getElementById("practiceScoringReaderQuestionsSection"),
+  practiceScoringReaderQuestionsTitle: document.getElementById("practiceScoringReaderQuestionsTitle"),
   practiceScoringAmbiguitySection: document.getElementById("practiceScoringAmbiguitySection"),
   practiceScoringAmbiguityRisks: document.getElementById("practiceScoringAmbiguityRisks"),
   practiceScoringInvestigationAdvice: document.getElementById("practiceScoringInvestigationAdvice"),
@@ -4294,8 +4294,26 @@ function renderPracticeImprovementItems(preview) {
   return items;
 }
 
+function getVisibleReaderQuestions(items, qaTicket = isQaScenario()) {
+  if (!qaTicket) {
+    return items;
+  }
+  return items.filter((item) => {
+    if (item.classification !== "不足情報") {
+      return false;
+    }
+    return !/(?:不具合|正常|仕様|修正).{0,35}(?:扱って|変更|維持|問題ありませんか|よいでしょうか|しますか)/u.test(
+      String(item.question || "")
+    );
+  });
+}
+
 function renderPracticeReaderQuestions(items) {
   elements.practiceScoringReaderQuestionsSection?.classList.toggle("hidden", items.length === 0);
+  setTextContent(
+    elements.practiceScoringReaderQuestionsTitle,
+    isQaScenario() ? "回答者から聞き返されそうなこと" : "読み手が疑問に思うこと"
+  );
   if (!elements.practiceScoringReaderQuestions) {
     return;
   }
@@ -4369,24 +4387,6 @@ function renderPracticeRewriteSuggestions(items) {
         <small>${escapeHtml(item.reason)}</small>
       </div>`)
     .join("");
-}
-
-function getRubricFindingsSummary(result, { qaTicket = isQaScenario() } = {}) {
-  const findings = result?.rubricFindings;
-  if (!findings) {
-    return "";
-  }
-  const factAssessments = findings.factAssessments || [];
-  const presentFacts = factAssessments.filter(({ status }) => status === "present").length;
-  const ticketChecks = (findings.ticketFieldChecks || []).filter(
-    ({ field }) => !qaTicket || field !== "severity"
-  );
-  const matchedTicketFields = ticketChecks.filter(({ matched }) => matched).length;
-  const evidenceMatched = findings.evidenceCheck?.matched ? "適合" : "不足・対象外あり";
-  const capText = Number.isInteger(findings.appliedScoreCap)
-    ? ` 重大な不足または未確認の断定があるため、総合点の上限を${findings.appliedScoreCap}点としています。`
-    : "";
-  return `内容確認：必須情報 ${presentFacts}/${factAssessments.length}。設定チェック：${matchedTicketFields}/${ticketChecks.length}、添付証跡 ${evidenceMatched}。チケット設定と添付証跡は総合点とは別に確認しています。${capText}`;
 }
 
 const scoringVerdictPresentation = {
@@ -4472,11 +4472,7 @@ function renderPracticeScoringPreview() {
   const verdictPresentation = getScoringVerdictPresentation(preview.verdict);
   setTextContent(elements.practiceScoringPreviewTotal, String(preview.totalScore));
   setTextContent(elements.practiceScoringVerdict, verdictPresentation.label);
-  setTextContent(elements.practiceScoringVerdictDescription, verdictPresentation.description);
   setTextContent(elements.practiceScoringOverallAssessment, preview.overallAssessment);
-  const findingsSummary = getRubricFindingsSummary(preview);
-  setTextContent(elements.practiceScoringBasis, findingsSummary);
-  elements.practiceScoringBasis?.classList.toggle("hidden", !findingsSummary);
   elements.practiceScoringVerdict?.classList.toggle(
     "is-ready",
     ["開発着手可能", "回答依頼可能"].includes(preview.verdict)
@@ -4489,6 +4485,9 @@ function renderPracticeScoringPreview() {
     "is-danger",
     ["再整理を推奨", "質問の再整理を推奨"].includes(preview.verdict)
   );
+  if (elements.practiceScoringDetails) {
+    elements.practiceScoringDetails.open = false;
+  }
   renderPracticeScoringRadar(preview);
   renderPracticeDimensionFeedback(preview);
   const improvementItems = renderPracticeImprovementItems(preview);
@@ -4497,16 +4496,18 @@ function renderPracticeScoringPreview() {
     preview.strengths,
     "明確に評価できる記述はありません"
   );
-  const readerQuestions = preview.readerQuestions || [];
-  const ambiguityRisks = preview.ambiguityRisks || [];
-  const rewriteSuggestions = preview.rewriteSuggestions || [];
+  const qaTicket = isQaScenario();
+  const readerQuestions = getVisibleReaderQuestions(preview.readerQuestions || [], qaTicket);
+  const ambiguityRisks = qaTicket ? [] : preview.ambiguityRisks || [];
+  const investigationAdvice = qaTicket ? [] : preview.investigationAdvice || [];
+  const rewriteSuggestions = qaTicket ? [] : preview.rewriteSuggestions || [];
   elements.practiceScoringNoImprovements?.classList.toggle(
     "hidden",
     improvementItems.length + readerQuestions.length + ambiguityRisks.length + rewriteSuggestions.length > 0
   );
   renderPracticeReaderQuestions(readerQuestions);
   renderPracticeAmbiguityRisks(ambiguityRisks);
-  renderPracticeInvestigationAdvice(preview.investigationAdvice);
+  renderPracticeInvestigationAdvice(investigationAdvice);
   renderPracticeRewriteSuggestions(rewriteSuggestions);
 }
 
@@ -5048,19 +5049,19 @@ function renderTicketDetail() {
     .map((name) => `<li>${escapeHtml(String(name))}</li>`)
     .join("");
   const watcherNames = (fields.watcherIds || []).map(memberName).join("、") || "—";
-  const questions = (result?.readerQuestions || [])
+  const questions = getVisibleReaderQuestions(result?.readerQuestions || [], qaTicket)
     .map((item) => `<li>${escapeHtml(String(item.question || ""))}</li>`)
     .join("");
-  const advice = (result?.investigationAdvice || [])
+  const advice = (qaTicket ? [] : result?.investigationAdvice || [])
     .map((item) => `<li><strong>${escapeHtml(String(item.action || ""))}</strong>${item.purpose ? `<span>${escapeHtml(String(item.purpose))}</span>` : ""}</li>`)
     .join("");
   const strengths = (result?.strengths || [])
     .map((item) => `<li>${escapeHtml(String(item))}</li>`)
     .join("");
-  const ambiguityRisks = (result?.ambiguityRisks || [])
+  const ambiguityRisks = (qaTicket ? [] : result?.ambiguityRisks || [])
     .map((item) => `<li><strong>「${escapeHtml(String(item.quote || ""))}」</strong><span>${escapeHtml(String(item.risk || ""))}${item.advice ? ` — ${escapeHtml(String(item.advice))}` : ""}</span></li>`)
     .join("");
-  const rewrites = (result?.rewriteSuggestions || [])
+  const rewrites = (qaTicket ? [] : result?.rewriteSuggestions || [])
     .map((item) => `<li><strong>${escapeHtml(getReportSectionDisplayLabel(item.section))}</strong><span>${escapeHtml(String(item.suggested || ""))}${item.reason ? ` — ${escapeHtml(String(item.reason))}` : ""}</span></li>`)
     .join("");
   const dimensionFeedbackItems = getDimensionFeedbackItems(result, qaTicket);
@@ -5111,8 +5112,6 @@ function renderTicketDetail() {
   const scoreComparison = scoreDelta === null
     ? ""
     : `<p class="ticket-score-comparison">初回 ${initialScore}点 → ${escapeHtml(ticketRevisionLabel(revisionNumber))} ${currentScore}点 <strong class="${scoreDelta >= 0 ? "is-up" : "is-down"}">${scoreDelta >= 0 ? "+" : ""}${scoreDelta}点</strong></p>`;
-  const findingsSummary = getRubricFindingsSummary(result, { qaTicket });
-
   setTextContent(elements.ticketDetailNumber, `${trackerLabel} #${ticket.displayId || ""}`);
   elements.ticketDetailContent.innerHTML = `
     ${revisionNavigation}
@@ -5155,15 +5154,13 @@ function renderTicketDetail() {
       ${result?.status === "succeeded" ? `
         ${scoreComparison}
         <p class="ticket-detail-verdict">${escapeHtml(verdictPresentation.label)}</p>
-        ${verdictPresentation.description ? `<p class="ticket-detail-verdict-description">${escapeHtml(verdictPresentation.description)}</p>` : ""}
         <p>${escapeHtml(String(result.overallAssessment || ""))}</p>
-        ${findingsSummary ? `<p class="ticket-detail-scoring-basis">${escapeHtml(findingsSummary)}</p>` : ""}
         ${strengths ? `<h3>問題なし・評価できる点</h3><ul>${strengths}</ul>` : ""}
-        ${dimensionFeedback ? `<h3>観点別の採点理由</h3><ul class="ticket-detail-advice">${dimensionFeedback}</ul>` : ""}
+        ${dimensionFeedback ? `<details class="ticket-detail-score-details"><summary>採点の詳細を見る</summary><ul class="ticket-detail-advice">${dimensionFeedback}</ul></details>` : ""}
         ${requiredImprovements ? `<h3>修正を推奨</h3><ul class="ticket-detail-advice">${requiredImprovements}</ul>` : ""}
         ${optionalImprovements ? `<h3>さらに良くするなら</h3><ul class="ticket-detail-advice">${optionalImprovements}</ul>` : ""}
         ${hasImprovementSuggestions ? "" : '<p class="ticket-detail-no-improvements">優先して修正が必要な表現や不足情報はありません。</p>'}
-        ${questions ? `<h3>読み手が疑問に思うこと</h3><ul>${questions}</ul>` : ""}
+        ${questions ? `<h3>${qaTicket ? "回答者から聞き返されそうなこと" : "読み手が疑問に思うこと"}</h3><ul>${questions}</ul>` : ""}
         ${ambiguityRisks ? `<h3>曖昧さ・誤解のリスク</h3><ul class="ticket-detail-advice">${ambiguityRisks}</ul>` : ""}
         ${advice ? `<h3>次に確認・切り分けすること</h3><ol class="ticket-detail-advice">${advice}</ol>` : ""}
         ${rewrites ? `<h3>書き換え提案</h3><ul class="ticket-detail-advice">${rewrites}</ul>` : ""}

@@ -3268,9 +3268,9 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
 .practice-ai-review-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 26px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: start;
   padding: 4px 0 20px;
   border-bottom: 1px solid #d8e3ec;
 }
@@ -3376,7 +3376,36 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
 .practice-ai-radar-panel {
   min-width: 0;
+  max-width: 380px;
+  margin: 0 auto;
   padding: 12px 8px 2px;
+}
+
+.practice-ai-score-details {
+  margin-top: 18px;
+  border-top: 1px solid #d8e3ec;
+}
+
+.practice-ai-score-details > summary,
+.ticket-detail-score-details > summary {
+  cursor: pointer;
+  color: #47647b;
+  font-size: 0.76rem;
+  font-weight: 800;
+  list-style-position: inside;
+}
+
+.practice-ai-score-details > summary {
+  padding: 14px 2px 2px;
+}
+
+.practice-ai-score-details[open] > summary,
+.ticket-detail-score-details[open] > summary {
+  margin-bottom: 8px;
+}
+
+#practiceScoringDimensionFeedbackSection {
+  padding: 4px 2px 14px;
 }
 
 .practice-ai-radar-title {
@@ -3508,6 +3537,16 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
 .practice-ai-priority-item small {
   display: block;
+}
+
+.ticket-detail-score-details {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #e1e8ed;
+}
+
+.ticket-detail-score-details .ticket-detail-advice {
+  margin-top: 10px;
 }
 
 .practice-ai-review-item {
