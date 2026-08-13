@@ -30,13 +30,27 @@ const completeModelOutput = {
     investigationReadiness: 70,
   },
   dimensionFeedback: {
-    factualGrounding: { reason: "観測事実はありますが、一部の表現が曖昧です。", improvement: "観測した対象を具体化してください。" },
-    informationCoverage: { reason: "主要情報の一部が不足しています。", improvement: "発生条件を一つ補足してください。" },
-    reproducibility: { reason: "操作回数を一意に読み取れません。", improvement: "クリック回数を明記してください。" },
-    expectedActualSeparation: { reason: "期待と実際は概ね区別されています。", improvement: "期待値の仕様根拠を明記してください。" },
-    interpretiveClarity: { reason: "原因の推測は抑えられています。", improvement: "確認済み範囲を補足してください。" },
-    investigationReadiness: { reason: "調査は始められますが条件が不足しています。", improvement: "通信記録との対応を補足してください。" },
+    factualGrounding: { reason: "観測事実はありますが、一部の表現が曖昧です。" },
+    informationCoverage: { reason: "主要情報の一部が不足しています。" },
+    reproducibility: { reason: "操作回数を一意に読み取れません。" },
+    expectedActualSeparation: { reason: "期待と実際は概ね区別されています。" },
+    interpretiveClarity: { reason: "原因の推測は抑えられています。" },
+    investigationReadiness: { reason: "調査は始められますが条件が不足しています。" },
   },
+  improvementItems: [{
+    priority: "修正推奨",
+    title: "発生条件を具体化する",
+    detail: "クリック回数と確認対象を具体化してください。",
+    whyItMatters: "第三者が同じ条件で再現できるようにするためです。",
+    relatedDimensionIds: [
+      "factualGrounding",
+      "informationCoverage",
+      "reproducibility",
+      "expectedActualSeparation",
+      "interpretiveClarity",
+      "investigationReadiness",
+    ],
+  }],
   verdict: "追加確認を推奨",
   overallAssessment: "現象は伝わりますが、クリック回数の記載が不足しています。",
   readerQuestions: [
@@ -93,13 +107,20 @@ function completeOutputForScenario(scenarioId) {
   const dimensionFeedback = Object.fromEntries(
     rubric.dimensions.map(({ id }) => [id, {
       reason: "主要な内容は伝わります。",
-      improvement: "判断条件をもう一段具体化してください。",
     }])
   );
+  const improvementItems = [{
+    priority: "任意改善",
+    title: "判断条件を具体化する",
+    detail: "判断条件をもう一段具体化してください。",
+    whyItMatters: "読み手の確認負荷をさらに下げるためです。",
+    relatedDimensionIds: rubric.dimensions.map(({ id }) => id),
+  }];
   return {
     ...completeModelOutput,
     dimensions,
     dimensionFeedback,
+    improvementItems,
     verdict: rubric.ticketType === "qa" ? "回答依頼可能" : completeModelOutput.verdict,
     investigationAdvice: rubric.ticketType === "qa" ? [] : completeModelOutput.investigationAdvice,
     readerQuestions: completeModelOutput.readerQuestions.map((question) => ({
@@ -163,6 +184,14 @@ test("a complete ticket can return no reader questions", () => {
     readerQuestions: [],
   });
   assert.deepEqual(normalized.readerQuestions, []);
+});
+
+test("scores without a prioritized improvement are restored to 100", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    improvementItems: [],
+  });
+  assert.equal(Object.values(normalized.dimensions).every((score) => score === 100), true);
 });
 
 test("a ticket with no evidence-based strengths can return an empty strengths list", () => {
@@ -281,6 +310,7 @@ test("all registered rubrics produce scenario-specific structured-output schemas
       schema.properties.dimensionFeedback.required,
       rubric.dimensions.map((dimension) => dimension.id)
     );
+    assert.equal(schema.properties.improvementItems.maxItems, 4);
     assert.equal(schema.properties.readerQuestions.minItems, 0);
     assert.equal(schema.properties.readerQuestions.maxItems, 4);
     assert.deepEqual(
@@ -325,9 +355,20 @@ test("QA scenarios use a question-focused rubric and never ask the model to deci
   });
   assert.match(prompt, /AI自身が仕様回答を決めてはいけません/);
   assert.match(prompt, /不要な聞き返し/);
-  assert.match(prompt, /改善点を説明できない評価軸は100点/);
+  assert.match(prompt, /不具合として扱ってよいか/);
+  assert.match(prompt, /仕様決定の丸投げとは評価しない/);
+  assert.match(prompt, /実務上十分なら100点/);
+  assert.match(prompt, /90〜100点はそのまま回答依頼可能/);
   assert.match(prompt, /回答依頼可能/);
   assert.doesNotMatch(prompt, /不具合票を受け取って調査を始める/);
+  assert.match(
+    rubric.reviewSource.observations.map(({ text }) => text).join("\n"),
+    /画面内の『一覧へ戻る』リンク/
+  );
+  assert.match(
+    rubric.reviewSource.observations.map(({ text }) => text).join("\n"),
+    /検索条件の再設定が必要/
+  );
 });
 
 test("QA attempts accept the QA tracker and QA verdicts", () => {
@@ -354,6 +395,36 @@ test("QA attempts accept the QA tracker and QA verdicts", () => {
     selectedEvidenceIds: [],
   }, normalizedOutput, 88);
   assert.equal(findings.ticketFieldChecks.some(({ field }) => field === "severity"), false);
+});
+
+test("QA verdicts follow the learner-facing score bands", async () => {
+  const scenarioId = "customer-qa-search-state-after-back";
+  const rubric = getScenarioRubric(scenarioId);
+  const attempt = createAttemptRecord({
+    scenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      ...rubric.writingExample,
+      ticketFields: { tracker: "qa", progress: 0 },
+    },
+  }, { userId: "verified-google-sub" });
+  const modelOutput = completeOutputForScenario(scenarioId);
+  modelOutput.dimensions = Object.fromEntries(
+    rubric.dimensions.map(({ id }) => [id, 85])
+  );
+  const result = await scoreAttemptRecordWithGemini(attempt, {
+    apiKey: "server-only-key",
+    fetchImplementation: async () => ({
+      ok: true,
+      async json() {
+        return {
+          candidates: [{ content: { parts: [{ text: JSON.stringify(modelOutput) }] } }],
+        };
+      },
+    }),
+  });
+  assert.equal(result.totalScore, 85);
+  assert.equal(result.verdict, "回答依頼可能（軽微な改善あり）");
 });
 
 test("the customer search-state QA accepts both UI and workflow categories while recommending UI", () => {

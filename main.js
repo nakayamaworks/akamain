@@ -1280,6 +1280,11 @@ const elements = {
   practiceScoringDimensionFeedbackSection: document.getElementById("practiceScoringDimensionFeedbackSection"),
   practiceScoringDimensionFeedbackTitle: document.getElementById("practiceScoringDimensionFeedbackTitle"),
   practiceScoringDimensionFeedback: document.getElementById("practiceScoringDimensionFeedback"),
+  practiceScoringImprovementSection: document.getElementById("practiceScoringImprovementSection"),
+  practiceScoringRequiredImprovementsGroup: document.getElementById("practiceScoringRequiredImprovementsGroup"),
+  practiceScoringRequiredImprovements: document.getElementById("practiceScoringRequiredImprovements"),
+  practiceScoringOptionalImprovementsGroup: document.getElementById("practiceScoringOptionalImprovementsGroup"),
+  practiceScoringOptionalImprovements: document.getElementById("practiceScoringOptionalImprovements"),
   practiceScoringPreviewStrengths: document.getElementById("practiceScoringPreviewStrengths"),
   practiceScoringReaderQuestions: document.getElementById("practiceScoringReaderQuestions"),
   practiceScoringReaderQuestionsSection: document.getElementById("practiceScoringReaderQuestionsSection"),
@@ -4213,7 +4218,7 @@ function getDimensionFeedbackItems(result, qaTicket = isQaScenario()) {
     .map(([label, key, weight]) => {
       const score = result?.dimensions?.[key];
       const feedback = result?.dimensionFeedback?.[key];
-      if (!Number.isInteger(score) || score >= 100 || !feedback?.improvement) {
+      if (!Number.isInteger(score) || score >= 100 || !feedback?.reason) {
         return null;
       }
       return {
@@ -4221,7 +4226,6 @@ function getDimensionFeedbackItems(result, qaTicket = isQaScenario()) {
         score,
         weightedGap: (100 - score) * weight / 100,
         reason: feedback.reason || "",
-        improvement: feedback.improvement,
       };
     })
     .filter(Boolean);
@@ -4233,12 +4237,8 @@ function formatWeightedGap(value) {
 
 function renderPracticeDimensionFeedback(preview) {
   const items = getDimensionFeedbackItems(preview);
-  const totalGap = items.reduce((sum, item) => sum + item.weightedGap, 0);
   elements.practiceScoringDimensionFeedbackSection?.classList.toggle("hidden", items.length === 0);
-  setTextContent(
-    elements.practiceScoringDimensionFeedbackTitle,
-    `100点との差（加重差 ${formatWeightedGap(totalGap)}点、表示点では${100 - preview.totalScore}点）`
-  );
+  setTextContent(elements.practiceScoringDimensionFeedbackTitle, "観点別の採点理由");
   if (!elements.practiceScoringDimensionFeedback) {
     return items;
   }
@@ -4246,9 +4246,51 @@ function renderPracticeDimensionFeedback(preview) {
     <div class="practice-ai-dimension-item">
       <div><strong>${escapeHtml(item.label)}</strong><span>${item.score}点 / 総合点 −${escapeHtml(formatWeightedGap(item.weightedGap))}点</span></div>
       <p>${escapeHtml(item.reason)}</p>
-      <small><strong>満点にするには：</strong>${escapeHtml(item.improvement)}</small>
     </div>
   `).join("");
+  return items;
+}
+
+function getImprovementItems(result, qaTicket = isQaScenario()) {
+  if (Array.isArray(result?.improvementItems)) {
+    return result.improvementItems;
+  }
+  return getPracticeDimensionDefinitions(qaTicket)
+    .map(([, key]) => {
+      const feedback = result?.dimensionFeedback?.[key];
+      return feedback?.improvement
+        ? {
+            priority: "任意改善",
+            title: feedback.improvement,
+            detail: feedback.reason || feedback.improvement,
+            whyItMatters: "起票内容をさらに明確にするため。",
+            relatedDimensionIds: [key],
+          }
+        : null;
+    })
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
+function renderPracticeImprovementItems(preview) {
+  const items = getImprovementItems(preview);
+  const requiredItems = items.filter(({ priority }) => priority === "修正推奨");
+  const optionalItems = items.filter(({ priority }) => priority === "任意改善");
+  const renderItems = (target, entries) => {
+    if (!target) return;
+    target.innerHTML = entries.map((item) => `
+      <div class="practice-ai-priority-item">
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.detail)}</p>
+        <small>${escapeHtml(item.whyItMatters)}</small>
+      </div>
+    `).join("");
+  };
+  elements.practiceScoringImprovementSection?.classList.toggle("hidden", items.length === 0);
+  elements.practiceScoringRequiredImprovementsGroup?.classList.toggle("hidden", requiredItems.length === 0);
+  elements.practiceScoringOptionalImprovementsGroup?.classList.toggle("hidden", optionalItems.length === 0);
+  renderItems(elements.practiceScoringRequiredImprovements, requiredItems);
+  renderItems(elements.practiceScoringOptionalImprovements, optionalItems);
   return items;
 }
 
@@ -4352,6 +4394,10 @@ const scoringVerdictPresentation = {
     label: "調査・修正に着手可能",
     description: "開発担当者が原因調査と修正検討に着手できる情報が揃っています。",
   },
+  "開発着手可能（軽微な改善あり）": {
+    label: "着手可能・軽微な改善あり",
+    description: "調査には着手できます。より伝わりやすくするための軽微な改善があります。",
+  },
   "追加確認を推奨": {
     label: "追加確認を推奨",
     description: "調査は開始できますが、判断精度を上げるために追加確認を推奨します。",
@@ -4363,6 +4409,10 @@ const scoringVerdictPresentation = {
   "回答依頼可能": {
     label: "回答を依頼できる状態",
     description: "回答者が論点を理解し、判断または訂正できる情報が揃っています。",
+  },
+  "回答依頼可能（軽微な改善あり）": {
+    label: "良好・軽微な改善あり",
+    description: "回答を依頼できる情報は揃っています。さらに伝わりやすくするための軽微な改善があります。",
   },
   "追加整理を推奨": {
     label: "追加整理を推奨",
@@ -4427,11 +4477,21 @@ function renderPracticeScoringPreview() {
   const findingsSummary = getRubricFindingsSummary(preview);
   setTextContent(elements.practiceScoringBasis, findingsSummary);
   elements.practiceScoringBasis?.classList.toggle("hidden", !findingsSummary);
-  elements.practiceScoringVerdict?.classList.toggle("is-ready", preview.verdict === "開発着手可能");
-  elements.practiceScoringVerdict?.classList.toggle("is-warning", preview.verdict === "追加確認を推奨");
-  elements.practiceScoringVerdict?.classList.toggle("is-danger", preview.verdict === "再整理を推奨");
+  elements.practiceScoringVerdict?.classList.toggle(
+    "is-ready",
+    ["開発着手可能", "回答依頼可能"].includes(preview.verdict)
+  );
+  elements.practiceScoringVerdict?.classList.toggle(
+    "is-warning",
+    ["開発着手可能（軽微な改善あり）", "回答依頼可能（軽微な改善あり）", "追加確認を推奨", "追加整理を推奨"].includes(preview.verdict)
+  );
+  elements.practiceScoringVerdict?.classList.toggle(
+    "is-danger",
+    ["再整理を推奨", "質問の再整理を推奨"].includes(preview.verdict)
+  );
   renderPracticeScoringRadar(preview);
-  const dimensionFeedbackItems = renderPracticeDimensionFeedback(preview);
+  renderPracticeDimensionFeedback(preview);
+  const improvementItems = renderPracticeImprovementItems(preview);
   renderPracticeScoringPreviewList(
     elements.practiceScoringPreviewStrengths,
     preview.strengths,
@@ -4442,7 +4502,7 @@ function renderPracticeScoringPreview() {
   const rewriteSuggestions = preview.rewriteSuggestions || [];
   elements.practiceScoringNoImprovements?.classList.toggle(
     "hidden",
-    dimensionFeedbackItems.length + readerQuestions.length + ambiguityRisks.length + rewriteSuggestions.length > 0
+    improvementItems.length + readerQuestions.length + ambiguityRisks.length + rewriteSuggestions.length > 0
   );
   renderPracticeReaderQuestions(readerQuestions);
   renderPracticeAmbiguityRisks(ambiguityRisks);
@@ -5007,10 +5067,17 @@ function renderTicketDetail() {
   const dimensionFeedback = dimensionFeedbackItems.map((item) => `
     <li>
       <strong>${escapeHtml(item.label)} ${item.score}点（総合点 −${escapeHtml(formatWeightedGap(item.weightedGap))}点）</strong>
-      <span>${escapeHtml(item.reason)} — 満点にするには：${escapeHtml(item.improvement)}</span>
+      <span>${escapeHtml(item.reason)}</span>
     </li>
   `).join("");
-  const hasImprovementSuggestions = Boolean(dimensionFeedback || questions || ambiguityRisks || rewrites);
+  const improvementItems = getImprovementItems(result, qaTicket);
+  const renderDetailImprovements = (priority) => improvementItems
+    .filter((item) => item.priority === priority)
+    .map((item) => `<li><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.detail)} — ${escapeHtml(item.whyItMatters)}</span></li>`)
+    .join("");
+  const requiredImprovements = renderDetailImprovements("修正推奨");
+  const optionalImprovements = renderDetailImprovements("任意改善");
+  const hasImprovementSuggestions = Boolean(improvementItems.length || questions || ambiguityRisks || rewrites);
   const verdictPresentation = getScoringVerdictPresentation(result?.verdict);
   const reviewStatus = result?.status || (ticket.scoringSupported ? "pending" : "not_supported");
   const trackerLabel = ticketFieldLabel({ bug: "バグ", qa: "QA", feature: "機能", support: "サポート" }, fields.tracker);
@@ -5091,8 +5158,10 @@ function renderTicketDetail() {
         ${verdictPresentation.description ? `<p class="ticket-detail-verdict-description">${escapeHtml(verdictPresentation.description)}</p>` : ""}
         <p>${escapeHtml(String(result.overallAssessment || ""))}</p>
         ${findingsSummary ? `<p class="ticket-detail-scoring-basis">${escapeHtml(findingsSummary)}</p>` : ""}
-        ${strengths ? `<h3>良かった点</h3><ul>${strengths}</ul>` : ""}
-        ${dimensionFeedback ? `<h3>100点との差</h3><ul class="ticket-detail-advice">${dimensionFeedback}</ul>` : ""}
+        ${strengths ? `<h3>問題なし・評価できる点</h3><ul>${strengths}</ul>` : ""}
+        ${dimensionFeedback ? `<h3>観点別の採点理由</h3><ul class="ticket-detail-advice">${dimensionFeedback}</ul>` : ""}
+        ${requiredImprovements ? `<h3>修正を推奨</h3><ul class="ticket-detail-advice">${requiredImprovements}</ul>` : ""}
+        ${optionalImprovements ? `<h3>さらに良くするなら</h3><ul class="ticket-detail-advice">${optionalImprovements}</ul>` : ""}
         ${hasImprovementSuggestions ? "" : '<p class="ticket-detail-no-improvements">優先して修正が必要な表現や不足情報はありません。</p>'}
         ${questions ? `<h3>読み手が疑問に思うこと</h3><ul>${questions}</ul>` : ""}
         ${ambiguityRisks ? `<h3>曖昧さ・誤解のリスク</h3><ul class="ticket-detail-advice">${ambiguityRisks}</ul>` : ""}

@@ -95,7 +95,7 @@ function buildQaRubric(profile) {
         id: "impact-decision-consequence",
         description: "回答によって変わるテスト、バグ判定または業務上の判断を示す",
         importance: "important",
-        sourceRefs: sourceRefs(/^impact/),
+        sourceRefs: sourceRefs(/^(impact|user-impact)/),
       }],
     },
     factAssessmentPolicy: {
@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v9";
+export const PROMPT_VERSION = "practice-review.v10";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -188,8 +188,21 @@ function getFactIds(rubric) {
 
 function getRubricVerdicts(rubric) {
   return rubric.ticketType === "qa"
-    ? ["回答依頼可能", "追加整理を推奨", "質問の再整理を推奨"]
-    : ["開発着手可能", "追加確認を推奨", "再整理を推奨"];
+    ? ["回答依頼可能", "回答依頼可能（軽微な改善あり）", "追加整理を推奨", "質問の再整理を推奨"]
+    : ["開発着手可能", "開発着手可能（軽微な改善あり）", "追加確認を推奨", "再整理を推奨"];
+}
+
+function verdictForScore(totalScore, ticketType) {
+  if (ticketType === "qa") {
+    if (totalScore >= 90) return "回答依頼可能";
+    if (totalScore >= 80) return "回答依頼可能（軽微な改善あり）";
+    if (totalScore >= 70) return "追加整理を推奨";
+    return "質問の再整理を推奨";
+  }
+  if (totalScore >= 90) return "開発着手可能";
+  if (totalScore >= 80) return "開発着手可能（軽微な改善あり）";
+  if (totalScore >= 70) return "追加確認を推奨";
+  return "再整理を推奨";
 }
 
 export function buildModelOutputSchema(rubric) {
@@ -200,6 +213,7 @@ export function buildModelOutputSchema(rubric) {
   required: [
     "dimensions",
     "dimensionFeedback",
+    "improvementItems",
     "verdict",
     "overallAssessment",
     "readerQuestions",
@@ -229,14 +243,33 @@ export function buildModelOutputSchema(rubric) {
           dimension.id,
           {
             type: "object",
-            required: ["reason", "improvement"],
+            required: ["reason"],
             properties: {
               reason: { type: "string" },
-              improvement: { type: "string" },
             },
           },
         ])
       ),
+    },
+    improvementItems: {
+      type: "array",
+      minItems: 0,
+      maxItems: 4,
+      items: {
+        type: "object",
+        required: ["priority", "title", "detail", "whyItMatters", "relatedDimensionIds"],
+        properties: {
+          priority: { type: "string", enum: ["修正推奨", "任意改善"] },
+          title: { type: "string" },
+          detail: { type: "string" },
+          whyItMatters: { type: "string" },
+          relatedDimensionIds: {
+            type: "array",
+            minItems: 1,
+            items: { type: "string", enum: rubric.dimensions.map((dimension) => dimension.id) },
+          },
+        },
+      },
     },
     verdict: {
       type: "string",
@@ -515,8 +548,14 @@ export function buildScoringPrompt(attempt) {
       "rewriteSuggestionsは受講者の有効な文章を残した最小修正とし、記載例のコピーに置き換えないでください。",
       "strengthsは0〜3件です。『質問欄がある』『項目が埋まっている』などフォーム上当然のことを評価せず、このQA固有の論点整理が回答負荷をどう減らすかを示してください。",
       "dimensionsはQA本文の品質だけを採点してください。チケット設定と添付証跡は別チェックであり、dimensionsやverdictの減点理由に含めないでください。",
-      "dimensionFeedbackには各評価軸の点数の理由を具体的に記載してください。100点未満ならimprovementへ満点に届かなかった理由と最小の改善を必ず記載し、改善点を説明できない評価軸は100点にしてください。100点ならimprovementは空文字にしてください。",
-      "verdictは、十分なら『回答依頼可能』、軽微な追加整理が有効なら『追加整理を推奨』、主要論点を読み取れないなら『質問の再整理を推奨』を使用してください。",
+      "仕様書の未記載、観測事実、比較根拠、利用者影響を整理したうえで『不具合として扱ってよいか』『現在の理解で合っているか』を仕様担当者へ確認することは、正当なQA確認です。仕様決定の丸投げとは評価しないでください。",
+      "質問者に『仕様を変更するか現状維持か』などの設計選択肢を作らせないでください。QA担当者が仕様決定へ踏み込みすぎる場合があります。質問者が判断材料と現在の解釈を示していれば十分です。",
+      "『考えています』『認識です』『相違ないでしょうか』は未確定の解釈を示す表現です。確定仕様の断定として扱わず、重複や冗長さがある場合は文章上の任意改善として扱ってください。",
+      "dimensionFeedbackには各評価軸の点数の理由だけを具体的に記載してください。実務上十分なら100点を使用し、到達不能な理想との差を作らないでください。",
+      "improvementItemsは最大4件です。回答前に直す価値が高い不足は『修正推奨』、回答は依頼できるが表現を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。",
+      "90〜100点はそのまま回答依頼可能、80〜89点は良好で軽微な改善あり、70〜79点は確認前の整理を推奨、69点以下は主要情報不足の目安です。語句の好みや軽微な重複だけで80点台前半まで下げないでください。",
+      "点数を下げるのは、improvementItemsに挙げるだけの具体的な修正または任意改善がある評価軸だけです。relatedDimensionIdsに含まれない評価軸はシステムが100点として扱います。",
+      "verdictは点数帯に合わせて選びますが、最終判定はシステム側で総合点から確定します。",
       "各評価軸は0〜100の整数で採点してください。",
       "",
       "採点基準:",
@@ -558,7 +597,10 @@ export function buildScoringPrompt(attempt) {
     "strengthsは0〜3件とします。根拠のある長所がなければ空配列にしてください。無意味な文字列や項目を分けただけの回答を、形式面だけで無理に評価してはいけません。各項目では受講者の起票から短い文言をevidenceQuoteへ引用し、その記述から読み取れるこの不具合固有の判断・観察をevaluationへ、調査や意思決定にどう役立つかをwhyItHelpsへ記載してください。",
     "フォームの構造上当然となる『期待結果と実際の動作が分かれている』『再現回数が数値で書かれている』『操作手順がある』『項目が埋まっている』だけをstrengthsとして評価してはいけません。再現性を評価する場合は、具体的な比較条件と結果から何を絞り込めるかまで述べてください。",
     "採点基準にreviewGuideがある場合、strengthCriteriaは内容固有の着眼点として使い、disallowedGenericPraiseは単独の称賛として使用しないでください。nonScoringInvestigationIdeasは不足情報や減点理由ではなく、今後の調査提案としてのみ扱ってください。",
-    "dimensionFeedbackには各評価軸の点数の理由を具体的に記載してください。100点未満ならimprovementへ満点に届かなかった理由と最小の改善を必ず記載し、改善点を説明できない評価軸は100点にしてください。100点ならimprovementは空文字にしてください。",
+    "dimensionFeedbackには各評価軸の点数の理由だけを具体的に記載してください。実務上十分なら100点を使用し、到達不能な理想との差を作らないでください。",
+    "improvementItemsは最大4件です。調査開始前に直す価値が高い不足は『修正推奨』、調査は開始できるが表現や補足を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。",
+    "90〜100点はそのまま調査着手可能、80〜89点は良好で軽微な改善あり、70〜79点は追加確認を推奨、69点以下は主要情報不足の目安です。語句の好みや軽微な重複だけで80点台前半まで下げないでください。",
+    "点数を下げるのは、improvementItemsに挙げるだけの具体的な修正または任意改善がある評価軸だけです。relatedDimensionIdsに含まれない評価軸はシステムが100点として扱います。",
     "各評価軸は0〜100の整数で採点してください。",
     "",
     "採点基準:",
@@ -643,16 +685,49 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         feedback.reason,
         `dimensionFeedback.${dimension.id}.reason`
       );
-      const improvement = optionalString(
-        feedback.improvement,
-        `dimensionFeedback.${dimension.id}.improvement`
-      ) || "";
-      if (dimensions[dimension.id] < 100 && !improvement) {
-        throw new Error(`dimensionFeedback.${dimension.id}.improvement is required below 100`);
-      }
-      return [dimension.id, { reason, improvement }];
+      return [dimension.id, { reason }];
     })
   );
+  const validDimensionIds = new Set(rubric.dimensions.map(({ id }) => id));
+  const improvementItems = requireArray(rawOutput.improvementItems, "improvementItems")
+    .slice(0, 4)
+    .map((item, index) => {
+      const relatedDimensionIds = normalizeStringArray(
+        item.relatedDimensionIds,
+        `improvementItems[${index}].relatedDimensionIds`
+      );
+      if (
+        relatedDimensionIds.length === 0
+        || relatedDimensionIds.some((dimensionId) => !validDimensionIds.has(dimensionId))
+      ) {
+        throw new Error(`improvementItems[${index}].relatedDimensionIds contains an invalid dimension`);
+      }
+      return {
+        priority: requireEnum(
+          item.priority,
+          ["修正推奨", "任意改善"],
+          `improvementItems[${index}].priority`
+        ),
+        title: requireNonEmptyString(item.title, `improvementItems[${index}].title`),
+        detail: requireNonEmptyString(item.detail, `improvementItems[${index}].detail`),
+        whyItMatters: requireNonEmptyString(
+          item.whyItMatters,
+          `improvementItems[${index}].whyItMatters`
+        ),
+        relatedDimensionIds: [...new Set(relatedDimensionIds)],
+      };
+    });
+  const explainedDimensionIds = new Set(
+    improvementItems.flatMap(({ relatedDimensionIds }) => relatedDimensionIds)
+  );
+  rubric.dimensions.forEach(({ id }) => {
+    if (dimensions[id] < 100 && !explainedDimensionIds.has(id)) {
+      dimensions[id] = 100;
+      dimensionFeedback[id] = {
+        reason: "実務上の修正点または任意改善に該当する問題はありません。",
+      };
+    }
+  });
   const readerQuestions = requireArray(rawOutput.readerQuestions, "readerQuestions")
     .map((item, index) => {
       let classification = requireEnum(
@@ -744,6 +819,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   return {
     dimensions,
     dimensionFeedback,
+    improvementItems,
     verdict: requireEnum(rawOutput.verdict, getRubricVerdicts(rubric), "verdict"),
     overallAssessment: requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment"),
     readerQuestions,
@@ -963,6 +1039,7 @@ export function createFailedScoringResult(attempt, error, options = {}) {
       (rubric?.dimensions || rubricRegistry.dimensions).map((dimension) => [dimension.id, null])
     ),
     dimensionFeedback: {},
+    improvementItems: [],
     verdict: null,
     overallAssessment: null,
     readerQuestions: [],
@@ -1056,6 +1133,7 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     status: "succeeded",
     totalScore,
     ...review,
+    verdict: verdictForScore(totalScore, rubric.ticketType),
     rubricFindings,
     rubricVersion: rubric.rubricVersion,
     promptVersion: PROMPT_VERSION,

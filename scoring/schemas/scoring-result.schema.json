@@ -12,6 +12,7 @@
     "totalScore",
     "dimensions",
     "dimensionFeedback",
+    "improvementItems",
     "verdict",
     "overallAssessment",
     "readerQuestions",
@@ -90,9 +91,25 @@
         "responseEfficiency": { "$ref": "#/$defs/dimensionFeedback" }
       }
     },
+    "improvementItems": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["priority", "title", "detail", "whyItMatters", "relatedDimensionIds"],
+        "properties": {
+          "priority": { "enum": ["修正推奨", "任意改善"] },
+          "title": { "type": "string" },
+          "detail": { "type": "string" },
+          "whyItMatters": { "type": "string" },
+          "relatedDimensionIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
     "verdict": {
       "anyOf": [
-        { "enum": ["開発着手可能", "追加確認を推奨", "再整理を推奨", "回答依頼可能", "追加整理を推奨", "質問の再整理を推奨"] },
+        { "enum": ["開発着手可能", "開発着手可能（軽微な改善あり）", "追加確認を推奨", "再整理を推奨", "回答依頼可能", "回答依頼可能（軽微な改善あり）", "追加整理を推奨", "質問の再整理を推奨"] },
         { "type": "null" }
       ]
     },
@@ -245,7 +262,7 @@
     "dimensionFeedback": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["reason", "improvement"],
+      "required": ["reason"],
       "properties": {
         "reason": { "type": "string" },
         "improvement": { "type": "string" }

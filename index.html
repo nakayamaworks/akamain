@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260813a" />
+    <link rel="stylesheet" href="./styles.css?v=20260813b" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -637,7 +637,7 @@
                 <p id="practiceScoringOverallAssessment" class="practice-ai-overall-assessment"></p>
                 <p id="practiceScoringBasis" class="practice-ai-scoring-basis hidden"></p>
                 <div class="practice-ai-strengths">
-                  <h3>評価できる点</h3>
+                  <h3>問題なし・評価できる点</h3>
                   <ul id="practiceScoringPreviewStrengths"></ul>
                 </div>
               </article>
@@ -684,8 +684,18 @@
 
             <div class="practice-ai-advice">
               <article id="practiceScoringDimensionFeedbackSection" class="hidden">
-                <h3 id="practiceScoringDimensionFeedbackTitle">100点との差</h3>
+                <h3 id="practiceScoringDimensionFeedbackTitle">観点別の採点理由</h3>
                 <div id="practiceScoringDimensionFeedback" class="practice-ai-dimension-feedback"></div>
+              </article>
+              <article id="practiceScoringImprovementSection" class="hidden">
+                <div id="practiceScoringRequiredImprovementsGroup" class="practice-ai-priority-group hidden">
+                  <h3>修正を推奨</h3>
+                  <div id="practiceScoringRequiredImprovements" class="practice-ai-priority-list"></div>
+                </div>
+                <div id="practiceScoringOptionalImprovementsGroup" class="practice-ai-priority-group hidden">
+                  <h3>さらに良くするなら</h3>
+                  <div id="practiceScoringOptionalImprovements" class="practice-ai-priority-list"></div>
+                </div>
               </article>
               <p id="practiceScoringNoImprovements" class="practice-ai-no-improvements hidden">
                 優先して修正が必要な表現や不足情報はありません。
@@ -811,9 +821,9 @@
     <script src="./scenario-authoring-library.js?v=20260811c"></script>
     <script src="./scenario-library.js?v=20260810a"></script>
     <script src="./scenario-briefing-library.js?v=20260810a"></script>
-    <script src="./qa-scenario-authoring-library.js?v=20260813a"></script>
+    <script src="./qa-scenario-authoring-library.js?v=20260813b"></script>
     <script src="./evidence-library.js?v=20260805a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260813a"></script>
+    <script src="./main.js?v=20260813b"></script>
   </body>
 </html>
