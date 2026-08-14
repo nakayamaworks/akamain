@@ -487,7 +487,7 @@ test("ready-to-send reviews do not label polish as a required correction", async
   );
 });
 
-test("a factual contradiction remains a required correction even above 90 points", async () => {
+test("a reproducibility mismatch is consolidated without overwhelming an otherwise usable ticket", async () => {
   const scenarioId = "ec-payment-notification-double-order";
   const rubric = getScenarioRubric(scenarioId);
   const attempt = createAttemptRecord({
@@ -495,20 +495,55 @@ test("a factual contradiction remains a required correction even above 90 points
     projectId: rubric.projectId,
     answer: {
       ...rubric.writingExample,
-      sections: { ...rubric.writingExample.sections, reproducibility: "2/15" },
+      sections: {
+        ...rubric.writingExample.sections,
+        expected: "処理済みの通知IDを再受信した場合、初回の注文結果を返すこと",
+        reproducibility: "2/15",
+      },
       ticketFields: { tracker: "bug", progress: 0 },
     },
     selectedEvidenceIds: rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id),
   }, { userId: "verified-google-sub" });
   const modelOutput = completeOutputForScenario(scenarioId);
-  modelOutput.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 95]));
-  modelOutput.improvementItems = [{
-    priority: "修正推奨",
-    title: "再現回数を訂正する",
-    detail: "2/15を1/15へ訂正してください。",
-    whyItMatters: "発生頻度を正確に伝えるためです。",
-    relatedDimensionIds: ["factualGrounding"],
-  }];
+  modelOutput.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 60]));
+  modelOutput.improvementItems = [
+    {
+      priority: "修正推奨",
+      title: "再現回数を訂正する",
+      detail: "2/15を1/15へ訂正してください。",
+      whyItMatters: "発生頻度を正確に伝えるためです。",
+      relatedDimensionIds: ["factualGrounding"],
+    },
+    {
+      priority: "修正推奨",
+      title: "再現性欄の発生回数の修正",
+      detail: "再現性を15回中1回発生へ修正してください。",
+      whyItMatters: "調査担当者の誤認を防ぐためです。",
+      relatedDimensionIds: ["reproducibility"],
+    },
+    {
+      priority: "任意改善",
+      title: "切り分け状況の補足",
+      detail: "注文API側と周辺処理側のどちらに原因があるか未分明であると追記してください。",
+      whyItMatters: "原因の切り分け状況を伝えるためです。",
+      relatedDimensionIds: ["informationCoverage", "investigationReadiness"],
+    },
+  ];
+  modelOutput.rewriteSuggestions = [
+    {
+      section: "詳細",
+      original: rubric.writingExample.sections.detail,
+      suggested: "同じ通知を再送したところ、異なる注文番号の注文が2件作成されました。",
+      reason: "観測記録に合わせるためです。",
+    },
+    {
+      section: "再現性",
+      original: "2/15",
+      suggested: "15回中1回発生",
+      reason: "発生回数を訂正するためです。",
+    },
+  ];
+  modelOutput.strengths = [];
   modelOutput.factAssessments = modelOutput.factAssessments.map((assessment) =>
     assessment.factId === "reproducibility-observed"
       ? { ...assessment, status: "contradicted", evidenceQuote: "2/15" }
@@ -523,9 +558,14 @@ test("a factual contradiction remains a required correction even above 90 points
       },
     }),
   });
-  assert.ok(result.totalScore >= 90);
-  assert.ok(result.totalScore < 100);
+  assert.equal(result.totalScore, 93);
+  assert.equal(result.verdict, "開発着手可能");
   assert.equal(result.improvementItems[0].priority, "修正推奨");
+  assert.equal(result.improvementItems.filter(({ priority }) => priority === "修正推奨").length, 1);
+  assert.equal(result.improvementItems.filter(({ title }) => /再現/u.test(title)).length, 1);
+  assert.equal(result.improvementItems[1].title, "確認済みの影響範囲を補足する");
+  assert.deepEqual(result.rewriteSuggestions, []);
+  assert.match(result.strengths[0], /初回の注文結果を返すこと/);
   assert.match(result.overallAssessment, /15回中1回発生/);
 });
 
@@ -662,8 +702,12 @@ test("trace identifiers are not requested when the ticket and evidence already i
     },
     selectedEvidenceIds: ["webhook-replay-log", "duplicate-orders", "order-admin-screen"],
   });
-  assert.deepEqual(normalized.improvementItems, []);
-  assert.equal(normalized.dimensions.informationCoverage, 100);
+  assert.equal(
+    normalized.improvementItems.some((item) => /通知ID|決済ID|注文番号/u.test(item.title)),
+    false
+  );
+  assert.equal(normalized.improvementItems[0].title, "確認済みの影響範囲を補足する");
+  assert.equal(normalized.dimensions.informationCoverage, 90);
   assert.equal(normalized.dimensions.reproducibility, 100);
 });
 

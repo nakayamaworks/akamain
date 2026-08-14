@@ -4303,13 +4303,34 @@ function renderPracticeDimensionFeedback(preview) {
 
 function getImprovementItems(result, qaTicket = isQaScenario(), scenarioId = state.scenario?.scenarioId) {
   if (Array.isArray(result?.improvementItems)) {
+    let ecReproducibilityCorrectionSeen = false;
     return result.improvementItems.filter((item) => {
       if (scenarioId !== "ec-payment-notification-double-order") {
         return true;
       }
-      const text = `${item.title || ""} ${item.detail || ""}`;
-      return !/(?:通知ID|決済ID|注文番号).{0,45}(?:記載|明記|追記|補足|具体化|追加)/u.test(text)
-        && !/(?:任意の注文|対象の注文データ|商品種別|決済金額).{0,55}(?:前提条件|具体|明確|補足|意識すべき|書き換え|改め)/u.test(text);
+      const text = `${item.title || ""} ${item.detail || ""} ${item.whyItMatters || ""}`;
+      if (/(?:通知ID|決済ID|注文番号).{0,45}(?:記載|明記|追記|補足|具体化|追加)/u.test(text)) {
+        return false;
+      }
+      if (/(?:任意の注文|対象の注文データ|商品種別|決済金額).{0,55}(?:前提条件|具体|明確|補足|意識すべき|書き換え|改め)/u.test(text)) {
+        return false;
+      }
+      if (
+        /(?:注文API側.{0,45}周辺処理側|周辺処理側.{0,45}注文API側)/u.test(text)
+        && /(?:原因|切り分け)/u.test(text)
+        && /(?:未分明|未確認|できていない|補足|追記)/u.test(text)
+      ) {
+        return false;
+      }
+      const isReproducibilityCorrection = /(?:2\s*\/\s*15|15回中1回|再現(?:性|回数).{0,30}(?:訂正|修正|発生回数)|発生回数.{0,30}(?:訂正|修正))/u.test(text);
+      if (!isReproducibilityCorrection) {
+        return true;
+      }
+      if (ecReproducibilityCorrectionSeen) {
+        return false;
+      }
+      ecReproducibilityCorrectionSeen = true;
+      return true;
     });
   }
   return getPracticeDimensionDefinitions(qaTicket)
@@ -4327,6 +4348,28 @@ function getImprovementItems(result, qaTicket = isQaScenario(), scenarioId = sta
     })
     .filter(Boolean)
     .slice(0, 4);
+}
+
+function getVisibleRewriteSuggestions(
+  items,
+  qaTicket = isQaScenario(),
+  scenarioId = state.scenario?.scenarioId
+) {
+  if (qaTicket) {
+    return [];
+  }
+  return items.filter((item) => {
+    if (scenarioId !== "ec-payment-notification-double-order") {
+      return true;
+    }
+    const text = `${item.section || ""} ${item.original || ""} ${item.suggested || ""} ${item.reason || ""}`;
+    if (/(?:2\s*\/\s*15|15回中1回|再現(?:性|回数).{0,30}(?:訂正|修正|発生回数)|発生回数.{0,30}(?:訂正|修正))/u.test(text)) {
+      return false;
+    }
+    return !/^(?:■)?詳細$/u.test(item.section || "")
+      || !/(?:同一の決済通知|決済通知ID)/u.test(item.original || "")
+      || !/異なる注文番号/u.test(item.original || "");
+  });
 }
 
 function renderPracticeImprovementItems(preview) {
@@ -4571,7 +4614,10 @@ function renderPracticeScoringPreview() {
   const readerQuestions = getVisibleReaderQuestions(preview.readerQuestions || [], qaTicket);
   const ambiguityRisks = qaTicket ? [] : preview.ambiguityRisks || [];
   const investigationAdvice = qaTicket ? [] : preview.investigationAdvice || [];
-  const rewriteSuggestions = qaTicket ? [] : preview.rewriteSuggestions || [];
+  const rewriteSuggestions = getVisibleRewriteSuggestions(
+    preview.rewriteSuggestions || [],
+    qaTicket
+  );
   elements.practiceScoringNoImprovements?.classList.toggle(
     "hidden",
     improvementItems.length + readerQuestions.length + ambiguityRisks.length + rewriteSuggestions.length > 0
@@ -5136,7 +5182,12 @@ function renderTicketDetail() {
   const ambiguityRisks = (qaTicket ? [] : result?.ambiguityRisks || [])
     .map((item) => `<li><strong>「${escapeHtml(String(item.quote || ""))}」</strong><span>${escapeHtml(String(item.risk || ""))}${item.advice ? ` — ${escapeHtml(String(item.advice))}` : ""}</span></li>`)
     .join("");
-  const rewrites = (qaTicket ? [] : result?.rewriteSuggestions || [])
+  const visibleRewrites = getVisibleRewriteSuggestions(
+    result?.rewriteSuggestions || [],
+    qaTicket,
+    ticket.scenarioId
+  );
+  const rewrites = visibleRewrites
     .map((item) => `<li><strong>${escapeHtml(getReportSectionDisplayLabel(item.section))}</strong><span>${escapeHtml(String(item.suggested || ""))}${item.reason ? ` — ${escapeHtml(String(item.reason))}` : ""}</span></li>`)
     .join("");
   const dimensionFeedbackItems = getDimensionFeedbackItems(result, qaTicket);

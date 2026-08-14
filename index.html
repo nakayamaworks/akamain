@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260814a" />
+    <link rel="stylesheet" href="./styles.css?v=20260815a" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -643,18 +643,16 @@
                 </div>
               </article>
 
-              <details id="practiceScoringDetails" class="practice-ai-score-details">
-                <summary>採点の詳細を見る</summary>
-                <div class="practice-ai-radar-panel">
-                  <div class="practice-ai-radar-title">文章品質の6つの観点</div>
-                  <div class="practice-ai-radar-shell">
-                    <svg
-                      id="practiceScoringRadar"
-                      class="practice-ai-radar"
-                      viewBox="0 0 360 320"
-                      role="img"
-                      aria-label="AIレビューの6項目"
-                    >
+              <div class="practice-ai-radar-panel">
+                <div class="practice-ai-radar-title">文章品質の6つの観点</div>
+                <div class="practice-ai-radar-shell">
+                  <svg
+                    id="practiceScoringRadar"
+                    class="practice-ai-radar"
+                    viewBox="0 0 360 320"
+                    role="img"
+                    aria-label="AIレビューの6項目"
+                  >
                       <g class="result-radar-grid" aria-hidden="true">
                         <polygon points="180,55 270.9,107.5 270.9,212.5 180,265 89.1,212.5 89.1,107.5"></polygon>
                         <polygon points="180,81.3 248.2,120.6 248.2,199.4 180,238.8 111.8,199.4 111.8,120.6"></polygon>
@@ -680,15 +678,18 @@
                         <text x="60" y="242" text-anchor="middle"><tspan id="practiceRadarLabelClarity">解釈明瞭</tspan><tspan id="practiceRadarClarity" x="60" dy="15">0</tspan></text>
                         <text x="62" y="87" text-anchor="middle"><tspan id="practiceRadarLabelInvestigation">切り分け</tspan><tspan id="practiceRadarInvestigation" x="62" dy="15">0</tspan></text>
                       </g>
-                    </svg>
-                  </div>
+                  </svg>
                 </div>
-                <article id="practiceScoringDimensionFeedbackSection" class="hidden">
-                  <h3 id="practiceScoringDimensionFeedbackTitle">観点別の採点理由</h3>
-                  <div id="practiceScoringDimensionFeedback" class="practice-ai-dimension-feedback"></div>
-                </article>
-              </details>
+              </div>
             </div>
+
+            <details id="practiceScoringDetails" class="practice-ai-score-details">
+              <summary>採点の詳細を見る</summary>
+              <article id="practiceScoringDimensionFeedbackSection" class="hidden">
+                <h3 id="practiceScoringDimensionFeedbackTitle">観点別の採点理由</h3>
+                <div id="practiceScoringDimensionFeedback" class="practice-ai-dimension-feedback"></div>
+              </article>
+            </details>
 
             <div class="practice-ai-advice">
               <article id="practiceScoringImprovementSection" class="hidden">
@@ -828,6 +829,6 @@
     <script src="./qa-scenario-authoring-library.js?v=20260813b"></script>
     <script src="./evidence-library.js?v=20260805a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260814b"></script>
+    <script src="./main.js?v=20260815a"></script>
   </body>
 </html>

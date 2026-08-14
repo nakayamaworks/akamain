@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v12";
+export const PROMPT_VERSION = "practice-review.v13";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -604,6 +604,8 @@ export function buildScoringPrompt(attempt) {
     "reviewGuide.acceptedConciseConditionsがある場合、そこに記載した簡潔な表現はこのシナリオで十分な記述です。overallAssessment、dimensionFeedback、improvementItems、readerQuestions、rewriteSuggestionsのいずれでも、その具体化や書き換えを要求しないでください。",
     "dimensionFeedbackには各評価軸の点数の理由だけを具体的に記載してください。実務上十分なら100点を使用し、到達不能な理想との差を作らないでください。",
     "improvementItemsは最大4件です。調査開始前に直す価値が高い不足は『修正推奨』、調査は開始できるが表現や補足を磨ける点は『任意改善』としてください。同じ原因を複数項目へ分割せず、各項目のrelatedDimensionIdsに関係する評価軸をまとめてください。detailには抽象論ではなく、この起票へそのまま反映できる具体的な修正内容を示してください。",
+    "同じ問題をoverallAssessment、improvementItems、ambiguityRisks、rewriteSuggestionsへ重複して並べないでください。総評で短く触れ、具体的な修正はimprovementItemsの1件へ集約してください。",
+    "一部に事実誤認があっても、ほかにこの不具合固有の良い記述があればstrengthsとして独立に評価してください。1件の誤りを理由に起票全体の長所を消さないでください。",
     "90〜100点はそのまま調査着手可能、80〜89点は良好で軽微な改善あり、70〜79点は追加確認を推奨、69点以下は主要情報不足の目安です。語句の好みや軽微な重複だけで80点台前半まで下げないでください。",
     "点数を下げるのは、improvementItemsに挙げるだけの具体的な修正または任意改善がある評価軸だけです。relatedDimensionIdsに含まれない評価軸はシステムが100点として扱います。",
     "各評価軸は0〜100の整数で採点してください。",
@@ -694,6 +696,46 @@ function requestsAlreadyStatedEcRecoveryStatus(item, scenarioId, attempt) {
     && /(?:復旧できることを確認|取り消し.{0,30}確認)/u.test(answerText);
 }
 
+function isEcReproducibilityCorrection(item, scenarioId) {
+  if (scenarioId !== "ec-payment-notification-double-order") {
+    return false;
+  }
+  const text = `${item.title || ""} ${item.detail || ""} ${item.original || ""} ${item.suggested || ""} ${item.reason || ""}`;
+  return /(?:2\s*\/\s*15|15回中1回|再現(?:性|回数).{0,30}(?:訂正|修正|発生回数)|発生回数.{0,30}(?:訂正|修正))/u.test(text);
+}
+
+function requestsUnhelpfulEcUnknownCauseNote(item, scenarioId) {
+  if (scenarioId !== "ec-payment-notification-double-order") {
+    return false;
+  }
+  const text = `${item.title || ""} ${item.detail || ""} ${item.reason || ""}`;
+  return /(?:注文API側.{0,45}周辺処理側|周辺処理側.{0,45}注文API側)/u.test(text)
+    && /(?:原因|切り分け)/u.test(text)
+    && /(?:未分明|未確認|できていない|補足|追記)/u.test(text);
+}
+
+function hasEcSurroundingComparison(answerText) {
+  return /通知メール.{0,25}(?:1通|一通)/u.test(answerText)
+    && /売上.{0,25}(?:1件|一件)/u.test(answerText);
+}
+
+function isEcSurroundingComparisonImprovement(item, scenarioId) {
+  if (scenarioId !== "ec-payment-notification-double-order") {
+    return false;
+  }
+  const text = `${item.title || ""} ${item.detail || ""} ${item.whyItMatters || ""}`;
+  return /通知メール/u.test(text) && /売上/u.test(text);
+}
+
+function rewritesAcceptedEcDescription(item, scenarioId) {
+  if (scenarioId !== "ec-payment-notification-double-order") {
+    return false;
+  }
+  return /^(?:■)?詳細$/u.test(item.section)
+    && /(?:同一の決済通知|決済通知ID)/u.test(item.original)
+    && /異なる注文番号/u.test(item.original);
+}
+
 function createAttemptEvidenceChecker(attempt) {
   if (!attempt) {
     return () => true;
@@ -727,6 +769,8 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const attemptAnswerText = JSON.stringify(attempt?.answer || {});
   const ecReproducibilityMismatch = scenarioId === "ec-payment-notification-double-order"
     && /2\s*\/\s*15/u.test(attemptAnswerText);
+  const ecSurroundingComparisonMissing = scenarioId === "ec-payment-notification-double-order"
+    && !hasEcSurroundingComparison(attemptAnswerText);
   const dimensions = Object.fromEntries(
     rubric.dimensions.map((dimension) => [
       dimension.id,
@@ -777,11 +821,11 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     })
     .filter((item) => !requestsRedundantTrackingIdentifier(item, rubric, attempt))
     .filter((item) => !requestsUnsupportedEcOrderDetails(item, scenarioId))
-    .filter((item) => !requestsAlreadyStatedEcRecoveryStatus(item, scenarioId, attempt));
+    .filter((item) => !requestsAlreadyStatedEcRecoveryStatus(item, scenarioId, attempt))
+    .filter((item) => !isEcReproducibilityCorrection(item, scenarioId))
+    .filter((item) => !requestsUnhelpfulEcUnknownCauseNote(item, scenarioId))
+    .filter((item) => !isEcSurroundingComparisonImprovement(item, scenarioId));
   if (ecReproducibilityMismatch) {
-    improvementItems = improvementItems.filter(
-      ({ relatedDimensionIds }) => !relatedDimensionIds.includes("reproducibility")
-    );
     improvementItems.unshift({
       priority: "修正推奨",
       title: "再現回数の記述を訂正する",
@@ -789,9 +833,8 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       whyItMatters: "実際の発生頻度と異なる数値は、再現試験と調査優先度の判断を誤らせるためです。",
       relatedDimensionIds: ["factualGrounding", "reproducibility"],
     });
-    improvementItems = improvementItems.slice(0, 4);
-    dimensions.factualGrounding = Math.min(dimensions.factualGrounding, 90);
-    dimensions.reproducibility = Math.min(dimensions.reproducibility, 85);
+    dimensions.factualGrounding = 90;
+    dimensions.reproducibility = 90;
     dimensionFeedback.factualGrounding = {
       reason: "主要事象は正確ですが、再現性の『2/15』が提示された検証結果と一致していません。",
     };
@@ -799,6 +842,24 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       reason: "試行回数は分かりますが、発生回数は『15回中1回』への訂正が必要です。",
     };
   }
+  if (ecSurroundingComparisonMissing) {
+    improvementItems.push({
+      priority: "任意改善",
+      title: "確認済みの影響範囲を補足する",
+      detail: "確認済みの『顧客への通知メールは1通』『決済側の売上は1件』を周辺確認・補足へ追記すると、注文だけが重複したことを伝えられます。",
+      whyItMatters: "重複が注文作成に限定されるのか、通知や決済まで波及しているのかを調査担当者が判断しやすくなるためです。",
+      relatedDimensionIds: ["informationCoverage", "investigationReadiness"],
+    });
+    dimensions.informationCoverage = Math.max(dimensions.informationCoverage, 90);
+    dimensions.investigationReadiness = Math.max(dimensions.investigationReadiness, 90);
+    dimensionFeedback.informationCoverage = {
+      reason: "主要情報は揃っています。確認済みの通知メールと決済売上の件数を補足すると、影響範囲がさらに明確になります。",
+    };
+    dimensionFeedback.investigationReadiness = {
+      reason: "調査は開始できます。注文以外への波及有無を追記すると、初動の切り分けがより速くなります。",
+    };
+  }
+  improvementItems = improvementItems.slice(0, 4);
   const explainedDimensionIds = new Set(
     improvementItems.flatMap(({ relatedDimensionIds }) => relatedDimensionIds)
   );
@@ -871,7 +932,9 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       suggested: requireNonEmptyString(item.suggested, `rewriteSuggestions[${index}].suggested`),
       reason: requireNonEmptyString(item.reason, `rewriteSuggestions[${index}].reason`),
     }))
-    .filter((item) => item.original === "（未記載）" || isGroundedQuote(item.original));
+    .filter((item) => item.original === "（未記載）" || isGroundedQuote(item.original))
+    .filter((item) => !isEcReproducibilityCorrection(item, scenarioId))
+    .filter((item) => !rewritesAcceptedEcDescription(item, scenarioId));
   const factAssessments = requireArray(rawOutput.factAssessments, "factAssessments")
     .map((item, index) => {
       const factId = requireEnum(item.factId, [...validFactIds], `factAssessments[${index}].factId`);
@@ -914,8 +977,41 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     throw new Error("forbiddenClaimIds must not contain duplicates");
   }
   const overallAssessment = ecReproducibilityMismatch
-    ? "主要な事象、仕様に基づく期待結果、実際の動作は整理されており、調査を開始できる状態です。ただし、再現性の『2/15』は提示された検証結果と一致しないため、『15回中1回発生』への訂正が必要です。"
+    ? "主要な事象、仕様に基づく期待結果、実際の動作は整理されており、調査を開始できる状態です。再現性の『2/15』のみ、確認済みの『15回中1回発生』へ訂正してください。"
     : requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment");
+  let strengths = requireArray(rawOutput.strengths, "strengths").map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      throw new Error(`strengths[${index}] must be an object`);
+    }
+    const evidenceQuote = requireNonEmptyString(
+      item.evidenceQuote,
+      `strengths[${index}].evidenceQuote`
+    );
+    const evaluation = requireNonEmptyString(
+      item.evaluation,
+      `strengths[${index}].evaluation`
+    );
+    const whyItHelps = requireNonEmptyString(
+      item.whyItHelps,
+      `strengths[${index}].whyItHelps`
+    );
+    return { evidenceQuote, evaluation, whyItHelps };
+  }).filter((item) =>
+    isGroundedQuote(item.evidenceQuote)
+    && !isGenericStructurePraise(item.evaluation, item.whyItHelps)
+  ).map(({ evidenceQuote, evaluation, whyItHelps }) =>
+    `「${evidenceQuote}」という記述から、${removeTerminalPunctuation(evaluation)}。${whyItHelps}`
+  );
+  const ecExpectedQuote = "処理済みの通知IDを再受信した場合、初回の注文結果を返すこと";
+  if (
+    scenarioId === "ec-payment-notification-double-order"
+    && attemptAnswerText.includes(ecExpectedQuote)
+    && !strengths.some((strength) => strength.includes(ecExpectedQuote))
+  ) {
+    strengths.unshift(
+      `「${ecExpectedQuote}」という記述から、仕様に基づく期待動作を具体的に示しています。二重作成という実際の動作とのずれを、調査担当者がすぐ判断できます。`
+    );
+  }
   return {
     dimensions,
     dimensionFeedback,
@@ -926,29 +1022,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     ambiguityRisks,
     investigationAdvice,
     rewriteSuggestions,
-    strengths: requireArray(rawOutput.strengths, "strengths").map((item, index) => {
-      if (!item || typeof item !== "object" || Array.isArray(item)) {
-        throw new Error(`strengths[${index}] must be an object`);
-      }
-      const evidenceQuote = requireNonEmptyString(
-        item.evidenceQuote,
-        `strengths[${index}].evidenceQuote`
-      );
-      const evaluation = requireNonEmptyString(
-        item.evaluation,
-        `strengths[${index}].evaluation`
-      );
-      const whyItHelps = requireNonEmptyString(
-        item.whyItHelps,
-        `strengths[${index}].whyItHelps`
-      );
-      return { evidenceQuote, evaluation, whyItHelps };
-    }).filter((item) =>
-      isGroundedQuote(item.evidenceQuote)
-      && !isGenericStructurePraise(item.evaluation, item.whyItHelps)
-    ).map(({ evidenceQuote, evaluation, whyItHelps }) =>
-      `「${evidenceQuote}」という記述から、${removeTerminalPunctuation(evaluation)}。${whyItHelps}`
-    ).slice(0, 2),
+    strengths: strengths.slice(0, 2),
     factAssessments,
     forbiddenClaimIds,
   };

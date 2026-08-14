@@ -3273,9 +3273,9 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
 .practice-ai-review-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 26px;
+  align-items: center;
   padding: 4px 0 20px;
   border-bottom: 1px solid #d8e3ec;
 }
@@ -3381,8 +3381,6 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
 .practice-ai-radar-panel {
   min-width: 0;
-  max-width: 380px;
-  margin: 0 auto;
   padding: 12px 8px 2px;
 }
 
