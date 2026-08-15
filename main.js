@@ -836,7 +836,8 @@ function formatPeripheralSchedule(value) {
     .replace(/必要があります$/u, "必要")
     .replace(/必要です$/u, "必要")
     .replace(/未定です$/u, "未定")
-    .replace(/[。．]+$/u, "");
+    .replace(/[。．]+$/u, "")
+    .replace(/。(?=\S)/gu, "。\n");
 }
 
 function getScenarioSchedule(rawScenario) {
@@ -2780,6 +2781,14 @@ function renderScenarioBrief() {
     ["関係者", peopleInfo, "assignee related"],
   ].filter(([, value]) => value);
   const renderBriefValue = (value, key) => {
+    if (key.split(/\s+/u).includes("schedule")) {
+      const scheduleMarkup = String(value)
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => `<span class="scenario-schedule-line">${escapeHtml(line)}</span>`)
+        .join("");
+      return `<dd class="scenario-schedule-copy">${scheduleMarkup}</dd>`;
+    }
     if (key !== "specification") {
       return `<dd>${escapeHtml(value)}</dd>`;
     }

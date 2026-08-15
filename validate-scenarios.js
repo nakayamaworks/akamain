@@ -1710,9 +1710,10 @@ try {
     !peripheralCopy.includes("顧客登録画面で必要項目を入力し保存操作を行った場合、操作1回につき顧客レコードを1件だけ作成する。")
     || peripheralCopy.includes("原因箇所は現時点で特定できていません")
     || !peripheralCopy.includes("受入後に対象機能の回帰試験を実施")
+    || (peripheralCopy.match(/scenario-schedule-line/g) || []).length < 2
     || /対応日程[\\s\\S]*?(?:です|ます)/u.test(peripheralCopy)
   ) {
-    errors.push("related material and schedule must use specification-only, plain-form peripheral copy");
+    errors.push("related material and schedule must use concise, line-separated peripheral copy");
   }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";
   const leakedInitialSubjects = vm.runInContext(

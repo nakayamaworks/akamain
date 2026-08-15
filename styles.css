@@ -1381,6 +1381,15 @@ button {
   display: block;
 }
 
+.scenario-schedule-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.scenario-schedule-line {
+  display: block;
+}
+
 .scenario-intro-section:first-child .scenario-brief-wide dd {
   font-size: 0.94rem;
   line-height: 1.95;
