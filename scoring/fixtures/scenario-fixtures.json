@@ -3672,6 +3672,1230 @@
           }
         }
       ]
+    },
+    "customer-search-delete-last-page-stays-empty": {
+      "scenarioId": "customer-search-delete-last-page-stays-empty",
+      "rubricVersion": "customer-search-delete-last-page-stays-empty.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる",
+            "sections": {
+              "detail": "顧客検索結果の最終ページで最後の1件を削除すると前ページへ戻らず0件のページが表示される",
+              "preconditions": "検索結果が21件あり1ページ20件で表示されていること",
+              "steps": "1. 顧客名で検索して2ページ目を開く\n2. 2ページ目の顧客1件を削除する",
+              "expected": "削除後は1ページ目へ戻り残り20件が表示されること",
+              "actual": "2ページ目のまま0件と表示されページ移動ボタンも無効になる",
+              "remarks": "再検索すると1ページ目に20件が正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる",
+            "sections": {
+              "detail": "顧客検索結果の最終ページで最後の1件を削除すると前ページへ戻らず0件のページが表示される",
+              "preconditions": "検索結果が21件あり1ページ20件で表示されていること",
+              "steps": "顧客名で検索して2ページ目を開く。2ページ目の顧客1件を削除する",
+              "expected": "顧客一覧画面仕様書 Rev.2.4「5.6 削除後のページ制御」\n削除後は1ページ目へ戻り残り20件が表示されること",
+              "actual": "2ページ目のまま0件と表示されページ移動ボタンも無効になる",
+              "remarks": "再検索すると1ページ目に20件が正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる",
+            "sections": {
+              "detail": "顧客検索結果の最終ページで最後の1件を削除すると前ページへ戻らず0件のページが表示される\n原因は実装不備であることを確認しました。",
+              "preconditions": "検索結果が21件あり1ページ20件で表示されていること",
+              "steps": "1. 顧客名で検索して2ページ目を開く\n2. 2ページ目の顧客1件を削除する",
+              "expected": "削除後は1ページ目へ戻り残り20件が表示されること",
+              "actual": "2ページ目のまま0件と表示されページ移動ボタンも無効になる",
+              "remarks": "再検索すると1ページ目に20件が正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる",
+            "sections": {
+              "detail": "検索結果が21件あり1ページ20件で表示されていること",
+              "preconditions": "1. 顧客名で検索して2ページ目を開く\n2. 2ページ目の顧客1件を削除する",
+              "steps": "削除後は1ページ目へ戻り残り20件が表示されること",
+              "expected": "2ページ目のまま0件と表示されページ移動ボタンも無効になる",
+              "actual": "再検索すると1ページ目に20件が正しく表示される",
+              "remarks": "3/3",
+              "reproducibility": "顧客検索結果の最終ページで最後の1件を削除すると前ページへ戻らず0件のページが表示される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる",
+            "sections": {
+              "detail": "顧客検索結果の最終ページで最後の1件を削除すると前ページへ戻らず0件のページが表示される\n上記について継続して確認が必要です。",
+              "preconditions": "検索結果が21件あり1ページ20件で表示されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 顧客名で検索して2ページ目を開く\n2. 2ページ目の顧客1件を削除する\n上記について継続して確認が必要です。",
+              "expected": "削除後は1ページ目へ戻り残り20件が表示されること\n上記について継続して確認が必要です。",
+              "actual": "2ページ目のまま0件と表示されページ移動ボタンも無効になる\n上記について継続して確認が必要です。",
+              "remarks": "再検索すると1ページ目に20件が正しく表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "attendance-approved-correction-total-stale": {
+      "scenarioId": "attendance-approved-correction-total-stale",
+      "rubricVersion": "attendance-approved-correction-total-stale.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "打刻修正を承認しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "退勤打刻を18時から19時へ修正して承認しても日次勤務合計が8時間のまま変わらない",
+              "preconditions": "9時出勤18時退勤で休憩1時間の勤務が確定前であること",
+              "steps": "1. 退勤打刻を19時へ修正申請する\n2. 管理者が修正申請を承認する\n3. 日次勤務集計を開く",
+              "expected": "日次勤務合計が9時間へ更新されること",
+              "actual": "打刻は19時へ更新されるが日次勤務合計は8時間のままになる",
+              "remarks": "月次集計を手動再計算すると9時間へ更新される",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "打刻修正を承認しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "退勤打刻を18時から19時へ修正して承認しても日次勤務合計が8時間のまま変わらない",
+              "preconditions": "9時出勤18時退勤で休憩1時間の勤務が確定前であること",
+              "steps": "退勤打刻を19時へ修正申請する。管理者が修正申請を承認する。日次勤務集計を開く",
+              "expected": "勤怠集計仕様書 Rev.4.7「6.2 打刻修正承認後の再計算」\n日次勤務合計が9時間へ更新されること",
+              "actual": "打刻は19時へ更新されるが日次勤務合計は8時間のままになる",
+              "remarks": "月次集計を手動再計算すると9時間へ更新される",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "打刻修正を承認しても日次勤務合計が更新されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により打刻修正を承認しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "退勤打刻を18時から19時へ修正して承認しても日次勤務合計が8時間のまま変わらない\n原因は実装不備であることを確認しました。",
+              "preconditions": "9時出勤18時退勤で休憩1時間の勤務が確定前であること",
+              "steps": "1. 退勤打刻を19時へ修正申請する\n2. 管理者が修正申請を承認する\n3. 日次勤務集計を開く",
+              "expected": "日次勤務合計が9時間へ更新されること",
+              "actual": "打刻は19時へ更新されるが日次勤務合計は8時間のままになる",
+              "remarks": "月次集計を手動再計算すると9時間へ更新される",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "打刻修正を承認しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "9時出勤18時退勤で休憩1時間の勤務が確定前であること",
+              "preconditions": "1. 退勤打刻を19時へ修正申請する\n2. 管理者が修正申請を承認する\n3. 日次勤務集計を開く",
+              "steps": "日次勤務合計が9時間へ更新されること",
+              "expected": "打刻は19時へ更新されるが日次勤務合計は8時間のままになる",
+              "actual": "月次集計を手動再計算すると9時間へ更新される",
+              "remarks": "5/5",
+              "reproducibility": "退勤打刻を18時から19時へ修正して承認しても日次勤務合計が8時間のまま変わらない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "打刻修正を承認しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "退勤打刻を18時から19時へ修正して承認しても日次勤務合計が8時間のまま変わらない\n上記について継続して確認が必要です。",
+              "preconditions": "9時出勤18時退勤で休憩1時間の勤務が確定前であること\n上記について継続して確認が必要です。",
+              "steps": "1. 退勤打刻を19時へ修正申請する\n2. 管理者が修正申請を承認する\n3. 日次勤務集計を開く\n上記について継続して確認が必要です。",
+              "expected": "日次勤務合計が9時間へ更新されること\n上記について継続して確認が必要です。",
+              "actual": "打刻は19時へ更新されるが日次勤務合計は8時間のままになる\n上記について継続して確認が必要です。",
+              "remarks": "月次集計を手動再計算すると9時間へ更新される\n上記について継続して確認が必要です。",
+              "reproducibility": "5/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "salon-reservation-auto-assigns-off-duty-staff": {
+      "scenarioId": "salon-reservation-auto-assigns-off-duty-staff",
+      "rubricVersion": "salon-reservation-auto-assigns-off-duty-staff.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "指名なし予約の自動割当で休業日のスタッフが選択される",
+            "sections": {
+              "detail": "指名なし予約を登録すると対象日時が休業日のスタッフへ自動で割り当てられる",
+              "preconditions": "スタッフAが対象日を終日休業として登録していること",
+              "steps": "1. 指名なしで空いている時間を選ぶ\n2. カットメニューで予約を確定する",
+              "expected": "勤務可能なスタッフだけから担当者が自動選択されること",
+              "actual": "終日休業のスタッフAが担当者として割り当てられる",
+              "remarks": "スタッフAを指名した場合は休業日のため選択できない",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "指名なし予約の自動割当で休業日のスタッフが選択される",
+            "sections": {
+              "detail": "指名なし予約を登録すると対象日時が休業日のスタッフへ自動で割り当てられる",
+              "preconditions": "スタッフAが対象日を終日休業として登録していること",
+              "steps": "指名なしで空いている時間を選ぶ。カットメニューで予約を確定する",
+              "expected": "予約割当仕様書 Rev.3.6「4.3 指名なし予約の候補抽出」\n勤務可能なスタッフだけから担当者が自動選択されること",
+              "actual": "終日休業のスタッフAが担当者として割り当てられる",
+              "remarks": "スタッフAを指名した場合は休業日のため選択できない",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "指名なし予約の自動割当で休業日のスタッフが選択される",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により指名なし予約の自動割当で休業日のスタッフが選択される",
+            "sections": {
+              "detail": "指名なし予約を登録すると対象日時が休業日のスタッフへ自動で割り当てられる\n原因は実装不備であることを確認しました。",
+              "preconditions": "スタッフAが対象日を終日休業として登録していること",
+              "steps": "1. 指名なしで空いている時間を選ぶ\n2. カットメニューで予約を確定する",
+              "expected": "勤務可能なスタッフだけから担当者が自動選択されること",
+              "actual": "終日休業のスタッフAが担当者として割り当てられる",
+              "remarks": "スタッフAを指名した場合は休業日のため選択できない",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "指名なし予約の自動割当で休業日のスタッフが選択される",
+            "sections": {
+              "detail": "スタッフAが対象日を終日休業として登録していること",
+              "preconditions": "1. 指名なしで空いている時間を選ぶ\n2. カットメニューで予約を確定する",
+              "steps": "勤務可能なスタッフだけから担当者が自動選択されること",
+              "expected": "終日休業のスタッフAが担当者として割り当てられる",
+              "actual": "スタッフAを指名した場合は休業日のため選択できない",
+              "remarks": "4/4",
+              "reproducibility": "指名なし予約を登録すると対象日時が休業日のスタッフへ自動で割り当てられる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "指名なし予約の自動割当で休業日のスタッフが選択される",
+            "sections": {
+              "detail": "指名なし予約を登録すると対象日時が休業日のスタッフへ自動で割り当てられる\n上記について継続して確認が必要です。",
+              "preconditions": "スタッフAが対象日を終日休業として登録していること\n上記について継続して確認が必要です。",
+              "steps": "1. 指名なしで空いている時間を選ぶ\n2. カットメニューで予約を確定する\n上記について継続して確認が必要です。",
+              "expected": "勤務可能なスタッフだけから担当者が自動選択されること\n上記について継続して確認が必要です。",
+              "actual": "終日休業のスタッフAが担当者として割り当てられる\n上記について継続して確認が必要です。",
+              "remarks": "スタッフAを指名した場合は休業日のため選択できない\n上記について継続して確認が必要です。",
+              "reproducibility": "4/4\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "ec-payment-notification-header-case-rejected": {
+      "scenarioId": "ec-payment-notification-header-case-rejected",
+      "rubricVersion": "ec-payment-notification-header-case-rejected.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "決済通知の署名ヘッダー名が小文字だと注文APIが401を返す",
+            "sections": {
+              "detail": "有効な署名でも署名ヘッダー名を小文字で送信すると決済通知が401で拒否される",
+              "preconditions": "検証用注文が支払待ちで署名秘密鍵が登録済みであること",
+              "steps": "1. 有効な署名を生成する\n2. 署名ヘッダー名を小文字で決済通知を送信する",
+              "expected": "ヘッダー名の大文字小文字にかかわらず通知が受理されること",
+              "actual": "小文字の署名ヘッダーは401で拒否され注文が支払待ちのままになる",
+              "remarks": "同じ署名値で仕様書どおりの表記にすると200で受理される",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "決済通知の署名ヘッダー名が小文字だと注文APIが401を返す",
+            "sections": {
+              "detail": "有効な署名でも署名ヘッダー名を小文字で送信すると決済通知が401で拒否される",
+              "preconditions": "検証用注文が支払待ちで署名秘密鍵が登録済みであること",
+              "steps": "有効な署名を生成する。署名ヘッダー名を小文字で決済通知を送信する",
+              "expected": "決済通知API仕様書 Rev.5.9「3.2 署名ヘッダーの照合」\nヘッダー名の大文字小文字にかかわらず通知が受理されること",
+              "actual": "小文字の署名ヘッダーは401で拒否され注文が支払待ちのままになる",
+              "remarks": "同じ署名値で仕様書どおりの表記にすると200で受理される",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "決済通知の署名ヘッダー名が小文字だと注文APIが401を返す",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により決済通知の署名ヘッダー名が小文字だと注文APIが401を返す",
+            "sections": {
+              "detail": "有効な署名でも署名ヘッダー名を小文字で送信すると決済通知が401で拒否される\n原因は実装不備であることを確認しました。",
+              "preconditions": "検証用注文が支払待ちで署名秘密鍵が登録済みであること",
+              "steps": "1. 有効な署名を生成する\n2. 署名ヘッダー名を小文字で決済通知を送信する",
+              "expected": "ヘッダー名の大文字小文字にかかわらず通知が受理されること",
+              "actual": "小文字の署名ヘッダーは401で拒否され注文が支払待ちのままになる",
+              "remarks": "同じ署名値で仕様書どおりの表記にすると200で受理される",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "決済通知の署名ヘッダー名が小文字だと注文APIが401を返す",
+            "sections": {
+              "detail": "検証用注文が支払待ちで署名秘密鍵が登録済みであること",
+              "preconditions": "1. 有効な署名を生成する\n2. 署名ヘッダー名を小文字で決済通知を送信する",
+              "steps": "ヘッダー名の大文字小文字にかかわらず通知が受理されること",
+              "expected": "小文字の署名ヘッダーは401で拒否され注文が支払待ちのままになる",
+              "actual": "同じ署名値で仕様書どおりの表記にすると200で受理される",
+              "remarks": "10/10",
+              "reproducibility": "有効な署名でも署名ヘッダー名を小文字で送信すると決済通知が401で拒否される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "決済通知の署名ヘッダー名が小文字だと注文APIが401を返す",
+            "sections": {
+              "detail": "有効な署名でも署名ヘッダー名を小文字で送信すると決済通知が401で拒否される\n上記について継続して確認が必要です。",
+              "preconditions": "検証用注文が支払待ちで署名秘密鍵が登録済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. 有効な署名を生成する\n2. 署名ヘッダー名を小文字で決済通知を送信する\n上記について継続して確認が必要です。",
+              "expected": "ヘッダー名の大文字小文字にかかわらず通知が受理されること\n上記について継続して確認が必要です。",
+              "actual": "小文字の署名ヘッダーは401で拒否され注文が支払待ちのままになる\n上記について継続して確認が必要です。",
+              "remarks": "同じ署名値で仕様書どおりの表記にすると200で受理される\n上記について継続して確認が必要です。",
+              "reproducibility": "10/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "inventory-lot-leading-zero-lost-export": {
+      "scenarioId": "inventory-lot-leading-zero-lost-export",
+      "rubricVersion": "inventory-lot-leading-zero-lost-export.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "ロット番号をCSV出力すると先頭の0が欠落する",
+            "sections": {
+              "detail": "ロット番号00125をCSV出力すると125に変換され元の識別子を判別できない",
+              "preconditions": "ロット番号00125の在庫が登録されていること",
+              "steps": "1. ロット別在庫一覧を開く\n2. CSV出力を実行する",
+              "expected": "CSVにもロット番号00125が文字列として出力されること",
+              "actual": "CSVではロット番号が125と出力され先頭の0が欠落する",
+              "remarks": "画面とPDF出力では00125と正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "ロット番号をCSV出力すると先頭の0が欠落する",
+            "sections": {
+              "detail": "ロット番号00125をCSV出力すると125に変換され元の識別子を判別できない",
+              "preconditions": "ロット番号00125の在庫が登録されていること",
+              "steps": "ロット別在庫一覧を開く。CSV出力を実行する",
+              "expected": "在庫CSV出力仕様書 Rev.4.4「2.7 ロット番号」\nCSVにもロット番号00125が文字列として出力されること",
+              "actual": "CSVではロット番号が125と出力され先頭の0が欠落する",
+              "remarks": "画面とPDF出力では00125と正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "ロット番号をCSV出力すると先頭の0が欠落する",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりロット番号をCSV出力すると先頭の0が欠落する",
+            "sections": {
+              "detail": "ロット番号00125をCSV出力すると125に変換され元の識別子を判別できない\n原因は実装不備であることを確認しました。",
+              "preconditions": "ロット番号00125の在庫が登録されていること",
+              "steps": "1. ロット別在庫一覧を開く\n2. CSV出力を実行する",
+              "expected": "CSVにもロット番号00125が文字列として出力されること",
+              "actual": "CSVではロット番号が125と出力され先頭の0が欠落する",
+              "remarks": "画面とPDF出力では00125と正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "ロット番号をCSV出力すると先頭の0が欠落する",
+            "sections": {
+              "detail": "ロット番号00125の在庫が登録されていること",
+              "preconditions": "1. ロット別在庫一覧を開く\n2. CSV出力を実行する",
+              "steps": "CSVにもロット番号00125が文字列として出力されること",
+              "expected": "CSVではロット番号が125と出力され先頭の0が欠落する",
+              "actual": "画面とPDF出力では00125と正しく表示される",
+              "remarks": "3/3",
+              "reproducibility": "ロット番号00125をCSV出力すると125に変換され元の識別子を判別できない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "ロット番号をCSV出力すると先頭の0が欠落する",
+            "sections": {
+              "detail": "ロット番号00125をCSV出力すると125に変換され元の識別子を判別できない\n上記について継続して確認が必要です。",
+              "preconditions": "ロット番号00125の在庫が登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. ロット別在庫一覧を開く\n2. CSV出力を実行する\n上記について継続して確認が必要です。",
+              "expected": "CSVにもロット番号00125が文字列として出力されること\n上記について継続して確認が必要です。",
+              "actual": "CSVではロット番号が125と出力され先頭の0が欠落する\n上記について継続して確認が必要です。",
+              "remarks": "画面とPDF出力では00125と正しく表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "mobile-notification-token-not-reregistered": {
+      "scenarioId": "mobile-notification-token-not-reregistered",
+      "rubricVersion": "mobile-notification-token-not-reregistered.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "通知許可を再度オンにしても端末トークンが再登録されない",
+            "sections": {
+              "detail": "通知許可をオフからオンへ戻しても端末トークンがサーバーへ再登録されず通知を受信できない",
+              "preconditions": "ログイン済み端末で通知を1回受信済みであること",
+              "steps": "1. OS設定で通知許可をオフにする\n2. 通知許可をオンへ戻す\n3. アプリを起動してテスト通知を送る",
+              "expected": "端末トークンが再登録され通知を受信できること",
+              "actual": "端末トークンが無効のままでテスト通知が配信対象外になる",
+              "remarks": "ログアウト後に再ログインするとトークンが登録され通知を受信できる",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "通知許可を再度オンにしても端末トークンが再登録されない",
+            "sections": {
+              "detail": "通知許可をオフからオンへ戻しても端末トークンがサーバーへ再登録されず通知を受信できない",
+              "preconditions": "ログイン済み端末で通知を1回受信済みであること",
+              "steps": "OS設定で通知許可をオフにする。通知許可をオンへ戻す。アプリを起動してテスト通知を送る",
+              "expected": "プッシュ通知登録仕様書 Rev.4.6「5.3 通知許可変更後の再登録」\n端末トークンが再登録され通知を受信できること",
+              "actual": "端末トークンが無効のままでテスト通知が配信対象外になる",
+              "remarks": "ログアウト後に再ログインするとトークンが登録され通知を受信できる",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "通知許可を再度オンにしても端末トークンが再登録されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により通知許可を再度オンにしても端末トークンが再登録されない",
+            "sections": {
+              "detail": "通知許可をオフからオンへ戻しても端末トークンがサーバーへ再登録されず通知を受信できない\n原因は実装不備であることを確認しました。",
+              "preconditions": "ログイン済み端末で通知を1回受信済みであること",
+              "steps": "1. OS設定で通知許可をオフにする\n2. 通知許可をオンへ戻す\n3. アプリを起動してテスト通知を送る",
+              "expected": "端末トークンが再登録され通知を受信できること",
+              "actual": "端末トークンが無効のままでテスト通知が配信対象外になる",
+              "remarks": "ログアウト後に再ログインするとトークンが登録され通知を受信できる",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "通知許可を再度オンにしても端末トークンが再登録されない",
+            "sections": {
+              "detail": "ログイン済み端末で通知を1回受信済みであること",
+              "preconditions": "1. OS設定で通知許可をオフにする\n2. 通知許可をオンへ戻す\n3. アプリを起動してテスト通知を送る",
+              "steps": "端末トークンが再登録され通知を受信できること",
+              "expected": "端末トークンが無効のままでテスト通知が配信対象外になる",
+              "actual": "ログアウト後に再ログインするとトークンが登録され通知を受信できる",
+              "remarks": "5/5",
+              "reproducibility": "通知許可をオフからオンへ戻しても端末トークンがサーバーへ再登録されず通知を受信できない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "通知許可を再度オンにしても端末トークンが再登録されない",
+            "sections": {
+              "detail": "通知許可をオフからオンへ戻しても端末トークンがサーバーへ再登録されず通知を受信できない\n上記について継続して確認が必要です。",
+              "preconditions": "ログイン済み端末で通知を1回受信済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. OS設定で通知許可をオフにする\n2. 通知許可をオンへ戻す\n3. アプリを起動してテスト通知を送る\n上記について継続して確認が必要です。",
+              "expected": "端末トークンが再登録され通知を受信できること\n上記について継続して確認が必要です。",
+              "actual": "端末トークンが無効のままでテスト通知が配信対象外になる\n上記について継続して確認が必要です。",
+              "remarks": "ログアウト後に再ログインするとトークンが登録され通知を受信できる\n上記について継続して確認が必要です。",
+              "reproducibility": "5/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-can-rolling-counter-rollover-rejected": {
+      "scenarioId": "automotive-can-rolling-counter-rollover-rejected",
+      "rubricVersion": "automotive-can-rolling-counter-rollover-rejected.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "CAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する",
+            "sections": {
+              "detail": "4ビットのローリングカウンタが15から0へ周回したフレームを異常として破棄する",
+              "preconditions": "MSG-221を100ミリ秒周期で受信していること",
+              "steps": "1. カウンタ14のフレームを送信する\n2. 15と0の順に正常なフレームを送信する",
+              "expected": "15から0への周回を連続値として受理すること",
+              "actual": "カウンタ0のフレームが連続性異常として破棄される",
+              "remarks": "0以外の連続値と0から1への遷移は正常に受理される",
+              "reproducibility": "20/20"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "CAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する",
+            "sections": {
+              "detail": "4ビットのローリングカウンタが15から0へ周回したフレームを異常として破棄する",
+              "preconditions": "MSG-221を100ミリ秒周期で受信していること",
+              "steps": "カウンタ14のフレームを送信する。15と0の順に正常なフレームを送信する",
+              "expected": "CAN通信仕様書 Rev.6.5「8.4 ローリングカウンタ監視」\n15から0への周回を連続値として受理すること",
+              "actual": "カウンタ0のフレームが連続性異常として破棄される",
+              "remarks": "0以外の連続値と0から1への遷移は正常に受理される",
+              "reproducibility": "20/20"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "CAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりCAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する",
+            "sections": {
+              "detail": "4ビットのローリングカウンタが15から0へ周回したフレームを異常として破棄する\n原因は実装不備であることを確認しました。",
+              "preconditions": "MSG-221を100ミリ秒周期で受信していること",
+              "steps": "1. カウンタ14のフレームを送信する\n2. 15と0の順に正常なフレームを送信する",
+              "expected": "15から0への周回を連続値として受理すること",
+              "actual": "カウンタ0のフレームが連続性異常として破棄される",
+              "remarks": "0以外の連続値と0から1への遷移は正常に受理される",
+              "reproducibility": "20/20"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "CAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する",
+            "sections": {
+              "detail": "MSG-221を100ミリ秒周期で受信していること",
+              "preconditions": "1. カウンタ14のフレームを送信する\n2. 15と0の順に正常なフレームを送信する",
+              "steps": "15から0への周回を連続値として受理すること",
+              "expected": "カウンタ0のフレームが連続性異常として破棄される",
+              "actual": "0以外の連続値と0から1への遷移は正常に受理される",
+              "remarks": "20/20",
+              "reproducibility": "4ビットのローリングカウンタが15から0へ周回したフレームを異常として破棄する"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "CAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する",
+            "sections": {
+              "detail": "4ビットのローリングカウンタが15から0へ周回したフレームを異常として破棄する\n上記について継続して確認が必要です。",
+              "preconditions": "MSG-221を100ミリ秒周期で受信していること\n上記について継続して確認が必要です。",
+              "steps": "1. カウンタ14のフレームを送信する\n2. 15と0の順に正常なフレームを送信する\n上記について継続して確認が必要です。",
+              "expected": "15から0への周回を連続値として受理すること\n上記について継続して確認が必要です。",
+              "actual": "カウンタ0のフレームが連続性異常として破棄される\n上記について継続して確認が必要です。",
+              "remarks": "0以外の連続値と0から1への遷移は正常に受理される\n上記について継続して確認が必要です。",
+              "reproducibility": "20/20\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "payment-refund-event-before-response-stale": {
+      "scenarioId": "payment-refund-event-before-response-stale",
+      "rubricVersion": "payment-refund-event-before-response-stale.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る",
+            "sections": {
+              "detail": "返金完了Webhookの後に返金API応答を処理すると完了済み取引が処理中へ上書きされる",
+              "preconditions": "返金可能な売上確定済み取引があること",
+              "steps": "1. 返金APIを実行する\n2. API応答前に返金完了Webhookを受信させる",
+              "expected": "完了Webhook受信後は返金完了状態が維持されること",
+              "actual": "遅れて届いたAPI応答により返金状態が処理中へ戻る",
+              "remarks": "API応答後にWebhookが届く通常順序では返金完了になる",
+              "reproducibility": "8/8"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る",
+            "sections": {
+              "detail": "返金完了Webhookの後に返金API応答を処理すると完了済み取引が処理中へ上書きされる",
+              "preconditions": "返金可能な売上確定済み取引があること",
+              "steps": "返金APIを実行する。API応答前に返金完了Webhookを受信させる",
+              "expected": "返金状態遷移仕様書 Rev.5.3「6.4 非同期イベントの順序逆転」\n完了Webhook受信後は返金完了状態が維持されること",
+              "actual": "遅れて届いたAPI応答により返金状態が処理中へ戻る",
+              "remarks": "API応答後にWebhookが届く通常順序では返金完了になる",
+              "reproducibility": "8/8"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る",
+            "sections": {
+              "detail": "返金完了Webhookの後に返金API応答を処理すると完了済み取引が処理中へ上書きされる\n原因は実装不備であることを確認しました。",
+              "preconditions": "返金可能な売上確定済み取引があること",
+              "steps": "1. 返金APIを実行する\n2. API応答前に返金完了Webhookを受信させる",
+              "expected": "完了Webhook受信後は返金完了状態が維持されること",
+              "actual": "遅れて届いたAPI応答により返金状態が処理中へ戻る",
+              "remarks": "API応答後にWebhookが届く通常順序では返金完了になる",
+              "reproducibility": "8/8"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る",
+            "sections": {
+              "detail": "返金可能な売上確定済み取引があること",
+              "preconditions": "1. 返金APIを実行する\n2. API応答前に返金完了Webhookを受信させる",
+              "steps": "完了Webhook受信後は返金完了状態が維持されること",
+              "expected": "遅れて届いたAPI応答により返金状態が処理中へ戻る",
+              "actual": "API応答後にWebhookが届く通常順序では返金完了になる",
+              "remarks": "8/8",
+              "reproducibility": "返金完了Webhookの後に返金API応答を処理すると完了済み取引が処理中へ上書きされる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る",
+            "sections": {
+              "detail": "返金完了Webhookの後に返金API応答を処理すると完了済み取引が処理中へ上書きされる\n上記について継続して確認が必要です。",
+              "preconditions": "返金可能な売上確定済み取引があること\n上記について継続して確認が必要です。",
+              "steps": "1. 返金APIを実行する\n2. API応答前に返金完了Webhookを受信させる\n上記について継続して確認が必要です。",
+              "expected": "完了Webhook受信後は返金完了状態が維持されること\n上記について継続して確認が必要です。",
+              "actual": "遅れて届いたAPI応答により返金状態が処理中へ戻る\n上記について継続して確認が必要です。",
+              "remarks": "API応答後にWebhookが届く通常順序では返金完了になる\n上記について継続して確認が必要です。",
+              "reproducibility": "8/8\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "medical-lab-result-unit-conversion-wrong": {
+      "scenarioId": "medical-lab-result-unit-conversion-wrong",
+      "rubricVersion": "medical-lab-result-unit-conversion-wrong.v3",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる",
+            "sections": {
+              "detail": "外部検査から受信した25ng/dLをμg/L表示へ変換すると本来250のところ2500と表示される",
+              "preconditions": "表示単位がμg/Lに設定された検査項目TEST-17であること",
+              "steps": "1. 25ng/dLの検査結果を受信する\n2. 診療画面でTEST-17を開く",
+              "expected": "25ng/dLが250μg/Lと表示されること",
+              "actual": "25ng/dLが2500μg/Lと表示される",
+              "remarks": "ng/mLからμg/Lへの変換と単位変換なしの項目は正常",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる",
+            "sections": {
+              "detail": "外部検査から受信した25ng/dLをμg/L表示へ変換すると本来250のところ2500と表示される",
+              "preconditions": "表示単位がμg/Lに設定された検査項目TEST-17であること",
+              "steps": "25ng/dLの検査結果を受信する。診療画面でTEST-17を開く",
+              "expected": "検査単位変換仕様書 Rev.6.2「7.5 質量濃度の換算」\n25ng/dLが250μg/Lと表示されること",
+              "actual": "25ng/dLが2500μg/Lと表示される",
+              "remarks": "ng/mLからμg/Lへの変換と単位変換なしの項目は正常",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる",
+            "sections": {
+              "detail": "外部検査から受信した25ng/dLをμg/L表示へ変換すると本来250のところ2500と表示される\n原因は実装不備であることを確認しました。",
+              "preconditions": "表示単位がμg/Lに設定された検査項目TEST-17であること",
+              "steps": "1. 25ng/dLの検査結果を受信する\n2. 診療画面でTEST-17を開く",
+              "expected": "25ng/dLが250μg/Lと表示されること",
+              "actual": "25ng/dLが2500μg/Lと表示される",
+              "remarks": "ng/mLからμg/Lへの変換と単位変換なしの項目は正常",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる",
+            "sections": {
+              "detail": "表示単位がμg/Lに設定された検査項目TEST-17であること",
+              "preconditions": "1. 25ng/dLの検査結果を受信する\n2. 診療画面でTEST-17を開く",
+              "steps": "25ng/dLが250μg/Lと表示されること",
+              "expected": "25ng/dLが2500μg/Lと表示される",
+              "actual": "ng/mLからμg/Lへの変換と単位変換なしの項目は正常",
+              "remarks": "10/10",
+              "reproducibility": "外部検査から受信した25ng/dLをμg/L表示へ変換すると本来250のところ2500と表示される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる",
+            "sections": {
+              "detail": "外部検査から受信した25ng/dLをμg/L表示へ変換すると本来250のところ2500と表示される\n上記について継続して確認が必要です。",
+              "preconditions": "表示単位がμg/Lに設定された検査項目TEST-17であること\n上記について継続して確認が必要です。",
+              "steps": "1. 25ng/dLの検査結果を受信する\n2. 診療画面でTEST-17を開く\n上記について継続して確認が必要です。",
+              "expected": "25ng/dLが250μg/Lと表示されること\n上記について継続して確認が必要です。",
+              "actual": "25ng/dLが2500μg/Lと表示される\n上記について継続して確認が必要です。",
+              "remarks": "ng/mLからμg/Lへの変換と単位変換なしの項目は正常\n上記について継続して確認が必要です。",
+              "reproducibility": "10/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
     }
   }
 }

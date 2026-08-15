@@ -4987,5 +4987,295 @@
   }
 };
 
+  const section = (text) => ({ kind: "section", text });
+  const line = (text, answer, trainingRole = "") => ({
+    kind: "line",
+    ...(trainingRole ? { trainingRole } : {}),
+    text,
+    answers: [answer.replaceAll(" ", "")],
+  });
+
+  const projectDefaults = {
+    customer: ["App version: 2.3.1", "Google Chrome 126.0.6478.127", "Windows 11 23H2"],
+    attendance: ["Web version: 4.12.0", "Google Chrome 126.0.6478.127", "Windows 11 23H2"],
+    salon: ["Release 2026.07.2", "Safari 18.5", "macOS 15.5"],
+    ec: ["Storefront v8.4.2", "Google Chrome 126.0.6478.127", "Windows 11 23H2"],
+    inventory: ["Client 5.7.0 (Build 1842)", "Microsoft Edge 126.0.2592.102", "Windows 10 22H2"],
+    mobile: ["App 3.4.0 (34018)", "iOS 18.5", "iPhone 15"],
+    automotive: ["ECU Software: v5.12.3", "Hardware Rev: C", "Vehicle profile: TEST-02"],
+    payment: ["API version: 2024-06-20", "Environment: Sandbox", "Gateway build: 7.18.4"],
+    medical: ["Client version: 4.8.2", "Database schema: 2026.07", "Windows 11 Enterprise 23H2"],
+  };
+
+  const buildAdditionalBugScenario = (definition) => {
+    const environment = projectDefaults[definition.projectId];
+    const report = [
+      section("■詳細"),
+      line(definition.detail[0], definition.detail[1]),
+      section("■前提条件"),
+      line(definition.precondition[0], definition.precondition[1]),
+      section("■操作手順"),
+      ...definition.steps.map(([text, answer], index) => line(`${index + 1}. ${text}`, `${index + 1}.${answer}`)),
+      section("■期待結果"),
+      line(definition.expected[0], definition.expected[1]),
+      section("■実際の動作"),
+      line(definition.actual[0], definition.actual[1]),
+      section("■備考"),
+      line(definition.remark[0], definition.remark[1], "remark"),
+      section("■再現性"),
+      line(definition.reproducibility, definition.reproducibility),
+    ];
+    const specificationObservation = `${definition.specificationStatement}${definition.contextNote ? ` ${definition.contextNote}` : ""}`;
+    return {
+      schemaVersion: "scenario-authoring.v2",
+      scenario: {
+        scenarioId: definition.scenarioId,
+        projectId: definition.projectId,
+        difficulty: definition.difficulty,
+        environment: environment.map((text) => ({ text })),
+        subject: { text: definition.subject[0], answers: [definition.subject[1].replaceAll(" ", "")] },
+        report,
+      },
+      briefing: {
+        testTarget: definition.testTarget,
+        notes: [definition.observation, definition.comparison, specificationObservation],
+      },
+      specificationReference: definition.specificationReference,
+      specificationContent: [
+        definition.specificationStatement
+          .replace(/^.+?仕様では、/u, "")
+          .replace(/と規定されています。?$/u, "とする。"),
+      ],
+      judgement: definition.judgement,
+      reviewSource: {
+        schemaVersion: "scenario-review-source.v1",
+        sourceType: "scenario-observations",
+        testTarget: definition.testTarget,
+        environment,
+        observations: [
+          { id: "observation-1", role: "primary-observation", text: definition.observation },
+          { id: "observation-2", role: "comparison-check", text: definition.comparison },
+          { id: "observation-3", role: "specification-and-context", text: specificationObservation },
+        ],
+        specificationReference: definition.specificationReference,
+        alternativeExcellentAnswer: {
+          subject: definition.subject[0],
+          sections: {
+            detail: definition.detail[0],
+            preconditions: definition.precondition[0],
+            steps: definition.steps.map(([text]) => text).join("。"),
+            expected: `${definition.specificationReference}\n${definition.expected[0]}`,
+            actual: definition.actual[0],
+            remarks: definition.remark[0],
+            reproducibility: definition.reproducibility,
+          },
+        },
+      },
+      reviewGuide: {
+        sourceBoundary: "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        strengthCriteria: [
+          `観測記録『${definition.observation}』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する`,
+          `比較確認『${definition.comparison}』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する`,
+          `仕様・周辺情報『${specificationObservation}』について、期待動作と確認済み事実を推測から分けているか評価する`,
+        ],
+        nonScoringInvestigationIdeas: [],
+        disallowedGenericPraise: [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている",
+        ],
+      },
+    };
+  };
+
+  const additionalBugDefinitions = [
+    {
+      scenarioId: "customer-search-delete-last-page-stays-empty", projectId: "customer", difficulty: "advanced",
+      subject: ["顧客検索結果の最終ページで最後の1件を削除しても空ページのままになる", "kokyakukensakukekkanosaishu-pe-jidesaigono1kenwosakujoshitemokarape-jinomamaninaru"],
+      detail: ["顧客検索結果の最終ページで最後の1件を削除すると前ページへ戻らず0件のページが表示される", "kokyakukensakukekkanosaishu-pe-jidesaigono1kenwosakujosurutomaepe-jihemodorazu0kennnope-jigahyoujisareru"],
+      precondition: ["検索結果が21件あり1ページ20件で表示されていること", "kensakukekkaga21kenna ri1pe-ji20kenndehyoujisareteirukoto"],
+      steps: [["顧客名で検索して2ページ目を開く", "kokyakumeidekensakushite2pe-jimewohiraku"], ["2ページ目の顧客1件を削除する", "2pe-jimenokokyaku1kenwosakujosuru"]],
+      expected: ["削除後は1ページ目へ戻り残り20件が表示されること", "sakujogoha1pe-jimehemodorinokori20kenngahyoujisarerukoto"],
+      actual: ["2ページ目のまま0件と表示されページ移動ボタンも無効になる", "2pe-jimenomama0kenntohyoujisarepe-jiidoubotannmomukouninaru"],
+      remark: ["再検索すると1ページ目に20件が正しく表示される", "saikensakusuruto1pe-jimeni20kenngatadashikuhyoujisareru"], reproducibility: "3/3",
+      testTarget: "顧客検索結果で最終ページの最後の1件を削除した後の表示をテストしています。",
+      observation: "顧客名で21件を検索し、2ページ目にある最後の1件を削除しました。削除は成功しましたが、2ページ目に0件と表示され、ページ移動ボタンも無効になりました。",
+      comparison: "同じデータで1ページ目の顧客を削除した場合は残り20件が表示されました。最終ページでの削除を3回実施し、3回とも空ページになりました。再検索すると20件が表示されます。",
+      specificationStatement: "顧客一覧画面仕様では、削除後の現在ページが総ページ数を超える場合、存在する直前ページへ移動すると規定されています。",
+      contextNote: "削除対象の顧客に関連履歴はなく、削除処理自体は正常終了しています。",
+      specificationReference: "顧客一覧画面仕様書 Rev.2.4「5.6 削除後のページ制御」",
+      judgement: { severity: "s3", scope: "影響を受けるのは、検索結果の最終ページにある最後の顧客を削除する担当者です。削除データ自体に不整合はありません。", workaround: "修正までは、削除後に検索を再実行して1ページ目へ戻ります。", recovery: "検索条件を再送信すると残りの検索結果を表示できます。", risk: "残りの顧客が存在しないと誤認し、確認作業を中断する可能性があります。" },
+    },
+    {
+      scenarioId: "attendance-approved-correction-total-stale", projectId: "attendance", difficulty: "advanced",
+      subject: ["打刻修正を承認しても日次勤務合計が更新されない", "dakokushuseiwoshouninshitemonichijikinmugoukeigakoushinsarenai"],
+      detail: ["退勤打刻を18時から19時へ修正して承認しても日次勤務合計が8時間のまま変わらない", "taikindakokuwo18jikkara19jihe shuseishiteshouninshitemonichijikinmugoukeiga8jikannnomamakawaranai"],
+      precondition: ["9時出勤18時退勤で休憩1時間の勤務が確定前であること", "9jishukkin18jitaikindekyuukei1jikannnokinmugakakuteimaedearukoto"],
+      steps: [["退勤打刻を19時へ修正申請する", "taikindakokuwo19ji heshuseishinseisuru"], ["管理者が修正申請を承認する", "kannrishagashuseishinseiwoshouninsuru"], ["日次勤務集計を開く", "nichijikinmushuukeiwohiraku"]],
+      expected: ["日次勤務合計が9時間へ更新されること", "nichijikinmugoukeiga9jikannhekoushinsarerukoto"],
+      actual: ["打刻は19時へ更新されるが日次勤務合計は8時間のままになる", "dakokuha19jihekoushinsareruganichijikinmugoukeiha8jikannnomamaninaru"],
+      remark: ["月次集計を手動再計算すると9時間へ更新される", "getujishuukeiwoshudousaikeisansuruto9jikannhekoushinsareru"], reproducibility: "5/5",
+      testTarget: "承認済みの打刻修正が日次勤務合計へ反映されることをテストしています。",
+      observation: "9時出勤・18時退勤・休憩1時間の勤務で、退勤を19時へ修正申請して管理者が承認しました。打刻欄は19時へ変わりましたが、日次勤務合計は8時間のままでした。",
+      comparison: "同じ修正を5件で確認し、5件とも承認直後の合計が更新されませんでした。月次集計の手動再計算を行うと9時間へ更新され、未承認の申請では打刻も合計も変わりません。",
+      specificationStatement: "勤怠集計仕様では、打刻修正の承認完了時に対象日の勤務時間と月次集計を再計算すると規定されています。",
+      contextNote: "承認履歴と修正後の退勤時刻は正常に保存されています。",
+      specificationReference: "勤怠集計仕様書 Rev.4.7「6.2 打刻修正承認後の再計算」",
+      judgement: { severity: "s2", scope: "影響を受けるのは、承認後に打刻時刻が変わる勤務データです。表示中の勤務合計と修正済み打刻が一致しません。", workaround: "修正までは、打刻修正承認後に月次集計の手動再計算を実行します。", recovery: "対象月を再計算し、日次合計と月次合計が修正後打刻に一致することを確認します。", risk: "再計算せず給与連携すると勤務時間と残業時間を誤って計上する可能性があります。" },
+    },
+    {
+      scenarioId: "salon-reservation-auto-assigns-off-duty-staff", projectId: "salon", difficulty: "intermediate",
+      subject: ["指名なし予約の自動割当で休業日のスタッフが選択される", "shimeinashiyoyak nojidouwariatedekyuugyoubinostaffugasentakusareru"],
+      detail: ["指名なし予約を登録すると対象日時が休業日のスタッフへ自動で割り当てられる", "shimeinashiyoyakuwotourokusurutotaishounichijigakyuugyoubinostaffuhejidoudewariaterareru"],
+      precondition: ["スタッフAが対象日を終日休業として登録していること", "staffuagataishoubiwoshuujitsukyuugyoutoshitetourokushiteirukoto"],
+      steps: [["指名なしで空いている時間を選ぶ", "shimeinashideaiteirujikannwoerabu"], ["カットメニューで予約を確定する", "kattomenyu-deyoyakuwokakuteisuru"]],
+      expected: ["勤務可能なスタッフだけから担当者が自動選択されること", "kinmukanounastaffudakekaratanntoushagajidousentakusarerukoto"],
+      actual: ["終日休業のスタッフAが担当者として割り当てられる", "shuujitsukyuugyounostaffuagatanntoushatoshitewariaterareru"],
+      remark: ["スタッフAを指名した場合は休業日のため選択できない", "staffuawoshimeishitabaaihakyuugyoubinotamesentakudekinai"], reproducibility: "4/4",
+      testTarget: "指名なし予約で勤務可能なスタッフだけが自動割当されることをテストしています。",
+      observation: "スタッフAを対象日の終日休業として登録し、指名なしでカット予約を確定しました。予約は成功しましたが、休業中のスタッフAが担当者として割り当てられました。",
+      comparison: "同じ条件で4回登録し、4回ともスタッフAが選ばれました。スタッフAを明示的に指名する場合は休業日として選択できず、勤務中のスタッフBを指名した予約は正常です。",
+      specificationStatement: "予約割当仕様では、指名なし予約の候補から休業、休憩、他予約と重なるスタッフを除外すると規定されています。",
+      contextNote: "スタッフAの休業予定は予約日時より前に登録済みで、管理画面にも表示されています。",
+      specificationReference: "予約割当仕様書 Rev.3.6「4.3 指名なし予約の候補抽出」",
+      judgement: { severity: "s2", scope: "影響を受けるのは、指名なしで登録する予約です。休業中のスタッフへ担当が割り当てられる可能性があります。", workaround: "修正までは、指名なし予約の登録後に担当者の勤務予定を確認し、勤務中のスタッフへ変更します。", recovery: "誤って割り当てられた予約の担当者を勤務可能なスタッフへ変更し、顧客への案内内容を確認します。", risk: "来店時に担当者が不在となり、予約変更や待ち時間が発生する可能性があります。" },
+    },
+    {
+      scenarioId: "ec-payment-notification-header-case-rejected", projectId: "ec", difficulty: "advanced",
+      subject: ["決済通知の署名ヘッダー名が小文字だと注文APIが401を返す", "kessaitsuuchinoshomeihedda-meigakomojidatochuumonapi ga401wokaesu"],
+      detail: ["有効な署名でも署名ヘッダー名を小文字で送信すると決済通知が401で拒否される", "yuukounashomeidemoshomeihedda-meiwokomojidesoushinsurutokessaitsuuchiga401dekyohisareru"],
+      precondition: ["検証用注文が支払待ちで署名秘密鍵が登録済みであること", "kenshouyouchuumongashiharaimachideshomeihimitsukagit atourokuzumidearukoto"],
+      steps: [["有効な署名を生成する", "yuukounashomeiwoseiseisuru"], ["署名ヘッダー名を小文字で決済通知を送信する", "shomeihedda-meiwokomojidekessaitsuuchiwosoushinsuru"]],
+      expected: ["ヘッダー名の大文字小文字にかかわらず通知が受理されること", "hedda-meinooomojikomojinikakawarazutsuuchigajurisare rukoto"],
+      actual: ["小文字の署名ヘッダーは401で拒否され注文が支払待ちのままになる", "komojinoshomeihedda-ha401dekyohisarechuumongashiharaimachinomamaninaru"],
+      remark: ["同じ署名値で仕様書どおりの表記にすると200で受理される", "onajishomeichideshiyoushodoorinohyounisuruto200dejurisareru"], reproducibility: "10/10",
+      testTarget: "決済通知のHTTPヘッダー名を大文字小文字を変えて受理可否をテストしています。",
+      observation: "同じ通知本文と有効な署名値を使い、署名ヘッダー名だけを小文字にして送信しました。注文APIは401を返し、注文は支払待ちのままになりました。",
+      comparison: "小文字表記を10回送信して10回とも401になりました。同じ署名値を仕様書の表記で送ると200で受理され、通知本文、時刻、接続元は同一です。",
+      specificationStatement: "決済通知API仕様ではHTTPヘッダー名を大文字小文字を区別せず照合し、署名値が一致する通知を受理すると規定されています。",
+      contextNote: "署名値の検証ログでは、小文字表記の場合に署名ヘッダー未指定と記録されています。",
+      specificationReference: "決済通知API仕様書 Rev.5.9「3.2 署名ヘッダーの照合」",
+      judgement: { severity: "s2", scope: "影響を受けるのは、署名ヘッダー名を小文字へ正規化して送る決済事業者からの通知です。対象注文が支払待ちから更新されません。", workaround: "修正までは、決済事業者側で署名ヘッダー名を仕様書の表記に固定します。", recovery: "拒否された決済通知を正しいヘッダー表記で再送し、注文と決済状態の一致を確認します。", risk: "決済済み注文が支払待ちとして残り、出荷遅延や重複決済案内につながる可能性があります。" },
+    },
+    {
+      scenarioId: "inventory-lot-leading-zero-lost-export", projectId: "inventory", difficulty: "beginner",
+      subject: ["ロット番号をCSV出力すると先頭の0が欠落する", "rototbangouwocsvshutsuryokusurutosentouno0gaketsurakusuru"],
+      detail: ["ロット番号00125をCSV出力すると125に変換され元の識別子を判別できない", "rototbangou00125wocsvshutsuryokusuruto125nihenkansaremotono shikibetsushiw hannbetsudekinai"],
+      precondition: ["ロット番号00125の在庫が登録されていること", "rototbangou00125nozaikogatourokusareteirukoto"],
+      steps: [["ロット別在庫一覧を開く", "rottobetuzaikoitirannwohiraku"], ["CSV出力を実行する", "csvshutsuryokuw jikkousuru"]],
+      expected: ["CSVにもロット番号00125が文字列として出力されること", "csvnimorototbangou00125gamoji retsutoshiteshutsuryokusarerukoto"],
+      actual: ["CSVではロット番号が125と出力され先頭の0が欠落する", "csvdeharototbangouga125toshutsuryokusaresentouno0gaketsurakusuru"],
+      remark: ["画面とPDF出力では00125と正しく表示される", "gamenntopdfshutsuryokudeha00125totadashikuhyoujisareru"], reproducibility: "3/3",
+      testTarget: "ロット別在庫のCSVで先頭ゼロを含む識別子の保持をテストしています。",
+      observation: "ロット番号00125の在庫を一覧からCSV出力しました。画面では00125ですが、CSVのロット番号列には125と出力され、先頭の0が欠落しました。",
+      comparison: "同じデータを3回出力して3回とも125になりました。PDF出力では00125が保持され、先頭に英字を含むA0125もCSVで保持されます。",
+      specificationStatement: "在庫出力仕様では、ロット番号を数値へ変換せず登録値の文字列をそのまま出力すると規定されています。",
+      contextNote: "表計算ソフトではなくテキストエディタでCSVを開いても125と記録されています。",
+      specificationReference: "在庫CSV出力仕様書 Rev.4.4「2.7 ロット番号」",
+      judgement: { severity: "s2", scope: "影響を受けるのは、先頭に0を含むロット番号をCSVで出力する在庫です。画面上の登録値は保持されています。", workaround: "修正までは、PDF出力または画面表示からロット番号を照合します。", recovery: "誤ったCSVを破棄し、修正版で再出力して登録値と一致することを確認します。", risk: "別ロットとの同一性を誤認し、出荷追跡や回収対象の特定を誤る可能性があります。" },
+    },
+    {
+      scenarioId: "mobile-notification-token-not-reregistered", projectId: "mobile", difficulty: "intermediate",
+      subject: ["通知許可を再度オンにしても端末トークンが再登録されない", "tsuuchikyokawosaidoonnishitemotannmatsuto-kengasaitourokusarenai"],
+      detail: ["通知許可をオフからオンへ戻しても端末トークンがサーバーへ再登録されず通知を受信できない", "tsuuchikyokawooffkaraonhemodoshitemotannmatsuto-kengasa-ba-hesaitourokusarezutsuuchiw jushindekinai"],
+      precondition: ["ログイン済み端末で通知を1回受信済みであること", "roguinzumitannmatsudetsuuchiwo1kaijushinzumidearukoto"],
+      steps: [["OS設定で通知許可をオフにする", "ossetteidetsuuchikyokawooffnisuru"], ["通知許可をオンへ戻す", "tsuuchikyokawoonhemodosu"], ["アプリを起動してテスト通知を送る", "apuriwokidoushitetesutotsuuchiwookuru"]],
+      expected: ["端末トークンが再登録され通知を受信できること", "tannmatsuto-kengasaitourokusaretsuuchiw jushindekirukoto"],
+      actual: ["端末トークンが無効のままでテスト通知が配信対象外になる", "tannmatsuto-kengamukounomamadetesutotsuuchigahaishintaishougaininaru"],
+      remark: ["ログアウト後に再ログインするとトークンが登録され通知を受信できる", "roguautogonisa iroguinsurutoto-kengatourokusaretsuuchiw jushindekiru"], reproducibility: "5/5",
+      testTarget: "OSの通知許可を再度オンにした際の端末トークン再登録をテストしています。",
+      observation: "通知受信済みの端末でOSの通知許可をオフにし、その後オンへ戻してアプリを起動しました。テスト通知を送っても配信対象外となり、端末では受信できませんでした。",
+      comparison: "同じ操作を5回実施して5回とも再登録されませんでした。ログアウト後に再ログインすると端末トークンが登録され、テスト通知を受信できます。アプリの再起動だけでは復旧しません。",
+      specificationStatement: "通知登録仕様では、アプリ起動時にOSの通知許可と端末トークンを確認し、有効なトークンが未登録ならサーバーへ送信すると規定されています。",
+      contextNote: "OSから取得したトークン値は許可再開前後で同一ですが、サーバー上では無効状態のままです。",
+      specificationReference: "プッシュ通知登録仕様書 Rev.4.6「5.3 通知許可変更後の再登録」",
+      judgement: { severity: "s2", scope: "影響を受けるのは、通知許可を一度オフにしてから再度オンにしたログイン済み端末です。通知を受信できません。", workaround: "修正までは、通知許可を戻した後にログアウトして再ログインします。", recovery: "対象端末で再ログインし、トークンが有効状態で登録されたこととテスト通知の受信を確認します。", risk: "重要なお知らせや更新通知を利用者が受信できない状態が継続する可能性があります。" },
+    },
+    {
+      scenarioId: "automotive-can-rolling-counter-rollover-rejected", projectId: "automotive", difficulty: "advanced",
+      subject: ["CAN信号のローリングカウンタが15から0へ戻ると正常フレームを破棄する", "canshingounoro-rinngukauntaga15kara0hemodorutoseijoufure-muw hakisuru"],
+      detail: ["4ビットのローリングカウンタが15から0へ周回したフレームを異常として破棄する", "4bittonoro-rinngukauntaga15kara0heshuukaishitafure-muwoijoutoshitehakisuru"],
+      precondition: ["MSG-221を100ミリ秒周期で受信していること", "msg-221wo100miribyou shuukidejushinshiteirukoto"],
+      steps: [["カウンタ14のフレームを送信する", "kaunta14nofure-muwosoushinsuru"], ["15と0の順に正常なフレームを送信する", "15to0nojunnniseijounafure-muwosoushinsuru"]],
+      expected: ["15から0への周回を連続値として受理すること", "15kara0henoshuukaiworen zokuchitoshitejuris arerukoto"],
+      actual: ["カウンタ0のフレームが連続性異常として破棄される", "kaunta0nofure-mugarenzokuseiijoutoshitehakisareru"],
+      remark: ["0以外の連続値と0から1への遷移は正常に受理される", "0igainorenzokuchito0kara1henoseniwaseijounijurisareru"], reproducibility: "20/20",
+      testTarget: "CAN信号の4ビットローリングカウンタが周回する境界をテストしています。",
+      observation: "MSG-221を100ミリ秒周期で送信し、ローリングカウンタを14、15、0の順に変化させました。カウンタ0のフレームだけが連続性異常として破棄されました。",
+      comparison: "15から0への遷移を20回確認し、20回とも0のフレームが破棄されました。0から1および14から15の遷移は受理され、データ部とチェックサムは正常です。",
+      specificationStatement: "CAN通信仕様では4ビットカウンタを0から15で循環させ、15の次の0を連続した正常値として受理すると規定されています。",
+      contextNote: "同じ受信経路の8ビットカウンタでは255から0への周回を正常に受理しています。",
+      specificationReference: "CAN通信仕様書 Rev.6.5「8.4 ローリングカウンタ監視」",
+      judgement: { severity: "s2", scope: "影響を受けるのは、MSG-221のローリングカウンタが15から0へ周回するタイミングの受信データです。1フレームが欠落します。", workaround: "修正までは、試験環境では周回直後の値を次周期で再送して受信値を補完します。", recovery: "修正版へ更新して周回時のフレーム欠落がないことと診断履歴を確認します。", risk: "周期データが一時的に欠落し、表示更新や監視判定が遅れる可能性があります。" },
+    },
+    {
+      scenarioId: "payment-refund-event-before-response-stale", projectId: "payment", difficulty: "advanced",
+      subject: ["返金WebhookがAPI応答より先に届くと取引状態が処理中へ戻る", "hennkinnwebhookgaapioutouyorisakinitodokutorihikijoutaigashorichuuhemodoru"],
+      detail: ["返金完了Webhookの後に返金API応答を処理すると完了済み取引が処理中へ上書きされる", "hennkinnkannryouwebhooknoatonihennkinnapioutouwo shorisurutokannryouzumi torihikigashorichuuheuwagakisareru"],
+      precondition: ["返金可能な売上確定済み取引があること", "hennkinkanouna uriagekakuteizumitorihikigaarukoto"],
+      steps: [["返金APIを実行する", "hennkinnapiwojikkousuru"], ["API応答前に返金完了Webhookを受信させる", "apioutoumaenihennkinnkannryouwebhookwojushinsaseru"]],
+      expected: ["完了Webhook受信後は返金完了状態が維持されること", "kannryouwebhookjushingohahennkinnkannryoujoutaigai jis arerukoto"],
+      actual: ["遅れて届いたAPI応答により返金状態が処理中へ戻る", "okuretetodoitaapioutouniyorihennkinnjoutaigashorichuuhemodoru"],
+      remark: ["API応答後にWebhookが届く通常順序では返金完了になる", "apioutougon iwebhookgatodokuts uujoujunnjodehahennkinnkannryouninaru"], reproducibility: "8/8",
+      testTarget: "返金API応答と完了Webhookの到着順序を入れ替えて状態遷移をテストしています。",
+      observation: "返金API実行後、API応答を遅延させて返金完了Webhookを先に受信しました。いったん返金完了になりましたが、API応答の処理後に返金処理中へ戻りました。",
+      comparison: "完了Webhookを先に受信する順序で8回確認し、8回とも処理中へ戻りました。API応答の後にWebhookが届く通常順序では返金完了のままです。返金額は同一です。",
+      specificationStatement: "返金状態遷移仕様では、返金完了は処理中より優先度の高い終端状態であり、遅延した受付応答で前の状態へ戻してはならないと規定されています。",
+      contextNote: "ゲートウェイ側では返金が完了しており、再返金要求は重複として拒否されます。",
+      specificationReference: "返金状態遷移仕様書 Rev.5.3「6.4 非同期イベントの順序逆転」",
+      judgement: { severity: "s1", scope: "影響を受けるのは、返金完了Webhookが返金API応答より先に到着した取引です。ゲートウェイと加盟店画面の状態が一致しません。", workaround: "修正までは、処理中が長時間続く返金をゲートウェイ照会し、完了済みなら手動で状態を補正します。", recovery: "対象取引を返金完了へ補正し、返金額と会計連携と監査ログの一致を確認します。", risk: "完了済み返金を未完了と誤認し、重複操作や顧客への誤案内につながる可能性があります。" },
+    },
+    {
+      scenarioId: "medical-lab-result-unit-conversion-wrong", projectId: "medical", difficulty: "advanced",
+      subject: ["検査結果の単位変換でng/dLをμg/Lへ換算すると値が10倍になる", "kensakekkanotannihenkandeng/dlwomicrog/lhekansansurutonega10baininaru"],
+      detail: ["外部検査から受信した25ng/dLをμg/L表示へ変換すると本来250のところ2500と表示される", "gaibukensakarajushinshita25ng/dlwomicrog/lhyoujihehenkansurutohonrai250notokoro2500tohyoujisareru"],
+      precondition: ["表示単位がμg/Lに設定された検査項目TEST-17であること", "hyoujitannigamicrog/lnisetteisaretakensakoumokutest-17dearukoto"],
+      steps: [["25ng/dLの検査結果を受信する", "25ng/dlnokensakekkawojushinsuru"], ["診療画面でTEST-17を開く", "shinnryougamende test-17wohiraku"]],
+      expected: ["25ng/dLが250μg/Lと表示されること", "25ng/dlga250microg/ltohyoujisarerukoto"],
+      actual: ["25ng/dLが2500μg/Lと表示される", "25ng/dlga2500microg/ltohyoujisareru"],
+      remark: ["ng/mLからμg/Lへの変換と単位変換なしの項目は正常", "ng/mlkaramicrog/lhenohenkantotannihenkannnashikoumokuhaseijou"], reproducibility: "10/10",
+      testTarget: "外部検査結果をng/dLからμg/Lへ単位変換する計算をテストしています。",
+      observation: "検査項目TEST-17へ25ng/dLの結果を連携しました。診療画面の表示単位はμg/Lで、本来250μg/Lとなるところ2500μg/Lと表示されました。",
+      comparison: "同じ結果を10回連携して10回とも2500μg/Lになりました。ng/mLからμg/Lへの変換と、受信単位をそのまま表示する項目は正常です。受信原文は25ng/dLです。",
+      specificationStatement: "検査単位変換仕様では、ng/dLからμg/Lへの変換係数を10とし、受信値25を表示値250へ変換すると規定されています。",
+      contextNote: "データベースには受信値25と受信単位ng/dLが変更されず保存されています。",
+      specificationReference: "検査単位変換仕様書 Rev.6.2「7.5 質量濃度の換算」",
+      judgement: { severity: "s1", scope: "影響を受けるのは、ng/dLで受信してμg/Lへ表示変換する検査項目です。保存された原値は正しいものの診療画面の表示値が10倍になります。", workaround: "修正までは、対象項目の受信原文を確認し、ng/dLの値から手計算した結果を参照します。", recovery: "修正版で表示値を再計算し、過去の対象結果について診療記録への影響を確認します。", risk: "検査値を実際より高く誤認し、診療判断や追加検査の判断を誤る可能性があります。" },
+    },
+  ];
+
+  additionalBugDefinitions.forEach((definition) => {
+    scenarios[definition.scenarioId] = buildAdditionalBugScenario(definition);
+  });
+
+  const specificationContentOverrides = {
+    "customer-save-multiple-clicks-duplicate": [
+      "1回の顧客登録操作につき、作成されるレコードは1件とする。",
+    ],
+  };
+
+  Object.entries(scenarios).forEach(([scenarioId, profile]) => {
+    if (specificationContentOverrides[scenarioId]) {
+      profile.specificationContent = specificationContentOverrides[scenarioId];
+      return;
+    }
+    if (Array.isArray(profile.specificationContent) && profile.specificationContent.length > 0) {
+      return;
+    }
+    let currentSection = "";
+    profile.specificationContent = profile.scenario.report
+      .flatMap((entry) => {
+        if (entry.kind === "section") {
+          currentSection = entry.text;
+          return [];
+        }
+        if (entry.kind !== "line" || currentSection !== "■期待結果") {
+          return [];
+        }
+        return [`${entry.text.replace(/こと$/u, "").replace(/[。．]+$/u, "")}。`];
+      });
+  });
+
   window.TYPING_WORKBENCH_SCENARIO_AUTHORING = Object.freeze(scenarios);
 })();

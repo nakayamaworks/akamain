@@ -146,11 +146,10 @@ function getScenarioSpecificationReference(rawScenario) {
 }
 
 function getScenarioSpecificationDetails(rawScenario) {
-  const observations = getScenarioAuthoringProfile(rawScenario.scenarioId)
-    ?.reviewSource?.observations || [];
-  return observations
-    .filter(({ id, role }) => role === "specification-and-context" || /^source(?:-|$)/.test(id || ""))
-    .map(({ text }) => text?.trim())
+  const specificationContent = getScenarioAuthoringProfile(rawScenario.scenarioId)
+    ?.specificationContent || [];
+  return specificationContent
+    .map((text) => text?.trim())
     .filter(Boolean);
 }
 
@@ -534,7 +533,7 @@ const scenarioCategoryRules = {
     [/ロット|同時出庫|在庫数がマイナス/, "workflow"],
   ],
   mobile: [
-    [/画面回転|通知から開く/, "ui"],
+    [/画面回転|通知/, "ui"],
     [/バックグラウンド|同期データ/, "api"],
   ],
   automotive: [
@@ -684,6 +683,15 @@ const scenarioIncidentalNotes = [
   [/別の患者の検査結果/, "患者Aと患者Bは同じ診療科ですが担当医は異なります。両者の氏名は似ていません"],
   [/体重の単位変換/, "検証端末の表示倍率は125%です。倍率を100%に戻しても計算値は変わりませんでした"],
   [/検査結果.*再送/, "再送時に検査装置の画面テーマが切り替わっていますが、連携メッセージの内容は初回と同じです"],
+  [/最終ページ.*最後の1件を削除/, "削除対象の顧客には関連履歴がなく、削除処理自体は正常終了しています"],
+  [/打刻修正を承認/, "修正申請には理由を入力しており、承認履歴にも同じ理由が保存されています"],
+  [/指名なし予約の自動割当/, "顧客はクーポンを使用していません。料金計算と通知メールは正常でした"],
+  [/署名ヘッダー名が小文字/, "検証時の接続元IPと通知本文は成功時と同一で、署名値も一致しています"],
+  [/ロット番号をCSV出力/, "対象ロットには商品画像が登録されていますが、PDF出力では画像の有無にかかわらず番号が保持されます"],
+  [/通知許可を再度オン/, "端末の省電力モードは無効で、同じ時間帯のアプリ内お知らせは取得できています"],
+  [/ローリングカウンタが15から0/, "計測中のバス負荷は28%で、同じフレームのデータ値とチェックサムは正常でした"],
+  [/返金WebhookがAPI応答より先/, "検証用カードのブランドを変えてもイベントの到着順と状態遷移は同じでした"],
+  [/ng\/dLをμg\/Lへ換算/, "検査装置の表示言語は日本語ですが、英語へ変更しても受信値と単位は同一でした"],
 ];
 
 function getScenarioIncidentalNote(rawScenario) {
@@ -820,6 +828,17 @@ function formatJapaneseDate(dateValue) {
   return `${year}年${month}月${day}日`;
 }
 
+function formatPeripheralSchedule(value) {
+  return String(value || "")
+    .replace(/受入後すぐに(.+?)を実施します$/u, "受入後すぐに$1を実施")
+    .replace(/受入後に(.+?)を実施します$/u, "受入後に$1を実施")
+    .replace(/決定します/u, "決定")
+    .replace(/必要があります$/u, "必要")
+    .replace(/必要です$/u, "必要")
+    .replace(/未定です$/u, "未定")
+    .replace(/[。．]+$/u, "");
+}
+
 function getScenarioSchedule(rawScenario) {
   const subject = rawScenario.subject?.text || "";
   const today = getLocalDateInputValue();
@@ -830,7 +849,7 @@ function getScenarioSchedule(rawScenario) {
     return {
       dueDate,
       priority: "urgent",
-      text: `修正版受入期限：${formatJapaneseDate(dueDate)}。受入後すぐに医療安全確認を実施します`,
+      text: `修正版受入期限：${formatJapaneseDate(dueDate)}。受入後すぐに医療安全確認を実施`,
     };
   }
 
@@ -840,7 +859,7 @@ function getScenarioSchedule(rawScenario) {
     return {
       dueDate,
       priority: "urgent",
-      text: `緊急リリース予定：${formatJapaneseDate(releaseDate)}。回帰試験のため${formatJapaneseDate(dueDate)}までに修正版が必要です`,
+      text: `緊急リリース予定：${formatJapaneseDate(releaseDate)}。修正版受入期限：${formatJapaneseDate(dueDate)}`,
     };
   }
 
@@ -860,7 +879,7 @@ function getScenarioSchedule(rawScenario) {
     return {
       dueDate,
       priority: "high",
-      text: `再試験開始：${formatJapaneseDate(retestDate)}。修正版は前日の${formatJapaneseDate(dueDate)}までに受け入れる必要があります`,
+      text: `再試験開始：${formatJapaneseDate(retestDate)}。修正版受入期限：${formatJapaneseDate(dueDate)}`,
     };
   }
 
@@ -870,7 +889,7 @@ function getScenarioSchedule(rawScenario) {
     return {
       dueDate,
       priority: "high",
-      text: `給与締め処理：${formatJapaneseDate(closingDate)}。事前の集計確認のため${formatJapaneseDate(dueDate)}までに修正版が必要です`,
+      text: `給与締め処理：${formatJapaneseDate(closingDate)}。修正版受入期限：${formatJapaneseDate(dueDate)}`,
     };
   }
 
@@ -879,7 +898,7 @@ function getScenarioSchedule(rawScenario) {
     return {
       dueDate: "",
       priority: "normal",
-      text: `${formatJapaneseDate(triageDate)}のバグ判定会で対応リリースを決定します。現時点では修正期限は未定です`,
+      text: `バグ判定会：${formatJapaneseDate(triageDate)}。修正期限：未定`,
     };
   }
 
@@ -889,7 +908,7 @@ function getScenarioSchedule(rawScenario) {
     return {
       dueDate,
       priority: "normal",
-      text: `次回リリース予定：${formatJapaneseDate(releaseDate)}。回帰試験期間を確保するため${formatJapaneseDate(dueDate)}までに修正版が必要です`,
+      text: `次回リリース予定：${formatJapaneseDate(releaseDate)}。修正版受入期限：${formatJapaneseDate(dueDate)}`,
     };
   }
 
@@ -897,7 +916,7 @@ function getScenarioSchedule(rawScenario) {
   return {
     dueDate,
     priority: "normal",
-    text: `修正版受入期限：${formatJapaneseDate(dueDate)}。受入後に対象機能の回帰試験を実施します`,
+    text: `修正版受入期限：${formatJapaneseDate(dueDate)}。受入後に対象機能の回帰試験を実施`,
   };
 }
 
@@ -2757,14 +2776,26 @@ function renderScenarioBrief() {
     ...(qaScenario ? [["質問種別", getQaTypeLabel(state.scenario.qaType), "qaType"]] : []),
     ["確認日時・環境", environmentMemo, "occurredAt environment"],
     ["関連資料", specificationInfo, "specification"],
-    ["対応日程", context.schedule, "schedule risk"],
+    ["対応日程", formatPeripheralSchedule(context.schedule), "schedule risk"],
     ["関係者", peopleInfo, "assignee related"],
   ].filter(([, value]) => value);
+  const renderBriefValue = (value, key) => {
+    if (key !== "specification") {
+      return `<dd>${escapeHtml(value)}</dd>`;
+    }
+    const [reference, ...details] = String(value).split("\n").filter(Boolean);
+    const detailMarkup = details.map((detail) => {
+      const label = "記載内容：";
+      const content = detail.startsWith(label) ? detail.slice(label.length).trim() : detail;
+      return `<span class="scenario-specification-statement"><strong>${label}</strong>${escapeHtml(content)}</span>`;
+    }).join("");
+    return `<dd class="scenario-specification-copy"><strong class="scenario-specification-reference">${escapeHtml(reference || "")}</strong>${detailMarkup}</dd>`;
+  };
   const renderBriefItems = (items) => items
     .map(([label, value, key = ""]) => {
       const labelMarkup = label ? `<dt>${escapeHtml(label)}</dt>` : "";
       const unlabeledClass = label ? "" : ' class="is-unlabeled"';
-      return `<div${unlabeledClass} data-brief-key="${escapeHtml(key)}">${labelMarkup}<dd>${escapeHtml(value)}</dd></div>`;
+      return `<div${unlabeledClass} data-brief-key="${escapeHtml(key)}">${labelMarkup}${renderBriefValue(value, key)}</div>`;
     })
     .join("");
   const glossaryItems = getScenarioGlossaryItems(context);

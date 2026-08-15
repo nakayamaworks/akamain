@@ -598,14 +598,15 @@ if (!Array.isArray(scenarios)) {
     });
   });
 
-  projectIds.forEach((projectId) => {
+  validProjectIds.forEach((projectId) => {
     const projectScenarios = scenarios.filter((scenario) => scenario.projectId === projectId);
-    difficulties.forEach((difficulty) => {
-      const count = projectScenarios.filter((scenario) => scenario.difficulty === difficulty).length;
-      if (count !== 1) {
-        errors.push(`${projectId}: expected one ${difficulty} scenario, found ${count}`);
-      }
-    });
+    const projectDifficulties = new Set(projectScenarios.map((scenario) => scenario.difficulty));
+    if (
+      projectScenarios.length !== 4
+      || [...allowedDifficulties].some((difficulty) => !projectDifficulties.has(difficulty))
+    ) {
+      errors.push(`${projectId}: bug bank must contain four scenarios and cover all difficulties`);
+    }
   });
 }
 
@@ -616,8 +617,8 @@ const allScenarioRefs = scenarios.map((scenario) => ({
 const allSubjects = scenarios.map((scenario) => scenario.subject);
 const briefingProfiles = briefingContext.window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS || {};
 const uniqueScenarioIds = Object.keys(authoredScenarios);
-if (uniqueScenarioIds.length !== 27 || scenarios.length !== 27) {
-  errors.push("authoring registry and compatibility view must both contain 27 scenarios");
+if (uniqueScenarioIds.length !== 36 || scenarios.length !== 36) {
+  errors.push("authoring registry and compatibility view must both contain 36 scenarios");
 }
 
 uniqueScenarioIds.forEach((scenarioId) => {
@@ -673,6 +674,15 @@ Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
     errors.push(`${scenarioId}: authored scenario and reference report must be complete`);
   }
   if (
+    !Array.isArray(profile.specificationContent)
+    || profile.specificationContent.length < 1
+    || profile.specificationContent.some(
+      (text) => !text?.trim().endsWith("。") || /です|ます|原因箇所|現時点で特定|確認したところ/u.test(text)
+    )
+  ) {
+    errors.push(`${scenarioId}: related material must contain specification statements only`);
+  }
+  if (
     !guide?.sourceBoundary
     || guide.sourceBoundary.includes("見本")
     || !Array.isArray(guide.strengthCriteria)
@@ -716,14 +726,28 @@ const requiredQaSections = [
 ];
 const requiredQaTypes = new Set(["specification", "behavior", "conflict"]);
 if (
-  qaScenarioIds.length !== 3
-  || qaScenarios.length !== 3
-  || new Set(qaScenarioIds).size !== 3
-  || new Set(qaScenarios.map((scenario) => scenario.qaType)).size !== 3
+  qaScenarioIds.length !== 36
+  || qaScenarios.length !== 36
+  || new Set(qaScenarioIds).size !== 36
   || qaScenarios.some((scenario) => !requiredQaTypes.has(scenario.qaType))
 ) {
-  errors.push("QA authoring registry must contain one scenario for each of the three QA types");
+  errors.push("QA authoring registry and runtime view must both contain 36 valid scenarios");
 }
+
+validProjectIds.forEach((projectId) => {
+  const projectQaScenarios = qaScenarios.filter((scenario) => scenario.projectId === projectId);
+  const projectQaTypes = new Set(projectQaScenarios.map((scenario) => scenario.qaType));
+  const projectDifficulties = new Set(projectQaScenarios.map((scenario) => scenario.difficulty));
+  if (
+    projectQaScenarios.length !== 4
+    || [...requiredQaTypes].some((qaType) => !projectQaTypes.has(qaType))
+    || [...allowedDifficulties].some((difficulty) => !projectDifficulties.has(difficulty))
+  ) {
+    errors.push(
+      `${projectId}: QA bank must contain four scenarios and cover all QA types and difficulties`
+    );
+  }
+});
 
 Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
   const scenario = profile.scenario;
@@ -791,6 +815,15 @@ Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
     || guide.disallowedGenericPraise.length < 3
   ) {
     errors.push(`${scenarioId}: QA review guide must define source boundaries and scenario-specific praise`);
+  }
+  if (
+    !Array.isArray(profile.specificationContent)
+    || profile.specificationContent.length < 1
+    || profile.specificationContent.some(
+      (text) => !text?.trim().endsWith("。") || /です|ます|原因箇所|現時点で特定|確認したところ/u.test(text)
+    )
+  ) {
+    errors.push(`${scenarioId}: QA related material must contain specification statements only`);
   }
 });
 
@@ -1468,14 +1501,14 @@ try {
   };
   const registryScenarioIds = Object.keys(scoringRubricRegistry.scenarios);
   if (
-    registryScenarioIds.length !== 27
-    || new Set(registryScenarioIds).size !== 27
+    registryScenarioIds.length !== 36
+    || new Set(registryScenarioIds).size !== 36
     || scoringRubricRegistry.dimensions.reduce(
       (sum, dimension) => sum + dimension.weight,
       0
     ) !== 100
   ) {
-    errors.push("scoring rubric registry must cover 27 scenarios with dimensions totaling 100");
+    errors.push("scoring rubric registry must cover 36 scenarios with dimensions totaling 100");
   }
   Object.values(scoringRubricRegistry.scenarios).forEach((rubric) => {
     const facts = Object.values(rubric.requiredFacts).flat();
@@ -1525,7 +1558,7 @@ try {
         || !fixtureSet.fixtures.some(({ fixtureId }) => fixtureId === "alternative-excellent");
     })
   ) {
-    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 27 rubrics");
+    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 36 rubrics");
   }
   fixtureScenarioIds.forEach((scenarioId) => {
     const rubric = scoringRubricRegistry.scenarios[scenarioId];
@@ -1651,6 +1684,27 @@ try {
   ) {
     errors.push("scenario brief must render one unlabeled work memo without report-style sections");
   }
+  const peripheralCopy = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      state.scenario = buildScenario(scenarioBank.find((scenario) =>
+        scenario.scenarioId === "customer-save-multiple-clicks-duplicate"
+      ));
+      renderScenarioBrief();
+      const markup = elements.scenarioIntroDecision.innerHTML;
+      state.scenario = previousScenario;
+      return markup;
+    })()`,
+    smokeContext
+  );
+  if (
+    !peripheralCopy.includes("1回の顧客登録操作につき、作成されるレコードは1件とする。")
+    || peripheralCopy.includes("原因箇所は現時点で特定できていません")
+    || !peripheralCopy.includes("受入後に対象機能の回帰試験を実施")
+    || /対応日程[\\s\\S]*?(?:です|ます)/u.test(peripheralCopy)
+  ) {
+    errors.push("related material and schedule must use specification-only, plain-form peripheral copy");
+  }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";
   const leakedInitialSubjects = vm.runInContext(
     `scenarioBank
@@ -1671,7 +1725,7 @@ try {
     smokeContext
   );
   if (
-    runtimeScenarioIds.length !== 27 ||
+    runtimeScenarioIds.length !== 36 ||
     new Set(runtimeScenarioIds).size !== runtimeScenarioIds.length ||
     runtimeScenarioIds.some(
       (scenarioId) =>
@@ -1679,7 +1733,7 @@ try {
         !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scenarioId)
     )
   ) {
-    errors.push("runtime smoke test expected 27 unique persistent scenario IDs");
+    errors.push("runtime smoke test expected 36 unique persistent scenario IDs");
   }
   const runtimeEnvironmentFailures = vm.runInContext(
     `scenarioBank.map((scenario) => {
@@ -2016,12 +2070,12 @@ try {
     scenarioNarrativeCoverage.map(({ incidental }) => incidental)
   ).size;
   if (
-    scenarioNarrativeCoverage.length !== 27 ||
+    scenarioNarrativeCoverage.length !== 36 ||
     invalidNarratives.length > 0 ||
-    uniqueIncidentalNotes !== 27
+    uniqueIncidentalNotes !== 36
   ) {
     errors.push(
-      `runtime smoke test expected 27 distinct raw field reports without expected-result leakage: ${JSON.stringify(
+      `runtime smoke test expected 36 distinct raw field reports without expected-result leakage: ${JSON.stringify(
         invalidNarratives
       )}`
     );
@@ -2109,9 +2163,9 @@ try {
       requiredCount >= fileCount ||
       invalidFiles > 0
   );
-  if (evidenceCoverage.length !== 27 || invalidEvidenceCoverage.length > 0) {
+  if (evidenceCoverage.length !== 36 || invalidEvidenceCoverage.length > 0) {
     errors.push(
-      `runtime smoke test expected complete evidence profiles for all 27 scenarios: ${JSON.stringify(
+      `runtime smoke test expected complete evidence profiles for all 36 scenarios: ${JSON.stringify(
         invalidEvidenceCoverage
       )}`
     );
@@ -2488,6 +2542,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated ${scenarios.length} unified scenarios, ${uniqueScenarioIds.length} QA work memos and test targets, ${judgementProfiles.length} judgement profiles, ${specificationReferences.length} specification references, ${allSubjects.length} categories, assignments, and environment selections, ${allSubjects.length} schedules, ${reportProcedureCount} report steps, ${reportRemarkCount} report remarks, and typing score bounds across ${projectIds.length} projects.`
+    `Validated ${scenarios.length} bug scenarios and ${qaScenarios.length} QA scenarios, ${uniqueScenarioIds.length} bug work memos and test targets, ${judgementProfiles.length} judgement profiles, ${specificationReferences.length} specification references, ${allSubjects.length} categories, assignments, and environment selections, ${allSubjects.length} schedules, ${reportProcedureCount} report steps, ${reportRemarkCount} report remarks, and typing score bounds across ${validProjectIds.size} projects.`
   );
 }

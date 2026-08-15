@@ -1465,4 +1465,74 @@
       ]
     ),
   ];
+
+  const additionalScenarioIds = [
+    "customer-search-delete-last-page-stays-empty",
+    "attendance-approved-correction-total-stale",
+    "salon-reservation-auto-assigns-off-duty-staff",
+    "ec-payment-notification-header-case-rejected",
+    "inventory-lot-leading-zero-lost-export",
+    "mobile-notification-token-not-reregistered",
+    "automotive-can-rolling-counter-rollover-rejected",
+    "payment-refund-event-before-response-stale",
+    "medical-lab-result-unit-conversion-wrong",
+  ];
+
+  additionalScenarioIds.forEach((scenarioId, scenarioIndex) => {
+    const authoring = window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[scenarioId];
+    if (!authoring) {
+      return;
+    }
+    const scenario = authoring.scenario;
+    const observations = authoring.reviewSource.observations;
+    const environment = scenario.environment.map(({ text }) => text).join(" / ");
+    const prefix = scenarioId.split("-").slice(0, 2).join("-");
+    const evidenceFiles = [
+      candidate(
+        `${prefix}-operation`,
+        `${prefix}_operation.mp4`,
+        "video",
+        true,
+        observations[0].text,
+        ["操作開始", observations[0].text, "操作終了"],
+        "主要な操作条件と画面上の結果を一続きで確認できる。"
+      ),
+      candidate(
+        `${prefix}-comparison`,
+        `${prefix}_comparison.log`,
+        "log",
+        true,
+        observations[1].text,
+        ["comparison-check", observations[1].text],
+        "再現回数と正常条件との差を確認できる。"
+      ),
+      candidate(
+        `${prefix}-state`,
+        `${prefix}_state.json`,
+        "json",
+        true,
+        `発生時の内部状態。${observations[0].text}`,
+        [JSON.stringify({ scenarioId, result: "observed", sequence: scenarioIndex + 1 })],
+        "画面上の結果と同じ時点の処理状態を追跡できる。"
+      ),
+      candidate(
+        `${prefix}-unrelated`,
+        `${prefix}_unrelated.png`,
+        "image",
+        false,
+        "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+        ["別日時の確認", "対象操作なし"],
+        "対象シナリオの操作と結果を示さないため、添付対象ではない。"
+      ),
+    ];
+    window.TYPING_WORKBENCH_EVIDENCE_PROFILES.push(
+      profile(
+        scenario.subject.text,
+        `ADDITIONAL-${String(scenarioIndex + 1).padStart(2, "0")}`,
+        environment,
+        evidenceFiles,
+        "2026/08/15 10:30"
+      )
+    );
+  });
 })();

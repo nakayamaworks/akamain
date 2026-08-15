@@ -37,7 +37,8 @@ typing_workbench/
 
 ## シナリオの手修正
 
-全27シナリオは `scenario-authoring-library.js` で、次の内容をまとめて編集できる。
+不具合36シナリオは `scenario-authoring-library.js`、QA 36シナリオは
+`qa-scenario-authoring-library.js` で、次の内容をまとめて編集できる。
 
 - `scenario.subject`: 題名とタイピング入力候補
 - `scenario.report`: 記載例入力の詳細、前提条件、操作手順、期待結果、実際の動作、備考、再現性
@@ -47,7 +48,24 @@ typing_workbench/
 - `judgement`: 障害レベル、影響範囲、回避策、復旧方法、リスク
 - `reviewGuide`: 内容固有の評価観点、減点しない追加調査、禁止する定型的な称賛
 
-`scoring/rubrics/scenario-rubrics.json` と `scoring/fixtures/scenario-fixtures.json` は生成物のため、直接編集しない。編集後は次を実行して採点データを更新する。
+手動で文言を確認・修正するときは、対象の `scenarioId` を検索する。
+
+- 不具合の問題文、記載例、現場メモ、仕様、障害判断、AIレビュー方針:
+  `scenario-authoring-library.js`
+- QAの問題文、記載例、確認材料、仕様、質問種別、AIレビュー方針:
+  `qa-scenario-authoring-library.js`
+- 不具合で選択する添付証跡の名前、説明、プレビュー、正解・不正解:
+  `evidence-library.js`
+- プロジェクト別のカテゴリ判定、担当者・ウォッチャー、期限・優先度:
+  `main.js`
+- 画面上の固定ラベル、案内文、ボタン文言: `index.html` と `main.js`
+
+`scoring/rubrics/scenario-rubrics.json` と
+`scoring/fixtures/scenario-fixtures.json` は生成物なので直接修正しない。
+表示文とタイピング回答は同じシナリオ定義にあるため、日本語だけを変更せず
+`answers` のローマ字入力候補も同時に確認する。
+
+編集後は次を実行して採点データを更新する。
 
 ```sh
 node validate-scenarios.js --write-scoring-rubrics

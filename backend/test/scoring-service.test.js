@@ -278,8 +278,8 @@ test("all registered scenarios can be stored and reviewed", async () => {
   assert.equal(normalized.scenarioId, "customer-context-menu-not-shown");
   assert.equal(normalized.answer.ticketFields.tracker, "bug");
   assert.equal(isScoringSupported(normalized.scenarioId), true);
-  assert.equal(SUPPORTED_SCENARIO_IDS.length, 30);
-  assert.equal(new Set(SUPPORTED_SCENARIO_IDS).size, 30);
+  assert.equal(SUPPORTED_SCENARIO_IDS.length, 72);
+  assert.equal(new Set(SUPPORTED_SCENARIO_IDS).size, 72);
   assert.equal(SUPPORTED_SCENARIO_IDS.every(isScoringSupported), true);
   assert.equal(isScoringSupported("unknown-scenario"), false);
   await assert.rejects(
