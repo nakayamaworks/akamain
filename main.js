@@ -2787,9 +2787,9 @@ function renderScenarioBrief() {
     const detailMarkup = details.map((detail) => {
       const label = "記載内容：";
       const content = detail.startsWith(label) ? detail.slice(label.length).trim() : detail;
-      return `<span class="scenario-specification-statement"><strong>${label}</strong>${escapeHtml(content)}</span>`;
+      return `<span class="scenario-specification-statement">${label}${escapeHtml(content)}</span>`;
     }).join("");
-    return `<dd class="scenario-specification-copy"><strong class="scenario-specification-reference">${escapeHtml(reference || "")}</strong>${detailMarkup}</dd>`;
+    return `<dd class="scenario-specification-copy"><span class="scenario-specification-reference">${escapeHtml(reference || "")}</span>${detailMarkup}</dd>`;
   };
   const renderBriefItems = (items) => items
     .map(([label, value, key = ""]) => {

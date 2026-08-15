@@ -1381,10 +1381,6 @@ button {
   display: block;
 }
 
-.scenario-specification-statement strong {
-  margin-right: 0.35em;
-}
-
 .scenario-intro-section:first-child .scenario-brief-wide dd {
   font-size: 0.94rem;
   line-height: 1.95;
