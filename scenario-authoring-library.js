@@ -5043,8 +5043,8 @@
       specificationReference: definition.specificationReference,
       specificationContent: [
         definition.specificationStatement
-          .replace(/^.+?仕様では、/u, "")
-          .replace(/と規定されています。?$/u, "とする。"),
+          .replace(/^.+?仕様では、?/u, "")
+          .replace(/と規定されています。?$/u, "。"),
       ],
       judgement: definition.judgement,
       reviewSource: {
@@ -5250,8 +5250,89 @@
   });
 
   const specificationContentOverrides = {
+    "customer-context-menu-not-shown": [
+      "顧客一覧画面で顧客を選択し、選択行を右クリックした場合、編集や履歴確認を呼び出すコンテキストメニューを表示する。",
+    ],
+    "customer-search-nonexistent-name-all-results": [
+      "顧客一覧画面の氏名検索で、入力した氏名に一致する顧客が存在しない場合、検索結果を0件と表示する。",
+    ],
     "customer-save-multiple-clicks-duplicate": [
-      "1回の顧客登録操作につき、作成されるレコードは1件とする。",
+      "顧客登録画面で必要項目を入力し保存操作を行った場合、操作1回につき顧客レコードを1件だけ作成する。",
+    ],
+    "attendance-clock-out-next-day": [
+      "勤務開始日時と退勤日時が同一暦日内である場合、退勤時刻を勤務開始日と同じ勤務日へ登録する。",
+    ],
+    "salon-duplicate-reservation": [
+      "担当者と時間帯の組み合わせが予約確定済みの場合、その時間帯を新規予約の選択対象から除外する。",
+    ],
+    "ec-out-of-stock-cart": [
+      "商品の利用可能在庫数が0の場合、対象商品をカートへ追加できない状態とし、追加処理を受け付けない。",
+    ],
+    "inventory-over-shipment": [
+      "入力した出庫数が商品の利用可能在庫数を上回る場合、出庫登録を中止し、在庫不足エラーを入力者へ表示する。",
+    ],
+    "mobile-rotation-clears-input": [
+      "入力フォームに未送信の内容がある状態で端末を回転し画面が再構成された場合、回転前の入力内容を保持して再表示する。",
+    ],
+    "automotive-speed-display-delay": [
+      "車速信号を受信した場合、信号値の変更から200ms以内にメーターの速度表示へ反映する。",
+    ],
+    "payment-failed-payment-sales-record": [
+      "決済結果が失敗と確定した取引は売上計上の対象外とし、当該取引の売上データを作成しない。",
+    ],
+    "medical-cross-patient-results": [
+      "診療画面で表示対象を別の患者へ切り替えた場合、切替前の患者情報を破棄し、選択した患者の検査結果だけを表示する。",
+    ],
+    "attendance-overnight-break-not-deducted": [
+      "日をまたぐ勤務で、翌日側の休憩が勤務開始から終了までの区間内にある場合、その休憩時間を実労働時間から控除する。",
+    ],
+    "attendance-simultaneous-clock-out-double-overtime": [
+      "同一人物かつ同一勤務日に同一の退勤打刻を複数端末から受信した場合、重複分を除外して1件として集計する。",
+    ],
+    "salon-cancelled-slot-remains-booked": [
+      "確定済み予約のキャンセル処理が完了した場合、予約に使用していた担当者と時間帯の枠を再び予約可能な状態へ戻す。",
+    ],
+    "salon-simultaneous-double-booking": [
+      "同一担当者かつ同一開始時刻の予約確定要求を同時に受信した場合、先に確定した1件だけを登録し、後続要求を受け付けない。",
+    ],
+    "ec-tax-rounding-inconsistent": [
+      "商品価格へ消費税を加算する際は商品単位で小数点以下を切り捨て、同じ税率・税抜価格の商品には同じ税込価格を表示する。",
+    ],
+    "ec-payment-notification-double-order": [
+      "処理済みの決済通知IDを再受信した場合、新たな注文を作成せず、初回処理で確定した注文結果を返す。",
+    ],
+    "inventory-expired-lot-fifo": [
+      "商品の出庫候補を表示する際は期限切れロットを除外し、使用可能なロットを入庫日の古い順に表示する。",
+    ],
+    "inventory-simultaneous-shipment-negative-stock": [
+      "同一商品の出庫要求を同時に受信した場合、在庫更新を直列に処理し、先行処理後の利用可能在庫を後続処理の判定に使用する。",
+    ],
+    "mobile-notification-opens-wrong-news": [
+      "利用者がプッシュ通知をタップした場合、通知に含まれるお知らせIDを遷移先へ引き渡し、そのIDに対応するお知らせ詳細を表示する。",
+    ],
+    "mobile-background-sync-data-lost": [
+      "オフラインで作成した未送信データがある状態でアプリのプロセスが解放された場合、データを永続領域に保持し、次回起動後の同期対象として復元する。",
+    ],
+    "automotive-can-byte-order-reversed": [
+      "BatteryVoltage信号を受信した場合、DBCで指定されたIntel（Little Endian）形式のバイト順に従って物理値へ復号する。",
+    ],
+    "automotive-bus-off-recovery-receive-stopped": [
+      "ADAS ECUがBus-Off状態から復帰した場合、Bus-Off解除後500ms以内にCANフレームの受信処理を再開する。",
+    ],
+    "payment-idempotency-key-double-charge": [
+      "同一加盟店から同じ冪等キーの決済要求を再受信した場合、決済処理を追加実行せず、初回要求の処理結果を返す。",
+    ],
+    "payment-timeout-authorization-remains": [
+      "取引照会によってタイムアウトした決済の失敗が確定した場合、失敗確定から5分以内に当該取引の与信を取り消す。",
+    ],
+    "medical-weight-conversion-dose-thousandfold": [
+      "体重をg単位で受信した場合はkg単位へ換算してから用量を乗算し、18,000gの患者について投薬量を180mgと算出する。",
+    ],
+    "medical-lab-result-resend-duplicate": [
+      "登録済みの検査結果IDと同一IDの連携データを再受信した場合、患者記録へ検査結果を追加せず、既存結果を維持する。",
+    ],
+    "ec-payment-notification-header-case-rejected": [
+      "決済通知を受信した場合、HTTPヘッダー名は大文字と小文字を区別せずに照合し、署名値が一致する通知を受理する。",
     ],
   };
 

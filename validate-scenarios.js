@@ -93,6 +93,13 @@ const requiredFields = [
   "reproducibility",
 ];
 const errors = [];
+const hasConcreteSpecificationContent = (content) => (
+  Array.isArray(content)
+  && content.length > 0
+  && content.every((text) => typeof text === "string" && text.trim().length >= 24)
+  && content.join("").length >= 28
+  && content.some((text) => /場合|際|時|後|前|状態|受信|入力|選択|操作|表示|登録|処理|対象|条件|算出|換算|更新|出力|削除|再計算|規定|候補|照合|受理|取得|保持|適用|判定/u.test(text))
+);
 
 if (/<details class="scenario-rules[^"]*" open>/u.test(indexSource)) {
   errors.push("scenario decision criteria must be collapsed on initial display");
@@ -674,13 +681,12 @@ Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
     errors.push(`${scenarioId}: authored scenario and reference report must be complete`);
   }
   if (
-    !Array.isArray(profile.specificationContent)
-    || profile.specificationContent.length < 1
+    !hasConcreteSpecificationContent(profile.specificationContent)
     || profile.specificationContent.some(
       (text) => !text?.trim().endsWith("。") || /です|ます|原因箇所|現時点で特定|確認したところ/u.test(text)
     )
   ) {
-    errors.push(`${scenarioId}: related material must contain specification statements only`);
+    errors.push(`${scenarioId}: related material must state concrete conditions, operations, and behavior`);
   }
   if (
     !guide?.sourceBoundary
@@ -817,13 +823,12 @@ Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
     errors.push(`${scenarioId}: QA review guide must define source boundaries and scenario-specific praise`);
   }
   if (
-    !Array.isArray(profile.specificationContent)
-    || profile.specificationContent.length < 1
+    !hasConcreteSpecificationContent(profile.specificationContent)
     || profile.specificationContent.some(
       (text) => !text?.trim().endsWith("。") || /です|ます|原因箇所|現時点で特定|確認したところ/u.test(text)
     )
   ) {
-    errors.push(`${scenarioId}: QA related material must contain specification statements only`);
+    errors.push(`${scenarioId}: QA related material must state concrete rules or a concrete specification gap`);
   }
 });
 
@@ -1698,7 +1703,7 @@ try {
     smokeContext
   );
   if (
-    !peripheralCopy.includes("1回の顧客登録操作につき、作成されるレコードは1件とする。")
+    !peripheralCopy.includes("顧客登録画面で必要項目を入力し保存操作を行った場合、操作1回につき顧客レコードを1件だけ作成する。")
     || peripheralCopy.includes("原因箇所は現時点で特定できていません")
     || !peripheralCopy.includes("受入後に対象機能の回帰試験を実施")
     || /対応日程[\\s\\S]*?(?:です|ます)/u.test(peripheralCopy)
