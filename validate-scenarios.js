@@ -101,6 +101,10 @@ const hasConcreteSpecificationContent = (content) => (
   && content.some((text) => /場合|際|時|後|前|状態|受信|入力|選択|操作|表示|登録|処理|対象|条件|算出|換算|更新|出力|削除|再計算|規定|候補|照合|受理|取得|保持|適用|判定/u.test(text))
 );
 
+if (mainSource.includes("記載内容：")) {
+  errors.push("related material body must not repeat the redundant content label");
+}
+
 if (/<details class="scenario-rules[^"]*" open>/u.test(indexSource)) {
   errors.push("scenario decision criteria must be collapsed on initial display");
 }

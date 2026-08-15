@@ -2770,7 +2770,7 @@ function renderScenarioBrief() {
   ].filter(([, value]) => value);
   const specificationInfo = [
     context.specification,
-    ...getScenarioSpecificationDetails(state.scenario).map((text) => `記載内容：${text}`),
+    ...getScenarioSpecificationDetails(state.scenario),
   ].filter(Boolean).join("\n");
   const decisionItems = [
     ...(qaScenario ? [["質問種別", getQaTypeLabel(state.scenario.qaType), "qaType"]] : []),
@@ -2784,11 +2784,9 @@ function renderScenarioBrief() {
       return `<dd>${escapeHtml(value)}</dd>`;
     }
     const [reference, ...details] = String(value).split("\n").filter(Boolean);
-    const detailMarkup = details.map((detail) => {
-      const label = "記載内容：";
-      const content = detail.startsWith(label) ? detail.slice(label.length).trim() : detail;
-      return `<span class="scenario-specification-statement">${label}${escapeHtml(content)}</span>`;
-    }).join("");
+    const detailMarkup = details
+      .map((detail) => `<span class="scenario-specification-statement">${escapeHtml(detail)}</span>`)
+      .join("");
     return `<dd class="scenario-specification-copy"><span class="scenario-specification-reference">${escapeHtml(reference || "")}</span>${detailMarkup}</dd>`;
   };
   const renderBriefItems = (items) => items
