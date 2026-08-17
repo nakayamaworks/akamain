@@ -396,7 +396,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v14"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v15"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問") ||
@@ -404,6 +404,16 @@ if (
   !mainSource.includes('placeholder="説明（任意）"')
 ) {
   errors.push("AI review must assess optional attachment descriptions without adding a separate request");
+}
+if (
+  !backendScoringSource.includes("attemptContentFingerprint") ||
+  !backendScoringSource.includes("stabilizeRevisionScoringResult") ||
+  !backendScoringSource.includes("seed: scoringSeedForAttempt(attempt)") ||
+  backendScoringSource.includes("temperature: 0.25") ||
+  !backendServerSource.includes("matchingScoredRevision(ticket, attempt)") ||
+  !backendServerSource.includes("latestSuccessfulScoringResult(attempt)")
+) {
+  errors.push("revision scoring must reuse identical content and prevent ungrounded score regressions");
 }
 
 const rubricDimensionIds = new Set(

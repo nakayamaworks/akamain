@@ -2,16 +2,19 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   SUPPORTED_SCENARIO_IDS,
+  attemptContentFingerprint,
   buildRubricFindings,
   buildModelOutputSchema,
   buildScoringPrompt,
   calculateWeightedTotal,
   createAttemptRecord,
   createFailedScoringResult,
+  createReusedScoringResult,
   isScoringSupported,
   getScenarioRubric,
   normalizeModelOutput,
   scoreAttemptRecordWithGemini,
+  stabilizeRevisionScoringResult,
   validateAttemptInput,
 } from "../src/scoring-service.js";
 
@@ -139,6 +142,196 @@ function completeOutputForScenario(scenarioId) {
 
 test("weighted total follows the pilot rubric weights", () => {
   assert.equal(calculateWeightedTotal(completeModelOutput.dimensions), 74);
+});
+
+test("attempt fingerprints ignore revision metadata and order-only changes", () => {
+  const first = {
+    scenarioId: pilotScenarioId,
+    projectId: "customer",
+    attemptId: crypto.randomUUID(),
+    revisionNumber: 1,
+    startedAt: "2026-08-17T01:00:00.000Z",
+    completedAt: "2026-08-17T01:05:00.000Z",
+    answer: {
+      subject: "保存操作で顧客が重複登録される",
+      sections: { detail: "保存ボタンを3回クリックする" },
+      ticketFields: { priority: "high", watcherIds: ["kikuta", "tsunagi"] },
+    },
+    selectedEvidenceIds: ["log-b", "log-a"],
+    evidenceDescriptions: { "log-a": "APIログ", "log-b": "画面ログ" },
+  };
+  const sameContent = {
+    ...structuredClone(first),
+    attemptId: crypto.randomUUID(),
+    revisionNumber: 2,
+    startedAt: "2026-08-17T02:00:00.000Z",
+    completedAt: "2026-08-17T02:05:00.000Z",
+    answer: {
+      ...structuredClone(first.answer),
+      ticketFields: { watcherIds: ["tsunagi", "kikuta"], priority: "high" },
+    },
+    selectedEvidenceIds: ["log-a", "log-b"],
+  };
+  assert.equal(attemptContentFingerprint(first), attemptContentFingerprint(sameContent));
+  sameContent.answer.sections.detail += "。確認結果は2件";
+  assert.notEqual(attemptContentFingerprint(first), attemptContentFingerprint(sameContent));
+});
+
+test("an identical revision reuses the exact previous score and feedback", () => {
+  const attempt = { attemptId: crypto.randomUUID() };
+  const previousResult = {
+    schemaVersion: "scoring-result.v3",
+    scoringResultId: crypto.randomUUID(),
+    attemptId: crypto.randomUUID(),
+    status: "succeeded",
+    totalScore: 82,
+    dimensions: { factualGrounding: 82 },
+    dimensionFeedback: { factualGrounding: { reason: "前回の理由" } },
+    improvementItems: [],
+    verdict: "開発着手可能（軽微な改善あり）",
+    overallAssessment: "前回の総評",
+    scoredAt: "2026-08-17T01:00:00.000Z",
+  };
+  const reused = createReusedScoringResult(attempt, previousResult, {
+    scoringResultId: "9aa36eba-00ee-4ae0-a918-54eb5e11686f",
+    scoredAt: "2026-08-17T02:00:00.000Z",
+  });
+  assert.equal(reused.attemptId, attempt.attemptId);
+  assert.equal(reused.scoringResultId, "9aa36eba-00ee-4ae0-a918-54eb5e11686f");
+  assert.equal(reused.totalScore, 82);
+  assert.deepEqual(reused.dimensions, previousResult.dimensions);
+  assert.deepEqual(reused.dimensionFeedback, previousResult.dimensionFeedback);
+  assert.equal(reused.overallAssessment, "前回の総評");
+});
+
+function revisionScoringResult(attemptId, score, factStatus, factQuote) {
+  const rubric = getScenarioRubric(pilotScenarioId);
+  const dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, score]));
+  return {
+    schemaVersion: "scoring-result.v3",
+    scoringResultId: crypto.randomUUID(),
+    attemptId,
+    status: "succeeded",
+    totalScore: score,
+    dimensions,
+    dimensionFeedback: Object.fromEntries(
+      rubric.dimensions.map(({ id }) => [id, { reason: `${score}点の理由` }])
+    ),
+    improvementItems: [{
+      priority: "修正推奨",
+      title: "記述を確認する",
+      detail: "記述内容を確認してください。",
+      whyItMatters: "調査判断に必要なためです。",
+      relatedDimensionIds: rubric.dimensions.map(({ id }) => id),
+    }],
+    verdict: score >= 80 ? "開発着手可能（軽微な改善あり）" : "追加確認を推奨",
+    overallAssessment: `${score}点の総評`,
+    rubricFindings: {
+      factAssessments: [{
+        factId: "steps-reproducible",
+        status: factStatus,
+        evidenceQuote: factQuote,
+      }],
+      forbiddenClaimIds: [],
+      ticketFieldChecks: [],
+      evidenceCheck: { matched: true },
+      rawWeightedScore: score,
+      scoreCaps: [],
+      appliedScoreCap: null,
+    },
+    rubricVersion: "test",
+    promptVersion: "test",
+    modelId: "test-model",
+    scoredAt: "2026-08-17T01:00:00.000Z",
+    errorCode: null,
+  };
+}
+
+test("a revision cannot lose points from AI variance without an objective regression", () => {
+  const previousAttempt = {
+    scenarioId: pilotScenarioId,
+    projectId: "customer",
+    attemptId: crypto.randomUUID(),
+    answer: {
+      subject: "保存操作で顧客が重複登録される",
+      sections: { detail: "保存ボタンを3回クリックする" },
+      ticketFields: {},
+    },
+    selectedEvidenceIds: [],
+    evidenceDescriptions: {},
+  };
+  const currentAttempt = {
+    ...structuredClone(previousAttempt),
+    attemptId: crypto.randomUUID(),
+    answer: {
+      ...structuredClone(previousAttempt.answer),
+      subject: "保存操作で顧客が2件重複登録される",
+    },
+  };
+  const previousResult = revisionScoringResult(
+    previousAttempt.attemptId,
+    82,
+    "present",
+    "保存ボタンを3回クリックする"
+  );
+  const noisyLowerResult = revisionScoringResult(
+    currentAttempt.attemptId,
+    74,
+    "missing",
+    ""
+  );
+  const stabilized = stabilizeRevisionScoringResult(
+    currentAttempt,
+    noisyLowerResult,
+    previousAttempt,
+    previousResult
+  );
+  assert.equal(stabilized.totalScore, 82);
+  assert.match(stabilized.overallAssessment, /AIの採点揺れ/);
+  assert.equal(calculateWeightedTotal(stabilized.dimensions, pilotScenarioId), 82);
+});
+
+test("a revision may lose points when a previously present fact was actually removed", () => {
+  const previousAttempt = {
+    scenarioId: pilotScenarioId,
+    projectId: "customer",
+    attemptId: crypto.randomUUID(),
+    answer: {
+      subject: "保存操作で顧客が重複登録される",
+      sections: { detail: "保存ボタンを3回クリックする" },
+      ticketFields: {},
+    },
+    selectedEvidenceIds: [],
+    evidenceDescriptions: {},
+  };
+  const currentAttempt = {
+    ...structuredClone(previousAttempt),
+    attemptId: crypto.randomUUID(),
+    answer: {
+      ...structuredClone(previousAttempt.answer),
+      sections: { detail: "保存後に顧客が重複した" },
+    },
+  };
+  const previousResult = revisionScoringResult(
+    previousAttempt.attemptId,
+    82,
+    "present",
+    "保存ボタンを3回クリックする"
+  );
+  const lowerResult = revisionScoringResult(
+    currentAttempt.attemptId,
+    74,
+    "missing",
+    ""
+  );
+  const stabilized = stabilizeRevisionScoringResult(
+    currentAttempt,
+    lowerResult,
+    previousAttempt,
+    previousResult
+  );
+  assert.equal(stabilized.totalScore, 74);
+  assert.doesNotMatch(stabilized.overallAssessment, /AIの採点揺れ/);
 });
 
 test("inconsistent question classifications are normalized conservatively", () => {
@@ -317,6 +510,32 @@ test("attachment descriptions are normalized and included in the existing AI rev
   assert.match(prompt, /evidenceDescriptionsは起票内容の一部/);
   assert.match(prompt, /investigationReadinessだけで評価/);
   assert.match(prompt, /14:32付近の顧客登録APIログ/);
+});
+
+test("revision prompts anchor the review to the previous score and improvements", () => {
+  const rubric = getScenarioRubric(pilotScenarioId);
+  const previousAttempt = {
+    scenarioId: pilotScenarioId,
+    projectId: rubric.projectId,
+    answer: rubric.writingExample,
+    selectedEvidenceIds: [],
+    evidenceDescriptions: {},
+  };
+  const previousScoringResult = {
+    status: "succeeded",
+    totalScore: 78,
+    dimensions: completeModelOutput.dimensions,
+    improvementItems: completeModelOutput.improvementItems,
+    rubricFindings: { factAssessments: [], forbiddenClaimIds: [] },
+  };
+  const prompt = buildScoringPrompt(previousAttempt, {
+    previousAttempt,
+    previousScoringResult,
+  });
+  assert.match(prompt, /前回版との比較/);
+  assert.match(prompt, /前回の改善点が解消した評価軸だけを加点/);
+  assert.match(prompt, /"previousScore":78/);
+  assert.equal(prompt.includes("userId"), false);
 });
 
 test("all registered rubrics produce scenario-specific structured-output schemas", () => {
@@ -891,6 +1110,8 @@ test("the attempt record exists before Gemini scoring starts", async () => {
     fetchImplementation: async (_url, request) => {
       const sentBody = JSON.parse(request.body);
       assert.equal(sentBody.contents[0].parts[0].text.includes("verified-google-sub"), false);
+      assert.equal(Number.isInteger(sentBody.generationConfig.seed), true);
+      assert.equal("temperature" in sentBody.generationConfig, false);
       return {
         ok: true,
         async json() {

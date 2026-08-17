@@ -133,6 +133,15 @@ getLeaderboard(options)
 
 新しい画面フローでは保存とレビューを分離する。`POST /api/attempts`の成功を画面へ返した後に`POST /api/attempts/:attempt_id/review`を呼ぶ。レビュー失敗時も保存済みチケットを一覧へ残し、再送でAttemptを重複させない。`POST /api/scoring`は旧クライアント互換用とする。
 
+`POST /api/attempts/:attempt_id/review`は次の順で採点結果を決定する。
+
+1. 同一Attemptに成功済み結果があれば、その結果を返して再採点しない
+2. 同じチケットの過去版に内容指紋が一致する成功結果があれば、現在版用のScoringResultとして複製する
+3. 内容が変わった修正版は前回版と前回レビューをGeminiへ渡し、前回基準からの変化を評価する
+4. 明確な事実・設定・添付の後退がないのに総合点が下がった場合、バックエンドが前回点を下限として評価軸を安定化する
+
+内容指紋には`scenarioId`、`projectId`、題名、本文、チケット項目、選択添付、添付説明を含める。Attempt ID、版番号、開始・完了日時は含めない。
+
 `answer_json.ticketFields`は`tracker`、`private`、`status`、`severity`、`priority`、`assigneeId`、`category`、`version`、`environment`、`startDate`、`dueDate`、`progress`、`watcherIds`を保持する。Sheetsの列追加は行わない。
 
 ## 4. ステータス

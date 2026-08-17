@@ -2,8 +2,10 @@ import http from "node:http";
 import { OAuth2Client } from "google-auth-library";
 import {
   DEFAULT_MODEL,
+  attemptContentFingerprint,
   createAttemptRecord,
   createFailedScoringResult,
+  createReusedScoringResult,
   isScoringSupported,
   scoreAttemptRecordWithGemini,
 } from "./scoring-service.js";
@@ -25,6 +27,33 @@ const googleAuthClient = new OAuth2Client();
 const scoringWindows = new Map();
 const scoringWindowMs = 60000;
 const scoringLimitPerWindow = 5;
+
+function latestSuccessfulScoringResult(attempt) {
+  return (attempt?.scoringResults || []).find(
+    (result) => result.status === "succeeded" && Number.isInteger(result.totalScore)
+  ) || null;
+}
+
+function previousTicketRevision(ticket, attempt) {
+  return [...(ticket?.revisions || [])]
+    .filter((revision) =>
+      revision.attemptId !== attempt.attemptId
+      && (revision.revisionNumber || 1) < (attempt.revisionNumber || 1)
+    )
+    .sort((left, right) => (right.revisionNumber || 1) - (left.revisionNumber || 1))[0] || null;
+}
+
+function matchingScoredRevision(ticket, attempt) {
+  const fingerprint = attemptContentFingerprint(attempt);
+  return [...(ticket?.revisions || [])]
+    .filter((revision) =>
+      revision.attemptId !== attempt.attemptId
+      && (revision.revisionNumber || 1) < (attempt.revisionNumber || 1)
+      && attemptContentFingerprint(revision) === fingerprint
+      && latestSuccessfulScoringResult(revision)
+    )
+    .sort((left, right) => (right.revisionNumber || 1) - (left.revisionNumber || 1))[0] || null;
+}
 
 function sendJson(response, statusCode, body, origin = "") {
   response.writeHead(statusCode, {
@@ -299,12 +328,34 @@ const server = http.createServer(async (request, response) => {
         error.code = "SCENARIO_NOT_SUPPORTED";
         throw error;
       }
+      const existingResult = latestSuccessfulScoringResult(attempt);
+      if (existingResult) {
+        sendJson(response, 200, { scoringResult: existingResult }, origin);
+        return;
+      }
+      const ticket = attempt.ticketId
+        ? await storageRepository.getTicketById(user.userId, attempt.ticketId)
+        : null;
+      const matchedRevision = matchingScoredRevision(ticket, attempt);
+      if (matchedRevision) {
+        const scoringResult = createReusedScoringResult(
+          attempt,
+          latestSuccessfulScoringResult(matchedRevision)
+        );
+        await storageRepository.appendScoringResult(scoringResult);
+        sendJson(response, 200, { scoringResult }, origin);
+        return;
+      }
+      const previousAttempt = previousTicketRevision(ticket, attempt);
+      const previousScoringResult = latestSuccessfulScoringResult(previousAttempt);
       enforceScoringRateLimit(user.userId);
       let scoringResult;
       try {
         scoringResult = await scoreAttemptRecordWithGemini(attempt, {
           apiKey: geminiApiKey,
           modelId: geminiModel,
+          previousAttempt,
+          previousScoringResult,
         });
       } catch (error) {
         const failedResult = createFailedScoringResult(attempt, error, { modelId: geminiModel });

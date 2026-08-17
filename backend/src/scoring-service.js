@@ -165,11 +165,59 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v14";
+export const PROMPT_VERSION = "practice-review.v15";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
 const factAssessmentStatuses = ["present", "missing", "contradicted"];
+
+function canonicalizeFingerprintValue(value) {
+  if (typeof value === "string") {
+    return value.normalize("NFKC").replace(/\r\n?/gu, "\n").trim();
+  }
+  if (Array.isArray(value)) {
+    return value.map(canonicalizeFingerprintValue);
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonicalizeFingerprintValue(value[key])])
+    );
+  }
+  return value ?? null;
+}
+
+export function attemptContentFingerprint(attempt) {
+  const ticketFields = {
+    ...(attempt?.answer?.ticketFields || {}),
+    watcherIds: [...new Set(attempt?.answer?.ticketFields?.watcherIds || [])].sort(),
+  };
+  const selectedEvidenceIds = [...new Set(attempt?.selectedEvidenceIds || [])].sort();
+  const evidenceDescriptions = Object.fromEntries(
+    selectedEvidenceIds.map((fileId) => [
+      fileId,
+      attempt?.evidenceDescriptions?.[fileId] || "",
+    ])
+  );
+  const content = canonicalizeFingerprintValue({
+    scenarioId: attempt?.scenarioId || "",
+    projectId: attempt?.projectId || "",
+    answer: {
+      subject: attempt?.answer?.subject || "",
+      sections: attempt?.answer?.sections || {},
+      ticketFields,
+    },
+    selectedEvidenceIds,
+    evidenceDescriptions,
+  });
+  return crypto.createHash("sha256").update(JSON.stringify(content)).digest("hex");
+}
+
+function scoringSeedForAttempt(attempt) {
+  const seed = Number.parseInt(attemptContentFingerprint(attempt).slice(0, 8), 16) & 0x7fffffff;
+  return seed || 1;
+}
 
 export function getScenarioRubric(scenarioId) {
   const rubric = rubricRegistry.scenarios[scenarioId] || qaRubrics[scenarioId];
@@ -534,7 +582,32 @@ export function validateAttemptInput(input) {
   }
 }
 
-export function buildScoringPrompt(attempt) {
+function buildRevisionPromptParts(options = {}) {
+  const previousAttempt = options.previousAttempt;
+  const previousResult = options.previousScoringResult;
+  if (!previousAttempt || previousResult?.status !== "succeeded") {
+    return [];
+  }
+  return [
+    "",
+    "前回版との比較:",
+    "これは前回のAI指摘を受けて修正された起票です。修正版をゼロから別基準で採点せず、前回と同じ記述・同じ品質の評価軸は前回点を維持してください。",
+    "前回の改善点が解消した評価軸だけを加点し、前回より明確に悪化した事実・記述がある評価軸だけを減点してください。単なる表現の違いや新しい好みを、修正版だけの減点理由にしてはいけません。",
+    "dimensionFeedbackとimprovementItemsでは、前回から変わった評価について、何が解消・未解消・悪化したのかが分かるようにしてください。",
+    JSON.stringify({
+      previousAnswer: previousAttempt.answer,
+      previousSelectedEvidenceIds: previousAttempt.selectedEvidenceIds || [],
+      previousEvidenceDescriptions: previousAttempt.evidenceDescriptions || {},
+      previousScore: previousResult.totalScore,
+      previousDimensions: previousResult.dimensions,
+      previousImprovementItems: previousResult.improvementItems || [],
+      previousFactAssessments: previousResult.rubricFindings?.factAssessments || [],
+      previousForbiddenClaimIds: previousResult.rubricFindings?.forbiddenClaimIds || [],
+    }),
+  ];
+}
+
+export function buildScoringPrompt(attempt, options = {}) {
   const rubric = getScenarioRubric(attempt?.scenarioId);
   if (!rubric) {
     const error = new Error("このシナリオはAI採点の対象外です。");
@@ -586,6 +659,7 @@ export function buildScoringPrompt(attempt) {
         selectedEvidenceIds: attempt.selectedEvidenceIds || [],
         evidenceDescriptions: attempt.evidenceDescriptions || {},
       }),
+      ...buildRevisionPromptParts(options),
     ].join("\n");
   }
   return [
@@ -639,6 +713,7 @@ export function buildScoringPrompt(attempt) {
       selectedEvidenceIds: attempt.selectedEvidenceIds || [],
       evidenceDescriptions: attempt.evidenceDescriptions || {},
     }),
+    ...buildRevisionPromptParts(options),
   ].join("\n");
 }
 
@@ -1197,6 +1272,163 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
   };
 }
 
+function successfulScoringResult(result) {
+  return result?.status === "succeeded" && Number.isInteger(result.totalScore);
+}
+
+export function createReusedScoringResult(attempt, sourceResult, options = {}) {
+  if (!successfulScoringResult(sourceResult)) {
+    throw new Error("a successful scoring result is required for reuse");
+  }
+  return {
+    ...structuredClone(sourceResult),
+    scoringResultId: options.scoringResultId || crypto.randomUUID(),
+    attemptId: requireNonEmptyString(attempt?.attemptId, "attempt.attemptId"),
+    scoredAt: options.scoredAt || new Date().toISOString(),
+  };
+}
+
+function scoringFactMap(result) {
+  return new Map(
+    (result?.rubricFindings?.factAssessments || []).map((assessment) => [
+      assessment.factId,
+      assessment,
+    ])
+  );
+}
+
+function currentAttemptContainsEvidenceQuote(attempt, quote) {
+  const normalizedQuote = normalizedQuoteText(quote);
+  const evidenceMatch = /^添付証跡[:：](.+)$/u.exec(normalizedQuote);
+  if (evidenceMatch) {
+    return new Set(attempt?.selectedEvidenceIds || []).has(evidenceMatch[1]);
+  }
+  const currentText = normalizedQuoteText(JSON.stringify({
+    answer: attempt?.answer || {},
+    evidenceDescriptions: attempt?.evidenceDescriptions || {},
+  }));
+  return Boolean(normalizedQuote) && currentText.includes(normalizedQuote);
+}
+
+function getObjectiveRevisionRegressions(
+  currentAttempt,
+  currentResult,
+  previousAttempt,
+  previousResult
+) {
+  const regressions = [];
+  const previousFacts = scoringFactMap(previousResult);
+  const currentFacts = scoringFactMap(currentResult);
+  previousFacts.forEach((previous, factId) => {
+    const current = currentFacts.get(factId);
+    if (!current) {
+      return;
+    }
+    const presentFactWasLost = previous.status === "present"
+      && current.status !== "present"
+      && currentAttemptContainsEvidenceQuote(previousAttempt, previous.evidenceQuote)
+      && !currentAttemptContainsEvidenceQuote(currentAttempt, previous.evidenceQuote);
+    const missingFactBecameContradicted = previous.status === "missing"
+      && current.status === "contradicted";
+    if (presentFactWasLost || missingFactBecameContradicted) {
+      regressions.push(`fact:${factId}`);
+    }
+  });
+
+  const previousClaims = new Set(previousResult?.rubricFindings?.forbiddenClaimIds || []);
+  (currentResult?.rubricFindings?.forbiddenClaimIds || []).forEach((claimId) => {
+    if (!previousClaims.has(claimId)) {
+      regressions.push(`claim:${claimId}`);
+    }
+  });
+
+  const previousFields = new Map(
+    (previousResult?.rubricFindings?.ticketFieldChecks || []).map((check) => [check.field, check])
+  );
+  (currentResult?.rubricFindings?.ticketFieldChecks || []).forEach((check) => {
+    if (previousFields.get(check.field)?.matched === true && check.matched === false) {
+      regressions.push(`ticket-field:${check.field}`);
+    }
+  });
+
+  if (
+    previousResult?.rubricFindings?.evidenceCheck?.matched === true
+    && currentResult?.rubricFindings?.evidenceCheck?.matched === false
+  ) {
+    regressions.push("evidence-selection");
+  }
+
+  return regressions;
+}
+
+export function stabilizeRevisionScoringResult(
+  currentAttempt,
+  currentResult,
+  previousAttempt,
+  previousResult
+) {
+  if (!successfulScoringResult(currentResult) || !successfulScoringResult(previousResult)) {
+    return currentResult;
+  }
+  if (attemptContentFingerprint(currentAttempt) === attemptContentFingerprint(previousAttempt)) {
+    return createReusedScoringResult(currentAttempt, previousResult, {
+      scoredAt: currentResult.scoredAt,
+    });
+  }
+  if (currentResult.totalScore >= previousResult.totalScore) {
+    return currentResult;
+  }
+  const regressions = getObjectiveRevisionRegressions(
+    currentAttempt,
+    currentResult,
+    previousAttempt,
+    previousResult
+  );
+  if (regressions.length > 0) {
+    return currentResult;
+  }
+
+  const dimensions = { ...(currentResult.dimensions || {}) };
+  const dimensionFeedback = structuredClone(currentResult.dimensionFeedback || {});
+  const rubric = getScenarioRubric(currentAttempt.scenarioId);
+  const raisedDimensionIds = new Set();
+  let adjustedTotal = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
+  while (adjustedTotal < previousResult.totalScore) {
+    const candidate = rubric.dimensions
+      .map(({ id, weight }) => ({
+        id,
+        weight,
+        gap: Math.max(0, (previousResult.dimensions?.[id] || 0) - (dimensions[id] || 0)),
+      }))
+      .filter(({ gap }) => gap > 0)
+      .sort((left, right) => right.gap * right.weight - left.gap * left.weight)[0];
+    if (!candidate) {
+      break;
+    }
+    dimensions[candidate.id] += 1;
+    raisedDimensionIds.add(candidate.id);
+    adjustedTotal = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
+  }
+  raisedDimensionIds.forEach((dimensionId) => {
+    dimensionFeedback[dimensionId] = {
+      reason: "前回から明確な悪化が確認されないため、採点の一貫性を保って前回評価を維持しました。",
+    };
+  });
+  const totalScore = Math.max(previousResult.totalScore, adjustedTotal);
+  const stabilityNote = "明確な事実後退がない評価軸は、AIの採点揺れで点数が下がらないよう前回評価を維持しています。";
+  return {
+    ...currentResult,
+    totalScore,
+    dimensions,
+    dimensionFeedback,
+    verdict: verdictForScore(totalScore, rubric.ticketType),
+    overallAssessment: `${currentResult.overallAssessment} ${stabilityNote}`.trim(),
+    rubricFindings: currentResult.rubricFindings
+      ? { ...currentResult.rubricFindings, rawWeightedScore: adjustedTotal }
+      : currentResult.rubricFindings,
+  };
+}
+
 export function createAttemptRecord(attemptInput, options = {}) {
   const normalized = validateAttemptInput(attemptInput);
   const attemptId = options.attemptId || crypto.randomUUID();
@@ -1273,11 +1505,11 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
       "x-goog-api-key": apiKey,
     },
     body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: buildScoringPrompt(attempt) }] }],
+      contents: [{ role: "user", parts: [{ text: buildScoringPrompt(attempt, options) }] }],
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: buildModelOutputSchema(rubric),
-        temperature: 0.25,
+        seed: scoringSeedForAttempt(attempt),
       },
     }),
   });
@@ -1331,7 +1563,7 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
       ? { ...item, priority: "任意改善" }
       : item
   );
-  return {
+  const scoringResult = {
     schemaVersion: "scoring-result.v3",
     scoringResultId: crypto.randomUUID(),
     attemptId: attempt.attemptId,
@@ -1347,6 +1579,14 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     scoredAt: new Date().toISOString(),
     errorCode: null,
   };
+  return options.previousAttempt && options.previousScoringResult
+    ? stabilizeRevisionScoringResult(
+        attempt,
+        scoringResult,
+        options.previousAttempt,
+        options.previousScoringResult
+      )
+    : scoringResult;
 }
 
 export async function scoreAttemptWithGemini(attemptInput, options) {
