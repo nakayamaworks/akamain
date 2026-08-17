@@ -253,6 +253,7 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
   "practiceScoringRetryButton",
   "practiceScoringResult",
   "practiceScoringPreviewTotal",
+  "practiceScoringComparison",
   "practiceScoringVerdict",
   "practiceScoringOverallAssessment",
   "practiceScoringDetails",
@@ -275,6 +276,12 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
     errors.push(`authoring mode prototype is missing #${elementId}`);
   }
 });
+if (
+  !mainSource.includes('practiceMode ? "指摘を元に修正"') ||
+  indexSource.includes('type="button">同じシナリオに再挑戦</button>')
+) {
+  errors.push("practice AI results must lead to revising the saved answer, not restarting it");
+}
 const runtimeConfigKeys = [
   ...runtimeConfigSource.matchAll(/^\s{2}([A-Za-z][A-Za-z0-9]*):/gm),
 ].map((match) => match[1]);
@@ -1867,6 +1874,7 @@ try {
       state.practiceScoringStatus = "succeeded";
       state.practiceScoringResult =
         window.TYPING_WORKBENCH_SCORING_PREVIEWS[state.scenario.scenarioId];
+      state.revisionPreviousScore = 70;
       renderPracticeScoringPreview();
       const firstEditableGroup = groups.find((group) => group.referenceLines.length > 0);
       const previousFirstGroupValue = state.practiceSections[firstEditableGroup.key];
@@ -1887,6 +1895,8 @@ try {
         scoringPreviewRendered:
           elements.practiceScoringPreviewTotal.textContent === "77" &&
           elements.practiceScoringVerdict.textContent === "追加確認を推奨" &&
+          elements.practiceScoringComparison.textContent ===
+            "前回 70点 → 今回 77点（+7点）" &&
           elements.practiceRadarFactual.textContent === "78" &&
           elements.practiceScoringDimensionFeedback.innerHTML.includes("個別理由を取得できませんでした") &&
           elements.practiceScoringReaderQuestions.innerHTML.includes("保存API") &&
@@ -1902,6 +1912,7 @@ try {
       state.practiceSubject = "";
       state.practiceSections = {};
       state.practiceWritingComplete = false;
+      state.revisionPreviousScore = null;
       return { beforeComplete, afterComplete };
     })()`,
     smokeContext
@@ -1924,6 +1935,89 @@ try {
       `runtime smoke test expected practice authoring to render, complete, and compare answers: ${JSON.stringify(
         practiceAuthoringPrototype
       )}`
+    );
+  }
+  const resultRevisionFlow = vm.runInContext(
+    `(() => {
+      const previous = {
+        authoringMode: state.authoringMode,
+        projectId: state.projectId,
+        scenario: state.scenario,
+      };
+      const target = scenarioBank.find((scenario) =>
+        scenario.scenarioId === "customer-save-multiple-clicks-duplicate"
+      );
+      state.projectId = target.projectId;
+      state.scenario = buildScenario(target);
+      state.authoringMode = "practice";
+      const sectionEntries = getPracticeSectionGroups()
+        .filter((group) => group.referenceLines.length > 0)
+        .map((group, index) => [
+          group.title.replace(/^■/, ""),
+          "修正前の本文" + (index + 1),
+        ]);
+      const evidenceId = getCurrentEvidenceProfile().files[0].id;
+      state.currentSavedAttempt = {
+        attemptId: "revision-attempt-1",
+        ticketId: "revision-ticket-1",
+        displayId: "REVISION1",
+        scenarioId: target.scenarioId,
+        projectId: target.projectId,
+        answer: {
+          subject: "修正前の題名",
+          sections: Object.fromEntries(sectionEntries),
+          ticketFields: {
+            tracker: "bug",
+            status: "new",
+            severity: "s2",
+            priority: "high",
+            category: "workflow",
+            progress: 0,
+          },
+        },
+        selectedEvidenceIds: [evidenceId],
+        evidenceDescriptions: {
+          [evidenceId]: "重複登録が発生した時刻のAPIログ",
+        },
+        scoringResults: [{ status: "succeeded", totalScore: 72 }],
+      };
+      handleRetryButton();
+      const result = {
+        revisionTicketId: state.revisionTicketId,
+        previousScore: state.revisionPreviousScore,
+        subject: state.practiceSubject,
+        sectionValues: Object.values(state.practiceSections),
+        expectedSectionCount: sectionEntries.length,
+        evidenceRestored: state.selectedEvidenceIds.includes(evidenceId),
+        evidenceDescription: state.evidenceDescriptions[evidenceId],
+        writingComplete: state.practiceWritingComplete,
+        awaitingCreate: state.awaitingCreate,
+        view: state.view,
+        createLabel: elements.createButton.textContent,
+      };
+      state.authoringMode = previous.authoringMode;
+      state.projectId = previous.projectId;
+      state.scenario = previous.scenario;
+      resetSession();
+      return result;
+    })()`,
+    smokeContext
+  );
+  if (
+    resultRevisionFlow.revisionTicketId !== "revision-ticket-1" ||
+    resultRevisionFlow.previousScore !== 72 ||
+    resultRevisionFlow.subject !== "修正前の題名" ||
+    resultRevisionFlow.sectionValues.filter((value) => value.startsWith("修正前の本文")).length !==
+      resultRevisionFlow.expectedSectionCount ||
+    !resultRevisionFlow.evidenceRestored ||
+    resultRevisionFlow.evidenceDescription !== "重複登録が発生した時刻のAPIログ" ||
+    !resultRevisionFlow.writingComplete ||
+    !resultRevisionFlow.awaitingCreate ||
+    resultRevisionFlow.view !== "create" ||
+    resultRevisionFlow.createLabel !== "保存"
+  ) {
+    errors.push(
+      `AI feedback revision must preserve the saved answer and score context: ${JSON.stringify(resultRevisionFlow)}`
     );
   }
   const practiceDraftRoundTrip = vm.runInContext(

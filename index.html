@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260817a" />
+    <link rel="stylesheet" href="./styles.css?v=20260817b" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -636,6 +636,7 @@
                     <strong id="practiceScoringPreviewTotal">--</strong><small> / 100</small>
                   </span>
                 </div>
+                <p id="practiceScoringComparison" class="practice-score-comparison hidden"></p>
                 <p id="practiceScoringOverallAssessment" class="practice-ai-overall-assessment"></p>
                 <div class="practice-ai-strengths">
                   <h3>問題なし・評価できる点</h3>
@@ -810,10 +811,10 @@
           <button id="sameScenarioPracticeButton" class="primary-button hidden" type="button">
             同じ題材で実践起票
           </button>
+          <button id="retryButton" class="secondary-button" type="button">もう一度</button>
           <button id="nextScenarioButton" class="primary-button hidden" type="button">
             次の未挑戦シナリオへ
           </button>
-          <button id="retryButton" class="secondary-button" type="button">同じシナリオに再挑戦</button>
           <button id="resultExitButton" class="danger-button" type="button">終了</button>
         </div>
       </div>
@@ -829,6 +830,6 @@
     <script src="./qa-scenario-authoring-library.js?v=20260815d"></script>
     <script src="./evidence-library.js?v=20260815a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260817c"></script>
+    <script src="./main.js?v=20260817d"></script>
   </body>
 </html>

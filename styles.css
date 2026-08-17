@@ -3351,6 +3351,32 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   gap: 16px;
 }
 
+.practice-score-comparison {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border-left: 4px solid #6d8fac;
+  background: #edf5fb;
+  color: #314b63;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.practice-score-comparison.is-up {
+  border-left-color: #3f8d63;
+  background: #edf8f1;
+  color: #207245;
+}
+
+.practice-score-comparison.is-down {
+  border-left-color: #b85b55;
+  background: #fff1f0;
+  color: #a33838;
+}
+
+.practice-score-comparison.is-same {
+  color: #53697d;
+}
+
 .practice-ai-verdict {
   display: inline-flex;
   align-items: center;

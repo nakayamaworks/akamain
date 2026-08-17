@@ -1180,9 +1180,11 @@ function beginTicketRevision(ticket) {
   if (!selectScenarioById(ticket.scenarioId)) {
     return false;
   }
+  const previousScore = successfulTicketScore(ticket);
   resetSession();
   const ticketId = ticket.ticketId || state.ticketDetailId || ticket.attemptId;
   state.revisionTicketId = ticketId;
+  state.revisionPreviousScore = previousScore;
   state.practiceSubject = String(ticket.answer?.subject || "");
   const savedSections = ticket.answer?.sections || {};
   state.practiceSections = Object.fromEntries(
@@ -1294,6 +1296,7 @@ const elements = {
   practiceSaveRetryButton: document.getElementById("practiceSaveRetryButton"),
   practiceScoringResult: document.getElementById("practiceScoringResult"),
   practiceScoringPreviewTotal: document.getElementById("practiceScoringPreviewTotal"),
+  practiceScoringComparison: document.getElementById("practiceScoringComparison"),
   practiceScoringVerdict: document.getElementById("practiceScoringVerdict"),
   practiceScoringOverallAssessment: document.getElementById("practiceScoringOverallAssessment"),
   practiceScoringDetails: document.getElementById("practiceScoringDetails"),
@@ -1618,6 +1621,8 @@ const state = {
   revisionTicketId: "",
   currentAttemptId: "",
   currentAttemptSaved: false,
+  currentSavedAttempt: null,
+  revisionPreviousScore: null,
   currentEditableOrder: 0,
   currentDraft: "",
   totalInputChars: 0,
@@ -3697,6 +3702,8 @@ function resetSession() {
   state.practiceScoringRequestId += 1;
   state.currentAttemptId = "";
   state.currentAttemptSaved = false;
+  state.currentSavedAttempt = null;
+  state.revisionPreviousScore = null;
   state.revisionTicketId = "";
   setTextContent(elements.ticketCreateTitle, "新しいチケット");
   setTextContent(elements.createButton, "作成");
@@ -4711,6 +4718,23 @@ function renderPracticeScoringPreview() {
           ? state.practiceScoringError || "AIレビューを完了できませんでした。"
           : "AIレビューを開始します。"
   );
+  const previousScore = state.revisionPreviousScore;
+  const currentScore = preview?.totalScore;
+  const showComparison =
+    isSucceeded && Number.isInteger(previousScore) && Number.isInteger(currentScore);
+  elements.practiceScoringComparison?.classList.toggle("hidden", !showComparison);
+  if (showComparison) {
+    const scoreDelta = currentScore - previousScore;
+    setTextContent(
+      elements.practiceScoringComparison,
+      `前回 ${previousScore}点 → 今回 ${currentScore}点（${scoreDelta >= 0 ? "+" : ""}${scoreDelta}点）`
+    );
+    elements.practiceScoringComparison?.classList.toggle("is-up", scoreDelta > 0);
+    elements.practiceScoringComparison?.classList.toggle("is-down", scoreDelta < 0);
+    elements.practiceScoringComparison?.classList.toggle("is-same", scoreDelta === 0);
+  } else {
+    setTextContent(elements.practiceScoringComparison, "");
+  }
   if (!isSucceeded) {
     return;
   }
@@ -4827,6 +4851,11 @@ async function requestPracticeScoring() {
       }
       state.currentAttemptId = saved.attempt?.attemptId || payload.attemptId;
       state.currentAttemptSaved = true;
+      state.currentSavedAttempt = saved.attempt || {
+        ...payload,
+        attemptId: state.currentAttemptId,
+        ticketId: state.revisionTicketId || state.currentAttemptId,
+      };
       if (!state.revisionTicketId) {
         deletePracticeDraft(state.scenario.scenarioId);
       }
@@ -4836,12 +4865,10 @@ async function requestPracticeScoring() {
       );
       setLoadingIndicator(elements.resultTitle, false);
       if (elements.resultExitButton) elements.resultExitButton.disabled = false;
-      if (elements.retryButton) elements.retryButton.disabled = false;
       if (elements.nextScenarioButton) elements.nextScenarioButton.disabled = false;
     }
     if (state.currentAttemptSaved) {
       if (elements.resultExitButton) elements.resultExitButton.disabled = false;
-      if (elements.retryButton) elements.retryButton.disabled = false;
       if (elements.nextScenarioButton) elements.nextScenarioButton.disabled = false;
     }
     const response = await window.TYPING_WORKBENCH_PROFILE_API.reviewAttempt(
@@ -4852,6 +4879,12 @@ async function requestPracticeScoring() {
     }
     state.practiceScoringStatus = "succeeded";
     state.practiceScoringResult = response.scoringResult;
+    state.currentSavedAttempt = {
+      ...(state.currentSavedAttempt || {}),
+      attemptId: state.currentAttemptId,
+      scoringResults: [response.scoringResult],
+    };
+    if (elements.retryButton) elements.retryButton.disabled = false;
     updateSessionPracticeScore(response.scoringResult?.totalScore);
   } catch (error) {
     if (state.practiceScoringRequestId !== requestId) {
@@ -4868,6 +4901,10 @@ async function requestPracticeScoring() {
     if (elements.resultExitButton) elements.resultExitButton.disabled = false;
     if (elements.retryButton) elements.retryButton.disabled = false;
     if (elements.nextScenarioButton) elements.nextScenarioButton.disabled = false;
+    setTextContent(
+      elements.retryButton,
+      state.currentAttemptSaved ? "内容を修正" : "入力内容を修正"
+    );
   }
   renderPracticeScoringPreview();
 }
@@ -5435,7 +5472,7 @@ function renderTicketDetail() {
       ` : `<p>${reviewStatus === "not_supported" ? "このシナリオのAIレビューは準備中です。起票内容は保存されています。" : "AIレビュー結果はまだありません。起票内容は保存されています。"}</p>`}
     </article>
     <div class="ticket-detail-actions">
-      <button class="primary-button" type="button" data-detail-edit-ticket-id="${escapeHtml(String(latestRevision.ticketId || state.ticketDetailId || latestRevision.attemptId))}">${result?.status === "succeeded" ? "指摘をもとに修正" : "内容を修正"}</button>
+      <button class="primary-button" type="button" data-detail-edit-ticket-id="${escapeHtml(String(latestRevision.ticketId || state.ticketDetailId || latestRevision.attemptId))}">${result?.status === "succeeded" ? "指摘を元に修正" : "内容を修正"}</button>
       <button class="secondary-button" type="button" data-detail-retry-scenario-id="${escapeHtml(String(ticket.scenarioId || ""))}">同じシナリオに再挑戦</button>
     </div>
   `;
@@ -5695,8 +5732,12 @@ function finishSession() {
   setLoadingIndicator(elements.resultTitle, practiceMode);
   setTextContent(
     elements.retryButton,
-    practiceMode ? "同じシナリオに再挑戦" : "もう一度記載例を入力"
+    practiceMode ? "指摘を元に修正" : "もう一度記載例を入力"
   );
+  elements.retryButton?.classList.toggle("primary-button", practiceMode);
+  elements.retryButton?.classList.toggle("secondary-button", !practiceMode);
+  elements.nextScenarioButton?.classList.toggle("primary-button", !practiceMode);
+  elements.nextScenarioButton?.classList.toggle("secondary-button", practiceMode);
   if (practiceMode) {
     const hasUnattemptedScenario = getUnattemptedScenarioEntries(state.projectId).length > 0;
     setTextContent(
@@ -6071,6 +6112,24 @@ function handleCreateButton() {
 }
 
 function handleRetryButton() {
+  if (isPracticeMode()) {
+    if (state.currentSavedAttempt) {
+      beginTicketRevision(state.currentSavedAttempt);
+      return;
+    }
+    elements.resultOverlay?.classList.add("hidden");
+    setView("create");
+    state.running = false;
+    state.awaitingCreate = true;
+    state.practiceWritingComplete = true;
+    clearSetupHighlight();
+    renderReport();
+    renderEvidenceAttachment();
+    setTextContent(elements.createButton, "保存");
+    syncControls();
+    elements.subjectDocument?.querySelector("#practiceSubjectInput")?.focus();
+    return;
+  }
   beginSessionForCurrentScenario();
 }
 
