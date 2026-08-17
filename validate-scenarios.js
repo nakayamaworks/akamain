@@ -2322,6 +2322,42 @@ try {
       )}`
     );
   }
+  const evidenceOrderingPrototype = vm.runInContext(
+    `(() => {
+      const target = scenarioBank.find((scenario) =>
+        /保存ボタンを連続クリック.*顧客データが重複登録/.test(scenario.subject.text)
+      );
+      const profile = buildScenario(target).evidenceProfile;
+      const requiredIds = new Set(profile.requiredIds);
+      const inspect = (files) => ({
+        ids: files.map((file) => file.id),
+        upperHasDecoy: files.slice(0, requiredIds.size).some((file) => !requiredIds.has(file.id)),
+        lowerHasRequired: files.slice(requiredIds.size).some((file) => requiredIds.has(file.id)),
+        uniqueCount: new Set(files.map((file) => file.id)).size,
+      });
+      return {
+        first: inspect(shuffleEvidenceFiles(profile.files, profile.requiredIds, () => 0)),
+        second: inspect(shuffleEvidenceFiles(profile.files, profile.requiredIds, () => 0.999999)),
+        fileCount: profile.files.length,
+      };
+    })()`,
+    smokeContext
+  );
+  if (
+    evidenceOrderingPrototype.first.uniqueCount !== evidenceOrderingPrototype.fileCount ||
+    evidenceOrderingPrototype.second.uniqueCount !== evidenceOrderingPrototype.fileCount ||
+    !evidenceOrderingPrototype.first.upperHasDecoy ||
+    !evidenceOrderingPrototype.first.lowerHasRequired ||
+    !evidenceOrderingPrototype.second.upperHasDecoy ||
+    !evidenceOrderingPrototype.second.lowerHasRequired ||
+    JSON.stringify(evidenceOrderingPrototype.first.ids) === JSON.stringify(evidenceOrderingPrototype.second.ids)
+  ) {
+    errors.push(
+      `runtime smoke test expected randomized evidence order with answers mixed across the list: ${JSON.stringify(
+        evidenceOrderingPrototype
+      )}`
+    );
+  }
   const evidenceSetupFlow = vm.runInContext(
     `(() => {
       const previousScenario = state.scenario;

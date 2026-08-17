@@ -1628,6 +1628,7 @@ const state = {
   selectedEvidenceIds: [],
   evidencePickerDraftIds: [],
   evidencePreviewId: "",
+  evidencePickerFileOrder: [],
   evidencePickerOpen: false,
   evidenceSetupActive: false,
   practiceSubject: "",
@@ -2311,6 +2312,47 @@ function getEvidenceFile(fileId) {
   return getCurrentEvidenceProfile()?.files.find((file) => file.id === fileId) || null;
 }
 
+function shuffleEvidenceFiles(files, requiredIds, random = Math.random) {
+  const shuffled = [...files];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  const requiredSet = new Set(requiredIds || []);
+  const upperSize = Math.min(requiredSet.size, Math.max(0, shuffled.length - 1));
+  const upperIsAllRequired = upperSize > 0
+    && shuffled.slice(0, upperSize).every((file) => requiredSet.has(file.id));
+  const lowerDecoyIndex = shuffled.findIndex(
+    (file, index) => index >= upperSize && !requiredSet.has(file.id)
+  );
+  if (upperIsAllRequired && lowerDecoyIndex >= 0) {
+    const upperRequiredIndex = Math.floor(random() * upperSize);
+    [shuffled[upperRequiredIndex], shuffled[lowerDecoyIndex]] = [
+      shuffled[lowerDecoyIndex],
+      shuffled[upperRequiredIndex],
+    ];
+  }
+  return shuffled;
+}
+
+function getOrderedEvidenceFiles(profile = getCurrentEvidenceProfile()) {
+  if (!profile) {
+    return [];
+  }
+  const profileIds = new Set(profile.files.map((file) => file.id));
+  const hasCurrentOrder = state.evidencePickerFileOrder.length === profile.files.length
+    && state.evidencePickerFileOrder.every((fileId) => profileIds.has(fileId));
+  if (!hasCurrentOrder) {
+    state.evidencePickerFileOrder = shuffleEvidenceFiles(
+      profile.files,
+      profile.requiredIds
+    ).map((file) => file.id);
+  }
+  return state.evidencePickerFileOrder
+    .map((fileId) => profile.files.find((file) => file.id === fileId))
+    .filter(Boolean);
+}
+
 function closeEvidencePicker() {
   state.evidencePickerOpen = false;
   elements.evidencePickerOverlay?.classList.add("hidden");
@@ -2427,7 +2469,7 @@ function renderEvidencePicker() {
   }
   if (elements.evidenceFileList) {
     const selectedIds = new Set(state.evidencePickerDraftIds);
-    elements.evidenceFileList.innerHTML = profile.files
+    elements.evidenceFileList.innerHTML = getOrderedEvidenceFiles(profile)
       .map(
         (file) => `
           <div class="windows-file-row ${selectedIds.has(file.id) ? "is-selected" : ""} ${
@@ -2462,7 +2504,7 @@ function openEvidencePicker() {
     return;
   }
   state.evidencePickerDraftIds = [...state.selectedEvidenceIds];
-  state.evidencePreviewId = state.selectedEvidenceIds[0] || profile.files[0]?.id || "";
+  state.evidencePreviewId = state.selectedEvidenceIds[0] || getOrderedEvidenceFiles(profile)[0]?.id || "";
   state.evidencePickerOpen = true;
   renderEvidencePicker();
   elements.evidencePickerOverlay?.classList.remove("hidden");
@@ -3619,6 +3661,7 @@ function resetSession() {
   state.selectedEvidenceIds = [];
   state.evidencePickerDraftIds = [];
   state.evidencePreviewId = "";
+  state.evidencePickerFileOrder = [];
   state.evidencePickerOpen = false;
   state.evidenceSetupActive = false;
   state.currentEditableOrder = 0;
