@@ -4306,14 +4306,19 @@ function getDimensionFeedbackItems(result, qaTicket = isQaScenario()) {
     .map(([label, key, weight]) => {
       const score = result?.dimensions?.[key];
       const feedback = result?.dimensionFeedback?.[key];
-      if (!Number.isInteger(score) || score >= 100 || !feedback?.reason) {
+      if (!Number.isInteger(score) || score >= 100) {
         return null;
       }
+      const relatedImprovement = (result?.improvementItems || []).find((item) =>
+        item?.relatedDimensionIds?.includes(key)
+      );
       return {
         label,
         score,
         weightedGap: (100 - score) * weight / 100,
-        reason: feedback.reason || "",
+        reason: feedback?.reason
+          || relatedImprovement?.detail
+          || "この観点の個別理由を取得できませんでした。総合評価と改善提案を確認してください。",
       };
     })
     .filter(Boolean);

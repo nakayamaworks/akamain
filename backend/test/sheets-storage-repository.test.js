@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SheetsStorageRepository } from "../src/sheets-storage-repository.js";
+import {
+  SheetsStorageRepository,
+  rowToScoringResult,
+  scoringResultToRow,
+} from "../src/sheets-storage-repository.js";
 
 function attemptRow(attemptId, ticketNumber, ticketId = "", revisionNumber = "", parentId = "") {
   return [
@@ -98,4 +102,45 @@ test("Sheets user synchronization is shared by concurrent read requests", async 
   assert.deepEqual(third, first);
   assert.equal(reads, 1);
   assert.equal(writes, 1);
+});
+
+test("Sheets scoring results preserve dimension feedback and improvement items", () => {
+  const scoringResult = {
+    schemaVersion: "scoring-result.v3",
+    scoringResultId: "33333333-3333-4333-8333-333333333333",
+    attemptId: "11111111-1111-4111-8111-111111111111",
+    status: "succeeded",
+    totalScore: 82,
+    dimensions: { factualGrounding: 80 },
+    verdict: "追加確認を推奨",
+    overallAssessment: "主要事象は確認できるが、補足が必要です。",
+    readerQuestions: [],
+    ambiguityRisks: [],
+    investigationAdvice: [],
+    rewriteSuggestions: [],
+    strengths: [],
+    rubricVersion: "scenario.v1",
+    promptVersion: "practice-review.v7",
+    modelId: "gemini-test",
+    scoredAt: "2026-08-17T00:00:00.000Z",
+    errorCode: null,
+    rubricFindings: null,
+    dimensionFeedback: {
+      factualGrounding: { reason: "確認済み事実の補足が必要です。" },
+    },
+    improvementItems: [
+      {
+        priority: "修正推奨",
+        title: "事実を補足する",
+        detail: "確認した値を追記してください。",
+        whyItMatters: "再現条件を判断するためです。",
+        relatedDimensionIds: ["factualGrounding"],
+      },
+    ],
+  };
+
+  const restored = rowToScoringResult(scoringResultToRow(scoringResult));
+
+  assert.deepEqual(restored.dimensionFeedback, scoringResult.dimensionFeedback);
+  assert.deepEqual(restored.improvementItems, scoringResult.improvementItems);
 });

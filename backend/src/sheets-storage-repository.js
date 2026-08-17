@@ -64,6 +64,8 @@ const TAB_COLUMNS = {
     "scored_at",
     "error_code",
     "rubric_findings_json",
+    "dimension_feedback_json",
+    "improvement_items_json",
   ],
 };
 
@@ -171,7 +173,7 @@ function rowToAttempt(row) {
   };
 }
 
-function scoringResultToRow(result) {
+export function scoringResultToRow(result) {
   return [
     result.schemaVersion,
     result.scoringResultId,
@@ -192,10 +194,12 @@ function scoringResultToRow(result) {
     result.scoredAt,
     result.errorCode || "",
     json(result.rubricFindings),
+    json(result.dimensionFeedback),
+    json(result.improvementItems),
   ];
 }
 
-function rowToScoringResult(row) {
+export function rowToScoringResult(row) {
   return {
     schemaVersion: row[0],
     scoringResultId: row[1],
@@ -216,6 +220,8 @@ function rowToScoringResult(row) {
     scoredAt: row[16],
     errorCode: nullable(row[17]),
     rubricFindings: parseJson(row[18], null),
+    dimensionFeedback: parseJson(row[19], {}),
+    improvementItems: parseJson(row[20], []),
   };
 }
 

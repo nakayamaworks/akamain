@@ -1885,6 +1885,7 @@ try {
           elements.practiceScoringPreviewTotal.textContent === "77" &&
           elements.practiceScoringVerdict.textContent === "追加確認を推奨" &&
           elements.practiceRadarFactual.textContent === "78" &&
+          elements.practiceScoringDimensionFeedback.innerHTML.includes("個別理由を取得できませんでした") &&
           elements.practiceScoringReaderQuestions.innerHTML.includes("保存API") &&
           elements.practiceScoringAmbiguityRisks.innerHTML.includes("DBの排他制御"),
         writingRemainsEditable:
