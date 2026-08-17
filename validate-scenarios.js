@@ -370,6 +370,7 @@ if (
   !attemptSchema?.required?.includes("parentAttemptId") ||
   !attemptSchema?.required?.includes("userId") ||
   !attemptSchema?.required?.includes("scenarioId") ||
+  !attemptSchema?.required?.includes("evidenceDescriptions") ||
   attemptSchema?.properties?.authoringMode?.enum?.length !== 2 ||
   !attemptSchema?.properties?.answer?.required?.includes("ticketFields")
 ) {
@@ -388,12 +389,14 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v13"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v14"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
-  !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問")
+  !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問") ||
+  !backendScoringSource.includes("evidenceDescriptionsは起票内容の一部") ||
+  !mainSource.includes('placeholder="説明（任意）"')
 ) {
-  errors.push("AI review prompt must distinguish standard operations, unsupported additions, and true missing facts");
+  errors.push("AI review must assess optional attachment descriptions without adding a separate request");
 }
 
 const rubricDimensionIds = new Set(
@@ -1951,10 +1954,12 @@ try {
       elements.environmentSelect.value = "Chrome 139 / macOS 15.6";
       const evidenceId = getCurrentEvidenceProfile().files[0].id;
       state.selectedEvidenceIds = [evidenceId];
+      state.evidenceDescriptions[evidenceId] = "14:32付近の顧客登録APIログ";
       const savedWhileWriting = saveCurrentPracticeDraft();
       state.practiceSubject = "消去対象";
       state.practiceSections = {};
       state.selectedEvidenceIds = [];
+      state.evidenceDescriptions = {};
       const resumedWhileWriting = resumePracticeDraft(
         getLatestPracticeDraft(target.projectId)
       );
@@ -1966,6 +1971,7 @@ try {
         expectedSectionCount: groups.length,
         priority: elements.prioritySelect.value,
         evidenceRestored: state.selectedEvidenceIds.includes(evidenceId),
+        evidenceDescription: state.evidenceDescriptions[evidenceId],
         privateValue: getSelectedTicketFields().private,
         running: state.running,
         awaitingCreate: state.awaitingCreate,
@@ -2007,6 +2013,7 @@ try {
       practiceDraftRoundTrip.writingState.expectedSectionCount ||
     practiceDraftRoundTrip.writingState.priority !== "high" ||
     !practiceDraftRoundTrip.writingState.evidenceRestored ||
+    practiceDraftRoundTrip.writingState.evidenceDescription !== "14:32付近の顧客登録APIログ" ||
     practiceDraftRoundTrip.writingState.privateValue !== false ||
     !practiceDraftRoundTrip.writingState.running ||
     practiceDraftRoundTrip.writingState.awaitingCreate ||

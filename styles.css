@@ -312,6 +312,25 @@
   padding-left: 22px;
 }
 
+.ticket-detail-evidence li + li {
+  margin-top: 8px;
+}
+
+.ticket-detail-evidence strong,
+.ticket-detail-evidence span {
+  display: block;
+}
+
+.ticket-detail-evidence span {
+  margin-top: 2px;
+  color: #536273;
+  font-size: 0.84rem;
+}
+
+.ticket-detail-evidence .ticket-detail-evidence-empty {
+  color: #858d95;
+}
+
 .ticket-detail-review-card {
   padding: 22px 24px;
   border-color: #cfd9e6;
@@ -2018,12 +2037,34 @@ button {
 
 .attached-evidence-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 72px 44px;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(220px, 1.1fr) 72px 44px;
   align-items: center;
   gap: 10px;
   min-height: 27px;
   color: #414950;
   font-size: 0.78rem;
+}
+
+.attached-evidence-description {
+  min-width: 0;
+  width: 100%;
+  height: 27px;
+  padding: 3px 6px;
+  border: 1px solid #b8b8b8;
+  border-radius: 2px;
+  background: #fff;
+  color: #333;
+  font: inherit;
+}
+
+.attached-evidence-description:focus {
+  border-color: #4b86b4;
+  outline: 1px solid #4b86b4;
+  outline-offset: 0;
+}
+
+.attached-evidence-description::placeholder {
+  color: #858585;
 }
 
 .attached-evidence-name {
@@ -4238,6 +4279,11 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
   .attached-evidence-row {
     grid-template-columns: minmax(0, 1fr) 44px;
+  }
+
+  .attached-evidence-description {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   .attached-evidence-size {

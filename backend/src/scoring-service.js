@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v13";
+export const PROMPT_VERSION = "practice-review.v14";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -494,6 +494,24 @@ export function validateAttemptInput(input) {
       ])
     );
     const completedAt = input.completedAt || new Date().toISOString();
+    const selectedEvidenceIds = [...new Set(
+      Array.isArray(input.selectedEvidenceIds)
+        ? input.selectedEvidenceIds.filter((value) => typeof value === "string")
+        : []
+    )];
+    const rawEvidenceDescriptions = input.evidenceDescriptions
+      && typeof input.evidenceDescriptions === "object"
+      && !Array.isArray(input.evidenceDescriptions)
+      ? input.evidenceDescriptions
+      : {};
+    const evidenceDescriptions = Object.fromEntries(
+      selectedEvidenceIds.map((fileId) => [
+        fileId,
+        typeof rawEvidenceDescriptions[fileId] === "string"
+          ? rawEvidenceDescriptions[fileId].trim().slice(0, 200)
+          : "",
+      ])
+    );
     return {
       scenarioId,
       projectId: requireNonEmptyString(input.projectId, "projectId"),
@@ -503,9 +521,8 @@ export function validateAttemptInput(input) {
         sections,
         ticketFields: normalizeTicketFields(input.answer?.ticketFields),
       },
-      selectedEvidenceIds: Array.isArray(input.selectedEvidenceIds)
-        ? input.selectedEvidenceIds.filter((value) => typeof value === "string")
-        : [],
+      selectedEvidenceIds,
+      evidenceDescriptions,
       startedAt: input.startedAt || completedAt,
       completedAt,
     };
@@ -567,6 +584,7 @@ export function buildScoringPrompt(attempt) {
       JSON.stringify({
         answer: attempt.answer,
         selectedEvidenceIds: attempt.selectedEvidenceIds || [],
+        evidenceDescriptions: attempt.evidenceDescriptions || {},
       }),
     ].join("\n");
   }
@@ -591,7 +609,9 @@ export function buildScoringPrompt(attempt) {
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
     "forbiddenClaimsに該当する断定がある場合だけ、そのIDをforbiddenClaimIdsへ入れてください。",
-    "チケット設定と添付証跡は別チェックです。expectedTicketFieldsとevidenceFilesをdimensionsやverdictの減点理由に含めないでください。",
+    "チケット設定と添付証跡の選択正誤は別チェックです。expectedTicketFields、および必要なevidenceFilesを選べたかどうかをdimensionsやverdictの減点理由に含めないでください。",
+    "一方、選択した添付ファイルごとのevidenceDescriptionsは起票内容の一部です。ファイル名だけでは内容を判別しにくい証跡について、読み手がファイルの内容や確認箇所を把握できる説明になっているかをinvestigationReadinessだけで評価してください。未入力や『ログです』『エラーあり』のような汎用説明があれば軽微な改善として扱い、根拠のない原因断定やファイル内容と矛盾する説明は明確に指摘してください。",
+    "evidenceDescriptionsが全件具体的で、対象処理・時刻・確認箇所などを簡潔に把握できる場合は、添付説明を理由にinvestigationReadinessを減点しないでください。説明が未入力でも送信自体は可能であり、添付説明だけを理由に主要情報不足や再整理を推奨してはいけません。",
     "readerQuestionsは確定した不足がなければ0件で構いません。最大4件とし、件数を満たすための質問を作らないでください。",
     "readerQuestionsはチケット本文と選択済み証跡だけを読んだ実際の担当者が、起票者へ聞き返す質問です。観測記録、提示材料、シナリオ、記載例だけにある情報を引用したり、その情報との違いを質問したりしないでください。",
     "investigationAdviceは起票の不足とは分けて1〜4件示してください。",
@@ -617,6 +637,7 @@ export function buildScoringPrompt(attempt) {
     JSON.stringify({
       answer: attempt.answer,
       selectedEvidenceIds: attempt.selectedEvidenceIds || [],
+      evidenceDescriptions: attempt.evidenceDescriptions || {},
     }),
   ].join("\n");
 }
@@ -740,7 +761,10 @@ function createAttemptEvidenceChecker(attempt) {
   if (!attempt) {
     return () => true;
   }
-  const answerText = normalizedQuoteText(JSON.stringify(attempt.answer || {}));
+  const answerText = normalizedQuoteText(JSON.stringify({
+    answer: attempt.answer || {},
+    evidenceDescriptions: attempt.evidenceDescriptions || {},
+  }));
   const selectedEvidenceIds = new Set(attempt.selectedEvidenceIds || []);
   return (quote) => {
     const normalizedQuote = normalizedQuoteText(quote);

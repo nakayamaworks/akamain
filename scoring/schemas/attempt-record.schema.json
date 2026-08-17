@@ -16,6 +16,7 @@
     "authoringMode",
     "answer",
     "selectedEvidenceIds",
+    "evidenceDescriptions",
     "startedAt",
     "completedAt"
   ],
@@ -114,6 +115,13 @@
       "uniqueItems": true,
       "items": {
         "type": "string"
+      }
+    },
+    "evidenceDescriptions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 200
       }
     },
     "startedAt": {

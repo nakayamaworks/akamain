@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   SheetsStorageRepository,
+  attemptToRow,
+  rowToAttempt,
   rowToScoringResult,
   scoringResultToRow,
 } from "../src/sheets-storage-repository.js";
@@ -143,4 +145,29 @@ test("Sheets scoring results preserve dimension feedback and improvement items",
 
   assert.deepEqual(restored.dimensionFeedback, scoringResult.dimensionFeedback);
   assert.deepEqual(restored.improvementItems, scoringResult.improvementItems);
+});
+
+test("Sheets attempts preserve optional attachment descriptions", () => {
+  const attempt = {
+    schemaVersion: "attempt.v3",
+    attemptId: "11111111-1111-4111-8111-111111111111",
+    userId: "user-1",
+    scenarioId: "scenario-one",
+    projectId: "customer",
+    authoringMode: "practice",
+    answer: { subject: "題名", sections: {}, ticketFields: {} },
+    selectedEvidenceIds: ["api-log"],
+    evidenceDescriptions: { "api-log": "14:32付近の顧客登録APIログ" },
+    startedAt: "2026-08-17T00:00:00.000Z",
+    completedAt: "2026-08-17T00:01:00.000Z",
+    ticketNumber: 40001,
+    ticketId: "11111111-1111-4111-8111-111111111111",
+    revisionNumber: 1,
+    parentAttemptId: null,
+  };
+
+  assert.deepEqual(
+    rowToAttempt(attemptToRow(attempt)).evidenceDescriptions,
+    attempt.evidenceDescriptions
+  );
 });

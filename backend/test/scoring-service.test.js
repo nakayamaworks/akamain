@@ -291,6 +291,34 @@ test("all registered scenarios can be stored and reviewed", async () => {
   );
 });
 
+test("attachment descriptions are normalized and included in the existing AI review prompt", () => {
+  const rubric = getScenarioRubric(pilotScenarioId);
+  const selectedEvidenceIds = rubric.evidenceFiles
+    .filter(({ required }) => required)
+    .map(({ id }) => id);
+  const firstEvidenceId = selectedEvidenceIds[0];
+  const normalized = validateAttemptInput({
+    scenarioId: pilotScenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      subject: "保存操作で顧客が重複登録される",
+      sections: { detail: "保存時の挙動を確認した。" },
+    },
+    selectedEvidenceIds: [...selectedEvidenceIds, selectedEvidenceIds[0]],
+    evidenceDescriptions: {
+      [firstEvidenceId]: "  14:32付近の顧客登録APIログ  ",
+      ignoredEvidence: "選択していないため保存対象外",
+    },
+  });
+  assert.deepEqual(normalized.selectedEvidenceIds, selectedEvidenceIds);
+  assert.equal(normalized.evidenceDescriptions[firstEvidenceId], "14:32付近の顧客登録APIログ");
+  assert.equal("ignoredEvidence" in normalized.evidenceDescriptions, false);
+  const prompt = buildScoringPrompt(normalized);
+  assert.match(prompt, /evidenceDescriptionsは起票内容の一部/);
+  assert.match(prompt, /investigationReadinessだけで評価/);
+  assert.match(prompt, /14:32付近の顧客登録APIログ/);
+});
+
 test("all registered rubrics produce scenario-specific structured-output schemas", () => {
   SUPPORTED_SCENARIO_IDS.forEach((scenarioId) => {
     const rubric = getScenarioRubric(scenarioId);

@@ -43,6 +43,7 @@ const TAB_COLUMNS = {
     "ticket_id",
     "revision_number",
     "parent_attempt_id",
+    "evidence_descriptions_json",
   ],
   ScoringResults: [
     "schema_version",
@@ -135,7 +136,7 @@ function rowToUser(row) {
   };
 }
 
-function attemptToRow(attempt) {
+export function attemptToRow(attempt) {
   return [
     attempt.schemaVersion,
     attempt.attemptId,
@@ -151,10 +152,11 @@ function attemptToRow(attempt) {
     attempt.ticketId,
     attempt.revisionNumber,
     attempt.parentAttemptId || "",
+    json(attempt.evidenceDescriptions || {}),
   ];
 }
 
-function rowToAttempt(row) {
+export function rowToAttempt(row) {
   return {
     schemaVersion: row[0],
     attemptId: row[1],
@@ -170,6 +172,7 @@ function rowToAttempt(row) {
     ticketId: nullable(row[11]) || row[1],
     revisionNumber: nullableNumber(row[12]) || 1,
     parentAttemptId: nullable(row[13]),
+    evidenceDescriptions: parseJson(row[14], {}),
   };
 }
 

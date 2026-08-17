@@ -1192,6 +1192,7 @@ function beginTicketRevision(ticket) {
     ])
   );
   state.selectedEvidenceIds = [...(ticket.selectedEvidenceIds || [])];
+  state.evidenceDescriptions = { ...(ticket.evidenceDescriptions || {}) };
   applyTicketDefaults();
   applyTicketFieldValues(ticket.answer?.ticketFields || {});
   renderEvidenceAttachment();
@@ -1531,6 +1532,17 @@ function normalizePracticeDraft(rawDraft) {
     selectedEvidenceIds: Array.isArray(rawDraft.selectedEvidenceIds)
       ? rawDraft.selectedEvidenceIds.filter((fileId) => typeof fileId === "string")
       : [],
+    evidenceDescriptions: rawDraft.evidenceDescriptions
+      && typeof rawDraft.evidenceDescriptions === "object"
+      && !Array.isArray(rawDraft.evidenceDescriptions)
+      ? Object.fromEntries(
+          Object.entries(rawDraft.evidenceDescriptions)
+            .filter(([fileId, description]) =>
+              typeof fileId === "string" && typeof description === "string"
+            )
+            .map(([fileId, description]) => [fileId, description.slice(0, 200)])
+        )
+      : {},
   };
 }
 
@@ -1626,6 +1638,7 @@ const state = {
   setupComplete: false,
   setupStepIndex: 0,
   selectedEvidenceIds: [],
+  evidenceDescriptions: {},
   evidencePickerDraftIds: [],
   evidencePreviewId: "",
   evidencePickerFileOrder: [],
@@ -2376,6 +2389,15 @@ function renderEvidenceAttachment() {
           (file) => `
             <div class="attached-evidence-row">
               <span class="attached-evidence-name"><span aria-hidden="true">📎</span>${escapeHtml(file.name)}</span>
+              <input
+                class="attached-evidence-description"
+                type="text"
+                maxlength="200"
+                placeholder="説明（任意）"
+                aria-label="${escapeHtml(file.name)}の説明（任意）"
+                data-evidence-description="${escapeHtml(file.id)}"
+                value="${escapeHtml(state.evidenceDescriptions[file.id] || "")}"
+              />
               <span class="attached-evidence-size">${escapeHtml(file.size)}</span>
               <button type="button" class="attached-evidence-remove" data-remove-evidence="${escapeHtml(file.id)}">削除</button>
             </div>
@@ -2559,6 +2581,27 @@ function handleAttachedEvidenceClick(event) {
     (fileId) => fileId !== removeButton.dataset.removeEvidence
   );
   renderEvidenceAttachment();
+}
+
+function handleAttachedEvidenceInput(event) {
+  const descriptionInput = event.target.closest("[data-evidence-description]");
+  if (!descriptionInput || !state.awaitingCreate) {
+    return;
+  }
+  const fileId = descriptionInput.dataset.evidenceDescription;
+  if (!state.selectedEvidenceIds.includes(fileId)) {
+    return;
+  }
+  state.evidenceDescriptions[fileId] = descriptionInput.value.slice(0, 200);
+}
+
+function getSelectedEvidenceDescriptions() {
+  return Object.fromEntries(
+    state.selectedEvidenceIds.map((fileId) => [
+      fileId,
+      String(state.evidenceDescriptions[fileId] || "").slice(0, 200),
+    ])
+  );
 }
 
 function getReportSectionLines(sectionName) {
@@ -3659,6 +3702,7 @@ function resetSession() {
   setTextContent(elements.createButton, "作成");
   elements.practiceSaveRetryButton?.classList.add("hidden");
   state.selectedEvidenceIds = [];
+  state.evidenceDescriptions = {};
   state.evidencePickerDraftIds = [];
   state.evidencePreviewId = "";
   state.evidencePickerFileOrder = [];
@@ -3893,6 +3937,7 @@ function buildCurrentPracticeDraft() {
       ticketFields: getPracticeTicketFieldPayload(),
     },
     selectedEvidenceIds: [...state.selectedEvidenceIds],
+    evidenceDescriptions: getSelectedEvidenceDescriptions(),
   };
 }
 
@@ -3944,6 +3989,7 @@ function resumePracticeDraft(draft) {
   state.practiceSubject = draft.answer.subject;
   state.practiceSections = { ...draft.answer.sections };
   state.selectedEvidenceIds = draft.selectedEvidenceIds.filter((fileId) => getEvidenceFile(fileId));
+  state.evidenceDescriptions = { ...(draft.evidenceDescriptions || {}) };
   applyTicketFieldValues(draft.answer.ticketFields);
   renderEvidenceAttachment();
   activateCreateSession();
@@ -4733,6 +4779,7 @@ function getPracticeAttemptPayload() {
       ticketFields: getPracticeTicketFieldPayload(),
     },
     selectedEvidenceIds: [...state.selectedEvidenceIds],
+    evidenceDescriptions: getSelectedEvidenceDescriptions(),
     startedAt: state.sessionStartAt
       ? new Date(state.sessionStartAt).toISOString()
       : null,
@@ -5248,8 +5295,17 @@ function renderTicketDetail() {
     `)
     .join("");
   const evidence = (ticket.selectedEvidenceIds || [])
-    .map((evidenceId) => getEvidenceFile(evidenceId)?.name || evidenceId)
-    .map((name) => `<li>${escapeHtml(String(name))}</li>`)
+    .map((evidenceId) => ({
+      name: getEvidenceFile(evidenceId)?.name || evidenceId,
+      description: ticket.evidenceDescriptions?.[evidenceId] || "",
+    }))
+    .map(({ name, description }) => `
+      <li>
+        <strong>${escapeHtml(String(name))}</strong>
+        ${description
+          ? `<span>${escapeHtml(String(description))}</span>`
+          : '<span class="ticket-detail-evidence-empty">説明なし</span>'}
+      </li>`)
     .join("");
   const watcherNames = (fields.watcherIds || []).map(memberName).join("、") || "—";
   const questions = getVisibleReaderQuestions(
@@ -6070,6 +6126,7 @@ on(elements.attachEvidenceButton, "click", applyEvidenceSelection);
 on(elements.evidenceFileList, "change", handleEvidenceFileListChange);
 on(elements.evidenceFileList, "click", handleEvidenceFileListClick);
 on(elements.attachedEvidenceList, "click", handleAttachedEvidenceClick);
+on(elements.attachedEvidenceList, "input", handleAttachedEvidenceInput);
 on(elements.retryButton, "click", handleRetryButton);
 on(elements.nextScenarioButton, "click", handleNextScenarioButton);
 on(elements.sameScenarioPracticeButton, "click", handleSameScenarioPractice);
