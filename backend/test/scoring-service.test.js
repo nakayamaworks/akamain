@@ -930,6 +930,35 @@ test("confirmed tax impact scope is explicit scoring evidence, not a forbidden c
   assert.match(prompt, /商品Bだけ異なる端数処理が使われた計算過程/);
   assert.match(prompt, /入力設定は同一であり、商品マスタ差によるものではない/);
   assert.match(prompt, /内部フィールド名や証跡IDを表示せず/);
+  assert.match(prompt, /設定値の変換箇所、呼び出し元、条件分岐、画面ごとの処理経路/);
+  assert.match(prompt, /題名に書かれた発生操作や条件が操作手順に存在するか/);
+});
+
+test("attachment-description feedback uses filenames and only lowers investigation readiness", () => {
+  const scenarioId = "ec-tax-rounding-inconsistent";
+  const rubric = getScenarioRubric(scenarioId);
+  const output = completeOutputForScenario(scenarioId);
+  output.dimensions.informationCoverage = 85;
+  output.dimensions.investigationReadiness = 75;
+  output.dimensionFeedback.informationCoverage.reason = "evidenceDescriptionsが空欄です。";
+  output.improvementItems = [{
+    priority: "任意改善",
+    title: "添付ファイルの説明を追加する",
+    detail: "product-settings、price-comparison、pricing-traceの説明欄が空欄です。",
+    whyItMatters: "証跡を開く前に内容を把握しやすくするためです。",
+    relatedDimensionIds: ["informationCoverage", "investigationReadiness"],
+  }];
+  const normalized = normalizeModelOutput(output, scenarioId);
+  assert.equal(normalized.dimensions.informationCoverage, 100);
+  assert.equal(normalized.dimensions.investigationReadiness, 90);
+  assert.deepEqual(
+    normalized.improvementItems[0].relatedDimensionIds,
+    ["investigationReadiness"]
+  );
+  assert.match(normalized.improvementItems[0].detail, /product_tax_settings_103010\.csv/);
+  assert.match(normalized.improvementItems[0].detail, /product_tax_comparison_103014\.png/);
+  assert.match(normalized.improvementItems[0].detail, /pricing_calculation_103013\.log/);
+  assert.doesNotMatch(normalized.improvementItems[0].detail, /product-settings|price-comparison|pricing-trace/);
 });
 
 test("scoring results are reusable only with current rubric, prompt, and model", () => {

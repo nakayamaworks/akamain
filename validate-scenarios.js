@@ -396,7 +396,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v17"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v19"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問") ||

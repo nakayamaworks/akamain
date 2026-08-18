@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v17";
+export const PROMPT_VERSION = "practice-review.v19";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -702,6 +702,8 @@ export function buildScoringPrompt(attempt, options = {}) {
     "添付証跡は追跡用識別子や証跡確認の事実を補完できますが、題名、主要な発生条件、期待結果、実際の動作そのものの記載を代替しません。",
     "選択済み添付証跡のsummary、contentPreview、confirmedFindingは、その証跡から確認できる事実として扱ってください。シナリオ本文にない事実でも、選択済み証跡で確認できるならレビュー判断に使用できます。未選択の証跡は、受講者が確認した事実として使わないでください。",
     "investigationAdviceは画面上で『追加で確認できること』として表示します。選択済み証跡や起票本文ですでに確認済みの内容を、これから行う確認として重複提案してはいけません。確認済み事実からさらに先へ進める具体的な調査候補がある場合だけ返し、なければ空配列にしてください。",
+    "選択済み証跡から、入力設定と実際の処理モードの差、正常系と異常系の分岐、処理順序など原因箇所を絞れる具体的な手がかりが得られる場合は、その確認済み事実を土台に一段先の調査候補をinvestigationAdviceへ1〜2件示してください。actionの冒頭で根拠となる確認済みの差異を簡潔に示し、証跡をもう一度開く提案ではなく、設定値の変換箇所、呼び出し元、条件分岐、画面ごとの処理経路など次に追う対象を具体化してください。",
+    "題名に書かれた発生操作や条件が操作手順に存在するかも確認してください。例えば題名では『複数選択』、手順では『複数商品を登録して一覧表示』となっている場合、同じ操作か判断できないため、実際に行った操作へ表現をそろえる任意改善として扱ってください。",
     "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用してください。記述確認または調査提案の場合はfactIdをnot-applicableにしてください。受講者へ提示されていない情報を答えさせる質問を、不足情報として生成してはいけません。",
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
@@ -767,6 +769,23 @@ function normalizedQuoteText(value) {
 function normalizePublicSectionLabel(value) {
   const label = String(value || "");
   return label === "備考" || label === "■備考" ? "周辺確認・補足" : label;
+}
+
+function publicReviewText(value, rubric) {
+  let text = String(value || "").replaceAll("evidenceDescriptions", "添付ファイルの説明");
+  (rubric?.evidenceFiles || []).forEach(({ id, name }) => {
+    if (id && name) {
+      text = text.replaceAll(id, name);
+    }
+  });
+  return text;
+}
+
+function isAttachmentDescriptionOnlyImprovement(item) {
+  const text = `${item.title || ""} ${item.detail || ""} ${item.whyItMatters || ""}`;
+  return /(?:添付ファイル|添付証跡).{0,35}(?:説明|概要|確認箇所)/u.test(text)
+    && /(?:空欄|未入力|入力|補足|追加|記載)/u.test(text)
+    && !/(?:矛盾|誤り|原因断定|事実と異なる)/u.test(text);
 }
 
 function isQaDecisionRestatement(question) {
@@ -909,10 +928,10 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       if (!feedback || typeof feedback !== "object" || Array.isArray(feedback)) {
         throw new Error(`dimensionFeedback.${dimension.id} must be an object`);
       }
-      const reason = requireNonEmptyString(
+      const reason = publicReviewText(requireNonEmptyString(
         feedback.reason,
         `dimensionFeedback.${dimension.id}.reason`
-      );
+      ), rubric);
       return [dimension.id, { reason }];
     })
   );
@@ -930,20 +949,34 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       ) {
         throw new Error(`improvementItems[${index}].relatedDimensionIds contains an invalid dimension`);
       }
-      return {
+      const normalizedItem = {
         priority: requireEnum(
           item.priority,
           ["修正推奨", "任意改善"],
           `improvementItems[${index}].priority`
         ),
-        title: requireNonEmptyString(item.title, `improvementItems[${index}].title`),
-        detail: requireNonEmptyString(item.detail, `improvementItems[${index}].detail`),
-        whyItMatters: requireNonEmptyString(
+        title: publicReviewText(
+          requireNonEmptyString(item.title, `improvementItems[${index}].title`),
+          rubric
+        ),
+        detail: publicReviewText(
+          requireNonEmptyString(item.detail, `improvementItems[${index}].detail`),
+          rubric
+        ),
+        whyItMatters: publicReviewText(requireNonEmptyString(
           item.whyItMatters,
           `improvementItems[${index}].whyItMatters`
-        ),
+        ), rubric),
         relatedDimensionIds: [...new Set(relatedDimensionIds)],
       };
+      if (
+        rubric.ticketType !== "qa"
+        && validDimensionIds.has("investigationReadiness")
+        && isAttachmentDescriptionOnlyImprovement(normalizedItem)
+      ) {
+        normalizedItem.relatedDimensionIds = ["investigationReadiness"];
+      }
+      return normalizedItem;
     })
     .filter((item) => !requestsRedundantTrackingIdentifier(item, rubric, attempt))
     .filter((item) => !requestsUnsupportedEcOrderDetails(item, scenarioId))
@@ -989,6 +1022,19 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const explainedDimensionIds = new Set(
     improvementItems.flatMap(({ relatedDimensionIds }) => relatedDimensionIds)
   );
+  const readinessImprovements = improvementItems.filter(({ relatedDimensionIds }) =>
+    relatedDimensionIds.includes("investigationReadiness")
+  );
+  if (
+    readinessImprovements.length > 0
+    && readinessImprovements.every(isAttachmentDescriptionOnlyImprovement)
+    && dimensions.investigationReadiness < 90
+  ) {
+    dimensions.investigationReadiness = 90;
+    dimensionFeedback.investigationReadiness = {
+      reason: "調査に必要な本文と証跡は揃っています。添付ファイルの説明を補足すると、証跡を開く前の確認コストをさらに下げられます。",
+    };
+  }
   rubric.dimensions.forEach(({ id }) => {
     if (dimensions[id] < 100 && !explainedDimensionIds.has(id)) {
       dimensions[id] = 100;
@@ -1016,12 +1062,16 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         factId = "not-applicable";
       }
       return {
-        reader: requireNonEmptyString(item.reader, `readerQuestions[${index}].reader`),
-        question: requireNonEmptyString(item.question, `readerQuestions[${index}].question`),
-        whyItMatters: requireNonEmptyString(
+        reader: publicReviewText(
+          requireNonEmptyString(item.reader, `readerQuestions[${index}].reader`), rubric
+        ),
+        question: publicReviewText(
+          requireNonEmptyString(item.question, `readerQuestions[${index}].question`), rubric
+        ),
+        whyItMatters: publicReviewText(requireNonEmptyString(
           item.whyItMatters,
           `readerQuestions[${index}].whyItMatters`
-        ),
+        ), rubric),
         classification,
         factId,
       };
@@ -1039,14 +1089,22 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const ambiguityRisks = requireArray(rawOutput.ambiguityRisks, "ambiguityRisks")
     .map((item, index) => ({
       quote: requireNonEmptyString(item.quote, `ambiguityRisks[${index}].quote`),
-      risk: requireNonEmptyString(item.risk, `ambiguityRisks[${index}].risk`),
-      advice: requireNonEmptyString(item.advice, `ambiguityRisks[${index}].advice`),
+      risk: publicReviewText(
+        requireNonEmptyString(item.risk, `ambiguityRisks[${index}].risk`), rubric
+      ),
+      advice: publicReviewText(
+        requireNonEmptyString(item.advice, `ambiguityRisks[${index}].advice`), rubric
+      ),
     }))
     .filter((item) => isGroundedQuote(item.quote));
   const investigationAdvice = requireArray(rawOutput.investigationAdvice, "investigationAdvice")
     .map((item, index) => ({
-      action: requireNonEmptyString(item.action, `investigationAdvice[${index}].action`),
-      purpose: requireNonEmptyString(item.purpose, `investigationAdvice[${index}].purpose`),
+      action: publicReviewText(
+        requireNonEmptyString(item.action, `investigationAdvice[${index}].action`), rubric
+      ),
+      purpose: publicReviewText(
+        requireNonEmptyString(item.purpose, `investigationAdvice[${index}].purpose`), rubric
+      ),
     }));
   const rewriteSuggestions = requireArray(rawOutput.rewriteSuggestions, "rewriteSuggestions")
     .map((item, index) => ({
@@ -1055,8 +1113,12 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       ),
       original: optionalString(item.original, `rewriteSuggestions[${index}].original`)
         || "（未記載）",
-      suggested: requireNonEmptyString(item.suggested, `rewriteSuggestions[${index}].suggested`),
-      reason: requireNonEmptyString(item.reason, `rewriteSuggestions[${index}].reason`),
+      suggested: publicReviewText(
+        requireNonEmptyString(item.suggested, `rewriteSuggestions[${index}].suggested`), rubric
+      ),
+      reason: publicReviewText(
+        requireNonEmptyString(item.reason, `rewriteSuggestions[${index}].reason`), rubric
+      ),
     }))
     .filter((item) => item.original === "（未記載）" || isGroundedQuote(item.original))
     .filter((item) => !isEcReproducibilityCorrection(item, scenarioId))
@@ -1104,7 +1166,9 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   }
   const overallAssessment = ecReproducibilityMismatch
     ? "主要な事象、仕様に基づく期待結果、実際の動作は整理されており、調査を開始できる状態です。再現性の『2/15』のみ、確認済みの『15回中1回発生』へ訂正してください。"
-    : requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment");
+    : publicReviewText(
+        requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment"), rubric
+      );
   let strengths = requireArray(rawOutput.strengths, "strengths").map((item, index) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) {
       throw new Error(`strengths[${index}] must be an object`);
@@ -1113,14 +1177,14 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       item.evidenceQuote,
       `strengths[${index}].evidenceQuote`
     );
-    const evaluation = requireNonEmptyString(
+    const evaluation = publicReviewText(requireNonEmptyString(
       item.evaluation,
       `strengths[${index}].evaluation`
-    );
-    const whyItHelps = requireNonEmptyString(
+    ), rubric);
+    const whyItHelps = publicReviewText(requireNonEmptyString(
       item.whyItHelps,
       `strengths[${index}].whyItHelps`
-    );
+    ), rubric);
     return { evidenceQuote, evaluation, whyItHelps };
   }).filter((item) =>
     isGroundedQuote(item.evidenceQuote)
