@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v27";
+export const PROMPT_VERSION = "practice-review.v28";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS = Object.freeze({
@@ -468,6 +468,17 @@ export function buildWorkflowConsistencyOutputSchema(rubric) {
   };
 }
 
+function answerSectionText(attempt, names) {
+  const sections = attempt?.answer?.sections || {};
+  for (const name of names) {
+    const value = sections[name];
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+  }
+  return "";
+}
+
 export function buildWorkflowConsistencyPrompt(attempt) {
   const rubric = getScenarioRubric(attempt?.scenarioId);
   if (!rubric) {
@@ -481,10 +492,10 @@ export function buildWorkflowConsistencyPrompt(attempt) {
     JSON.stringify(rubric.requiredFacts?.steps || []),
     "",
     "受講者の操作手順:",
-    String(attempt?.answer?.sections?.steps || ""),
+    answerSectionText(attempt, ["steps", "操作手順", "■操作手順"]),
     "",
     "受講者の実際の動作:",
-    String(attempt?.answer?.sections?.actual || ""),
+    answerSectionText(attempt, ["actual", "実際の動作", "■実際の動作"]),
     "",
     "観測記録と受講者手順の主要操作、遷移後の最終状態、結果を観測した場所または対象を比較してください。",
     "観測記録と操作手順がそれぞれ観測先を明示し、その意味が異なる場合はinconsistentです。明記されていない遷移を推測で補完しないでください。",
@@ -1023,7 +1034,10 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       const rawAnswerQuote = typeof workflow.answerQuote === "string"
         ? workflow.answerQuote.trim().slice(0, 500)
         : "";
-      const fullSteps = String(attempt?.answer?.sections?.steps || "").trim().slice(0, 500);
+      const fullSteps = answerSectionText(
+        attempt,
+        ["steps", "操作手順", "■操作手順"]
+      ).trim().slice(0, 500);
       const answerQuote = rawAnswerQuote && isGroundedQuote(rawAnswerQuote)
         ? rawAnswerQuote
         : fullSteps;
@@ -1054,7 +1068,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         && Boolean(workflowFact);
       const isConsistent = status === "consistent";
       workflowConsistency = {
-        status: canApplyMismatch ? "inconsistent" : status,
+        status: canApplyMismatch ? "inconsistent" : isConsistent ? "consistent" : "not-applicable",
         factId: canApplyMismatch || isConsistent ? requestedFactId : "not-applicable",
         sourceObservation: canApplyMismatch
           ? groundedSourceObservation || rawSourceObservation
@@ -1179,10 +1193,15 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     };
   }
   if (workflowConsistency.status === "inconsistent") {
-    const hasWorkflowImprovement = improvementItems.some(({ relatedDimensionIds }) =>
+    const workflowImprovementIndex = improvementItems.findIndex(({ relatedDimensionIds }) =>
       relatedDimensionIds.includes("reproducibility")
     );
-    if (!hasWorkflowImprovement) {
+    if (workflowImprovementIndex >= 0) {
+      improvementItems[workflowImprovementIndex] = {
+        ...improvementItems[workflowImprovementIndex],
+        priority: "修正推奨",
+      };
+    } else {
       improvementItems.unshift({
         priority: "修正推奨",
         title: "操作手順の確認先を修正する",

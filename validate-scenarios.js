@@ -397,7 +397,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v27"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v28"') ||
   !backendScoringSource.includes("systemInstruction:") ||
   !backendScoringSource.includes("buildScoringSystemInstruction(attempt)") ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||

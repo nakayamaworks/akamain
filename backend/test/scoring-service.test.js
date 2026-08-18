@@ -213,8 +213,8 @@ test("workflow consistency uses a separate focused structured assessment", () =>
     scenarioId: pilotScenarioId,
     answer: {
       sections: {
-        steps: "3. 顧客登録画面を表示する",
-        actual: "異なるIDの顧客データが3件登録される",
+        操作手順: "3. 顧客登録画面を表示する",
+        実際の動作: "異なるIDの顧客データが3件登録される",
       },
     },
   });
@@ -274,7 +274,7 @@ test("workflow mismatch quotes are repaired from the saved steps and review sour
       suggestedCorrection: "登録後の顧客一覧で重複した3件を確認する",
     },
   }, pilotScenarioId, {
-    answer: { subject: "重複登録", sections: { steps } },
+    answer: { subject: "重複登録", sections: { 操作手順: steps } },
     selectedEvidenceIds: [],
     evidenceDescriptions: {},
   });
@@ -283,6 +283,39 @@ test("workflow mismatch quotes are repaired from the saved steps and review sour
   assert.equal(
     normalized.factAssessments.find(({ factId }) => factId === "steps-reproducible").status,
     "contradicted"
+  );
+  assert.equal(
+    normalized.improvementItems.find(({ relatedDimensionIds }) =>
+      relatedDimensionIds.includes("reproducibility")
+    ).priority,
+    "修正推奨"
+  );
+});
+
+test("an unusable inconsistent audit is ignored instead of rendering blank feedback", () => {
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    workflowConsistency: {
+      status: "inconsistent",
+      factId: "steps-reproducible",
+      sourceObservation: "",
+      answerQuote: "",
+      reason: "",
+      suggestedCorrection: "",
+    },
+  }, pilotScenarioId, {
+    answer: { subject: "重複登録", sections: { 詳細: "保存すると重複する" } },
+    selectedEvidenceIds: [],
+    evidenceDescriptions: {},
+  });
+  assert.equal(normalized.workflowConsistency.status, "not-applicable");
+  assert.equal(
+    normalized.improvementItems.some(({ detail }) => /「」を、へ/u.test(detail)),
+    false
+  );
+  assert.equal(
+    normalized.rewriteSuggestions.some(({ original, suggested }) => !original && !suggested),
+    false
   );
 });
 
