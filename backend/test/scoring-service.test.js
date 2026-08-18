@@ -8,6 +8,7 @@ import {
   buildRubricFindings,
   buildModelOutputSchema,
   buildScoringPrompt,
+  buildScoringSystemInstruction,
   calculateWeightedTotal,
   createAttemptRecord,
   createFailedScoringResult,
@@ -600,7 +601,8 @@ test("QA scenarios use a question-focused rubric and never ask the model to deci
     answer: rubric.writingExample,
     selectedEvidenceIds: [],
   });
-  assert.match(prompt, /AI自身が仕様回答を決めてはいけません/);
+  const systemInstruction = buildScoringSystemInstruction({ scenarioId });
+  assert.match(systemInstruction, /AI自身が仕様回答を決めてはいけません/);
   assert.match(prompt, /不要な聞き返し/);
   assert.match(prompt, /不具合として扱ってよいか/);
   assert.match(prompt, /仕様決定の丸投げとは評価しない/);
@@ -608,6 +610,7 @@ test("QA scenarios use a question-focused rubric and never ask the model to deci
   assert.match(prompt, /90〜100点はそのまま回答依頼可能/);
   assert.match(prompt, /回答依頼可能/);
   assert.doesNotMatch(prompt, /不具合票を受け取って調査を始める/);
+  assert.doesNotMatch(prompt, /AI自身が仕様回答を決めてはいけません/);
   assert.match(
     rubric.reviewSource.observations.map(({ text }) => text).join("\n"),
     /画面内の『一覧へ戻る』リンク/
@@ -867,6 +870,21 @@ test("the mobile data-loss prompt rewards scenario-specific analysis without sco
   assert.match(prompt, /記載例より有効な比較確認や切り分け/);
   assert.match(prompt, /strengthsは0〜2件/);
   assert.doesNotMatch(prompt, /"writingExample"/);
+});
+
+test("bug and QA reviews use ticket-specific system instructions", () => {
+  const bugInstruction = buildScoringSystemInstruction({
+    scenarioId: "customer-save-multiple-clicks-duplicate",
+  });
+  const qaInstruction = buildScoringSystemInstruction({
+    scenarioId: "customer-qa-search-state-after-back",
+  });
+  assert.match(bugInstruction, /シニア開発者兼QAリード/);
+  assert.match(bugInstruction, /改善点がなければ無理に指摘を生成しない/);
+  assert.doesNotMatch(bugInstruction, /仕様回答を決めてはいけません/);
+  assert.match(qaInstruction, /仕様作成者としてQA起票を受け取り/);
+  assert.match(qaInstruction, /AI自身が仕様回答を決めてはいけません/);
+  assert.doesNotMatch(qaInstruction, /不具合票を受け取って調査を始める/);
 });
 
 test("semantic rubric policy does not require trace identifiers in ticket prose", () => {
@@ -1194,6 +1212,14 @@ test("the attempt record exists before Gemini scoring starts", async () => {
     fetchImplementation: async (_url, request) => {
       const sentBody = JSON.parse(request.body);
       assert.equal(sentBody.contents[0].parts[0].text.includes("verified-google-sub"), false);
+      assert.match(
+        sentBody.systemInstruction.parts[0].text,
+        /不具合票を受け取って調査を始めるシニア開発者兼QAリード/
+      );
+      assert.doesNotMatch(
+        sentBody.contents[0].parts[0].text,
+        /不具合票を受け取って調査を始めるシニア開発者兼QAリード/
+      );
       assert.equal(Number.isInteger(sentBody.generationConfig.seed), true);
       assert.equal("temperature" in sentBody.generationConfig, false);
       return {

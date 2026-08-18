@@ -165,8 +165,24 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v19";
+export const PROMPT_VERSION = "practice-review.v20";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
+
+const BUG_SCORING_SYSTEM_INSTRUCTION = [
+  "あなたは、不具合票を受け取って調査を始めるシニア開発者兼QAリードです。",
+  "提示された観測記録、仕様、選択済み証跡に基づき、事実と推測を区別して評価してください。",
+  "回答にない事実を断定せず、確認できない原因や影響を推測で補完しないでください。",
+  "一般論や無理に作った欠点ではなく、この不具合の調査に役立つ具体的なレビューを返してください。",
+  "実務上十分な記述は正当に評価し、改善点がなければ無理に指摘を生成しないでください。",
+].join("\n");
+
+const QA_SCORING_SYSTEM_INSTRUCTION = [
+  "あなたは、開発者または仕様作成者としてQA起票を受け取り、判断するシニア担当者です。",
+  "評価対象は仕様の正解ではなく、回答者が短時間で論点を理解し、判断または訂正できる質問になっているかです。AI自身が仕様回答を決めてはいけません。",
+  "提示されたreviewSourceと受講者のQA起票に基づき、確認済みの事実、現在の解釈、未確定事項を区別して評価してください。",
+  "回答にない事実を断定せず、一般論や無理に作った欠点ではなく、このQAの回答判断に役立つ具体的なレビューを返してください。",
+  "実務上十分な記述は正当に評価し、改善点がなければ無理に指摘を生成しないでください。",
+].join("\n");
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
 const factAssessmentStatuses = ["present", "missing", "contradicted"];
@@ -637,8 +653,6 @@ export function buildScoringPrompt(attempt, options = {}) {
   };
   if (rubric.ticketType === "qa") {
     return [
-      "あなたは、開発者または仕様作成者としてQA起票を受け取り、判断するシニア担当者です。",
-      "評価対象は仕様の正解ではなく、回答者が短時間で論点を理解し、判断または訂正できる質問になっているかです。AI自身が仕様回答を決めてはいけません。",
       "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、reviewSourceと受講者のQA起票を照合してください。",
       "質問をYesまたはNoだけに制限する必要はありません。必要なら回答者が正しい条件を短く補足でき、不要な聞き返しが生じにくいことを評価してください。",
       "一つのQAに独立した複数の判断事項が混在している場合は、どの回答がどの論点に対応するか曖昧になる点を指摘してください。",
@@ -682,12 +696,10 @@ export function buildScoringPrompt(attempt, options = {}) {
     ].join("\n");
   }
   return [
-    "あなたは、不具合票を受け取って調査を始めるシニア開発者兼QAリードです。",
     "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、提示された観測記録、仕様、証跡と受講者の起票内容に照らして評価してください。",
     "記載例と異なる表現や構成でも、事実に根差し、読み手が調査を始めやすい内容なら同等以上に評価してください。記載例より有効な比較確認や切り分けが含まれる場合は積極的に評価してください。",
     "点数だけでなく、実際の読み手が疑問に思うこと、誤解される表現、有効な切り分けを具体的に助言してください。",
-    "回答にない事実を断定してはいけません。確認できない原因や影響を推測で補完しないでください。",
-    "一般論だけの助言は禁止です。受講者の記述を引用し、この不具合に即して説明してください。",
+    "受講者の記述を引用し、この不具合に即して説明してください。",
     "確定した不足と、調査を進めるための追加提案を混同しないでください。",
     "reviewSourceが評価の事実源です。requiredFactsはreviewSourceのどの意味を読み手へ伝える必要があるかを示すもので、特定の文面や記載欄を指定する正解ではありません。語句、文順、セクション配置の一致を要求しないでください。",
     "reviewSource.learnerVisibleContextは問題画面で受講者にも提示された周辺情報です。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱ってください。受講者の記述がこれらと意味的に一致する場合、未確認の範囲・影響・回避策として指摘せず、forbiddenClaimIdsにも入れないでください。",
@@ -744,6 +756,18 @@ export function buildScoringPrompt(attempt, options = {}) {
     JSON.stringify(selectedEvidenceContext),
     ...buildRevisionPromptParts(options),
   ].join("\n");
+}
+
+export function buildScoringSystemInstruction(attempt) {
+  const rubric = getScenarioRubric(attempt?.scenarioId);
+  if (!rubric) {
+    const error = new Error("このシナリオはAI採点の対象外です。");
+    error.code = "SCENARIO_NOT_SUPPORTED";
+    throw error;
+  }
+  return rubric.ticketType === "qa"
+    ? QA_SCORING_SYSTEM_INSTRUCTION
+    : BUG_SCORING_SYSTEM_INSTRUCTION;
 }
 
 function removeTerminalPunctuation(value) {
@@ -1608,6 +1632,9 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
       "x-goog-api-key": apiKey,
     },
     body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: buildScoringSystemInstruction(attempt) }],
+      },
       contents: [{ role: "user", parts: [{ text: buildScoringPrompt(attempt, options) }] }],
       generationConfig: {
         responseMimeType: "application/json",

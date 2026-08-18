@@ -10,7 +10,8 @@ const argv = process.argv.slice(2);
 const answerFileIndex = argv.indexOf("--answer-json");
 const answerFile = answerFileIndex >= 0 ? argv[answerFileIndex + 1] : "";
 const scenarioIds = argv.filter((value, index) =>
-  value !== "--answer-json" && index !== answerFileIndex + 1
+  value !== "--answer-json"
+  && !(answerFileIndex >= 0 && index === answerFileIndex + 1)
 );
 const answerOverride = answerFile
   ? JSON.parse(fs.readFileSync(answerFile, "utf8"))
