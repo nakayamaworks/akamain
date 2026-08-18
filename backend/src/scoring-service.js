@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v26";
+export const PROMPT_VERSION = "practice-review.v27";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS = Object.freeze({
@@ -1011,48 +1011,65 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   };
   if (rubric.ticketType !== "qa") {
     const workflow = rawOutput.workflowConsistency;
-    if (!workflow || typeof workflow !== "object" || Array.isArray(workflow)) {
-      throw new Error("workflowConsistency must be an object");
-    }
-    const status = requireEnum(
-      workflow.status,
-      ["consistent", "inconsistent", "not-applicable"],
-      "workflowConsistency.status"
-    );
-    const factId = requireEnum(
-      workflow.factId,
-      ["not-applicable", ...workflowFactIds],
-      "workflowConsistency.factId"
-    );
-    workflowConsistency = {
-      status,
-      factId,
-      sourceObservation: optionalString(
-        workflow.sourceObservation,
-        "workflowConsistency.sourceObservation"
-      ),
-      answerQuote: optionalString(workflow.answerQuote, "workflowConsistency.answerQuote"),
-      reason: publicReviewText(
-        optionalString(workflow.reason, "workflowConsistency.reason"),
-        rubric
-      ),
-      suggestedCorrection: publicReviewText(
-        optionalString(workflow.suggestedCorrection, "workflowConsistency.suggestedCorrection"),
-        rubric
-      ),
-    };
-    if (
-      status === "inconsistent"
-      && (
-        factId === "not-applicable"
-        || !workflowConsistency.sourceObservation
-        || !workflowConsistency.answerQuote
-        || !workflowConsistency.reason
-        || !workflowConsistency.suggestedCorrection
-        || !isGroundedQuote(workflowConsistency.answerQuote)
-      )
-    ) {
-      throw new Error("inconsistent workflowConsistency must identify a grounded mismatch");
+    if (workflow && typeof workflow === "object" && !Array.isArray(workflow)) {
+      const allowedStatuses = ["consistent", "inconsistent", "not-applicable"];
+      const status = allowedStatuses.includes(workflow.status)
+        ? workflow.status
+        : "not-applicable";
+      const firstWorkflowFactId = [...workflowFactIds][0] || "not-applicable";
+      const requestedFactId = workflowFactIds.has(workflow.factId)
+        ? workflow.factId
+        : firstWorkflowFactId;
+      const rawAnswerQuote = typeof workflow.answerQuote === "string"
+        ? workflow.answerQuote.trim().slice(0, 500)
+        : "";
+      const fullSteps = String(attempt?.answer?.sections?.steps || "").trim().slice(0, 500);
+      const answerQuote = rawAnswerQuote && isGroundedQuote(rawAnswerQuote)
+        ? rawAnswerQuote
+        : fullSteps;
+      const workflowFact = (rubric.requiredFacts?.steps || [])
+        .find(({ id }) => id === requestedFactId);
+      const observationById = new Map(
+        (rubric.reviewSource?.observations || []).map((observation) => [
+          observation.id,
+          observation.text,
+        ])
+      );
+      const groundedSourceObservation = (workflowFact?.sourceRefs || [])
+        .map((sourceRef) => observationById.get(sourceRef))
+        .filter(Boolean)
+        .join(" ");
+      const rawReason = typeof workflow.reason === "string"
+        ? workflow.reason.trim().slice(0, 500)
+        : "";
+      const rawCorrection = typeof workflow.suggestedCorrection === "string"
+        ? workflow.suggestedCorrection.trim().slice(0, 500)
+        : "";
+      const rawSourceObservation = typeof workflow.sourceObservation === "string"
+        ? workflow.sourceObservation.trim().slice(0, 500)
+        : "";
+      const canApplyMismatch = status === "inconsistent"
+        && requestedFactId !== "not-applicable"
+        && Boolean(answerQuote)
+        && Boolean(workflowFact);
+      const isConsistent = status === "consistent";
+      workflowConsistency = {
+        status: canApplyMismatch ? "inconsistent" : status,
+        factId: canApplyMismatch || isConsistent ? requestedFactId : "not-applicable",
+        sourceObservation: canApplyMismatch
+          ? groundedSourceObservation || rawSourceObservation
+          : isConsistent ? rawSourceObservation : "",
+        answerQuote: canApplyMismatch ? answerQuote : isConsistent ? rawAnswerQuote : "",
+        reason: canApplyMismatch
+          ? publicReviewText(
+              rawReason || "操作手順の最終状態では、観測記録にある結果を同じ場所・対象で確認できないためです。",
+              rubric
+            )
+          : isConsistent ? publicReviewText(rawReason, rubric) : "",
+        suggestedCorrection: canApplyMismatch
+          ? publicReviewText(rawCorrection || workflowFact.description, rubric)
+          : isConsistent ? publicReviewText(rawCorrection, rubric) : "",
+      };
     }
   }
   const ecReproducibilityMismatch = scenarioId === "ec-payment-notification-double-order"
@@ -1977,12 +1994,29 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     error.code = "INVALID_MODEL_OUTPUT";
     throw error;
   }
-  modelOutput.workflowConsistency = options.workflowConsistencyAssessment
-    || await requestWorkflowConsistencyAssessment(attempt, {
-      apiKey,
-      modelId,
-      fetchImplementation,
-    });
+  if (options.workflowConsistencyAssessment) {
+    modelOutput.workflowConsistency = options.workflowConsistencyAssessment;
+  } else {
+    try {
+      modelOutput.workflowConsistency = await requestWorkflowConsistencyAssessment(attempt, {
+        apiKey,
+        modelId,
+        fetchImplementation,
+      });
+    } catch (error) {
+      console.warn(
+        `[workflow-consistency] ${error.code || "UNKNOWN"}: ${error.message}`
+      );
+      modelOutput.workflowConsistency = {
+        status: "not-applicable",
+        factId: "not-applicable",
+        sourceObservation: "",
+        answerQuote: "",
+        reason: "",
+        suggestedCorrection: "",
+      };
+    }
+  }
   let normalized;
   try {
     normalized = normalizeModelOutput(modelOutput, attempt.scenarioId, attempt);

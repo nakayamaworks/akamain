@@ -261,6 +261,74 @@ test("an AI-detected observation-path mismatch is enforced in reproducibility", 
   assert.equal(normalized.rewriteSuggestions[0].original, "3.顧客登録画面を表示する");
 });
 
+test("workflow mismatch quotes are repaired from the saved steps and review source", () => {
+  const steps = "1. 顧客情報を入力する\n2. 保存ボタンを3回押す\n3.顧客登録画面を表示する";
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    workflowConsistency: {
+      status: "inconsistent",
+      factId: "steps-reproducible",
+      sourceObservation: "誤って生成された引用",
+      answerQuote: "顧客登録画面を確認する",
+      reason: "確認先が観測記録と異なるためです。",
+      suggestedCorrection: "登録後の顧客一覧で重複した3件を確認する",
+    },
+  }, pilotScenarioId, {
+    answer: { subject: "重複登録", sections: { steps } },
+    selectedEvidenceIds: [],
+    evidenceDescriptions: {},
+  });
+  assert.equal(normalized.workflowConsistency.answerQuote, steps);
+  assert.match(normalized.workflowConsistency.sourceObservation, /登録後の一覧には/);
+  assert.equal(
+    normalized.factAssessments.find(({ factId }) => factId === "steps-reproducible").status,
+    "contradicted"
+  );
+});
+
+test("a failed secondary workflow audit does not discard a completed main review", async () => {
+  const rubric = getScenarioRubric(pilotScenarioId);
+  const attempt = createAttemptRecord({
+    scenarioId: pilotScenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      ...rubric.writingExample,
+      ticketFields: expectedTicketFieldsForTest(rubric),
+    },
+    selectedEvidenceIds: requiredEvidenceIds(rubric),
+    startedAt: fixedAttemptStartedAt,
+  }, { userId: "verified-google-sub" });
+  let requestCount = 0;
+  const result = await scoreAttemptRecordWithGemini(attempt, {
+    apiKey: "server-only-key",
+    fetchImplementation: async () => {
+      requestCount += 1;
+      if (requestCount === 1) {
+        return {
+          ok: true,
+          async json() {
+            return {
+              candidates: [{
+                content: { parts: [{ text: JSON.stringify(completeModelOutput) }] },
+              }],
+            };
+          },
+        };
+      }
+      return {
+        ok: false,
+        status: 503,
+        async json() {
+          return { error: { message: "workflow audit unavailable" } };
+        },
+      };
+    },
+  });
+  assert.equal(result.status, "succeeded");
+  assert.equal(result.rubricFindings.workflowConsistency.status, "not-applicable");
+  assert.equal(requestCount, 2);
+});
+
 test("overall score combines writing, ticket settings, and evidence selection", () => {
   const perfect = calculateScoreBreakdown({
     ticketFieldChecks: Array.from({ length: 8 }, (_, index) => ({

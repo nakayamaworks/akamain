@@ -226,7 +226,8 @@ function errorStatus(code) {
 function sendError(response, error, origin, context = "api") {
   const code = error.code || "INTERNAL_ERROR";
   const statusCode = errorStatus(code);
-  console.error(`[${context}] ${code}: ${error.message}`);
+  const causeMessage = error.cause?.message ? ` (${error.cause.message})` : "";
+  console.error(`[${context}] ${code}: ${error.message}${causeMessage}`);
   const storageFailure = code.startsWith("STORAGE_");
   sendJson(response, statusCode, {
     error: {
