@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v21";
+export const PROMPT_VERSION = "practice-review.v26";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS = Object.freeze({
@@ -179,7 +179,14 @@ const BUG_SCORING_SYSTEM_INSTRUCTION = [
   "提示された観測記録、仕様、選択済み証跡に基づき、事実と推測を区別して評価してください。",
   "回答にない事実を断定せず、確認できない原因や影響を推測で補完しないでください。",
   "一般論や無理に作った欠点ではなく、この不具合の調査に役立つ具体的なレビューを返してください。",
+  "操作手順は、操作を実行できることだけでなく、記載された実際の動作を観測できる状態まで到達するか検証してください。",
   "実務上十分な記述は正当に評価し、改善点がなければ無理に指摘を生成しないでください。",
+].join("\n");
+
+const WORKFLOW_CONSISTENCY_SYSTEM_INSTRUCTION = [
+  "あなたは不具合票の再現経路だけを監査するQAリードです。",
+  "文章品質、チケット設定、証跡の十分さは評価せず、操作手順どおり進んだとき、観測記録にある結果を同じ場所・状態・対象で確認できるかだけを厳密に判定してください。",
+  "明記されていない画面遷移や確認操作を推測で補ってはいけません。",
 ].join("\n");
 
 const QA_SCORING_SYSTEM_INSTRUCTION = [
@@ -436,6 +443,54 @@ export function buildModelOutputSchema(rubric) {
     },
   },
   };
+}
+
+export function buildWorkflowConsistencyOutputSchema(rubric) {
+  const workflowFactIds = (rubric.requiredFacts?.steps || []).map(({ id }) => id);
+  return {
+    type: "object",
+    required: [
+      "status",
+      "factId",
+      "sourceObservation",
+      "answerQuote",
+      "reason",
+      "suggestedCorrection",
+    ],
+    properties: {
+      status: { type: "string", enum: ["consistent", "inconsistent", "not-applicable"] },
+      factId: { type: "string", enum: ["not-applicable", ...workflowFactIds] },
+      sourceObservation: { type: "string" },
+      answerQuote: { type: "string" },
+      reason: { type: "string" },
+      suggestedCorrection: { type: "string" },
+    },
+  };
+}
+
+export function buildWorkflowConsistencyPrompt(attempt) {
+  const rubric = getScenarioRubric(attempt?.scenarioId);
+  if (!rubric) {
+    throw new Error("scenario rubric was not found");
+  }
+  return [
+    "観測記録:",
+    JSON.stringify(rubric.reviewSource?.observations || []),
+    "",
+    "再現手順に必要な意味:",
+    JSON.stringify(rubric.requiredFacts?.steps || []),
+    "",
+    "受講者の操作手順:",
+    String(attempt?.answer?.sections?.steps || ""),
+    "",
+    "受講者の実際の動作:",
+    String(attempt?.answer?.sections?.actual || ""),
+    "",
+    "観測記録と受講者手順の主要操作、遷移後の最終状態、結果を観測した場所または対象を比較してください。",
+    "観測記録と操作手順がそれぞれ観測先を明示し、その意味が異なる場合はinconsistentです。明記されていない遷移を推測で補完しないでください。",
+    "呼称が違っても同じ画面・状態を意味することが明らかな場合はconsistentです。",
+    "inconsistentの場合、factIdには該当する操作手順のrequiredFact、answerQuoteには受講者の不一致部分を原文のまま、suggestedCorrectionには観測記録に基づく確認操作を返してください。",
+  ].join("\n");
 }
 
 function requireNonEmptyString(value, fieldName) {
@@ -722,7 +777,7 @@ export function buildScoringPrompt(attempt, options = {}) {
     "investigationAdviceは画面上で『追加で確認できること』として表示します。選択済み証跡や起票本文ですでに確認済みの内容を、これから行う確認として重複提案してはいけません。確認済み事実からさらに先へ進める具体的な調査候補がある場合だけ返し、なければ空配列にしてください。",
     "選択済み証跡から、入力設定と実際の処理モードの差、正常系と異常系の分岐、処理順序など原因箇所を絞れる具体的な手がかりが得られる場合は、その確認済み事実を土台に一段先の調査候補をinvestigationAdviceへ1〜2件示してください。actionの冒頭で根拠となる確認済みの差異を簡潔に示し、証跡をもう一度開く提案ではなく、設定値の変換箇所、呼び出し元、条件分岐、画面ごとの処理経路など次に追う対象を具体化してください。",
     "題名に書かれた発生操作や条件が操作手順に存在するかも確認してください。例えば題名では『複数選択』、手順では『複数商品を登録して一覧表示』となっている場合、同じ操作か判断できないため、実際に行った操作へ表現をそろえる任意改善として扱ってください。",
-    "操作手順に記載した画面遷移と、実際の動作を確認した画面が整合するか確認してください。例えば登録件数を一覧で確認した観測記録に対し、手順が『登録画面を表示する』となっている場合は、再現確認先を誤るため具体的な修正対象として指摘してください。",
+    "操作手順の整合性は、(1) reviewSourceから主要操作・遷移後の状態・結果を観測した場所または対象を抽出し、(2) 受講者の操作手順から同じ3要素を抽出し、(3) 再現担当者が手順どおり進めて実際の動作を観測できるか、の順で必ず検証してください。操作自体が実行できても、手順の最終状態や確認先では記載された結果を観測できない場合、または観測に必要な遷移・確認操作が欠ける場合は、該当する再現手順のrequiredFactをpresentにせずcontradictedまたはmissingと判定し、reproducibilityの具体的な修正対象として指摘してください。reviewSourceと操作手順がそれぞれ観測先を明示し、その意味が異なる場合はcontradictedとし、reproducibilityは75点以下、improvementItemsは『修正推奨』にしてください。これは任意の表現改善として扱いません。ただし、呼称が違っても同じ画面・状態を意味することが明らかな場合は一致とみなしてください。選択済み証跡や実際の動作欄が結果を裏付けていても、それらで操作手順の不整合を補完してはいけません。固有名詞や定型文の一致ではなく、意味と観測可能性で判断してください。",
     "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用してください。記述確認または調査提案の場合はfactIdをnot-applicableにしてください。受講者へ提示されていない情報を答えさせる質問を、不足情報として生成してはいけません。",
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
@@ -943,6 +998,63 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const factIdValues = ["not-applicable", ...validFactIds];
   const isGroundedQuote = createAttemptEvidenceChecker(attempt);
   const attemptAnswerText = JSON.stringify(attempt?.answer || {});
+  const workflowFactIds = new Set(
+    (rubric.requiredFacts?.steps || []).map(({ id }) => id)
+  );
+  let workflowConsistency = {
+    status: "not-applicable",
+    factId: "not-applicable",
+    sourceObservation: "",
+    answerQuote: "",
+    reason: "",
+    suggestedCorrection: "",
+  };
+  if (rubric.ticketType !== "qa") {
+    const workflow = rawOutput.workflowConsistency;
+    if (!workflow || typeof workflow !== "object" || Array.isArray(workflow)) {
+      throw new Error("workflowConsistency must be an object");
+    }
+    const status = requireEnum(
+      workflow.status,
+      ["consistent", "inconsistent", "not-applicable"],
+      "workflowConsistency.status"
+    );
+    const factId = requireEnum(
+      workflow.factId,
+      ["not-applicable", ...workflowFactIds],
+      "workflowConsistency.factId"
+    );
+    workflowConsistency = {
+      status,
+      factId,
+      sourceObservation: optionalString(
+        workflow.sourceObservation,
+        "workflowConsistency.sourceObservation"
+      ),
+      answerQuote: optionalString(workflow.answerQuote, "workflowConsistency.answerQuote"),
+      reason: publicReviewText(
+        optionalString(workflow.reason, "workflowConsistency.reason"),
+        rubric
+      ),
+      suggestedCorrection: publicReviewText(
+        optionalString(workflow.suggestedCorrection, "workflowConsistency.suggestedCorrection"),
+        rubric
+      ),
+    };
+    if (
+      status === "inconsistent"
+      && (
+        factId === "not-applicable"
+        || !workflowConsistency.sourceObservation
+        || !workflowConsistency.answerQuote
+        || !workflowConsistency.reason
+        || !workflowConsistency.suggestedCorrection
+        || !isGroundedQuote(workflowConsistency.answerQuote)
+      )
+    ) {
+      throw new Error("inconsistent workflowConsistency must identify a grounded mismatch");
+    }
+  }
   const ecReproducibilityMismatch = scenarioId === "ec-payment-notification-double-order"
     && /2\s*\/\s*15/u.test(attemptAnswerText);
   const ecSurroundingComparisonMissing = scenarioId === "ec-payment-notification-double-order"
@@ -1049,6 +1161,24 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       reason: "調査は開始できます。注文以外への波及有無を追記すると、初動の切り分けがより速くなります。",
     };
   }
+  if (workflowConsistency.status === "inconsistent") {
+    const hasWorkflowImprovement = improvementItems.some(({ relatedDimensionIds }) =>
+      relatedDimensionIds.includes("reproducibility")
+    );
+    if (!hasWorkflowImprovement) {
+      improvementItems.unshift({
+        priority: "修正推奨",
+        title: "操作手順の確認先を修正する",
+        detail: `操作手順の「${workflowConsistency.answerQuote}」を、${workflowConsistency.suggestedCorrection}へ修正してください。`,
+        whyItMatters: workflowConsistency.reason,
+        relatedDimensionIds: ["reproducibility"],
+      });
+    }
+    dimensions.reproducibility = Math.min(dimensions.reproducibility, 75);
+    dimensionFeedback.reproducibility = {
+      reason: `操作手順の「${workflowConsistency.answerQuote}」は、観測記録上の確認経路と一致せず、その手順だけでは結果を確認できません。`,
+    };
+  }
   improvementItems = improvementItems.slice(0, 4);
   const explainedDimensionIds = new Set(
     improvementItems.flatMap(({ relatedDimensionIds }) => relatedDimensionIds)
@@ -1137,7 +1267,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
         requireNonEmptyString(item.purpose, `investigationAdvice[${index}].purpose`), rubric
       ),
     }));
-  const rewriteSuggestions = requireArray(rawOutput.rewriteSuggestions, "rewriteSuggestions")
+  let rewriteSuggestions = requireArray(rawOutput.rewriteSuggestions, "rewriteSuggestions")
     .map((item, index) => ({
       section: normalizePublicSectionLabel(
         requireNonEmptyString(item.section, `rewriteSuggestions[${index}].section`)
@@ -1154,6 +1284,17 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     .filter((item) => item.original === "（未記載）" || isGroundedQuote(item.original))
     .filter((item) => !isEcReproducibilityCorrection(item, scenarioId))
     .filter((item) => !rewritesAcceptedEcDescription(item, scenarioId));
+  if (
+    workflowConsistency.status === "inconsistent"
+    && !rewriteSuggestions.some(({ original }) => original === workflowConsistency.answerQuote)
+  ) {
+    rewriteSuggestions.unshift({
+      section: "操作手順",
+      original: workflowConsistency.answerQuote,
+      suggested: workflowConsistency.suggestedCorrection,
+      reason: workflowConsistency.reason,
+    });
+  }
   const factAssessments = requireArray(rawOutput.factAssessments, "factAssessments")
     .map((item, index) => {
       const factId = requireEnum(item.factId, [...validFactIds], `factAssessments[${index}].factId`);
@@ -1165,7 +1306,16 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
       if (ecReproducibilityMismatch && factId === "reproducibility-observed") {
         status = "contradicted";
       }
-      const evidenceQuote = ecReproducibilityMismatch && factId === "reproducibility-observed"
+      if (
+        workflowConsistency.status === "inconsistent"
+        && factId === workflowConsistency.factId
+      ) {
+        status = "contradicted";
+      }
+      const evidenceQuote = workflowConsistency.status === "inconsistent"
+        && factId === workflowConsistency.factId
+        ? workflowConsistency.answerQuote
+        : ecReproducibilityMismatch && factId === "reproducibility-observed"
         ? "2/15"
         : status === "missing"
           ? ""
@@ -1195,7 +1345,9 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   if (new Set(forbiddenClaimIds).size !== forbiddenClaimIds.length) {
     throw new Error("forbiddenClaimIds must not contain duplicates");
   }
-  const overallAssessment = ecReproducibilityMismatch
+  const overallAssessment = workflowConsistency.status === "inconsistent"
+    ? `主要な事象と期待結果は整理されていますが、操作手順の確認経路に不一致があります。${workflowConsistency.suggestedCorrection}へ修正してください。`
+    : ecReproducibilityMismatch
     ? "主要な事象、仕様に基づく期待結果、実際の動作は整理されており、調査を開始できる状態です。再現性の『2/15』のみ、確認済みの『15回中1回発生』へ訂正してください。"
     : publicReviewText(
         requireNonEmptyString(rawOutput.overallAssessment, "overallAssessment"), rubric
@@ -1246,6 +1398,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     strengths: strengths.slice(0, 2),
     factAssessments,
     forbiddenClaimIds,
+    workflowConsistency,
   };
 }
 
@@ -1378,6 +1531,7 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
   return {
     factAssessments: normalizedOutput.factAssessments,
     forbiddenClaimIds: normalizedOutput.forbiddenClaimIds,
+    workflowConsistency: normalizedOutput.workflowConsistency,
     missingCriticalFactIds,
     contradictedCriticalFactIds,
     ticketFieldChecks,
@@ -1711,6 +1865,66 @@ export function createFailedScoringResult(attempt, error, options = {}) {
   };
 }
 
+async function requestWorkflowConsistencyAssessment(attempt, options) {
+  const rubric = getScenarioRubric(attempt.scenarioId);
+  if (rubric.ticketType === "qa" || !(rubric.requiredFacts?.steps || []).length) {
+    return {
+      status: "not-applicable",
+      factId: "not-applicable",
+      sourceObservation: "",
+      answerQuote: "",
+      reason: "",
+      suggestedCorrection: "",
+    };
+  }
+  const endpoint =
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(options.modelId)}:generateContent`;
+  const response = await options.fetchImplementation(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": options.apiKey,
+    },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: WORKFLOW_CONSISTENCY_SYSTEM_INSTRUCTION }],
+      },
+      contents: [{
+        role: "user",
+        parts: [{ text: buildWorkflowConsistencyPrompt(attempt) }],
+      }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: buildWorkflowConsistencyOutputSchema(rubric),
+        seed: scoringSeedForAttempt(attempt) ^ 0x5f3759df,
+      },
+    }),
+  });
+  const responseBody = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(
+      responseBody.error?.message || "Gemini workflow consistency request failed"
+    );
+    error.code = response.status === 429 ? "RATE_LIMITED" : "GEMINI_ERROR";
+    throw error;
+  }
+  const responseText = responseBody.candidates?.[0]?.content?.parts
+    ?.map((part) => part.text || "")
+    .join("");
+  if (!responseText) {
+    const error = new Error("Gemini returned no workflow consistency result");
+    error.code = "EMPTY_RESULT";
+    throw error;
+  }
+  try {
+    return JSON.parse(responseText);
+  } catch (cause) {
+    const error = new Error("Gemini returned invalid workflow consistency JSON", { cause });
+    error.code = "INVALID_MODEL_OUTPUT";
+    throw error;
+  }
+}
+
 export async function scoreAttemptRecordWithGemini(attempt, options) {
   if (!isScoringSupported(attempt?.scenarioId)) {
     const error = new Error("このシナリオはAI採点の対象外です。");
@@ -1763,6 +1977,12 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     error.code = "INVALID_MODEL_OUTPUT";
     throw error;
   }
+  modelOutput.workflowConsistency = options.workflowConsistencyAssessment
+    || await requestWorkflowConsistencyAssessment(attempt, {
+      apiKey,
+      modelId,
+      fetchImplementation,
+    });
   let normalized;
   try {
     normalized = normalizeModelOutput(modelOutput, attempt.scenarioId, attempt);
@@ -1787,7 +2007,12 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
   );
   rubricFindings.scoreBreakdown = scoreBreakdown;
   const totalScore = scoreBreakdown.totalScore;
-  const { factAssessments: _factAssessments, forbiddenClaimIds: _forbiddenClaimIds, ...review } = normalized;
+  const {
+    factAssessments: _factAssessments,
+    forbiddenClaimIds: _forbiddenClaimIds,
+    workflowConsistency: _workflowConsistency,
+    ...review
+  } = normalized;
   const hasContradictedFacts = rubricFindings.factAssessments
     .some(({ status }) => status === "contradicted");
   const improvementItems = review.improvementItems.map((item) =>

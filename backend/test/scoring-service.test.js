@@ -9,6 +9,8 @@ import {
   buildModelOutputSchema,
   buildScoringPrompt,
   buildScoringSystemInstruction,
+  buildWorkflowConsistencyOutputSchema,
+  buildWorkflowConsistencyPrompt,
   calculateScoreBreakdown,
   calculateWeightedTotal,
   createAttemptRecord,
@@ -53,6 +55,17 @@ function expectedTicketFieldsForTest(rubric) {
 
 function requiredEvidenceIds(rubric) {
   return rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id);
+}
+
+function consistentWorkflowAssessmentFor(rubric) {
+  return {
+    status: "consistent",
+    factId: rubric.requiredFacts.steps?.[0]?.id || "not-applicable",
+    sourceObservation: "観測記録と操作手順の経路が一致している。",
+    answerQuote: "回答内に記載あり",
+    reason: "操作手順と観測経路が一致しています。",
+    suggestedCorrection: "",
+  };
 }
 
 const completeModelOutput = {
@@ -129,6 +142,14 @@ const completeModelOutput = {
     evidenceQuote: "回答内に記載あり",
   })),
   forbiddenClaimIds: [],
+  workflowConsistency: {
+    status: "consistent",
+    factId: "steps-reproducible",
+    sourceObservation: "登録後の一覧で結果を確認する。",
+    answerQuote: "保存ボタンを3回クリックする",
+    reason: "操作手順と観測経路が一致しています。",
+    suggestedCorrection: "",
+  },
 };
 
 function completeOutputForScenario(scenarioId) {
@@ -169,11 +190,75 @@ function completeOutputForScenario(scenarioId) {
       evidenceQuote: "回答内に記載あり",
     })),
     forbiddenClaimIds: [],
+    workflowConsistency: rubric.ticketType === "qa" ? undefined : {
+      status: "consistent",
+      factId: rubric.requiredFacts.steps?.[0]?.id || "not-applicable",
+      sourceObservation: "観測記録と操作手順の経路が一致している。",
+      answerQuote: "回答内に記載あり",
+      reason: "操作手順と観測経路が一致しています。",
+      suggestedCorrection: "",
+    },
   };
 }
 
 test("weighted total follows the pilot rubric weights", () => {
   assert.equal(calculateWeightedTotal(completeModelOutput.dimensions), 74);
+});
+
+test("workflow consistency uses a separate focused structured assessment", () => {
+  const rubric = getScenarioRubric(pilotScenarioId);
+  const reviewSchema = buildModelOutputSchema(rubric);
+  const workflowSchema = buildWorkflowConsistencyOutputSchema(rubric);
+  const prompt = buildWorkflowConsistencyPrompt({
+    scenarioId: pilotScenarioId,
+    answer: {
+      sections: {
+        steps: "3. 顧客登録画面を表示する",
+        actual: "異なるIDの顧客データが3件登録される",
+      },
+    },
+  });
+  assert.equal(reviewSchema.required.includes("workflowConsistency"), false);
+  assert.ok(workflowSchema.required.includes("status"));
+  assert.match(prompt, /登録後の一覧には/);
+  assert.match(prompt, /3\. 顧客登録画面を表示する/);
+  assert.doesNotMatch(prompt, /顧客登録画面.*一覧画面との不一致/);
+});
+
+test("an AI-detected observation-path mismatch is enforced in reproducibility", () => {
+  const attempt = {
+    answer: {
+      subject: "保存ボタンを3回押すと顧客が3件登録される",
+      sections: {
+        steps: "1. 顧客情報を入力する\n2. 保存ボタンを3回押す\n3.顧客登録画面を表示する",
+      },
+    },
+    selectedEvidenceIds: [],
+    evidenceDescriptions: {},
+  };
+  const normalized = normalizeModelOutput({
+    ...completeModelOutput,
+    dimensions: Object.fromEntries(
+      Object.keys(completeModelOutput.dimensions).map((id) => [id, 100])
+    ),
+    improvementItems: [],
+    rewriteSuggestions: [],
+    workflowConsistency: {
+      status: "inconsistent",
+      factId: "steps-reproducible",
+      sourceObservation: "登録後の一覧で重複した3件を確認する。",
+      answerQuote: "3.顧客登録画面を表示する",
+      reason: "登録結果の件数を確認できる状態へ到達しないためです。",
+      suggestedCorrection: "登録後の一覧画面を表示し、重複した3件を確認する",
+    },
+  }, pilotScenarioId, attempt);
+  assert.equal(normalized.dimensions.reproducibility, 75);
+  assert.equal(
+    normalized.factAssessments.find(({ factId }) => factId === "steps-reproducible").status,
+    "contradicted"
+  );
+  assert.equal(normalized.improvementItems[0].priority, "修正推奨");
+  assert.equal(normalized.rewriteSuggestions[0].original, "3.顧客登録画面を表示する");
 });
 
 test("overall score combines writing, ticket settings, and evidence selection", () => {
@@ -784,6 +869,7 @@ test("QA verdicts follow the learner-facing score bands", async () => {
   );
   const result = await scoreAttemptRecordWithGemini(attempt, {
     apiKey: "server-only-key",
+    workflowConsistencyAssessment: consistentWorkflowAssessmentFor(rubric),
     fetchImplementation: async () => ({
       ok: true,
       async json() {
@@ -817,6 +903,7 @@ test("ready-to-send reviews do not label polish as a required correction", async
   );
   const result = await scoreAttemptRecordWithGemini(attempt, {
     apiKey: "server-only-key",
+    workflowConsistencyAssessment: consistentWorkflowAssessmentFor(rubric),
     fetchImplementation: async () => ({
       ok: true,
       async json() {
@@ -900,6 +987,7 @@ test("a reproducibility mismatch is consolidated without overwhelming an otherwi
   );
   const result = await scoreAttemptRecordWithGemini(attempt, {
     apiKey: "server-only-key",
+    workflowConsistencyAssessment: consistentWorkflowAssessmentFor(rubric),
     fetchImplementation: async () => ({
       ok: true,
       async json() {
@@ -972,7 +1060,7 @@ test("the mobile data-loss prompt rewards scenario-specific analysis without sco
   assert.doesNotMatch(prompt, /"writingExample"/);
 });
 
-test("the duplicate-registration prompt requires the list screen used to confirm duplicate rows", () => {
+test("the duplicate-registration prompt relies on generic observation-path consistency", () => {
   const prompt = buildScoringPrompt({
     scenarioId: pilotScenarioId,
     answer: {
@@ -985,7 +1073,11 @@ test("the duplicate-registration prompt requires the list screen used to confirm
     selectedEvidenceIds: [],
   });
   assert.match(prompt, /登録後の顧客一覧で重複した3件を確認/);
-  assert.match(prompt, /顧客登録画面.*一覧画面との不一致/);
+  assert.match(prompt, /主要操作・遷移後の状態・結果を観測した場所または対象を抽出/);
+  assert.match(prompt, /観測先を明示し、その意味が異なる場合はcontradicted/);
+  assert.match(prompt, /証跡や実際の動作欄が結果を裏付けていても、それらで操作手順の不整合を補完してはいけません/);
+  assert.doesNotMatch(prompt, /顧客登録画面.*一覧画面との不一致/);
+  assert.doesNotMatch(prompt, /登録件数を一覧で確認した観測記録/);
 });
 
 test("bug and QA reviews use ticket-specific system instructions", () => {
@@ -1235,6 +1327,9 @@ test("a non-pilot scenario is scored with its own rubric version and findings", 
   const result = await scoreAttemptRecordWithGemini(attempt, {
     apiKey: "server-only-key",
     modelId: "test-model",
+    workflowConsistencyAssessment: consistentWorkflowAssessmentFor(
+      getScenarioRubric(scenarioId)
+    ),
     fetchImplementation: async () => ({
       ok: true,
       async json() {
@@ -1325,6 +1420,9 @@ test("the attempt record exists before Gemini scoring starts", async () => {
   const result = await scoreAttemptRecordWithGemini(attempt, {
     apiKey: "server-only-key",
     modelId: "test-model",
+    workflowConsistencyAssessment: consistentWorkflowAssessmentFor(
+      getScenarioRubric(attempt.scenarioId)
+    ),
     fetchImplementation: async (_url, request) => {
       const sentBody = JSON.parse(request.body);
       assert.equal(sentBody.contents[0].parts[0].text.includes("verified-google-sub"), false);
