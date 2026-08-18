@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v15";
+export const PROMPT_VERSION = "practice-review.v16";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -671,7 +671,9 @@ export function buildScoringPrompt(attempt, options = {}) {
     "一般論だけの助言は禁止です。受講者の記述を引用し、この不具合に即して説明してください。",
     "確定した不足と、調査を進めるための追加提案を混同しないでください。",
     "reviewSourceが評価の事実源です。requiredFactsはreviewSourceのどの意味を読み手へ伝える必要があるかを示すもので、特定の文面や記載欄を指定する正解ではありません。語句、文順、セクション配置の一致を要求しないでください。",
-    "reviewSourceはAI採点者だけが持つ研修用の事実源であり、チケットの開発担当者やQA担当者が読める情報ではありません。reviewSourceと起票内容の不一致は、AIレビュー自身のimprovementItemsまたはrewriteSuggestionsで事実訂正として示し、readerQuestionsで開発担当者がその事実を知っているように質問させてはいけません。",
+    "reviewSource.learnerVisibleContextは問題画面で受講者にも提示された周辺情報です。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱ってください。受講者の記述がこれらと意味的に一致する場合、未確認の範囲・影響・回避策として指摘せず、forbiddenClaimIdsにも入れないでください。",
+    "reviewSource.learnerVisibleContext.riskAssessmentは、記載された確度を維持して扱ってください。『可能性がある』というリスクを発生済みの事実へ強めた場合は指摘できますが、記載どおり潜在リスクとして書いた場合は未確認影響にしないでください。",
+    "reviewSourceのうちlearnerVisibleContextを除く観測記録は、AI採点者だけが持つ研修用の事実源であり、チケットの開発担当者やQA担当者が読める情報ではありません。reviewSourceと起票内容の不一致は、AIレビュー自身のimprovementItemsまたはrewriteSuggestionsで事実訂正として示し、readerQuestionsで開発担当者がその事実を知っているように質問させてはいけません。",
     "チーム内で既知と考えられる標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリック、コマンド、API実行方法など手順書レベルの詳細を不足扱いしないでください。第三者が主要な操作と順序を理解できれば十分です。",
     "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、事実誤認や不足と即断しないでください。確認が必要ならclassificationを『記述確認』、factIdをnot-applicableとし、『実施済みの事実か、再現のために補った推測か』を尋ねてください。reviewSourceにない詳細そのものを教えるよう要求してはいけません。",
     "追加記述がrequiredFactの意味を満たしている場合、reviewSourceと両立する限りfactAssessmentをcontradictedにしないでください。明確に両立しない場合だけcontradictedと判定してください。",
@@ -679,6 +681,7 @@ export function buildScoringPrompt(attempt, options = {}) {
     "通知ID、注文番号、患者ID、商品名などの追跡用識別子は、同一性や差異が説明され、選択済み証跡から対象を追跡できるなら、本文に具体値がなくても不足にしないでください。",
     "金額、時刻、件数、再現回数、仕様閾値は一律に例示扱いせず、発生条件・期待値・実測結果を成立させる値かを判断してください。入力材料と異なる値の記載は矛盾として扱ってください。",
     "添付証跡は追跡用識別子や証跡確認の事実を補完できますが、題名、主要な発生条件、期待結果、実際の動作そのものの記載を代替しません。",
+    "選択済み添付証跡のsummaryは、その証跡から確認できる事実として扱ってください。summaryですでに確認済みの内容を『次に確認すべきこと』として重複提案しないでください。未選択の証跡のsummaryは、受講者が確認した事実として使わないでください。",
     "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用してください。記述確認または調査提案の場合はfactIdをnot-applicableにしてください。受講者へ提示されていない情報を答えさせる質問を、不足情報として生成してはいけません。",
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
@@ -1274,6 +1277,18 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
 
 function successfulScoringResult(result) {
   return result?.status === "succeeded" && Number.isInteger(result.totalScore);
+}
+
+export function isScoringResultCompatible(result, attempt, options = {}) {
+  const rubric = getScenarioRubric(attempt?.scenarioId);
+  const modelId = options.modelId || DEFAULT_MODEL;
+  return Boolean(
+    successfulScoringResult(result)
+    && rubric
+    && result.rubricVersion === rubric.rubricVersion
+    && result.promptVersion === PROMPT_VERSION
+    && result.modelId === modelId
+  );
 }
 
 export function createReusedScoringResult(attempt, sourceResult, options = {}) {

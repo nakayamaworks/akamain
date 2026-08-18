@@ -42,7 +42,7 @@
     "customer-context-menu-not-shown": {
       "scenarioId": "customer-context-menu-not-shown",
       "projectId": "customer",
-      "rubricVersion": "customer-context-menu-not-shown.v3",
+      "rubricVersion": "customer-context-menu-not-shown.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -69,7 +69,13 @@
             "text": "画面仕様書の3.4.2には、一覧の選択行から編集や履歴確認を呼び出すメニューを表示する旨が記載されています。なお、同じマウスを使用した別画面の右クリック操作は正常です。"
           }
         ],
-        "specificationReference": "顧客管理システム画面仕様書 Rev.2.3「3.4.2 顧客一覧のコンテキストメニュー」"
+        "specificationReference": "顧客管理システム画面仕様書 Rev.2.3「3.4.2 顧客一覧のコンテキストメニュー」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、Chromeで顧客一覧を利用する管理者です。顧客詳細の表示や登録データには影響しません。",
+          "confirmedWorkaround": "修正までは、顧客を左クリックして詳細画面を開き、画面内の操作ボタンを使用します。",
+          "confirmedRecovery": "ページを再読み込みしてもメニューは戻りません。恒久的な復旧には画面の修正が必要です。",
+          "riskAssessment": "編集や履歴確認を右クリック操作で開始できないため、操作に余分な手間がかかります。誤更新やデータ消失は確認されていません。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -145,13 +151,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -176,12 +183,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -267,7 +274,7 @@
     "customer-search-nonexistent-name-all-results": {
       "scenarioId": "customer-search-nonexistent-name-all-results",
       "projectId": "customer",
-      "rubricVersion": "customer-search-nonexistent-name-all-results.v3",
+      "rubricVersion": "customer-search-nonexistent-name-all-results.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -294,7 +301,13 @@
             "text": "氏名検索の仕様では、一致する顧客が存在しない場合、検索結果は0件となる規定です。なお、前日に248件のCSV取込を実施していますが、取込処理自体は正常終了しています。"
           }
         ],
-        "specificationReference": "顧客検索機能仕様書 Rev.1.8「2.3.1 氏名検索」"
+        "specificationReference": "顧客検索機能仕様書 Rev.1.8「2.3.1 氏名検索」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、顧客一覧で氏名検索を利用する一般ユーザーです。",
+          "confirmedWorkaround": "修正までは、顧客番号など正常に動作する別の検索条件を使用します。",
+          "confirmedRecovery": "検索条件をクリアすると通常の一覧へ戻せますが、氏名検索の不具合自体は解消しません。",
+          "riskAssessment": "検索条件に一致しない場合でも検索対象の顧客が全件表示されるため、検索結果を正しいと誤認して別の顧客を選択してしまう可能性があります。なお、権限外データの表示は確認されていません。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -370,13 +383,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -401,12 +415,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -492,7 +506,7 @@
     "customer-save-multiple-clicks-duplicate": {
       "scenarioId": "customer-save-multiple-clicks-duplicate",
       "projectId": "customer",
-      "rubricVersion": "customer-save-multiple-clicks-duplicate.v5",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v6",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -519,7 +533,13 @@
             "text": "保存ボタンを1回だけ押下した場合は、1件のみ作成されます。顧客データ管理要件には、1回の登録操作につき1レコードを作成する旨が記載されています。原因箇所は現時点で特定できていません。"
           }
         ],
-        "specificationReference": "顧客データ管理要件書 Rev.1.5「2.2 レコード一意性」"
+        "specificationReference": "顧客データ管理要件書 Rev.1.5「2.2 レコード一意性」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、顧客登録画面で保存ボタンを連続して押下した場合に作成される顧客データです。同じ内容の顧客レコードが複数作成されます。",
+          "confirmedWorkaround": "修正までは、保存ボタンを一度だけ押し、完了表示が出るまで再操作しません。",
+          "confirmedRecovery": "作成されたレコードを照合し、重複分だけを管理画面から削除します。",
+          "riskAssessment": "同じ顧客への連絡や集計が重複する可能性があります。入力した元データの消失は確認されていません。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -595,13 +615,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -646,12 +667,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -744,7 +765,7 @@
     "attendance-clock-out-next-day": {
       "scenarioId": "attendance-clock-out-next-day",
       "projectId": "attendance",
-      "rubricVersion": "attendance-clock-out-next-day.v3",
+      "rubricVersion": "attendance-clock-out-next-day.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -771,7 +792,13 @@
             "text": "勤怠計算仕様書では、日をまたがない勤務の開始と終了は同一勤務日として扱います。対象者は先月まで夜勤チームに所属していましたが、今回使用した勤務予定は09:00〜18:00の日勤です。"
           }
         ],
-        "specificationReference": "勤怠計算仕様書 Rev.4.12「3.1.2 勤務日の確定」"
+        "specificationReference": "勤怠計算仕様書 Rev.4.12「3.1.2 勤務日の確定」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、同じ日に出勤と退勤を行う従業員の勤務実績です。対象日の勤怠集計と承認画面にも誤った日付が反映されます。",
+          "confirmedWorkaround": "修正までは、承認前に退勤側の勤務日を当日へ手動で戻します。",
+          "confirmedRecovery": "誤って保存された勤務日を修正し、対象日の勤怠集計を再実行します。",
+          "riskAssessment": "誤った勤務時間や給与額で確定される可能性があります。承認前であれば勤務実績を修正できます。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -847,13 +874,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -878,12 +906,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -970,7 +998,7 @@
     "salon-duplicate-reservation": {
       "scenarioId": "salon-duplicate-reservation",
       "projectId": "salon",
-      "rubricVersion": "salon-duplicate-reservation.v3",
+      "rubricVersion": "salon-duplicate-reservation.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -997,7 +1025,13 @@
             "text": "予約枠管理仕様では、予約確定済みの担当者および時間帯を、新規予約の選択対象から除外します。なお、2人目の顧客は初回来店クーポンを選択していましたが、料金計算は正常です。"
           }
         ],
-        "specificationReference": "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」"
+        "specificationReference": "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、同じ店舗・担当者・時間帯を指定した予約です。ほかの店舗や時間帯への影響は確認されていません。",
+          "confirmedWorkaround": "修正までは、予約を確定する直前に管理画面で最新の空き状況を確認します。",
+          "confirmedRecovery": "後から登録された予約を取り消し、該当する顧客へ別の時間帯を案内します。",
+          "riskAssessment": "同じ担当者に2件の予約が入り、来店時の対応遅延や予約変更が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -1073,13 +1107,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -1104,12 +1139,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -1202,7 +1237,7 @@
     "ec-out-of-stock-cart": {
       "scenarioId": "ec-out-of-stock-cart",
       "projectId": "ec",
-      "rubricVersion": "ec-out-of-stock-cart.v3",
+      "rubricVersion": "ec-out-of-stock-cart.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -1229,7 +1264,13 @@
             "text": "商品在庫連携仕様では、利用可能在庫がない商品はカートへの追加を受け付けません。なお、前日に商品画像を差し替えていますが、変更前の画像へ戻しても挙動は変わりませんでした。"
           }
         ],
-        "specificationReference": "商品在庫連携仕様書 Rev.8.4「4.1.3 カート追加可否」"
+        "specificationReference": "商品在庫連携仕様書 Rev.8.4「4.1.3 カート追加可否」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、在庫数が0の商品と、その商品をカートへ追加した購入者です。ほかの商品への影響は確認されていません。",
+          "confirmedWorkaround": "修正までは、対象商品を販売停止にするか、注文確定前に在庫の有無を確認します。",
+          "confirmedRecovery": "対象商品をカートから削除します。すでに注文が確定している場合は、注文をキャンセルして購入者へ連絡します。",
+          "riskAssessment": "在庫のない商品を受注し、注文のキャンセル、返金または配送遅延が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -1305,13 +1346,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -1336,12 +1378,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -1434,7 +1476,7 @@
     "inventory-over-shipment": {
       "scenarioId": "inventory-over-shipment",
       "projectId": "inventory",
-      "rubricVersion": "inventory-over-shipment.v3",
+      "rubricVersion": "inventory-over-shipment.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -1461,7 +1503,13 @@
             "text": "出庫業務仕様では、指定した出庫数が利用可能在庫を上回る場合、登録を中止して入力者へ通知します。別商品で現在庫以下の数量を指定した場合は、正常に登録できます。"
           }
         ],
-        "specificationReference": "出庫業務仕様書 Rev.5.7「3.1.4 出庫可能数の検証」"
+        "specificationReference": "出庫業務仕様書 Rev.5.7「3.1.4 出庫可能数の検証」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、現在庫を超える数量で出庫登録した商品です。対象商品の在庫台帳と出庫実績に誤った数量が記録されます。",
+          "confirmedWorkaround": "修正までは、登録前に実在庫を確認し、出庫数を現在庫以下へ変更します。",
+          "confirmedRecovery": "誤って登録された出庫を取り消し、棚卸結果を基に対象商品の在庫数を補正します。",
+          "riskAssessment": "在庫台帳と実在庫が一致しなくなり、欠品商品の引当てや誤出荷が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -1537,13 +1585,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -1568,12 +1617,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -1666,7 +1715,7 @@
     "mobile-rotation-clears-input": {
       "scenarioId": "mobile-rotation-clears-input",
       "projectId": "mobile",
-      "rubricVersion": "mobile-rotation-clears-input.v3",
+      "rubricVersion": "mobile-rotation-clears-input.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -1693,7 +1742,13 @@
             "text": "画面状態保持の資料には、画面回転によって画面が再構成される場合も、未送信の入力値を引き継ぐ旨が記載されています。なお、文字サイズを標準に変更しても再現しました。"
           }
         ],
-        "specificationReference": "モバイル画面状態保持仕様書 Rev.3.4「2.5 端末回転時の入力保持」"
+        "specificationReference": "モバイル画面状態保持仕様書 Rev.3.4「2.5 端末回転時の入力保持」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、Androidの対象画面で端末回転前に保存していない入力内容です。保存済みデータへの影響は確認されていません。",
+          "confirmedWorkaround": "修正までは、入力内容を送信または保存するまで端末を回転しません。",
+          "confirmedRecovery": "消えた入力内容は復元できないため、利用者が同じ内容を再入力します。",
+          "riskAssessment": "未保存の入力内容が失われ、入力作業のやり直しが発生します。サーバー上の保存済みデータは失われません。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -1769,13 +1824,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -1800,12 +1856,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -1891,7 +1947,7 @@
     "automotive-speed-display-delay": {
       "scenarioId": "automotive-speed-display-delay",
       "projectId": "automotive",
-      "rubricVersion": "automotive-speed-display-delay.v3",
+      "rubricVersion": "automotive-speed-display-delay.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -1918,7 +1974,13 @@
             "text": "メーター表示機能仕様では、車速信号の受信から表示反映まで200ms以内と定められています。なお、ナビ案内およびオーディオを停止しても、測定結果は変わりませんでした。"
           }
         ],
-        "specificationReference": "メーター表示機能仕様書 Rev.5.12「4.2.3 車速表示更新周期」"
+        "specificationReference": "メーター表示機能仕様書 Rev.5.12「4.2.3 車速表示更新周期」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、メーターECU v5.12.3を搭載した試験車両の速度表示です。走行制御ECUが受信する車速値に遅延は確認されていません。",
+          "confirmedWorkaround": "走行中に利用できる回避策はありません。修正版を適用するまで、対象車両の試験走行を停止します。",
+          "confirmedRecovery": "イグニッションをOFFにして再度ONにすると表示遅延は一時的に解消しますが、その後も再発します。",
+          "riskAssessment": "運転者が実際の速度を誤認するほか、速度計表示に関する法規要件へ抵触する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -1994,13 +2056,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -2025,12 +2088,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -2123,7 +2186,7 @@
     "payment-failed-payment-sales-record": {
       "scenarioId": "payment-failed-payment-sales-record",
       "projectId": "payment",
-      "rubricVersion": "payment-failed-payment-sales-record.v3",
+      "rubricVersion": "payment-failed-payment-sales-record.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -2150,7 +2213,13 @@
             "text": "売上連携API仕様では、決済成功が確定した取引のみを売上計上の対象とします。現時点で顧客への請求は発生しておらず、加盟店側の集計値のみ過大となっています。"
           }
         ],
-        "specificationReference": "売上連携API仕様書 Rev.2024-06「3.3 決済失敗時の売上制御」"
+        "specificationReference": "売上連携API仕様書 Rev.2024-06「3.3 決済失敗時の売上制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、決済に失敗した取引の売上データと加盟店の日次集計です。顧客への請求は発生していません。",
+          "confirmedWorkaround": "修正までは、日次締めの前に決済結果と売上データを照合し、失敗した取引を集計から除外します。",
+          "confirmedRecovery": "誤って作成された売上データを取り消し、そのデータを除外して加盟店の日次集計を再作成します。",
+          "riskAssessment": "加盟店の売上額と会計データが実際より多く計上され、照合や精算に差異が生じる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -2226,13 +2295,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -2257,12 +2327,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -2355,7 +2425,7 @@
     "medical-cross-patient-results": {
       "scenarioId": "medical-cross-patient-results",
       "projectId": "medical",
-      "rubricVersion": "medical-cross-patient-results.v3",
+      "rubricVersion": "medical-cross-patient-results.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -2382,7 +2452,13 @@
             "text": "診療情報表示仕様では、患者切替時に切替前の表示内容を破棄し、選択した患者のデータへ更新します。なお、患者Aと患者Bは同じ診療科ですが、担当医および氏名は異なります。"
           }
         ],
-        "specificationReference": "診療情報表示仕様書 Rev.4.8「3.1.5 患者切替時の表示更新」"
+        "specificationReference": "診療情報表示仕様書 Rev.4.8「3.1.5 患者切替時の表示更新」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、同じ端末で患者を続けて切り替えた医療従事者です。切替前の患者の検査結果が画面に残ります。",
+          "confirmedWorkaround": "修正までは、患者を切り替えるたびに画面を再読み込みし、患者IDと氏名を照合してから検査結果を参照します。",
+          "confirmedRecovery": "誤表示を確認した場合は画面を閉じ、再ログインして正しい患者情報を表示します。あわせて表示履歴を監査します。",
+          "riskAssessment": "別の患者の検査結果に基づく誤診や誤処置のほか、要配慮個人情報の漏えいにつながります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -2458,13 +2534,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -2489,12 +2566,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -2587,7 +2664,7 @@
     "attendance-overnight-break-not-deducted": {
       "scenarioId": "attendance-overnight-break-not-deducted",
       "projectId": "attendance",
-      "rubricVersion": "attendance-overnight-break-not-deducted.v3",
+      "rubricVersion": "attendance-overnight-break-not-deducted.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -2614,7 +2691,13 @@
             "text": "日跨ぎ勤務の休憩控除については、翌日側の休憩も勤務区間内であれば控除対象とする記載があります。なお、確認途中でブラウザを終了しましたが、再ログイン後も入力値は保持されていました。"
           }
         ],
-        "specificationReference": "勤怠計算仕様書 Rev.4.12「3.2.4 日跨ぎ勤務の休憩控除」"
+        "specificationReference": "勤怠計算仕様書 Rev.4.12「3.2.4 日跨ぎ勤務の休憩控除」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、夜勤など日付をまたぎ、翌日側に休憩を登録した勤務実績です。勤怠集計と給与計算にも影響します。",
+          "confirmedWorkaround": "修正までは、給与確定前に休憩時間と実労働時間を確認し、誤りがあれば手動で補正します。",
+          "confirmedRecovery": "対象勤務の実労働時間を修正し、勤怠集計と給与計算を再実行します。",
+          "riskAssessment": "実労働時間が過大に記録され、賃金の過払いまたは労働時間管理の誤りにつながる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -2690,13 +2773,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -2721,12 +2805,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -2819,7 +2903,7 @@
     "attendance-simultaneous-clock-out-double-overtime": {
       "scenarioId": "attendance-simultaneous-clock-out-double-overtime",
       "projectId": "attendance",
-      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v3",
+      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -2846,7 +2930,13 @@
             "text": "打刻処理設計書では、同一人物・同一勤務日の重複した退勤情報は1件として扱います。なお、食堂端末の利用記録など、同日に記録された別種別の打刻に異常はありません。"
           }
         ],
-        "specificationReference": "打刻処理設計書 Rev.4.6「5.3.2 重複打刻の排除」"
+        "specificationReference": "打刻処理設計書 Rev.4.6「5.3.2 重複打刻の排除」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、月末集計中に複数端末から同時に退勤を記録した従業員です。残業時間が二重計上され、対象月の給与計算にも影響します。",
+          "confirmedWorkaround": "修正までは、月末集計中の退勤記録を1台の端末に限定します。",
+          "confirmedRecovery": "重複した退勤記録を除外し、対象月の残業集計と給与計算を再実行します。",
+          "riskAssessment": "残業代の過払いと、労働時間記録の不整合が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -2922,13 +3012,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -2953,12 +3044,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -3051,7 +3142,7 @@
     "salon-cancelled-slot-remains-booked": {
       "scenarioId": "salon-cancelled-slot-remains-booked",
       "projectId": "salon",
-      "rubricVersion": "salon-cancelled-slot-remains-booked.v3",
+      "rubricVersion": "salon-cancelled-slot-remains-booked.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -3078,7 +3169,13 @@
             "text": "予約状態遷移仕様には、キャンセル完了後、対応する枠を予約可能な状態へ戻す処理が記載されています。なお、顧客へのキャンセル通知メールは毎回1通のみ送信されています。"
           }
         ],
-        "specificationReference": "予約状態遷移仕様書 Rev.2026.07「3.2 キャンセル後の空き枠反映」"
+        "specificationReference": "予約状態遷移仕様書 Rev.2026.07「3.2 キャンセル後の空き枠反映」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、キャンセルした予約と同じ店舗・担当者・時間帯の枠です。ほかの予約枠への影響は確認されていません。",
+          "confirmedWorkaround": "修正までは、店舗管理者が対象枠を管理画面から手動で空き状態へ変更します。",
+          "confirmedRecovery": "対象枠の状態を再計算し、新規予約画面へ予約可能な枠として反映します。",
+          "riskAssessment": "実際には空いている時間帯を販売できず、新しい予約を受け付けられない可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -3154,13 +3251,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -3185,12 +3283,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -3283,7 +3381,7 @@
     "salon-simultaneous-double-booking": {
       "scenarioId": "salon-simultaneous-double-booking",
       "projectId": "salon",
-      "rubricVersion": "salon-simultaneous-double-booking.v3",
+      "rubricVersion": "salon-simultaneous-double-booking.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -3310,7 +3408,13 @@
             "text": "予約枠管理仕様では、同じ担当者および開始時刻に対する確定処理は、同時に1件のみ受け付けます。なお、片方の端末のみダークモードでしたが、画面テーマを統一しても発生条件は変わりませんでした。"
           }
         ],
-        "specificationReference": "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」"
+        "specificationReference": "予約枠管理仕様書 Rev.2026.07「2.4 予約枠の排他制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、同じ担当者と時間帯に対してほぼ同時に確定された2件の予約です。",
+          "confirmedWorkaround": "修正までは、確定直前に予約枠を再読み込みし、ほかの予約が入っていないことを確認します。",
+          "confirmedRecovery": "後から確定した予約を取り消し、該当する顧客へ別の担当者または時間帯を案内します。",
+          "riskAssessment": "担当者が対応できない二重予約となり、顧客への予約変更や謝罪が必要になる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -3386,13 +3490,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -3417,12 +3522,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -3515,7 +3620,7 @@
     "ec-tax-rounding-inconsistent": {
       "scenarioId": "ec-tax-rounding-inconsistent",
       "projectId": "ec",
-      "rubricVersion": "ec-tax-rounding-inconsistent.v3",
+      "rubricVersion": "ec-tax-rounding-inconsistent.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -3542,7 +3647,13 @@
             "text": "価格計算仕様では、商品ごとに小数点以下を切り捨てる設定です。なお、商品Bの説明文には全角記号が含まれていますが、説明文を削除しても表示金額は変わりませんでした。"
           }
         ],
-        "specificationReference": "価格計算仕様書 Rev.8.4「2.2.1 消費税の端数処理」"
+        "specificationReference": "価格計算仕様書 Rev.8.4「2.2.1 消費税の端数処理」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、消費税計算で1円未満の端数が発生する商品です。商品一覧の表示、注文金額、会計連携の間で1円の差が生じます。",
+          "confirmedWorkaround": "修正までは、注文確定前に正しい税込価格を確認し、必要に応じて商品価格を手動で調整します。",
+          "confirmedRecovery": "端数処理の設定をそろえ、対象商品の税込価格を再計算して表示と注文金額を更新します。",
+          "riskAssessment": "画面の表示価格と請求額が一致せず、購入者への案内や会計照合に差異が生じる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -3618,13 +3729,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -3649,12 +3761,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -3746,7 +3858,7 @@
     "ec-payment-notification-double-order": {
       "scenarioId": "ec-payment-notification-double-order",
       "projectId": "ec",
-      "rubricVersion": "ec-payment-notification-double-order.v3",
+      "rubricVersion": "ec-payment-notification-double-order.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -3773,7 +3885,13 @@
             "text": "注文連携API仕様では、処理済みの通知IDを再受信した場合、初回の注文結果を返します。原因が注文API側にあるのか、周辺処理側にあるのかは、現時点で切り分けできていません。"
           }
         ],
-        "specificationReference": "注文連携API仕様書 Rev.8.4「6.3 決済通知の再送制御」"
+        "specificationReference": "注文連携API仕様書 Rev.8.4「6.3 決済通知の再送制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、決済事業者から同じ決済通知が再送された注文です。同じ通知に対して複数の注文番号が発行されます。",
+          "confirmedWorkaround": "修正までは、再送された通知の通知IDと決済IDを確認し、同じ決済に対する注文処理を手動で停止します。",
+          "confirmedRecovery": "重複して作成された注文をキャンセルし、関連する出荷処理と売上連携を取り消します。",
+          "riskAssessment": "同じ決済に対して、商品の二重出荷や売上の重複計上が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -3849,13 +3967,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -3884,12 +4003,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -3982,7 +4101,7 @@
     "inventory-expired-lot-fifo": {
       "scenarioId": "inventory-expired-lot-fifo",
       "projectId": "inventory",
-      "rubricVersion": "inventory-expired-lot-fifo.v3",
+      "rubricVersion": "inventory-expired-lot-fifo.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -4009,7 +4128,13 @@
             "text": "ロット管理仕様では、期限切れロットを候補から除外したうえで、使用可能なロットを入庫日の古い順に表示します。サーバー日時は7月27日であり、時刻のずれは確認されていません。"
           }
         ],
-        "specificationReference": "ロット管理仕様書 Rev.5.7「4.2.2 有効期限と出庫優先順位」"
+        "specificationReference": "ロット管理仕様書 Rev.5.7「4.2.2 有効期限と出庫優先順位」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、期限切れロットと期限内ロットが混在する商品の出庫候補です。対象倉庫でのロット選定に影響します。",
+          "confirmedWorkaround": "修正までは、出庫担当者が有効期限を確認し、期限内のロットを手動で選択します。",
+          "confirmedRecovery": "期限切れロットを出庫対象から外し、対象商品の出庫候補を再生成します。",
+          "riskAssessment": "期限切れの商品を誤って出荷し、品質事故や規制違反につながる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -4085,13 +4210,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -4116,12 +4242,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -4214,7 +4340,7 @@
     "inventory-simultaneous-shipment-negative-stock": {
       "scenarioId": "inventory-simultaneous-shipment-negative-stock",
       "projectId": "inventory",
-      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v3",
+      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -4241,7 +4367,13 @@
             "text": "在庫更新設計では、同一商品の在庫更新を並行処理せず、先に確定した結果を後続処理が参照します。なお、端末Aは有線、端末BはWi-Fi接続ですが、両方の要求がサーバーへ到達しています。"
           }
         ],
-        "specificationReference": "在庫更新設計書 Rev.5.7「5.1.3 同時出庫の排他制御」"
+        "specificationReference": "在庫更新設計書 Rev.5.7「5.1.3 同時出庫の排他制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、複数端末から同時に出庫された同一商品です。対象商品の在庫台帳と、その後の出庫処理に影響します。",
+          "confirmedWorkaround": "修正までは、同じ商品の出庫を1台の端末で順番に処理します。",
+          "confirmedRecovery": "対象商品の出庫履歴を照合し、成立しない出庫を取り消して在庫数を実在庫に合わせます。",
+          "riskAssessment": "実際には存在しない在庫を後続処理で引き当て、欠品や誤出荷が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -4317,13 +4449,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -4348,12 +4481,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -4446,7 +4579,7 @@
     "mobile-notification-opens-wrong-news": {
       "scenarioId": "mobile-notification-opens-wrong-news",
       "projectId": "mobile",
-      "rubricVersion": "mobile-notification-opens-wrong-news.v4",
+      "rubricVersion": "mobile-notification-opens-wrong-news.v5",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -4473,7 +4606,13 @@
             "text": "通知ディープリンク仕様では、通知に含まれるお知らせIDを遷移先画面へ引き渡します。通知音、バッジ件数および通知本文は、いずれもNEWS-102の内容と一致しています。"
           }
         ],
-        "specificationReference": "通知ディープリンク仕様書 Rev.3.4「3.2 お知らせIDの引き渡し」"
+        "specificationReference": "通知ディープリンク仕様書 Rev.3.4「3.2 お知らせIDの引き渡し」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、対象バージョンのiOSアプリで通知をタップした利用者です。通知本文は正しいものの、一つ前のお知らせが開きます。",
+          "confirmedWorkaround": "修正までは通知をタップせず、アプリ内のお知らせ一覧から通知に対応するお知らせを選択します。",
+          "confirmedRecovery": "誤ったお知らせが開いた場合は一覧へ戻り、通知に対応するお知らせを開き直します。アプリの再起動は不要です。",
+          "riskAssessment": "表示された古いお知らせを最新情報だと誤認し、誤った案内に従う可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -4549,13 +4688,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -4580,12 +4720,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -4678,7 +4818,7 @@
     "mobile-background-sync-data-lost": {
       "scenarioId": "mobile-background-sync-data-lost",
       "projectId": "mobile",
-      "rubricVersion": "mobile-background-sync-data-lost.v4",
+      "rubricVersion": "mobile-background-sync-data-lost.v5",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -4705,7 +4845,13 @@
             "text": "サーバーログに3件の同期要求はなく、送信済みデータは残っています。復帰後の端末内キューは0件でした。設計上、未送信データは永続領域へ保存し、メモリ解放後も同期対象として復元します。端末の空き容量は42GBで容量警告はありません。"
           }
         ],
-        "specificationReference": "オフライン同期設計書 Rev.3.4「4.3 未送信データの永続化」"
+        "specificationReference": "オフライン同期設計書 Rev.3.4「4.3 未送信データの永続化」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、OSによるメモリ解放が発生したiOS端末上の未送信データです。送信済みデータには影響しません。",
+          "confirmedWorkaround": "修正までは、送信完了を確認するまでアプリをバックグラウンドへ移しません。",
+          "confirmedRecovery": "消失した未送信データは復元できないため、元の記録を確認して再入力します。",
+          "riskAssessment": "未送信の業務記録が失われ、記録の欠落や再入力が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -4781,13 +4927,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -4815,12 +4962,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -4913,7 +5060,7 @@
     "automotive-can-byte-order-reversed": {
       "scenarioId": "automotive-can-byte-order-reversed",
       "projectId": "automotive",
-      "rubricVersion": "automotive-can-byte-order-reversed.v3",
+      "rubricVersion": "automotive-can-byte-order-reversed.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -4940,7 +5087,13 @@
             "text": "ADAS通信仕様では、対象信号はIntel形式で定義されています。CANoeの送信フレームはDBC定義と一致しており、診断ツールでは30.00Vとして復号されています。"
           }
         ],
-        "specificationReference": "ADAS通信仕様書 Rev.5.12「6.3.2 BatteryVoltage（Intel / Little Endian）」"
+        "specificationReference": "ADAS通信仕様書 Rev.5.12「6.3.2 BatteryVoltage（Intel / Little Endian）」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、メーターECUが表示に使用するバッテリー電圧信号です。車両制御は別経路の信号を使用しています。",
+          "confirmedWorkaround": "修正までは、診断ツールで実際の電圧を確認し、メーター上の電圧表示を判断に使用しません。",
+          "confirmedRecovery": "正しいDBC定義を適用してECUを再起動すると、バッテリー電圧が正しい値で表示されます。",
+          "riskAssessment": "運転者や整備担当者がバッテリー状態を誤認する可能性があります。走行制御への直接的な影響は確認されていません。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -5016,13 +5169,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -5047,12 +5201,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -5145,7 +5299,7 @@
     "automotive-bus-off-recovery-receive-stopped": {
       "scenarioId": "automotive-bus-off-recovery-receive-stopped",
       "projectId": "automotive",
-      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v3",
+      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -5172,7 +5326,13 @@
             "text": "通信制御仕様では、Bus-Off解除後500ms以内に受信処理を再開します。なお、計測PCの省電力設定は無効であり、別CANチャンネルの記録にも中断はありません。"
           }
         ],
-        "specificationReference": "ADAS ECU通信制御仕様書 Rev.5.12「7.4 Bus-Off復帰処理」"
+        "specificationReference": "ADAS ECU通信制御仕様書 Rev.5.12「7.4 Bus-Off復帰処理」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、高負荷試験でBus-Offから復帰したADAS ECU v5.12.3です。車輪速とブレーキ状態の受信が停止しますが、ほかのECUは通信を継続します。",
+          "confirmedWorkaround": "走行中に受信を再開させる回避策はありません。警告灯が点灯した場合は、安全な場所へ停車します。",
+          "confirmedRecovery": "車両を停止してイグニッションをOFFにし、再度ONにするとADAS ECUのCAN受信が再開します。",
+          "riskAssessment": "衝突被害軽減ブレーキなどの運転支援機能が利用できない状態が続きます。基本制動は独立した系統で動作します。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -5248,13 +5408,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -5279,12 +5440,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -5377,7 +5538,7 @@
     "payment-idempotency-key-double-charge": {
       "scenarioId": "payment-idempotency-key-double-charge",
       "projectId": "payment",
-      "rubricVersion": "payment-idempotency-key-double-charge.v3",
+      "rubricVersion": "payment-idempotency-key-double-charge.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -5404,7 +5565,13 @@
             "text": "決済API仕様では、同一加盟店から同じ冪等キーを受信した場合、処理を追加せず、初回の結果を返します。なお、2回目の送信時のみ画面幅を変更しましたが、送信内容は同一です。"
           }
         ],
-        "specificationReference": "決済API仕様書 Rev.2024-06「2.4 冪等キー」"
+        "specificationReference": "決済API仕様書 Rev.2024-06「2.4 冪等キー」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、タイムアウト後に同じ冪等キーで再試行された決済です。対象顧客へ同額の請求が二重に発生します。",
+          "confirmedWorkaround": "修正までは、決済を再試行する前に取引照会を行い、最初の決済が成立していないことを確認します。",
+          "confirmedRecovery": "二重に成立した決済を照合し、2件目の決済を取り消すか返金します。",
+          "riskAssessment": "顧客に金銭的な被害が生じるほか、加盟店への信用低下と決済データの不整合につながります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -5480,13 +5647,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -5511,12 +5679,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -5609,7 +5777,7 @@
     "payment-timeout-authorization-remains": {
       "scenarioId": "payment-timeout-authorization-remains",
       "projectId": "payment",
-      "rubricVersion": "payment-timeout-authorization-remains.v3",
+      "rubricVersion": "payment-timeout-authorization-remains.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -5636,7 +5804,13 @@
             "text": "与信管理仕様では、取引照会によって決済失敗が確定した場合、5分以内に与信を取り消します。なお、別のカードブランドでも同様にタイムアウトが発生しました。"
           }
         ],
-        "specificationReference": "与信管理仕様書 Rev.2024-06「5.2 タイムアウト時の与信取消」"
+        "specificationReference": "与信管理仕様書 Rev.2024-06「5.2 タイムアウト時の与信取消」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、処理がタイムアウトしたカード取引です。売上は確定していませんが、確保された与信枠が顧客のカードに残ります。",
+          "confirmedWorkaround": "修正までは、再決済する前に取引照会を行い、残っている与信の有無を確認します。",
+          "confirmedRecovery": "決済事業者へ与信の取消要求を送り、顧客のカードに残った利用枠を解放します。",
+          "riskAssessment": "顧客の利用可能額が一時的に減少し、同じ取引を再試行すると与信が二重に確保される可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -5712,13 +5886,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -5743,12 +5918,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -5841,7 +6016,7 @@
     "medical-weight-conversion-dose-thousandfold": {
       "scenarioId": "medical-weight-conversion-dose-thousandfold",
       "projectId": "medical",
-      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v3",
+      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -5868,7 +6043,13 @@
             "text": "投薬量計算仕様では、受信した体重をkgへ換算した後に用量を乗算します。対象患者の換算後体重は18kgです。なお、誤った投薬量の処方候補は承認していません。"
           }
         ],
-        "specificationReference": "投薬量計算仕様書 Rev.4.8「4.2.1 体重単位の換算」"
+        "specificationReference": "投薬量計算仕様書 Rev.4.8「4.2.1 体重単位の換算」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、体重をグラム単位で受信した患者の自動投薬量計算です。同じ条件で作成される処方候補すべてに影響します。",
+          "confirmedWorkaround": "修正までは自動計算を使用せず、医療従事者が体重をkgへ換算して投薬量を計算します。",
+          "confirmedRecovery": "誤った投薬量の処方候補を破棄し、正しい体重単位で再計算したうえで再承認します。",
+          "riskAssessment": "誤った投薬量を承認すると、過量投与によって患者の生命や身体へ重大な危害を与える可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -5944,13 +6125,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -5975,12 +6157,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -6073,7 +6255,7 @@
     "medical-lab-result-resend-duplicate": {
       "scenarioId": "medical-lab-result-resend-duplicate",
       "projectId": "medical",
-      "rubricVersion": "medical-lab-result-resend-duplicate.v3",
+      "rubricVersion": "medical-lab-result-resend-duplicate.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -6100,7 +6282,13 @@
             "text": "検査結果連携仕様では、登録済みの検査結果IDを再受信した場合も、患者記録を追加しません。なお、再送時に検査装置の画面テーマを変更しましたが、連携メッセージの本文は初回送信時と同一です。"
           }
         ],
-        "specificationReference": "検査結果連携仕様書 Rev.4.8「6.1.3 検査結果IDによる重複防止」"
+        "specificationReference": "検査結果連携仕様書 Rev.4.8「6.1.3 検査結果IDによる重複防止」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、検査連携から同じ検査結果IDを再受信した患者記録です。同じ測定結果が診療画面へ重複して表示されます。",
+          "confirmedWorkaround": "修正までは、検査結果IDと測定時刻を照合し、重複した行を除外して参照します。",
+          "confirmedRecovery": "重複して登録された検査結果を削除し、患者記録と監査ログに不整合がないことを確認します。",
+          "riskAssessment": "検査の実施回数や結果の時系列を誤認し、診療判断を誤る可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -6176,13 +6364,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -6207,12 +6396,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -6305,7 +6494,7 @@
     "customer-search-delete-last-page-stays-empty": {
       "scenarioId": "customer-search-delete-last-page-stays-empty",
       "projectId": "customer",
-      "rubricVersion": "customer-search-delete-last-page-stays-empty.v3",
+      "rubricVersion": "customer-search-delete-last-page-stays-empty.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -6332,7 +6521,13 @@
             "text": "顧客一覧画面仕様では、削除後の現在ページが総ページ数を超える場合、存在する直前ページへ移動すると規定されています。 削除対象の顧客に関連履歴はなく、削除処理自体は正常終了しています。"
           }
         ],
-        "specificationReference": "顧客一覧画面仕様書 Rev.2.4「5.6 削除後のページ制御」"
+        "specificationReference": "顧客一覧画面仕様書 Rev.2.4「5.6 削除後のページ制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、検索結果の最終ページにある最後の顧客を削除する担当者です。削除データ自体に不整合はありません。",
+          "confirmedWorkaround": "修正までは、削除後に検索を再実行して1ページ目へ戻ります。",
+          "confirmedRecovery": "検索条件を再送信すると残りの検索結果を表示できます。",
+          "riskAssessment": "残りの顧客が存在しないと誤認し、確認作業を中断する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -6408,13 +6603,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -6439,12 +6635,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -6531,7 +6727,7 @@
     "attendance-approved-correction-total-stale": {
       "scenarioId": "attendance-approved-correction-total-stale",
       "projectId": "attendance",
-      "rubricVersion": "attendance-approved-correction-total-stale.v3",
+      "rubricVersion": "attendance-approved-correction-total-stale.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -6558,7 +6754,13 @@
             "text": "勤怠集計仕様では、打刻修正の承認完了時に対象日の勤務時間と月次集計を再計算すると規定されています。 承認履歴と修正後の退勤時刻は正常に保存されています。"
           }
         ],
-        "specificationReference": "勤怠集計仕様書 Rev.4.7「6.2 打刻修正承認後の再計算」"
+        "specificationReference": "勤怠集計仕様書 Rev.4.7「6.2 打刻修正承認後の再計算」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、承認後に打刻時刻が変わる勤務データです。表示中の勤務合計と修正済み打刻が一致しません。",
+          "confirmedWorkaround": "修正までは、打刻修正承認後に月次集計の手動再計算を実行します。",
+          "confirmedRecovery": "対象月を再計算し、日次合計と月次合計が修正後打刻に一致することを確認します。",
+          "riskAssessment": "再計算せず給与連携すると勤務時間と残業時間を誤って計上する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -6634,13 +6836,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -6665,12 +6868,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -6757,7 +6960,7 @@
     "salon-reservation-auto-assigns-off-duty-staff": {
       "scenarioId": "salon-reservation-auto-assigns-off-duty-staff",
       "projectId": "salon",
-      "rubricVersion": "salon-reservation-auto-assigns-off-duty-staff.v3",
+      "rubricVersion": "salon-reservation-auto-assigns-off-duty-staff.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -6784,7 +6987,13 @@
             "text": "予約割当仕様では、指名なし予約の候補から休業、休憩、他予約と重なるスタッフを除外すると規定されています。 スタッフAの休業予定は予約日時より前に登録済みで、管理画面にも表示されています。"
           }
         ],
-        "specificationReference": "予約割当仕様書 Rev.3.6「4.3 指名なし予約の候補抽出」"
+        "specificationReference": "予約割当仕様書 Rev.3.6「4.3 指名なし予約の候補抽出」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、指名なしで登録する予約です。休業中のスタッフへ担当が割り当てられる可能性があります。",
+          "confirmedWorkaround": "修正までは、指名なし予約の登録後に担当者の勤務予定を確認し、勤務中のスタッフへ変更します。",
+          "confirmedRecovery": "誤って割り当てられた予約の担当者を勤務可能なスタッフへ変更し、顧客への案内内容を確認します。",
+          "riskAssessment": "来店時に担当者が不在となり、予約変更や待ち時間が発生する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -6860,13 +7069,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -6891,12 +7101,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -6983,7 +7193,7 @@
     "ec-payment-notification-header-case-rejected": {
       "scenarioId": "ec-payment-notification-header-case-rejected",
       "projectId": "ec",
-      "rubricVersion": "ec-payment-notification-header-case-rejected.v3",
+      "rubricVersion": "ec-payment-notification-header-case-rejected.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -7010,7 +7220,13 @@
             "text": "決済通知API仕様ではHTTPヘッダー名を大文字小文字を区別せず照合し、署名値が一致する通知を受理すると規定されています。 署名値の検証ログでは、小文字表記の場合に署名ヘッダー未指定と記録されています。"
           }
         ],
-        "specificationReference": "決済通知API仕様書 Rev.5.9「3.2 署名ヘッダーの照合」"
+        "specificationReference": "決済通知API仕様書 Rev.5.9「3.2 署名ヘッダーの照合」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、署名ヘッダー名を小文字へ正規化して送る決済事業者からの通知です。対象注文が支払待ちから更新されません。",
+          "confirmedWorkaround": "修正までは、決済事業者側で署名ヘッダー名を仕様書の表記に固定します。",
+          "confirmedRecovery": "拒否された決済通知を正しいヘッダー表記で再送し、注文と決済状態の一致を確認します。",
+          "riskAssessment": "決済済み注文が支払待ちとして残り、出荷遅延や重複決済案内につながる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -7086,13 +7302,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -7117,12 +7334,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -7209,7 +7426,7 @@
     "inventory-lot-leading-zero-lost-export": {
       "scenarioId": "inventory-lot-leading-zero-lost-export",
       "projectId": "inventory",
-      "rubricVersion": "inventory-lot-leading-zero-lost-export.v3",
+      "rubricVersion": "inventory-lot-leading-zero-lost-export.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -7236,7 +7453,13 @@
             "text": "在庫出力仕様では、ロット番号を数値へ変換せず登録値の文字列をそのまま出力すると規定されています。 表計算ソフトではなくテキストエディタでCSVを開いても125と記録されています。"
           }
         ],
-        "specificationReference": "在庫CSV出力仕様書 Rev.4.4「2.7 ロット番号」"
+        "specificationReference": "在庫CSV出力仕様書 Rev.4.4「2.7 ロット番号」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、先頭に0を含むロット番号をCSVで出力する在庫です。画面上の登録値は保持されています。",
+          "confirmedWorkaround": "修正までは、PDF出力または画面表示からロット番号を照合します。",
+          "confirmedRecovery": "誤ったCSVを破棄し、修正版で再出力して登録値と一致することを確認します。",
+          "riskAssessment": "別ロットとの同一性を誤認し、出荷追跡や回収対象の特定を誤る可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -7312,13 +7535,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -7343,12 +7567,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -7435,7 +7659,7 @@
     "mobile-notification-token-not-reregistered": {
       "scenarioId": "mobile-notification-token-not-reregistered",
       "projectId": "mobile",
-      "rubricVersion": "mobile-notification-token-not-reregistered.v3",
+      "rubricVersion": "mobile-notification-token-not-reregistered.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -7462,7 +7686,13 @@
             "text": "通知登録仕様では、アプリ起動時にOSの通知許可と端末トークンを確認し、有効なトークンが未登録ならサーバーへ送信すると規定されています。 OSから取得したトークン値は許可再開前後で同一ですが、サーバー上では無効状態のままです。"
           }
         ],
-        "specificationReference": "プッシュ通知登録仕様書 Rev.4.6「5.3 通知許可変更後の再登録」"
+        "specificationReference": "プッシュ通知登録仕様書 Rev.4.6「5.3 通知許可変更後の再登録」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、通知許可を一度オフにしてから再度オンにしたログイン済み端末です。通知を受信できません。",
+          "confirmedWorkaround": "修正までは、通知許可を戻した後にログアウトして再ログインします。",
+          "confirmedRecovery": "対象端末で再ログインし、トークンが有効状態で登録されたこととテスト通知の受信を確認します。",
+          "riskAssessment": "重要なお知らせや更新通知を利用者が受信できない状態が継続する可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -7538,13 +7768,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -7569,12 +7800,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -7661,7 +7892,7 @@
     "automotive-can-rolling-counter-rollover-rejected": {
       "scenarioId": "automotive-can-rolling-counter-rollover-rejected",
       "projectId": "automotive",
-      "rubricVersion": "automotive-can-rolling-counter-rollover-rejected.v3",
+      "rubricVersion": "automotive-can-rolling-counter-rollover-rejected.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -7688,7 +7919,13 @@
             "text": "CAN通信仕様では4ビットカウンタを0から15で循環させ、15の次の0を連続した正常値として受理すると規定されています。 同じ受信経路の8ビットカウンタでは255から0への周回を正常に受理しています。"
           }
         ],
-        "specificationReference": "CAN通信仕様書 Rev.6.5「8.4 ローリングカウンタ監視」"
+        "specificationReference": "CAN通信仕様書 Rev.6.5「8.4 ローリングカウンタ監視」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、MSG-221のローリングカウンタが15から0へ周回するタイミングの受信データです。1フレームが欠落します。",
+          "confirmedWorkaround": "修正までは、試験環境では周回直後の値を次周期で再送して受信値を補完します。",
+          "confirmedRecovery": "修正版へ更新して周回時のフレーム欠落がないことと診断履歴を確認します。",
+          "riskAssessment": "周期データが一時的に欠落し、表示更新や監視判定が遅れる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -7764,13 +8001,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -7795,12 +8033,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -7887,7 +8125,7 @@
     "payment-refund-event-before-response-stale": {
       "scenarioId": "payment-refund-event-before-response-stale",
       "projectId": "payment",
-      "rubricVersion": "payment-refund-event-before-response-stale.v3",
+      "rubricVersion": "payment-refund-event-before-response-stale.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -7914,7 +8152,13 @@
             "text": "返金状態遷移仕様では、返金完了は処理中より優先度の高い終端状態であり、遅延した受付応答で前の状態へ戻してはならないと規定されています。 ゲートウェイ側では返金が完了しており、再返金要求は重複として拒否されます。"
           }
         ],
-        "specificationReference": "返金状態遷移仕様書 Rev.5.3「6.4 非同期イベントの順序逆転」"
+        "specificationReference": "返金状態遷移仕様書 Rev.5.3「6.4 非同期イベントの順序逆転」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、返金完了Webhookが返金API応答より先に到着した取引です。ゲートウェイと加盟店画面の状態が一致しません。",
+          "confirmedWorkaround": "修正までは、処理中が長時間続く返金をゲートウェイ照会し、完了済みなら手動で状態を補正します。",
+          "confirmedRecovery": "対象取引を返金完了へ補正し、返金額と会計連携と監査ログの一致を確認します。",
+          "riskAssessment": "完了済み返金を未完了と誤認し、重複操作や顧客への誤案内につながる可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -7990,13 +8234,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -8021,12 +8266,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],
@@ -8113,7 +8358,7 @@
     "medical-lab-result-unit-conversion-wrong": {
       "scenarioId": "medical-lab-result-unit-conversion-wrong",
       "projectId": "medical",
-      "rubricVersion": "medical-lab-result-unit-conversion-wrong.v3",
+      "rubricVersion": "medical-lab-result-unit-conversion-wrong.v4",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -8140,7 +8385,13 @@
             "text": "検査単位変換仕様では、ng/dLからμg/Lへの変換係数を10とし、受信値25を表示値250へ変換すると規定されています。 データベースには受信値25と受信単位ng/dLが変更されず保存されています。"
           }
         ],
-        "specificationReference": "検査単位変換仕様書 Rev.6.2「7.5 質量濃度の換算」"
+        "specificationReference": "検査単位変換仕様書 Rev.6.2「7.5 質量濃度の換算」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、ng/dLで受信してμg/Lへ表示変換する検査項目です。保存された原値は正しいものの診療画面の表示値が10倍になります。",
+          "confirmedWorkaround": "修正までは、対象項目の受信原文を確認し、ng/dLの値から手計算した結果を参照します。",
+          "confirmedRecovery": "修正版で表示値を再計算し、過去の対象結果について診療記録への影響を確認します。",
+          "riskAssessment": "検査値を実際より高く誤認し、診療判断や追加検査の判断を誤る可能性があります。"
+        }
       },
       "requiredFacts": {
         "subject": [
@@ -8216,13 +8467,14 @@
       },
       "factAssessmentPolicy": {
         "semanticEquivalence": true,
-        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
         "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
         "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
         "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
         "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
         "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
-        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない"
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
       },
       "reviewGuide": {
         "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
@@ -8247,12 +8499,12 @@
         },
         {
           "id": "claim-unverified-scope",
-          "description": "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
           "severity": "major"
         },
         {
           "id": "claim-unverified-impact",
-          "description": "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
           "severity": "major"
         }
       ],

@@ -5358,5 +5358,15 @@
       });
   });
 
+  Object.values(scenarios).forEach((profile) => {
+    const judgement = profile.judgement;
+    profile.reviewSource.learnerVisibleContext = Object.freeze({
+      confirmedImpactScope: judgement.scope,
+      confirmedWorkaround: judgement.workaround,
+      confirmedRecovery: judgement.recovery,
+      riskAssessment: judgement.risk,
+    });
+  });
+
   window.TYPING_WORKBENCH_SCENARIO_AUTHORING = Object.freeze(scenarios);
 })();

@@ -6,6 +6,7 @@ import {
   createAttemptRecord,
   createFailedScoringResult,
   createReusedScoringResult,
+  isScoringResultCompatible,
   isScoringSupported,
   scoreAttemptRecordWithGemini,
 } from "./scoring-service.js";
@@ -28,9 +29,9 @@ const scoringWindows = new Map();
 const scoringWindowMs = 60000;
 const scoringLimitPerWindow = 5;
 
-function latestSuccessfulScoringResult(attempt) {
+function latestCompatibleScoringResult(attempt) {
   return (attempt?.scoringResults || []).find(
-    (result) => result.status === "succeeded" && Number.isInteger(result.totalScore)
+    (result) => isScoringResultCompatible(result, attempt, { modelId: geminiModel })
   ) || null;
 }
 
@@ -50,7 +51,7 @@ function matchingScoredRevision(ticket, attempt) {
       revision.attemptId !== attempt.attemptId
       && (revision.revisionNumber || 1) < (attempt.revisionNumber || 1)
       && attemptContentFingerprint(revision) === fingerprint
-      && latestSuccessfulScoringResult(revision)
+      && latestCompatibleScoringResult(revision)
     )
     .sort((left, right) => (right.revisionNumber || 1) - (left.revisionNumber || 1))[0] || null;
 }
@@ -328,7 +329,7 @@ const server = http.createServer(async (request, response) => {
         error.code = "SCENARIO_NOT_SUPPORTED";
         throw error;
       }
-      const existingResult = latestSuccessfulScoringResult(attempt);
+      const existingResult = latestCompatibleScoringResult(attempt);
       if (existingResult) {
         sendJson(response, 200, { scoringResult: existingResult }, origin);
         return;
@@ -340,14 +341,14 @@ const server = http.createServer(async (request, response) => {
       if (matchedRevision) {
         const scoringResult = createReusedScoringResult(
           attempt,
-          latestSuccessfulScoringResult(matchedRevision)
+          latestCompatibleScoringResult(matchedRevision)
         );
         await storageRepository.appendScoringResult(scoringResult);
         sendJson(response, 200, { scoringResult }, origin);
         return;
       }
       const previousAttempt = previousTicketRevision(ticket, attempt);
-      const previousScoringResult = latestSuccessfulScoringResult(previousAttempt);
+      const previousScoringResult = latestCompatibleScoringResult(previousAttempt);
       enforceScoringRateLimit(user.userId);
       let scoringResult;
       try {

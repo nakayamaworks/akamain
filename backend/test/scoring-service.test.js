@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  DEFAULT_MODEL,
+  PROMPT_VERSION,
   SUPPORTED_SCENARIO_IDS,
   attemptContentFingerprint,
   buildRubricFindings,
@@ -11,6 +13,7 @@ import {
   createFailedScoringResult,
   createReusedScoringResult,
   isScoringSupported,
+  isScoringResultCompatible,
   getScenarioRubric,
   normalizeModelOutput,
   scoreAttemptRecordWithGemini,
@@ -890,7 +893,56 @@ test("semantic rubric policy does not require trace identifiers in ticket prose"
   });
   assert.match(prompt, /追跡用識別子/);
   assert.match(prompt, /本文に具体値がなくても不足にしない/);
-  assert.match(prompt, /reviewSourceはAI採点者だけが持つ/);
+  assert.match(prompt, /learnerVisibleContextを除く観測記録は、AI採点者だけが持つ/);
+});
+
+test("all bug rubrics share learner-visible judgement context with Gemini", () => {
+  const bugRubrics = SUPPORTED_SCENARIO_IDS
+    .map((scenarioId) => getScenarioRubric(scenarioId))
+    .filter((rubric) => rubric.ticketType !== "qa");
+  assert.equal(bugRubrics.length, 36);
+  for (const rubric of bugRubrics) {
+    assert.ok(rubric.reviewSource.learnerVisibleContext.confirmedImpactScope);
+    assert.ok(rubric.reviewSource.learnerVisibleContext.confirmedWorkaround);
+    assert.ok(rubric.reviewSource.learnerVisibleContext.confirmedRecovery);
+    assert.ok(rubric.reviewSource.learnerVisibleContext.riskAssessment);
+  }
+});
+
+test("confirmed tax impact scope is explicit scoring evidence, not a forbidden claim", () => {
+  const scenarioId = "ec-tax-rounding-inconsistent";
+  const rubric = getScenarioRubric(scenarioId);
+  const confirmedScope = rubric.reviewSource.learnerVisibleContext.confirmedImpactScope;
+  assert.match(confirmedScope, /商品一覧の表示、注文金額、会計連携の間で1円の差/);
+
+  const prompt = buildScoringPrompt({
+    scenarioId,
+    answer: {
+      subject: "消費税計算で1円未満の端数が発生する商品を複数選択すると、商品一覧の表示、注文金額、会計連携の間で1円の差が生じてしまう",
+      sections: rubric.writingExample.sections,
+    },
+    selectedEvidenceIds: rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id),
+  });
+  assert.match(prompt, /受講者にも提示された周辺情報/);
+  assert.match(prompt, /意味的に一致する場合、未確認の範囲・影響・回避策として指摘せず/);
+  assert.match(prompt, /商品一覧の表示、注文金額、会計連携の間で1円の差/);
+  assert.match(prompt, /summaryですでに確認済みの内容を『次に確認すべきこと』として重複提案しない/);
+});
+
+test("scoring results are reusable only with current rubric, prompt, and model", () => {
+  const attempt = { scenarioId: "ec-tax-rounding-inconsistent" };
+  const rubric = getScenarioRubric(attempt.scenarioId);
+  const result = {
+    status: "succeeded",
+    totalScore: 90,
+    rubricVersion: rubric.rubricVersion,
+    promptVersion: PROMPT_VERSION,
+    modelId: DEFAULT_MODEL,
+  };
+  assert.equal(isScoringResultCompatible(result, attempt), true);
+  assert.equal(isScoringResultCompatible({ ...result, rubricVersion: "old" }, attempt), false);
+  assert.equal(isScoringResultCompatible({ ...result, promptVersion: "old" }, attempt), false);
+  assert.equal(isScoringResultCompatible({ ...result, modelId: "other-model" }, attempt), false);
 });
 
 test("bug reader questions never expose evaluator-only observations", () => {
@@ -974,7 +1026,7 @@ test("notification review treats standard delivery operations as known and unsup
     },
     selectedEvidenceIds: ["notification-payload", "notification-video", "navigation-log"],
   });
-  assert.equal(rubric.rubricVersion, "mobile-notification-opens-wrong-news.v4");
+  assert.equal(rubric.rubricVersion, "mobile-notification-opens-wrong-news.v5");
   assert.match(prompt, /NEWS-101を送信して開封した端末/);
   assert.match(prompt, /手順書レベルの詳細を不足扱いしない/);
   assert.match(prompt, /実施済みの事実か、再現のために補った推測か/);
@@ -998,7 +1050,7 @@ test("each scenario uses its own rubric, ticket fields, and evidence requirement
     completedAt: "2026-08-05T01:30:00.000Z",
   };
   const prompt = buildScoringPrompt(attempt);
-  assert.match(prompt, /customer-search-nonexistent-name-all-results\.v3/);
+  assert.match(prompt, /customer-search-nonexistent-name-all-results\.v4/);
   assert.match(prompt, /selectedEvidenceIds/);
   assert.match(prompt, /検索結果は0件/);
 });
@@ -1031,7 +1083,7 @@ test("a non-pilot scenario is scored with its own rubric version and findings", 
     }),
   });
   assert.equal(result.schemaVersion, "scoring-result.v3");
-  assert.equal(result.rubricVersion, `${scenarioId}.v3`);
+  assert.equal(result.rubricVersion, `${scenarioId}.v4`);
   assert.equal(result.rubricFindings.factAssessments.length, 7);
   assert.equal(result.rubricFindings.evidenceCheck.matched, false);
 });

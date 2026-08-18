@@ -396,7 +396,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v15"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v16"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問") ||
@@ -411,7 +411,7 @@ if (
   !backendScoringSource.includes("seed: scoringSeedForAttempt(attempt)") ||
   backendScoringSource.includes("temperature: 0.25") ||
   !backendServerSource.includes("matchingScoredRevision(ticket, attempt)") ||
-  !backendServerSource.includes("latestSuccessfulScoringResult(attempt)")
+  !backendServerSource.includes("latestCompatibleScoringResult(attempt)")
 ) {
   errors.push("revision scoring must reuse identical content and prevent ungrounded score regressions");
 }
@@ -731,6 +731,10 @@ Object.entries(authoredScenarios).forEach(([scenarioId, profile]) => {
     || reviewSource.observations.length < 3
     || reviewSource.observations.some(({ id, text }) => !id || !text)
     || !reviewSource?.specificationReference
+    || reviewSource?.learnerVisibleContext?.confirmedImpactScope !== profile.judgement?.scope
+    || reviewSource?.learnerVisibleContext?.confirmedWorkaround !== profile.judgement?.workaround
+    || reviewSource?.learnerVisibleContext?.confirmedRecovery !== profile.judgement?.recovery
+    || reviewSource?.learnerVisibleContext?.riskAssessment !== profile.judgement?.risk
     || !reviewSource?.alternativeExcellentAnswer?.subject
     || !reviewSource?.alternativeExcellentAnswer?.sections
   ) {
@@ -1256,8 +1260,15 @@ try {
           reproducibility: "3/3",
         },
       };
+      const judgement = getScenarioJudgementProfile(rawScenario);
       const reviewSource = {
         ...baseReviewSource,
+        learnerVisibleContext: {
+          confirmedImpactScope: judgement?.scope || "",
+          confirmedWorkaround: judgement?.workaround || "",
+          confirmedRecovery: judgement?.recovery || "",
+          riskAssessment: judgement?.risk || "",
+        },
         alternativeExcellentAnswer: existingProfile?.reviewSource?.alternativeExcellentAnswer
           || (rawScenario.scenarioId === "mobile-rotation-clears-input"
             ? mobileRotationAlternative
@@ -1286,7 +1297,7 @@ try {
         scenario: rawScenario,
         briefing,
         specificationReference: getScenarioSpecificationReference(rawScenario),
-        judgement: getScenarioJudgementProfile(rawScenario),
+        judgement,
         reviewSource,
         reviewGuide,
       }];
@@ -1315,24 +1326,25 @@ try {
     },
     {
       id: "claim-unverified-scope",
-      description: "確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+      description: "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
       severity: "major",
     },
     {
       id: "claim-unverified-impact",
-      description: "確認されていない損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+      description: "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
       severity: "major",
     },
   ];
   const factAssessmentPolicy = {
     semanticEquivalence: true,
-    sourceMaterialRule: "reviewSourceに含まれる観測記録、仕様、環境が事実判定の基準であり、writingExampleは判定に使用しない",
+    sourceMaterialRule: "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
     sectionFlexibilityRule: "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
     standardOperationDetailRule: "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
     unsupportedAdditionRule: "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
     trackingIdentifierRule: "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
     measuredValueRule: "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
     evidenceRule: "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+    learnerVisibleContextRule: "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う",
   };
   const scoringRubricRegistry = {
     schemaVersion: "scenario-rubric-registry.v1",
@@ -1398,12 +1410,12 @@ try {
         scenarioId: seed.scenarioId,
         projectId: seed.projectId,
         rubricVersion: isPilot
-          ? "customer-save-multiple-clicks-duplicate.v5"
+          ? "customer-save-multiple-clicks-duplicate.v6"
           : seed.scenarioId === "mobile-background-sync-data-lost"
-            ? "mobile-background-sync-data-lost.v4"
+            ? "mobile-background-sync-data-lost.v5"
             : seed.scenarioId === "mobile-notification-opens-wrong-news"
-              ? "mobile-notification-opens-wrong-news.v4"
-            : `${seed.scenarioId}.v3`,
+              ? "mobile-notification-opens-wrong-news.v5"
+            : `${seed.scenarioId}.v4`,
         reviewSource: reviewSourceForScoring,
         requiredFacts: generatedRequiredFacts,
         factAssessmentPolicy,
@@ -1553,6 +1565,10 @@ try {
       || factIds.size !== facts.length
       || reviewSourceIds.size < 3
       || Object.hasOwn(rubric.reviewSource || {}, "alternativeExcellentAnswer")
+      || !rubric.reviewSource?.learnerVisibleContext?.confirmedImpactScope
+      || !rubric.reviewSource?.learnerVisibleContext?.confirmedWorkaround
+      || !rubric.reviewSource?.learnerVisibleContext?.confirmedRecovery
+      || !rubric.reviewSource?.learnerVisibleContext?.riskAssessment
       || facts.some((fact) => !Array.isArray(fact.sourceRefs)
         || fact.sourceRefs.some((sourceRef) => !reviewSourceIds.has(sourceRef)))
       || rubric.factAssessmentPolicy?.semanticEquivalence !== true
@@ -1560,6 +1576,7 @@ try {
       || !rubric.factAssessmentPolicy?.sectionFlexibilityRule
       || !rubric.factAssessmentPolicy?.standardOperationDetailRule
       || !rubric.factAssessmentPolicy?.unsupportedAdditionRule
+      || !rubric.factAssessmentPolicy?.learnerVisibleContextRule
       || !rubric.writingExample?.subject
       || requiredEvidenceIds.length < 2
       || !rubric.expectedTicketFields.severity
