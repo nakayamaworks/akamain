@@ -4612,7 +4612,7 @@ function renderPracticeInvestigationAdvice(items) {
   elements.practiceScoringInvestigationSection?.classList.toggle("hidden", !hasItems);
   setTextContent(
     elements.practiceScoringInvestigationTitle,
-    isQaScenario() ? "回答依頼前に確認すること" : "次に確認・切り分けすること"
+    isQaScenario() ? "回答依頼前に確認すること" : "追加で確認できること"
   );
   if (!elements.practiceScoringInvestigationAdvice) {
     return;
@@ -5467,7 +5467,7 @@ function renderTicketDetail() {
         ${hasImprovementSuggestions ? "" : '<p class="ticket-detail-no-improvements">優先して修正が必要な表現や不足情報はありません。</p>'}
         ${questions ? `<h3>${qaTicket ? "回答者から聞き返されそうなこと" : "読み手が疑問に思うこと"}</h3><ul>${questions}</ul>` : ""}
         ${ambiguityRisks ? `<h3>曖昧さ・誤解のリスク</h3><ul class="ticket-detail-advice">${ambiguityRisks}</ul>` : ""}
-        ${advice ? `<h3>次に確認・切り分けすること</h3><ol class="ticket-detail-advice">${advice}</ol>` : ""}
+        ${advice ? `<h3>追加で確認できること</h3><ol class="ticket-detail-advice">${advice}</ol>` : ""}
         ${rewrites ? `<h3>書き換え提案</h3><ul class="ticket-detail-advice">${rewrites}</ul>` : ""}
       ` : `<p>${reviewStatus === "not_supported" ? "このシナリオのAIレビューは準備中です。起票内容は保存されています。" : "AIレビュー結果はまだありません。起票内容は保存されています。"}</p>`}
     </article>

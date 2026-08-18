@@ -396,7 +396,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v16"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v17"') ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問") ||
@@ -1205,6 +1205,8 @@ try {
           id: file.id,
           name: file.name,
           summary: file.summary,
+          contentPreview: file.preview,
+          confirmedFinding: file.resultReason,
           required: evidenceProfile.requiredIds.includes(file.id),
         })),
         reviewGuide: window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[
@@ -1410,12 +1412,12 @@ try {
         scenarioId: seed.scenarioId,
         projectId: seed.projectId,
         rubricVersion: isPilot
-          ? "customer-save-multiple-clicks-duplicate.v6"
+          ? "customer-save-multiple-clicks-duplicate.v7"
           : seed.scenarioId === "mobile-background-sync-data-lost"
-            ? "mobile-background-sync-data-lost.v5"
+            ? "mobile-background-sync-data-lost.v6"
             : seed.scenarioId === "mobile-notification-opens-wrong-news"
-              ? "mobile-notification-opens-wrong-news.v5"
-            : `${seed.scenarioId}.v4`,
+              ? "mobile-notification-opens-wrong-news.v6"
+            : `${seed.scenarioId}.v5`,
         reviewSource: reviewSourceForScoring,
         requiredFacts: generatedRequiredFacts,
         factAssessmentPolicy,
@@ -1579,6 +1581,7 @@ try {
       || !rubric.factAssessmentPolicy?.learnerVisibleContextRule
       || !rubric.writingExample?.subject
       || requiredEvidenceIds.length < 2
+      || rubric.evidenceFiles.some((file) => !file.contentPreview || !file.confirmedFinding)
       || !rubric.expectedTicketFields.severity
       || !rubric.expectedTicketFields.priority
       || !rubric.expectedTicketFields.category

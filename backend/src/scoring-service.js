@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v16";
+export const PROMPT_VERSION = "practice-review.v17";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const questionClassifications = ["不足情報", "記述確認", "調査提案"];
@@ -356,7 +356,7 @@ export function buildModelOutputSchema(rubric) {
     },
     investigationAdvice: {
       type: "array",
-      minItems: rubric.ticketType === "qa" ? 0 : 1,
+      minItems: 0,
       maxItems: 4,
       items: {
         type: "object",
@@ -619,6 +619,22 @@ export function buildScoringPrompt(attempt, options = {}) {
     writingExample: _writingExample,
     ...scoringRubric
   } = rubric;
+  const selectedEvidenceIds = new Set(attempt.selectedEvidenceIds || []);
+  const selectedEvidenceContext = (scoringRubric.evidenceFiles || [])
+    .filter(({ id }) => selectedEvidenceIds.has(id))
+    .map(({ id, name, summary, contentPreview, confirmedFinding }) => ({
+      id,
+      name,
+      summary,
+      contentPreview,
+      confirmedFinding,
+    }));
+  const scoringRubricForPrompt = {
+    ...scoringRubric,
+    evidenceFiles: (scoringRubric.evidenceFiles || []).map(
+      ({ contentPreview: _contentPreview, confirmedFinding: _confirmedFinding, ...file }) => file
+    ),
+  };
   if (rubric.ticketType === "qa") {
     return [
       "あなたは、開発者または仕様作成者としてQA起票を受け取り、判断するシニア担当者です。",
@@ -651,7 +667,7 @@ export function buildScoringPrompt(attempt, options = {}) {
       "各評価軸は0〜100の整数で採点してください。",
       "",
       "採点基準:",
-      JSON.stringify(scoringRubric),
+      JSON.stringify(scoringRubricForPrompt),
       "",
       "受講者の回答:",
       JSON.stringify({
@@ -659,6 +675,9 @@ export function buildScoringPrompt(attempt, options = {}) {
         selectedEvidenceIds: attempt.selectedEvidenceIds || [],
         evidenceDescriptions: attempt.evidenceDescriptions || {},
       }),
+      "",
+      "選択済み添付証跡の内容:",
+      JSON.stringify(selectedEvidenceContext),
       ...buildRevisionPromptParts(options),
     ].join("\n");
   }
@@ -681,7 +700,8 @@ export function buildScoringPrompt(attempt, options = {}) {
     "通知ID、注文番号、患者ID、商品名などの追跡用識別子は、同一性や差異が説明され、選択済み証跡から対象を追跡できるなら、本文に具体値がなくても不足にしないでください。",
     "金額、時刻、件数、再現回数、仕様閾値は一律に例示扱いせず、発生条件・期待値・実測結果を成立させる値かを判断してください。入力材料と異なる値の記載は矛盾として扱ってください。",
     "添付証跡は追跡用識別子や証跡確認の事実を補完できますが、題名、主要な発生条件、期待結果、実際の動作そのものの記載を代替しません。",
-    "選択済み添付証跡のsummaryは、その証跡から確認できる事実として扱ってください。summaryですでに確認済みの内容を『次に確認すべきこと』として重複提案しないでください。未選択の証跡のsummaryは、受講者が確認した事実として使わないでください。",
+    "選択済み添付証跡のsummary、contentPreview、confirmedFindingは、その証跡から確認できる事実として扱ってください。シナリオ本文にない事実でも、選択済み証跡で確認できるならレビュー判断に使用できます。未選択の証跡は、受講者が確認した事実として使わないでください。",
+    "investigationAdviceは画面上で『追加で確認できること』として表示します。選択済み証跡や起票本文ですでに確認済みの内容を、これから行う確認として重複提案してはいけません。確認済み事実からさらに先へ進める具体的な調査候補がある場合だけ返し、なければ空配列にしてください。",
     "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用してください。記述確認または調査提案の場合はfactIdをnot-applicableにしてください。受講者へ提示されていない情報を答えさせる質問を、不足情報として生成してはいけません。",
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
@@ -689,9 +709,10 @@ export function buildScoringPrompt(attempt, options = {}) {
     "チケット設定と添付証跡の選択正誤は別チェックです。expectedTicketFields、および必要なevidenceFilesを選べたかどうかをdimensionsやverdictの減点理由に含めないでください。",
     "一方、選択した添付ファイルごとのevidenceDescriptionsは起票内容の一部です。ファイル名だけでは内容を判別しにくい証跡について、読み手がファイルの内容や確認箇所を把握できる説明になっているかをinvestigationReadinessだけで評価してください。未入力や『ログです』『エラーあり』のような汎用説明があれば軽微な改善として扱い、根拠のない原因断定やファイル内容と矛盾する説明は明確に指摘してください。",
     "evidenceDescriptionsが全件具体的で、対象処理・時刻・確認箇所などを簡潔に把握できる場合は、添付説明を理由にinvestigationReadinessを減点しないでください。説明が未入力でも送信自体は可能であり、添付説明だけを理由に主要情報不足や再整理を推奨してはいけません。",
+    "利用者向けレビューではevidenceDescriptionsなどの内部フィールド名や証跡IDを表示せず、『添付ファイルの説明』と実際のファイル名を使用してください。",
     "readerQuestionsは確定した不足がなければ0件で構いません。最大4件とし、件数を満たすための質問を作らないでください。",
     "readerQuestionsはチケット本文と選択済み証跡だけを読んだ実際の担当者が、起票者へ聞き返す質問です。観測記録、提示材料、シナリオ、記載例だけにある情報を引用したり、その情報との違いを質問したりしないでください。",
-    "investigationAdviceは起票の不足とは分けて1〜4件示してください。",
+    "investigationAdviceは起票の不足とは分けて0〜4件示してください。",
     "文章が十分明確な場合は無理に欠点を作らず、調査開始後に読み手が確認したくなる点を調査提案として示してください。",
     "rewriteSuggestionsは本当に改善効果がある場合だけ返してください。受講者の有効な表現を残した最小限の修正とし、記載例を丸ごと再現した文章へ置き換えないでください。",
     "受講者向けの表示では『備考』欄を『周辺確認・補足』と呼びます。レビュー本文やrewriteSuggestionsのsectionでこの欄を指す場合も『周辺確認・補足』と表記してください。",
@@ -708,7 +729,7 @@ export function buildScoringPrompt(attempt, options = {}) {
     "各評価軸は0〜100の整数で採点してください。",
     "",
     "採点基準:",
-    JSON.stringify(scoringRubric),
+    JSON.stringify(scoringRubricForPrompt),
     "",
     "受講者の回答:",
     JSON.stringify({
@@ -716,6 +737,9 @@ export function buildScoringPrompt(attempt, options = {}) {
       selectedEvidenceIds: attempt.selectedEvidenceIds || [],
       evidenceDescriptions: attempt.evidenceDescriptions || {},
     }),
+    "",
+    "選択済み添付証跡の内容:",
+    JSON.stringify(selectedEvidenceContext),
     ...buildRevisionPromptParts(options),
   ].join("\n");
 }

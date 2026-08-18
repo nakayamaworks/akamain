@@ -3,7 +3,7 @@
   "scenarios": {
     "customer-context-menu-not-shown": {
       "scenarioId": "customer-context-menu-not-shown",
-      "rubricVersion": "customer-context-menu-not-shown.v4",
+      "rubricVersion": "customer-context-menu-not-shown.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -139,7 +139,7 @@
     },
     "customer-search-nonexistent-name-all-results": {
       "scenarioId": "customer-search-nonexistent-name-all-results",
-      "rubricVersion": "customer-search-nonexistent-name-all-results.v4",
+      "rubricVersion": "customer-search-nonexistent-name-all-results.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -275,7 +275,7 @@
     },
     "customer-save-multiple-clicks-duplicate": {
       "scenarioId": "customer-save-multiple-clicks-duplicate",
-      "rubricVersion": "customer-save-multiple-clicks-duplicate.v6",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v7",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -411,7 +411,7 @@
     },
     "attendance-clock-out-next-day": {
       "scenarioId": "attendance-clock-out-next-day",
-      "rubricVersion": "attendance-clock-out-next-day.v4",
+      "rubricVersion": "attendance-clock-out-next-day.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -547,7 +547,7 @@
     },
     "salon-duplicate-reservation": {
       "scenarioId": "salon-duplicate-reservation",
-      "rubricVersion": "salon-duplicate-reservation.v4",
+      "rubricVersion": "salon-duplicate-reservation.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -683,7 +683,7 @@
     },
     "ec-out-of-stock-cart": {
       "scenarioId": "ec-out-of-stock-cart",
-      "rubricVersion": "ec-out-of-stock-cart.v4",
+      "rubricVersion": "ec-out-of-stock-cart.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -819,7 +819,7 @@
     },
     "inventory-over-shipment": {
       "scenarioId": "inventory-over-shipment",
-      "rubricVersion": "inventory-over-shipment.v4",
+      "rubricVersion": "inventory-over-shipment.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -955,7 +955,7 @@
     },
     "mobile-rotation-clears-input": {
       "scenarioId": "mobile-rotation-clears-input",
-      "rubricVersion": "mobile-rotation-clears-input.v4",
+      "rubricVersion": "mobile-rotation-clears-input.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1091,7 +1091,7 @@
     },
     "automotive-speed-display-delay": {
       "scenarioId": "automotive-speed-display-delay",
-      "rubricVersion": "automotive-speed-display-delay.v4",
+      "rubricVersion": "automotive-speed-display-delay.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1227,7 +1227,7 @@
     },
     "payment-failed-payment-sales-record": {
       "scenarioId": "payment-failed-payment-sales-record",
-      "rubricVersion": "payment-failed-payment-sales-record.v4",
+      "rubricVersion": "payment-failed-payment-sales-record.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1363,7 +1363,7 @@
     },
     "medical-cross-patient-results": {
       "scenarioId": "medical-cross-patient-results",
-      "rubricVersion": "medical-cross-patient-results.v4",
+      "rubricVersion": "medical-cross-patient-results.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1499,7 +1499,7 @@
     },
     "attendance-overnight-break-not-deducted": {
       "scenarioId": "attendance-overnight-break-not-deducted",
-      "rubricVersion": "attendance-overnight-break-not-deducted.v4",
+      "rubricVersion": "attendance-overnight-break-not-deducted.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1635,7 +1635,7 @@
     },
     "attendance-simultaneous-clock-out-double-overtime": {
       "scenarioId": "attendance-simultaneous-clock-out-double-overtime",
-      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v4",
+      "rubricVersion": "attendance-simultaneous-clock-out-double-overtime.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1771,7 +1771,7 @@
     },
     "salon-cancelled-slot-remains-booked": {
       "scenarioId": "salon-cancelled-slot-remains-booked",
-      "rubricVersion": "salon-cancelled-slot-remains-booked.v4",
+      "rubricVersion": "salon-cancelled-slot-remains-booked.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -1907,7 +1907,7 @@
     },
     "salon-simultaneous-double-booking": {
       "scenarioId": "salon-simultaneous-double-booking",
-      "rubricVersion": "salon-simultaneous-double-booking.v4",
+      "rubricVersion": "salon-simultaneous-double-booking.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2043,7 +2043,7 @@
     },
     "ec-tax-rounding-inconsistent": {
       "scenarioId": "ec-tax-rounding-inconsistent",
-      "rubricVersion": "ec-tax-rounding-inconsistent.v4",
+      "rubricVersion": "ec-tax-rounding-inconsistent.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2179,7 +2179,7 @@
     },
     "ec-payment-notification-double-order": {
       "scenarioId": "ec-payment-notification-double-order",
-      "rubricVersion": "ec-payment-notification-double-order.v4",
+      "rubricVersion": "ec-payment-notification-double-order.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2315,7 +2315,7 @@
     },
     "inventory-expired-lot-fifo": {
       "scenarioId": "inventory-expired-lot-fifo",
-      "rubricVersion": "inventory-expired-lot-fifo.v4",
+      "rubricVersion": "inventory-expired-lot-fifo.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2451,7 +2451,7 @@
     },
     "inventory-simultaneous-shipment-negative-stock": {
       "scenarioId": "inventory-simultaneous-shipment-negative-stock",
-      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v4",
+      "rubricVersion": "inventory-simultaneous-shipment-negative-stock.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2587,7 +2587,7 @@
     },
     "mobile-notification-opens-wrong-news": {
       "scenarioId": "mobile-notification-opens-wrong-news",
-      "rubricVersion": "mobile-notification-opens-wrong-news.v5",
+      "rubricVersion": "mobile-notification-opens-wrong-news.v6",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2723,7 +2723,7 @@
     },
     "mobile-background-sync-data-lost": {
       "scenarioId": "mobile-background-sync-data-lost",
-      "rubricVersion": "mobile-background-sync-data-lost.v5",
+      "rubricVersion": "mobile-background-sync-data-lost.v6",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2859,7 +2859,7 @@
     },
     "automotive-can-byte-order-reversed": {
       "scenarioId": "automotive-can-byte-order-reversed",
-      "rubricVersion": "automotive-can-byte-order-reversed.v4",
+      "rubricVersion": "automotive-can-byte-order-reversed.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -2995,7 +2995,7 @@
     },
     "automotive-bus-off-recovery-receive-stopped": {
       "scenarioId": "automotive-bus-off-recovery-receive-stopped",
-      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v4",
+      "rubricVersion": "automotive-bus-off-recovery-receive-stopped.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3131,7 +3131,7 @@
     },
     "payment-idempotency-key-double-charge": {
       "scenarioId": "payment-idempotency-key-double-charge",
-      "rubricVersion": "payment-idempotency-key-double-charge.v4",
+      "rubricVersion": "payment-idempotency-key-double-charge.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3267,7 +3267,7 @@
     },
     "payment-timeout-authorization-remains": {
       "scenarioId": "payment-timeout-authorization-remains",
-      "rubricVersion": "payment-timeout-authorization-remains.v4",
+      "rubricVersion": "payment-timeout-authorization-remains.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3403,7 +3403,7 @@
     },
     "medical-weight-conversion-dose-thousandfold": {
       "scenarioId": "medical-weight-conversion-dose-thousandfold",
-      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v4",
+      "rubricVersion": "medical-weight-conversion-dose-thousandfold.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3539,7 +3539,7 @@
     },
     "medical-lab-result-resend-duplicate": {
       "scenarioId": "medical-lab-result-resend-duplicate",
-      "rubricVersion": "medical-lab-result-resend-duplicate.v4",
+      "rubricVersion": "medical-lab-result-resend-duplicate.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3675,7 +3675,7 @@
     },
     "customer-search-delete-last-page-stays-empty": {
       "scenarioId": "customer-search-delete-last-page-stays-empty",
-      "rubricVersion": "customer-search-delete-last-page-stays-empty.v4",
+      "rubricVersion": "customer-search-delete-last-page-stays-empty.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3811,7 +3811,7 @@
     },
     "attendance-approved-correction-total-stale": {
       "scenarioId": "attendance-approved-correction-total-stale",
-      "rubricVersion": "attendance-approved-correction-total-stale.v4",
+      "rubricVersion": "attendance-approved-correction-total-stale.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -3947,7 +3947,7 @@
     },
     "salon-reservation-auto-assigns-off-duty-staff": {
       "scenarioId": "salon-reservation-auto-assigns-off-duty-staff",
-      "rubricVersion": "salon-reservation-auto-assigns-off-duty-staff.v4",
+      "rubricVersion": "salon-reservation-auto-assigns-off-duty-staff.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -4083,7 +4083,7 @@
     },
     "ec-payment-notification-header-case-rejected": {
       "scenarioId": "ec-payment-notification-header-case-rejected",
-      "rubricVersion": "ec-payment-notification-header-case-rejected.v4",
+      "rubricVersion": "ec-payment-notification-header-case-rejected.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -4219,7 +4219,7 @@
     },
     "inventory-lot-leading-zero-lost-export": {
       "scenarioId": "inventory-lot-leading-zero-lost-export",
-      "rubricVersion": "inventory-lot-leading-zero-lost-export.v4",
+      "rubricVersion": "inventory-lot-leading-zero-lost-export.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -4355,7 +4355,7 @@
     },
     "mobile-notification-token-not-reregistered": {
       "scenarioId": "mobile-notification-token-not-reregistered",
-      "rubricVersion": "mobile-notification-token-not-reregistered.v4",
+      "rubricVersion": "mobile-notification-token-not-reregistered.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -4491,7 +4491,7 @@
     },
     "automotive-can-rolling-counter-rollover-rejected": {
       "scenarioId": "automotive-can-rolling-counter-rollover-rejected",
-      "rubricVersion": "automotive-can-rolling-counter-rollover-rejected.v4",
+      "rubricVersion": "automotive-can-rolling-counter-rollover-rejected.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -4627,7 +4627,7 @@
     },
     "payment-refund-event-before-response-stale": {
       "scenarioId": "payment-refund-event-before-response-stale",
-      "rubricVersion": "payment-refund-event-before-response-stale.v4",
+      "rubricVersion": "payment-refund-event-before-response-stale.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",
@@ -4763,7 +4763,7 @@
     },
     "medical-lab-result-unit-conversion-wrong": {
       "scenarioId": "medical-lab-result-unit-conversion-wrong",
-      "rubricVersion": "medical-lab-result-unit-conversion-wrong.v4",
+      "rubricVersion": "medical-lab-result-unit-conversion-wrong.v5",
       "fixtures": [
         {
           "fixtureId": "example-complete",

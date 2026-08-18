@@ -567,10 +567,7 @@ test("all registered rubrics produce scenario-specific structured-output schemas
       schema.properties.readerQuestions.items.properties.classification.enum,
       ["不足情報", "記述確認", "調査提案"]
     );
-    assert.equal(
-      schema.properties.investigationAdvice.minItems,
-      rubric.ticketType === "qa" ? 0 : 1
-    );
+    assert.equal(schema.properties.investigationAdvice.minItems, 0);
     assert.equal(schema.properties.investigationAdvice.maxItems, 4);
     assert.equal(schema.properties.strengths.minItems, 0);
     assert.equal(schema.properties.strengths.maxItems, 2);
@@ -926,7 +923,13 @@ test("confirmed tax impact scope is explicit scoring evidence, not a forbidden c
   assert.match(prompt, /受講者にも提示された周辺情報/);
   assert.match(prompt, /意味的に一致する場合、未確認の範囲・影響・回避策として指摘せず/);
   assert.match(prompt, /商品一覧の表示、注文金額、会計連携の間で1円の差/);
-  assert.match(prompt, /summaryですでに確認済みの内容を『次に確認すべきこと』として重複提案しない/);
+  assert.match(prompt, /画面上で『追加で確認できること』として表示/);
+  assert.match(prompt, /すでに確認済みの内容を、これから行う確認として重複提案してはいけません/);
+  assert.match(prompt, /item=B base=105 tax=10% mode=round result=116/);
+  assert.match(prompt, /B,105,10,floor/);
+  assert.match(prompt, /商品Bだけ異なる端数処理が使われた計算過程/);
+  assert.match(prompt, /入力設定は同一であり、商品マスタ差によるものではない/);
+  assert.match(prompt, /内部フィールド名や証跡IDを表示せず/);
 });
 
 test("scoring results are reusable only with current rubric, prompt, and model", () => {
@@ -1026,7 +1029,7 @@ test("notification review treats standard delivery operations as known and unsup
     },
     selectedEvidenceIds: ["notification-payload", "notification-video", "navigation-log"],
   });
-  assert.equal(rubric.rubricVersion, "mobile-notification-opens-wrong-news.v5");
+  assert.equal(rubric.rubricVersion, "mobile-notification-opens-wrong-news.v6");
   assert.match(prompt, /NEWS-101を送信して開封した端末/);
   assert.match(prompt, /手順書レベルの詳細を不足扱いしない/);
   assert.match(prompt, /実施済みの事実か、再現のために補った推測か/);
@@ -1050,7 +1053,7 @@ test("each scenario uses its own rubric, ticket fields, and evidence requirement
     completedAt: "2026-08-05T01:30:00.000Z",
   };
   const prompt = buildScoringPrompt(attempt);
-  assert.match(prompt, /customer-search-nonexistent-name-all-results\.v4/);
+  assert.match(prompt, /customer-search-nonexistent-name-all-results\.v5/);
   assert.match(prompt, /selectedEvidenceIds/);
   assert.match(prompt, /検索結果は0件/);
 });
@@ -1083,7 +1086,7 @@ test("a non-pilot scenario is scored with its own rubric version and findings", 
     }),
   });
   assert.equal(result.schemaVersion, "scoring-result.v3");
-  assert.equal(result.rubricVersion, `${scenarioId}.v4`);
+  assert.equal(result.rubricVersion, `${scenarioId}.v5`);
   assert.equal(result.rubricFindings.factAssessments.length, 7);
   assert.equal(result.rubricFindings.evidenceCheck.matched, false);
 });
