@@ -1297,6 +1297,7 @@ const elements = {
   practiceScoringResult: document.getElementById("practiceScoringResult"),
   practiceScoringPreviewTotal: document.getElementById("practiceScoringPreviewTotal"),
   practiceScoringComparison: document.getElementById("practiceScoringComparison"),
+  practiceScoringBreakdown: document.getElementById("practiceScoringBreakdown"),
   practiceScoringVerdict: document.getElementById("practiceScoringVerdict"),
   practiceScoringOverallAssessment: document.getElementById("practiceScoringOverallAssessment"),
   practiceScoringDetails: document.getElementById("practiceScoringDetails"),
@@ -4684,6 +4685,51 @@ function getScoringVerdictPresentation(verdict) {
   };
 }
 
+function scoreBreakdownMarkup(result) {
+  const breakdown = result?.rubricFindings?.scoreBreakdown;
+  if (!breakdown) {
+    return "";
+  }
+  const writing = breakdown.writingQuality;
+  const ticket = breakdown.ticketSettings;
+  const evidence = breakdown.evidenceSelection;
+  const evidenceDetail = evidence.requiredCount === 0
+    ? evidence.unrelatedCount === 0
+      ? "添付不要を正しく選択"
+      : `不要なファイルを${evidence.unrelatedCount}件選択`
+    : `${evidence.correctCount} / ${evidence.requiredCount}件が正解${evidence.unrelatedCount > 0 ? `・不要${evidence.unrelatedCount}件` : ""}`;
+  const capNotice = Number.isInteger(breakdown.appliedMaximum)
+    && breakdown.totalScore < breakdown.uncappedTotalScore
+      ? `<p class="practice-score-cap">重大な不足または事実誤認により、総合点は${escapeHtml(String(breakdown.appliedMaximum))}点が上限です。</p>`
+      : "";
+  return `
+    <div>
+      <span>文章品質</span>
+      <strong>${escapeHtml(String(writing.awardedPoints))} / ${escapeHtml(String(writing.maximumPoints))}</strong>
+      <small>AI評価 ${escapeHtml(String(writing.rawScore))}点</small>
+    </div>
+    <div>
+      <span>チケット設定</span>
+      <strong>${escapeHtml(String(ticket.awardedPoints))} / ${escapeHtml(String(ticket.maximumPoints))}</strong>
+      <small>${escapeHtml(String(ticket.matchedCount))} / ${escapeHtml(String(ticket.totalCount))}項目が正解</small>
+    </div>
+    <div>
+      <span>添付証跡</span>
+      <strong>${escapeHtml(String(evidence.awardedPoints))} / ${escapeHtml(String(evidence.maximumPoints))}</strong>
+      <small>${escapeHtml(evidenceDetail)}</small>
+    </div>
+    ${capNotice}`;
+}
+
+function renderPracticeScoreBreakdown(result) {
+  if (!elements.practiceScoringBreakdown) {
+    return;
+  }
+  const markup = scoreBreakdownMarkup(result);
+  elements.practiceScoringBreakdown.classList.toggle("hidden", !markup);
+  elements.practiceScoringBreakdown.innerHTML = markup;
+}
+
 function renderPracticeScoringPreview() {
   const preview = state.practiceScoringResult;
   const showPreview = isPracticeMode();
@@ -4741,6 +4787,7 @@ function renderPracticeScoringPreview() {
 
   const verdictPresentation = getScoringVerdictPresentation(preview.verdict);
   setTextContent(elements.practiceScoringPreviewTotal, String(preview.totalScore));
+  renderPracticeScoreBreakdown(preview);
   setTextContent(elements.practiceScoringVerdict, verdictPresentation.label);
   setTextContent(elements.practiceScoringOverallAssessment, preview.overallAssessment);
   elements.practiceScoringVerdict?.classList.toggle(
@@ -5458,6 +5505,7 @@ function renderTicketDetail() {
       </div>
       ${result?.status === "succeeded" ? `
         ${scoreComparison}
+        ${scoreBreakdownMarkup(result) ? `<div class="practice-score-breakdown ticket-score-breakdown">${scoreBreakdownMarkup(result)}</div>` : ""}
         <p class="ticket-detail-verdict">${escapeHtml(verdictPresentation.label)}</p>
         <p>${escapeHtml(String(result.overallAssessment || ""))}</p>
         ${strengths ? `<h3>問題なし・評価できる点</h3><ul>${strengths}</ul>` : ""}

@@ -572,7 +572,7 @@
     "customer-save-multiple-clicks-duplicate": {
       "scenarioId": "customer-save-multiple-clicks-duplicate",
       "projectId": "customer",
-      "rubricVersion": "customer-save-multiple-clicks-duplicate.v7",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v8",
       "reviewSource": {
         "schemaVersion": "scenario-review-source.v1",
         "sourceType": "scenario-observations",
@@ -631,10 +631,11 @@
         "steps": [
           {
             "id": "steps-reproducible",
-            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "description": "入力、保存ボタンの3回連続押下、登録後の顧客一覧で重複した3件を確認するまでの操作の流れを示す",
             "importance": "important",
             "sourceRefs": [
-              "observation-1"
+              "observation-1",
+              "observation-2"
             ]
           }
         ],
@@ -698,6 +699,9 @@
           "仕様・周辺情報『保存ボタンを1回だけ押下した場合は、1件のみ作成されます。顧客データ管理要件には、1回の登録操作につき1レコードを作成する旨が記載されています。原因箇所は現時点で特定できていません。』について、期待動作と確認済み事実を推測から分けているか評価する"
         ],
         "nonScoringInvestigationIdeas": [],
+        "scenarioSpecificPolicies": [
+          "観測記録では登録後の顧客一覧で重複した3件を確認している。操作手順の確認先が『顧客登録画面』となっている場合は一覧画面との不一致を見逃さず、reproducibilityの具体的な修正対象として指摘する"
+        ],
         "disallowedGenericPraise": [
           "期待結果と実際の動作が分離されている",
           "再現回数が数値で明記されている",

@@ -9,6 +9,7 @@ import {
   buildModelOutputSchema,
   buildScoringPrompt,
   buildScoringSystemInstruction,
+  calculateScoreBreakdown,
   calculateWeightedTotal,
   createAttemptRecord,
   createFailedScoringResult,
@@ -26,6 +27,33 @@ const pilotScenarioId = "customer-save-multiple-clicks-duplicate";
 const pilotFactIds = Object.values(getScenarioRubric(pilotScenarioId).requiredFacts)
   .flat()
   .map((fact) => fact.id);
+const fixedAttemptStartedAt = "2026-08-18T01:00:00.000Z";
+
+function expectedTicketFieldsForTest(rubric) {
+  const expected = rubric.expectedTicketFields || {};
+  const ticketFields = Object.fromEntries(
+    Object.entries(expected)
+      .filter(([field]) => field !== "dueDatePolicy")
+      .map(([field, value]) => [
+        field,
+        value && typeof value === "object" && !Array.isArray(value)
+          ? value.recommended
+          : value,
+      ])
+  );
+  if (expected.dueDatePolicy?.mode === "days-after-attempt") {
+    const dueDate = new Date(fixedAttemptStartedAt);
+    dueDate.setUTCDate(dueDate.getUTCDate() + Number(expected.dueDatePolicy.offsetDays || 0));
+    ticketFields.dueDate = dueDate.toISOString().slice(0, 10);
+  } else {
+    ticketFields.dueDate = null;
+  }
+  return ticketFields;
+}
+
+function requiredEvidenceIds(rubric) {
+  return rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id);
+}
 
 const completeModelOutput = {
   dimensions: {
@@ -148,6 +176,63 @@ test("weighted total follows the pilot rubric weights", () => {
   assert.equal(calculateWeightedTotal(completeModelOutput.dimensions), 74);
 });
 
+test("overall score combines writing, ticket settings, and evidence selection", () => {
+  const perfect = calculateScoreBreakdown({
+    ticketFieldChecks: Array.from({ length: 8 }, (_, index) => ({
+      field: `field-${index}`,
+      matched: true,
+    })),
+    evidenceCheck: {
+      expectedEvidenceIds: ["a", "b", "c"],
+      selectedEvidenceIds: ["a", "b", "c"],
+      unrelatedEvidenceIds: [],
+    },
+  }, 100);
+  assert.equal(perfect.totalScore, 100);
+  assert.equal(perfect.writingQuality.awardedPoints, 70);
+  assert.equal(perfect.ticketSettings.awardedPoints, 20);
+  assert.equal(perfect.evidenceSelection.awardedPoints, 10);
+
+  const wrongSelections = calculateScoreBreakdown({
+    ticketFieldChecks: Array.from({ length: 8 }, (_, index) => ({
+      field: `field-${index}`,
+      matched: index < 6,
+    })),
+    evidenceCheck: {
+      expectedEvidenceIds: ["a", "b", "c"],
+      selectedEvidenceIds: ["a", "b", "wrong"],
+      unrelatedEvidenceIds: ["wrong"],
+    },
+  }, 100);
+  assert.deepEqual(wrongSelections, {
+    writingQuality: { rawScore: 100, awardedPoints: 70, maximumPoints: 70 },
+    ticketSettings: { matchedCount: 6, totalCount: 8, awardedPoints: 15, maximumPoints: 20 },
+    evidenceSelection: {
+      correctCount: 2,
+      requiredCount: 3,
+      unrelatedCount: 1,
+      awardedPoints: 3,
+      maximumPoints: 10,
+    },
+    uncappedTotalScore: 88,
+    appliedMaximum: null,
+    totalScore: 88,
+  });
+
+  const capped = calculateScoreBreakdown({
+    ticketFieldChecks: [{ field: "severity", matched: true }],
+    evidenceCheck: {
+      expectedEvidenceIds: ["a"],
+      selectedEvidenceIds: ["a"],
+      unrelatedEvidenceIds: [],
+    },
+    appliedScoreCap: 74,
+  }, 100);
+  assert.equal(capped.uncappedTotalScore, 100);
+  assert.equal(capped.appliedMaximum, 74);
+  assert.equal(capped.totalScore, 74);
+});
+
 test("attempt fingerprints ignore revision metadata and order-only changes", () => {
   const first = {
     scenarioId: pilotScenarioId,
@@ -211,12 +296,31 @@ test("an identical revision reuses the exact previous score and feedback", () =>
 function revisionScoringResult(attemptId, score, factStatus, factQuote) {
   const rubric = getScenarioRubric(pilotScenarioId);
   const dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, score]));
+  const rubricFindings = {
+    factAssessments: [{
+      factId: "steps-reproducible",
+      status: factStatus,
+      evidenceQuote: factQuote,
+    }],
+    forbiddenClaimIds: [],
+    ticketFieldChecks: [],
+    evidenceCheck: {
+      expectedEvidenceIds: [],
+      selectedEvidenceIds: [],
+      unrelatedEvidenceIds: [],
+      matched: true,
+    },
+    rawWeightedScore: score,
+    scoreCaps: [],
+    appliedScoreCap: null,
+  };
+  rubricFindings.scoreBreakdown = calculateScoreBreakdown(rubricFindings, score);
   return {
     schemaVersion: "scoring-result.v3",
     scoringResultId: crypto.randomUUID(),
     attemptId,
     status: "succeeded",
-    totalScore: score,
+    totalScore: rubricFindings.scoreBreakdown.totalScore,
     dimensions,
     dimensionFeedback: Object.fromEntries(
       rubric.dimensions.map(({ id }) => [id, { reason: `${score}点の理由` }])
@@ -230,19 +334,7 @@ function revisionScoringResult(attemptId, score, factStatus, factQuote) {
     }],
     verdict: score >= 80 ? "開発着手可能（軽微な改善あり）" : "追加確認を推奨",
     overallAssessment: `${score}点の総評`,
-    rubricFindings: {
-      factAssessments: [{
-        factId: "steps-reproducible",
-        status: factStatus,
-        evidenceQuote: factQuote,
-      }],
-      forbiddenClaimIds: [],
-      ticketFieldChecks: [],
-      evidenceCheck: { matched: true },
-      rawWeightedScore: score,
-      scoreCaps: [],
-      appliedScoreCap: null,
-    },
+    rubricFindings,
     rubricVersion: "test",
     promptVersion: "test",
     modelId: "test-model",
@@ -290,7 +382,7 @@ test("a revision cannot lose points from AI variance without an objective regres
     previousAttempt,
     previousResult
   );
-  assert.equal(stabilized.totalScore, 82);
+  assert.equal(stabilized.totalScore, 87);
   assert.match(stabilized.overallAssessment, /AIの採点揺れ/);
   assert.equal(calculateWeightedTotal(stabilized.dimensions, pilotScenarioId), 82);
 });
@@ -334,7 +426,7 @@ test("a revision may lose points when a previously present fact was actually rem
     previousAttempt,
     previousResult
   );
-  assert.equal(stabilized.totalScore, 74);
+  assert.equal(stabilized.totalScore, 82);
   assert.doesNotMatch(stabilized.overallAssessment, /AIの採点揺れ/);
 });
 
@@ -681,8 +773,10 @@ test("QA verdicts follow the learner-facing score bands", async () => {
     projectId: rubric.projectId,
     answer: {
       ...rubric.writingExample,
-      ticketFields: { tracker: "qa", progress: 0 },
+      ticketFields: expectedTicketFieldsForTest(rubric),
     },
+    selectedEvidenceIds: requiredEvidenceIds(rubric),
+    startedAt: fixedAttemptStartedAt,
   }, { userId: "verified-google-sub" });
   const modelOutput = completeOutputForScenario(scenarioId);
   modelOutput.dimensions = Object.fromEntries(
@@ -699,8 +793,9 @@ test("QA verdicts follow the learner-facing score bands", async () => {
       },
     }),
   });
-  assert.equal(result.totalScore, 85);
-  assert.equal(result.verdict, "回答依頼可能（軽微な改善あり）");
+  assert.equal(result.rubricFindings.scoreBreakdown.writingQuality.rawScore, 85);
+  assert.equal(result.totalScore, 90);
+  assert.equal(result.verdict, "回答依頼可能");
 });
 
 test("ready-to-send reviews do not label polish as a required correction", async () => {
@@ -711,8 +806,10 @@ test("ready-to-send reviews do not label polish as a required correction", async
     projectId: rubric.projectId,
     answer: {
       ...rubric.writingExample,
-      ticketFields: { tracker: "qa", progress: 0 },
+      ticketFields: expectedTicketFieldsForTest(rubric),
     },
+    selectedEvidenceIds: requiredEvidenceIds(rubric),
+    startedAt: fixedAttemptStartedAt,
   }, { userId: "verified-google-sub" });
   const modelOutput = completeOutputForScenario(scenarioId);
   modelOutput.dimensions = Object.fromEntries(
@@ -729,7 +826,8 @@ test("ready-to-send reviews do not label polish as a required correction", async
       },
     }),
   });
-  assert.equal(result.totalScore, 95);
+  assert.equal(result.rubricFindings.scoreBreakdown.writingQuality.rawScore, 95);
+  assert.equal(result.totalScore, 97);
   assert.equal(result.verdict, "回答依頼可能");
   assert.deepEqual(
     result.improvementItems.map(({ priority }) => priority),
@@ -750,9 +848,10 @@ test("a reproducibility mismatch is consolidated without overwhelming an otherwi
         expected: "処理済みの通知IDを再受信した場合、初回の注文結果を返すこと",
         reproducibility: "2/15",
       },
-      ticketFields: { tracker: "bug", progress: 0 },
+      ticketFields: expectedTicketFieldsForTest(rubric),
     },
-    selectedEvidenceIds: rubric.evidenceFiles.filter(({ required }) => required).map(({ id }) => id),
+    selectedEvidenceIds: requiredEvidenceIds(rubric),
+    startedAt: fixedAttemptStartedAt,
   }, { userId: "verified-google-sub" });
   const modelOutput = completeOutputForScenario(scenarioId);
   modelOutput.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 60]));
@@ -808,7 +907,8 @@ test("a reproducibility mismatch is consolidated without overwhelming an otherwi
       },
     }),
   });
-  assert.equal(result.totalScore, 93);
+  assert.equal(result.rubricFindings.scoreBreakdown.writingQuality.rawScore, 93);
+  assert.equal(result.totalScore, 95);
   assert.equal(result.verdict, "開発着手可能");
   assert.equal(result.improvementItems[0].priority, "修正推奨");
   assert.equal(result.improvementItems.filter(({ priority }) => priority === "修正推奨").length, 1);
@@ -870,6 +970,22 @@ test("the mobile data-loss prompt rewards scenario-specific analysis without sco
   assert.match(prompt, /記載例より有効な比較確認や切り分け/);
   assert.match(prompt, /strengthsは0〜2件/);
   assert.doesNotMatch(prompt, /"writingExample"/);
+});
+
+test("the duplicate-registration prompt requires the list screen used to confirm duplicate rows", () => {
+  const prompt = buildScoringPrompt({
+    scenarioId: pilotScenarioId,
+    answer: {
+      subject: "保存ボタンを3回押すと顧客が3件登録される",
+      sections: {
+        steps: "1. 顧客情報を入力する\n2. 保存ボタンを3回押す\n3. 顧客登録画面を表示する",
+        actual: "顧客データが3件登録される",
+      },
+    },
+    selectedEvidenceIds: [],
+  });
+  assert.match(prompt, /登録後の顧客一覧で重複した3件を確認/);
+  assert.match(prompt, /顧客登録画面.*一覧画面との不一致/);
 });
 
 test("bug and QA reviews use ticket-specific system instructions", () => {
@@ -1235,7 +1351,8 @@ test("the attempt record exists before Gemini scoring starts", async () => {
 
   assert.equal(result.attemptId, attempt.attemptId);
   assert.equal(result.status, "succeeded");
-  assert.equal(result.totalScore, 74);
+  assert.equal(result.rubricFindings.scoreBreakdown.writingQuality.rawScore, 74);
+  assert.equal(result.totalScore, 52);
 });
 
 test("a Gemini outage is represented without turning it into a zero score", () => {

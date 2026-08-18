@@ -3377,6 +3377,48 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   color: #53697d;
 }
 
+.practice-score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.practice-score-breakdown > div {
+  display: grid;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid #d8e3ec;
+  border-radius: 6px;
+  background: #f7fafc;
+}
+
+.practice-score-breakdown span,
+.practice-score-breakdown small {
+  color: #607487;
+  font-size: 0.68rem;
+}
+
+.practice-score-breakdown strong {
+  color: #31597f;
+  font-size: 0.94rem;
+}
+
+.practice-score-cap {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 4px solid #b85b55;
+  background: #fff1f0;
+  color: #a33838;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.ticket-score-breakdown {
+  margin-bottom: 14px;
+}
+
 .practice-ai-verdict {
   display: inline-flex;
   align-items: center;
@@ -4282,6 +4324,10 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   }
 
   .practice-result-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-score-breakdown {
     grid-template-columns: 1fr;
   }
 

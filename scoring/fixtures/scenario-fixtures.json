@@ -275,7 +275,7 @@
     },
     "customer-save-multiple-clicks-duplicate": {
       "scenarioId": "customer-save-multiple-clicks-duplicate",
-      "rubricVersion": "customer-save-multiple-clicks-duplicate.v7",
+      "rubricVersion": "customer-save-multiple-clicks-duplicate.v8",
       "fixtures": [
         {
           "fixtureId": "example-complete",

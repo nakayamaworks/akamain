@@ -165,8 +165,14 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v20";
+export const PROMPT_VERSION = "practice-review.v21";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
+
+const SCORE_MAXIMUMS = Object.freeze({
+  writingQuality: 70,
+  ticketSettings: 20,
+  evidenceSelection: 10,
+});
 
 const BUG_SCORING_SYSTEM_INSTRUCTION = [
   "あなたは、不具合票を受け取って調査を始めるシニア開発者兼QAリードです。",
@@ -668,7 +674,7 @@ export function buildScoringPrompt(attempt, options = {}) {
       "investigationAdviceは0〜4件です。起票前に質問者自身が確認できること、または回答後に行う判断が本当にある場合だけ返してください。",
       "rewriteSuggestionsは受講者の有効な文章を残した最小修正とし、記載例のコピーに置き換えないでください。",
       "strengthsは0〜2件です。『質問欄がある』『項目が埋まっている』などフォーム上当然のことを評価せず、このQA固有の論点整理が回答負荷をどう減らすかを示してください。",
-      "dimensionsはQA本文の品質だけを採点してください。チケット設定と添付証跡は別チェックであり、dimensionsやverdictの減点理由に含めないでください。",
+      "dimensionsはQA本文の品質だけを採点してください。チケット設定と添付証跡はシステムが別途採点するため、dimensionsの減点理由に含めないでください。総合点と最終verdictはシステム側で確定します。",
       "仕様書の未記載、観測事実、比較根拠、利用者影響を整理したうえで『不具合として扱ってよいか』『現在の理解で合っているか』を仕様担当者へ確認することは、正当なQA確認です。仕様決定の丸投げとは評価しないでください。",
       "質問者に『仕様を変更するか現状維持か』などの設計選択肢を作らせないでください。QA担当者が仕様決定へ踏み込みすぎる場合があります。質問者が判断材料と現在の解釈を示していれば十分です。",
       "『考えています』『認識です』『相違ないでしょうか』は未確定の解釈を示す表現です。確定仕様の断定として扱わず、重複や冗長さがある場合は文章上の任意改善として扱ってください。",
@@ -716,11 +722,12 @@ export function buildScoringPrompt(attempt, options = {}) {
     "investigationAdviceは画面上で『追加で確認できること』として表示します。選択済み証跡や起票本文ですでに確認済みの内容を、これから行う確認として重複提案してはいけません。確認済み事実からさらに先へ進める具体的な調査候補がある場合だけ返し、なければ空配列にしてください。",
     "選択済み証跡から、入力設定と実際の処理モードの差、正常系と異常系の分岐、処理順序など原因箇所を絞れる具体的な手がかりが得られる場合は、その確認済み事実を土台に一段先の調査候補をinvestigationAdviceへ1〜2件示してください。actionの冒頭で根拠となる確認済みの差異を簡潔に示し、証跡をもう一度開く提案ではなく、設定値の変換箇所、呼び出し元、条件分岐、画面ごとの処理経路など次に追う対象を具体化してください。",
     "題名に書かれた発生操作や条件が操作手順に存在するかも確認してください。例えば題名では『複数選択』、手順では『複数商品を登録して一覧表示』となっている場合、同じ操作か判断できないため、実際に行った操作へ表現をそろえる任意改善として扱ってください。",
+    "操作手順に記載した画面遷移と、実際の動作を確認した画面が整合するか確認してください。例えば登録件数を一覧で確認した観測記録に対し、手順が『登録画面を表示する』となっている場合は、再現確認先を誤るため具体的な修正対象として指摘してください。",
     "readerQuestionsのclassificationが不足情報の場合は該当するrequiredFactsのfactIdを使用してください。記述確認または調査提案の場合はfactIdをnot-applicableにしてください。受講者へ提示されていない情報を答えさせる質問を、不足情報として生成してはいけません。",
     "factAssessmentsにはrequiredFactsの全factIdを重複なく1回ずつ含め、present・missing・contradictedのいずれかで判定してください。",
     "presentまたはcontradictedの場合は、受講者の回答に連続して実在する短い文言をevidenceQuoteへそのまま引用してください。reviewSourceの文章を受講者の記述として引用してはいけません。追跡用識別子を選択済み証跡で補完した場合は『添付証跡: <evidence id>』としてください。missingの場合は空文字にしてください。",
     "forbiddenClaimsに該当する断定がある場合だけ、そのIDをforbiddenClaimIdsへ入れてください。",
-    "チケット設定と添付証跡の選択正誤は別チェックです。expectedTicketFields、および必要なevidenceFilesを選べたかどうかをdimensionsやverdictの減点理由に含めないでください。",
+    "チケット設定と添付証跡の選択正誤はシステムが別途採点します。expectedTicketFields、および必要なevidenceFilesを選べたかどうかをdimensionsの減点理由に含めないでください。総合点と最終verdictはシステム側で確定します。",
     "一方、選択した添付ファイルごとのevidenceDescriptionsは起票内容の一部です。ファイル名だけでは内容を判別しにくい証跡について、読み手がファイルの内容や確認箇所を把握できる説明になっているかをinvestigationReadinessだけで評価してください。未入力や『ログです』『エラーあり』のような汎用説明があれば軽微な改善として扱い、根拠のない原因断定やファイル内容と矛盾する説明は明確に指摘してください。",
     "evidenceDescriptionsが全件具体的で、対象処理・時刻・確認箇所などを簡潔に把握できる場合は、添付説明を理由にinvestigationReadinessを減点しないでください。説明が未入力でも送信自体は可能であり、添付説明だけを理由に主要情報不足や再整理を推奨してはいけません。",
     "利用者向けレビューではevidenceDescriptionsなどの内部フィールド名や証跡IDを表示せず、『添付ファイルの説明』と実際のファイル名を使用してください。",
@@ -1387,6 +1394,81 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
   };
 }
 
+export function calculateScoreBreakdown(rubricFindings, writingQualityRawScore) {
+  const writingRaw = Math.max(0, Math.min(100, Math.round(writingQualityRawScore || 0)));
+  const writingQuality = Math.round(
+    writingRaw * SCORE_MAXIMUMS.writingQuality / 100
+  );
+
+  const ticketChecks = rubricFindings?.ticketFieldChecks || [];
+  const matchedTicketFields = ticketChecks.filter(({ matched }) => matched).length;
+  const ticketSettings = ticketChecks.length === 0
+    ? SCORE_MAXIMUMS.ticketSettings
+    : Math.round(
+        matchedTicketFields * SCORE_MAXIMUMS.ticketSettings / ticketChecks.length
+      );
+
+  const evidenceCheck = rubricFindings?.evidenceCheck || {};
+  const expectedEvidenceIds = evidenceCheck.expectedEvidenceIds || [];
+  const selectedEvidenceIds = new Set(evidenceCheck.selectedEvidenceIds || []);
+  const correctEvidenceCount = expectedEvidenceIds.filter((id) => selectedEvidenceIds.has(id)).length;
+  const unrelatedEvidenceCount = (evidenceCheck.unrelatedEvidenceIds || []).length;
+  const evidenceSelection = expectedEvidenceIds.length === 0
+    ? (selectedEvidenceIds.size === 0 ? SCORE_MAXIMUMS.evidenceSelection : 0)
+    : Math.round(
+        Math.max(0, correctEvidenceCount - unrelatedEvidenceCount)
+        * SCORE_MAXIMUMS.evidenceSelection
+        / expectedEvidenceIds.length
+      );
+  const uncappedTotalScore = writingQuality + ticketSettings + evidenceSelection;
+  const appliedMaximum = Number.isInteger(rubricFindings?.appliedScoreCap)
+    ? rubricFindings.appliedScoreCap
+    : null;
+  const totalScore = appliedMaximum === null
+    ? uncappedTotalScore
+    : Math.min(uncappedTotalScore, appliedMaximum);
+
+  return {
+    writingQuality: {
+      rawScore: writingRaw,
+      awardedPoints: writingQuality,
+      maximumPoints: SCORE_MAXIMUMS.writingQuality,
+    },
+    ticketSettings: {
+      matchedCount: matchedTicketFields,
+      totalCount: ticketChecks.length,
+      awardedPoints: ticketSettings,
+      maximumPoints: SCORE_MAXIMUMS.ticketSettings,
+    },
+    evidenceSelection: {
+      correctCount: correctEvidenceCount,
+      requiredCount: expectedEvidenceIds.length,
+      unrelatedCount: unrelatedEvidenceCount,
+      awardedPoints: evidenceSelection,
+      maximumPoints: SCORE_MAXIMUMS.evidenceSelection,
+    },
+    uncappedTotalScore,
+    appliedMaximum,
+    totalScore,
+  };
+}
+
+function appendSelectionAssessment(overallAssessment, scoreBreakdown) {
+  const notes = [];
+  const ticket = scoreBreakdown.ticketSettings;
+  const evidence = scoreBreakdown.evidenceSelection;
+  if (ticket.awardedPoints < ticket.maximumPoints) {
+    notes.push(`チケット設定は${ticket.matchedCount}/${ticket.totalCount}項目が正解です`);
+  }
+  if (evidence.awardedPoints < evidence.maximumPoints) {
+    notes.push("添付証跡の選択に不足または不要なファイルがあります");
+  }
+  if (notes.length === 0) {
+    return overallAssessment;
+  }
+  return `${overallAssessment} 文章内容とは別に、${notes.join("。")}。`.trim();
+}
+
 function successfulScoringResult(result) {
   return result?.status === "succeeded" && Number.isInteger(result.totalScore);
 }
@@ -1488,6 +1570,13 @@ function getObjectiveRevisionRegressions(
   return regressions;
 }
 
+function resultWritingQualityScore(result) {
+  return result?.rubricFindings?.scoreBreakdown?.writingQuality?.rawScore
+    ?? result?.rubricFindings?.rawWeightedScore
+    ?? result?.totalScore
+    ?? 0;
+}
+
 export function stabilizeRevisionScoringResult(
   currentAttempt,
   currentResult,
@@ -1519,8 +1608,9 @@ export function stabilizeRevisionScoringResult(
   const dimensionFeedback = structuredClone(currentResult.dimensionFeedback || {});
   const rubric = getScenarioRubric(currentAttempt.scenarioId);
   const raisedDimensionIds = new Set();
-  let adjustedTotal = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
-  while (adjustedTotal < previousResult.totalScore) {
+  const previousWritingScore = resultWritingQualityScore(previousResult);
+  let adjustedWritingScore = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
+  while (adjustedWritingScore < previousWritingScore) {
     const candidate = rubric.dimensions
       .map(({ id, weight }) => ({
         id,
@@ -1534,14 +1624,18 @@ export function stabilizeRevisionScoringResult(
     }
     dimensions[candidate.id] += 1;
     raisedDimensionIds.add(candidate.id);
-    adjustedTotal = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
+    adjustedWritingScore = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
   }
   raisedDimensionIds.forEach((dimensionId) => {
     dimensionFeedback[dimensionId] = {
       reason: "前回から明確な悪化が確認されないため、採点の一貫性を保って前回評価を維持しました。",
     };
   });
-  const totalScore = Math.max(previousResult.totalScore, adjustedTotal);
+  const scoreBreakdown = calculateScoreBreakdown(
+    currentResult.rubricFindings,
+    adjustedWritingScore
+  );
+  const totalScore = scoreBreakdown.totalScore;
   const stabilityNote = "明確な事実後退がない評価軸は、AIの採点揺れで点数が下がらないよう前回評価を維持しています。";
   return {
     ...currentResult,
@@ -1551,7 +1645,11 @@ export function stabilizeRevisionScoringResult(
     verdict: verdictForScore(totalScore, rubric.ticketType),
     overallAssessment: `${currentResult.overallAssessment} ${stabilityNote}`.trim(),
     rubricFindings: currentResult.rubricFindings
-      ? { ...currentResult.rubricFindings, rawWeightedScore: adjustedTotal }
+      ? {
+          ...currentResult.rubricFindings,
+          rawWeightedScore: adjustedWritingScore,
+          scoreBreakdown,
+        }
       : currentResult.rubricFindings,
   };
 }
@@ -1682,14 +1780,18 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     normalized,
     rawWeightedScore
   );
-  const totalScore = rubricFindings.appliedScoreCap === null
-    ? rawWeightedScore
-    : Math.min(rawWeightedScore, rubricFindings.appliedScoreCap);
+  const writingQualityRawScore = rawWeightedScore;
+  const scoreBreakdown = calculateScoreBreakdown(
+    rubricFindings,
+    writingQualityRawScore
+  );
+  rubricFindings.scoreBreakdown = scoreBreakdown;
+  const totalScore = scoreBreakdown.totalScore;
   const { factAssessments: _factAssessments, forbiddenClaimIds: _forbiddenClaimIds, ...review } = normalized;
   const hasContradictedFacts = rubricFindings.factAssessments
     .some(({ status }) => status === "contradicted");
   const improvementItems = review.improvementItems.map((item) =>
-    totalScore >= 90 && !hasContradictedFacts && item.priority === "修正推奨"
+    writingQualityRawScore >= 90 && !hasContradictedFacts && item.priority === "修正推奨"
       ? { ...item, priority: "任意改善" }
       : item
   );
@@ -1700,6 +1802,7 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     status: "succeeded",
     totalScore,
     ...review,
+    overallAssessment: appendSelectionAssessment(review.overallAssessment, scoreBreakdown),
     improvementItems,
     verdict: verdictForScore(totalScore, rubric.ticketType),
     rubricFindings,

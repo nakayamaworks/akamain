@@ -91,15 +91,17 @@ function check(id, passed, expected, actual) {
 export function evaluateFixtureResult({ fixtureSet, fixture, scoringResult }) {
   const expected = fixture.expected;
   const findings = scoringResult?.rubricFindings || {};
+  const writingQualityScore = findings.scoreBreakdown?.writingQuality?.rawScore
+    ?? scoringResult?.totalScore;
   const checks = [
     check("status", scoringResult?.status === "succeeded", "succeeded", scoringResult?.status ?? null),
     check(
       "score-range",
-      Number.isInteger(scoringResult?.totalScore)
-        && scoringResult.totalScore >= expected.scoreMin
-        && scoringResult.totalScore <= expected.scoreMax,
+      Number.isInteger(writingQualityScore)
+        && writingQualityScore >= expected.scoreMin
+        && writingQualityScore <= expected.scoreMax,
       { min: expected.scoreMin, max: expected.scoreMax },
-      scoringResult?.totalScore ?? null
+      writingQualityScore ?? null
     ),
     check(
       "missing-critical-facts",

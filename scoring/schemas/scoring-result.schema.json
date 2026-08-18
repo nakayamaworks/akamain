@@ -180,6 +180,7 @@
         "ticketFieldChecks",
         "evidenceCheck",
         "rawWeightedScore",
+        "scoreBreakdown",
         "scoreCaps",
         "appliedScoreCap"
       ],
@@ -237,6 +238,49 @@
           }
         },
         "rawWeightedScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "scoreBreakdown": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["writingQuality", "ticketSettings", "evidenceSelection", "uncappedTotalScore", "appliedMaximum", "totalScore"],
+          "properties": {
+            "writingQuality": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["rawScore", "awardedPoints", "maximumPoints"],
+              "properties": {
+                "rawScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+                "awardedPoints": { "type": "integer", "minimum": 0, "maximum": 70 },
+                "maximumPoints": { "const": 70 }
+              }
+            },
+            "ticketSettings": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["matchedCount", "totalCount", "awardedPoints", "maximumPoints"],
+              "properties": {
+                "matchedCount": { "type": "integer", "minimum": 0 },
+                "totalCount": { "type": "integer", "minimum": 0 },
+                "awardedPoints": { "type": "integer", "minimum": 0, "maximum": 20 },
+                "maximumPoints": { "const": 20 }
+              }
+            },
+            "evidenceSelection": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["correctCount", "requiredCount", "unrelatedCount", "awardedPoints", "maximumPoints"],
+              "properties": {
+                "correctCount": { "type": "integer", "minimum": 0 },
+                "requiredCount": { "type": "integer", "minimum": 0 },
+                "unrelatedCount": { "type": "integer", "minimum": 0 },
+                "awardedPoints": { "type": "integer", "minimum": 0, "maximum": 10 },
+                "maximumPoints": { "const": 10 }
+              }
+            },
+            "uncappedTotalScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "appliedMaximum": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+            "totalScore": { "type": "integer", "minimum": 0, "maximum": 100 }
+          }
+        },
         "scoreCaps": {
           "type": "array",
           "items": {

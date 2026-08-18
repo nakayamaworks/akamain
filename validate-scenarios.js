@@ -390,13 +390,14 @@ if (
   !scoringResultSchema?.required?.includes("promptVersion") ||
   !scoringResultSchema?.required?.includes("modelId") ||
   !scoringResultSchema?.required?.includes("rubricFindings") ||
+  !scoringResultSchema?.properties?.rubricFindings?.required?.includes("scoreBreakdown") ||
   !scoringResultSchema?.properties?.readerQuestions?.items?.properties?.classification?.enum?.includes("記述確認")
 ) {
   errors.push("scoring result schema must preserve grading provenance");
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v20"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v21"') ||
   !backendScoringSource.includes("systemInstruction:") ||
   !backendScoringSource.includes("buildScoringSystemInstruction(attempt)") ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
@@ -1286,6 +1287,9 @@ try {
           "仕様・周辺情報『" + reviewSource.observations[2].text + "』について、期待動作と確認済み事実を推測から分けているか評価する",
         ],
         nonScoringInvestigationIdeas: existingProfile?.reviewGuide?.nonScoringInvestigationIdeas || [],
+        ...((existingProfile?.reviewGuide?.scenarioSpecificPolicies || []).length
+          ? { scenarioSpecificPolicies: existingProfile.reviewGuide.scenarioSpecificPolicies }
+          : {}),
         ...((existingProfile?.reviewGuide?.acceptedConciseConditions || []).length
           ? { acceptedConciseConditions: existingProfile.reviewGuide.acceptedConciseConditions }
           : {}),
@@ -1376,9 +1380,13 @@ try {
         }],
         steps: [{
           id: "steps-reproducible",
-          description: "第三者が主要事象を再現できる操作の流れを示す",
+          description: seed.scenarioId === pilotRubric.scenarioId
+            ? "入力、保存ボタンの3回連続押下、登録後の顧客一覧で重複した3件を確認するまでの操作の流れを示す"
+            : "第三者が主要事象を再現できる操作の流れを示す",
           importance: "important",
-          sourceRefs: ["observation-1"],
+          sourceRefs: seed.scenarioId === pilotRubric.scenarioId
+            ? ["observation-1", "observation-2"]
+            : ["observation-1"],
         }],
         expected: [{
           id: "expected-from-specification",
@@ -1414,7 +1422,7 @@ try {
         scenarioId: seed.scenarioId,
         projectId: seed.projectId,
         rubricVersion: isPilot
-          ? "customer-save-multiple-clicks-duplicate.v7"
+          ? "customer-save-multiple-clicks-duplicate.v8"
           : seed.scenarioId === "mobile-background-sync-data-lost"
             ? "mobile-background-sync-data-lost.v6"
             : seed.scenarioId === "mobile-notification-opens-wrong-news"
