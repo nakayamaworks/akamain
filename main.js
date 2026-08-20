@@ -165,6 +165,7 @@ const projectCatalog = [
     id: "customer",
     name: "顧客管理システム",
     level: "初級",
+    testTargetImage: "./assets/images/test-targets/customer-management.webp",
     members: [
       { id: "kyakuno", name: "客野 迎", role: "顧客問い合わせ" },
       { id: "madoguchi", name: "窓口 結", role: "顧客管理業務" },
@@ -174,6 +175,7 @@ const projectCatalog = [
   },
   {
     id: "attendance", name: "勤怠管理システム", level: "初級",
+    testTargetImage: "./assets/images/test-targets/attendance-management.webp",
     members: [
       { id: "tokito", name: "時任 勤", role: "勤怠業務担当" },
       { id: "yasuda", name: "休田 憩", role: "労務QA" },
@@ -183,6 +185,7 @@ const projectCatalog = [
   },
   {
     id: "salon", name: "美容室予約システム", level: "初級",
+    testTargetImage: "./assets/images/test-targets/salon-booking.webp",
     members: [
       { id: "kamino", name: "髪野 美咲", role: "予約運用担当" },
       { id: "hasamida", name: "鋏田 切子", role: "スタイリスト連携担当" },
@@ -192,6 +195,7 @@ const projectCatalog = [
   },
   {
     id: "ec", name: "ECサイト", level: "中級",
+    testTargetImage: "./assets/images/test-targets/ecommerce.webp",
     members: [
       { id: "kagotani", name: "籠谷 買", role: "カート・注文機能" },
       { id: "haishima", name: "配島 迅", role: "物流連携担当" },
@@ -201,6 +205,7 @@ const projectCatalog = [
   },
   {
     id: "inventory", name: "在庫管理システム", level: "中級",
+    testTargetImage: "./assets/images/test-targets/inventory-management.webp",
     members: [
       { id: "kuramoto", name: "倉本 在", role: "倉庫業務担当" },
       { id: "tanahashi", name: "棚橋 数馬", role: "在庫数管理" },
@@ -210,6 +215,7 @@ const projectCatalog = [
   },
   {
     id: "mobile", name: "スマホアプリ", level: "中級",
+    testTargetImage: "./assets/images/test-targets/mobile-app.webp",
     members: [
       { id: "yubisaki", name: "指先 滑", role: "iOS機能" },
       { id: "gamen", name: "画面 回", role: "Android画面機能" },
@@ -219,6 +225,7 @@ const projectCatalog = [
   },
   {
     id: "automotive", name: "車載ソフト", level: "上級",
+    testTargetImage: "./assets/images/test-targets/automotive-software.webp",
     members: [
       { id: "kurumatani", name: "車谷 走", role: "車両システム連携" },
       { id: "hayami", name: "速水 駆", role: "走行制御担当" },
@@ -228,6 +235,7 @@ const projectCatalog = [
   },
   {
     id: "payment", name: "決済システム", level: "上級",
+    testTargetImage: "./assets/images/test-targets/payment-system.webp",
     members: [
       { id: "kinjo", name: "金城 決", role: "決済・売上計上" },
       { id: "haraikawa", name: "払川 済", role: "加盟店連携担当" },
@@ -237,6 +245,7 @@ const projectCatalog = [
   },
   {
     id: "medical", name: "医療システム", level: "上級",
+    testTargetImage: "./assets/images/test-targets/medical-system.webp",
     members: [
       { id: "yakushiji", name: "薬師寺 治", role: "医療安全担当" },
       { id: "shinno", name: "診野 守", role: "臨床検証担当" },
@@ -1399,6 +1408,9 @@ const elements = {
   scenarioIntroFacts: document.getElementById("scenarioIntroFacts"),
   scenarioIntroDecision: document.getElementById("scenarioIntroDecision"),
   scenarioIntroGlossary: document.getElementById("scenarioIntroGlossary"),
+  scenarioIntroTargetCard: document.getElementById("scenarioIntroTargetCard"),
+  scenarioIntroTargetImage: document.getElementById("scenarioIntroTargetImage"),
+  scenarioIntroTargetName: document.getElementById("scenarioIntroTargetName"),
   scenarioIntroStartButton: document.getElementById("scenarioIntroStartButton"),
   scenarioIntroPracticeButton: document.getElementById("scenarioIntroPracticeButton"),
   scenarioIntroBackButton: document.getElementById("scenarioIntroBackButton"),
@@ -1407,6 +1419,9 @@ const elements = {
   scenarioPanel: document.getElementById("scenarioPanel"),
   scenarioPanelTitle: document.getElementById("scenarioPanelTitle"),
   scenarioPanelSeverityRules: document.getElementById("scenarioPanelSeverityRules"),
+  scenarioPanelTargetCard: document.getElementById("scenarioPanelTargetCard"),
+  scenarioPanelTargetImage: document.getElementById("scenarioPanelTargetImage"),
+  scenarioPanelTargetName: document.getElementById("scenarioPanelTargetName"),
   rmProjectTitle: document.getElementById("rmProjectTitle"),
   rmProjectSwitcher: document.getElementById("rmProjectSwitcher"),
   ticketListBody: document.getElementById("ticketListBody"),
@@ -2843,6 +2858,40 @@ function renderScenarioBrief() {
   }
   elements.severityField?.classList.toggle("hidden", qaScenario);
   const project = getCurrentProject();
+  const targetImageAlt = `${project.name}のテスト対象イメージ`;
+  [
+    {
+      card: elements.scenarioIntroTargetCard,
+      image: elements.scenarioIntroTargetImage,
+      name: elements.scenarioIntroTargetName,
+    },
+    {
+      card: elements.scenarioPanelTargetCard,
+      image: elements.scenarioPanelTargetImage,
+      name: elements.scenarioPanelTargetName,
+    },
+  ].forEach(({ card, image, name }) => {
+    const hasImage = Boolean(project.testTargetImage);
+    card?.classList.toggle("hidden", !hasImage);
+    setTextContent(name, project.name);
+    if (!image) return;
+    if (!hasImage) {
+      if (typeof image.removeAttribute === "function") {
+        image.removeAttribute("src");
+      } else {
+        image.src = "";
+      }
+      image.alt = "";
+      return;
+    }
+    const currentSource = typeof image.getAttribute === "function"
+      ? image.getAttribute("src")
+      : image.src;
+    if (currentSource !== project.testTargetImage) {
+      image.src = project.testTargetImage;
+    }
+    image.alt = targetImageAlt;
+  });
   const assignee = project.members.find((member) => member.id === state.scenario.evaluation.assignee);
   const relatedWatcherId = state.scenario.evaluation.watchers
     ?.find((memberId) => memberId !== state.scenario.evaluation.assignee);

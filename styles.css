@@ -1414,6 +1414,48 @@ button {
   line-height: 1.95;
 }
 
+.scenario-target-card {
+  display: block;
+  margin: 0 0 18px;
+  padding: 12px;
+  border: 1px solid #d9e2eb;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.scenario-target-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e1e7ed;
+  border-radius: 5px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.scenario-target-name {
+  display: block;
+  margin: 0 0 10px;
+  color: #263b50;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.scenario-target-card-compact {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 8px;
+  background: #fff;
+}
+
+.scenario-target-card-compact .scenario-target-name {
+  margin: 0;
+  font-size: 0.84rem;
+}
+
 .scenario-glossary {
   margin: 0 0 18px;
   padding: 12px 16px;
@@ -4423,6 +4465,14 @@ th[aria-sort="descending"] .ticket-sort-button::after {
 
   .scenario-intro-card {
     padding: 16px;
+  }
+
+  .scenario-intro-card > .scenario-target-card {
+    padding: 9px;
+  }
+
+  .scenario-intro-card .scenario-target-name {
+    font-size: 0.9rem;
   }
 
   .result-created-banner,
