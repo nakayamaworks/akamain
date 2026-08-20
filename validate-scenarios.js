@@ -1977,6 +1977,45 @@ try {
       )}`
     );
   }
+  const perfectDimensionFeedback = vm.runInContext(
+    `(() => {
+      const inspect = (qaTicket) => {
+        const definitions = getPracticeDimensionDefinitions(qaTicket);
+        const result = {
+          dimensions: Object.fromEntries(definitions.map(([, key]) => [key, 100])),
+          dimensionFeedback: Object.fromEntries(
+            definitions.map(([, key]) => [key, { reason: key + "は十分です。" }])
+          ),
+          improvementItems: [],
+        };
+        const items = getDimensionFeedbackItems(result, qaTicket);
+        return {
+          count: items.length,
+          allPerfect: items.every((item) => item.score === 100 && item.weightedGap === 0),
+          allHaveReasons: items.every((item) => item.reason.endsWith("は十分です。")),
+          impact: formatDimensionScoreImpact(items[0]),
+        };
+      };
+      return { bug: inspect(false), qa: inspect(true) };
+    })()`,
+    smokeContext
+  );
+  if (
+    perfectDimensionFeedback.bug.count !== 6 ||
+    perfectDimensionFeedback.qa.count !== 6 ||
+    !perfectDimensionFeedback.bug.allPerfect ||
+    !perfectDimensionFeedback.qa.allPerfect ||
+    !perfectDimensionFeedback.bug.allHaveReasons ||
+    !perfectDimensionFeedback.qa.allHaveReasons ||
+    perfectDimensionFeedback.bug.impact !== "減点なし" ||
+    perfectDimensionFeedback.qa.impact !== "減点なし"
+  ) {
+    errors.push(
+      `runtime smoke test expected perfect bug and QA dimensions to remain visible: ${JSON.stringify(
+        perfectDimensionFeedback
+      )}`
+    );
+  }
   const resultRevisionFlow = vm.runInContext(
     `(() => {
       const previous = {

@@ -3654,6 +3654,10 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   white-space: nowrap;
 }
 
+.practice-ai-dimension-item.is-perfect > div span {
+  color: #287346;
+}
+
 .practice-ai-dimension-item p,
 .practice-ai-dimension-item small {
   color: #566978;

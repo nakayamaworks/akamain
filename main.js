@@ -4452,7 +4452,7 @@ function getDimensionFeedbackItems(result, qaTicket = isQaScenario()) {
     .map(([label, key, weight]) => {
       const score = result?.dimensions?.[key];
       const feedback = result?.dimensionFeedback?.[key];
-      if (!Number.isInteger(score) || score >= 100) {
+      if (!Number.isInteger(score)) {
         return null;
       }
       const relatedImprovement = (result?.improvementItems || []).find((item) =>
@@ -4474,6 +4474,12 @@ function formatWeightedGap(value) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
+function formatDimensionScoreImpact(item) {
+  return item.weightedGap > 0
+    ? `総合点 −${formatWeightedGap(item.weightedGap)}点`
+    : "減点なし";
+}
+
 function renderPracticeDimensionFeedback(preview) {
   const items = getDimensionFeedbackItems(preview);
   elements.practiceScoringDimensionFeedbackSection?.classList.toggle("hidden", items.length === 0);
@@ -4482,8 +4488,8 @@ function renderPracticeDimensionFeedback(preview) {
     return items;
   }
   elements.practiceScoringDimensionFeedback.innerHTML = items.map((item) => `
-    <div class="practice-ai-dimension-item">
-      <div><strong>${escapeHtml(item.label)}</strong><span>${item.score}点 / 総合点 −${escapeHtml(formatWeightedGap(item.weightedGap))}点</span></div>
+    <div class="practice-ai-dimension-item${item.weightedGap === 0 ? " is-perfect" : ""}">
+      <div><strong>${escapeHtml(item.label)}</strong><span>${item.score}点 / ${escapeHtml(formatDimensionScoreImpact(item))}</span></div>
       <p>${escapeHtml(item.reason)}</p>
     </div>
   `).join("");
@@ -5468,7 +5474,7 @@ function renderTicketDetail() {
   const dimensionFeedbackItems = getDimensionFeedbackItems(result, qaTicket);
   const dimensionFeedback = dimensionFeedbackItems.map((item) => `
     <li>
-      <strong>${escapeHtml(item.label)} ${item.score}点（総合点 −${escapeHtml(formatWeightedGap(item.weightedGap))}点）</strong>
+      <strong>${escapeHtml(item.label)} ${item.score}点（${escapeHtml(formatDimensionScoreImpact(item))}）</strong>
       <span>${escapeHtml(item.reason)}</span>
     </li>
   `).join("");
