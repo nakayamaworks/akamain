@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="あかマインは、テストエンジニアのための起票トレーニングサービスです。現場で使えるQA確認と不具合報告の力を、実務シナリオとAIレビューで鍛えます。" />
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
-    <title>QA確認・不具合報告の起票トレーニング｜あかマイン</title>
+    <title>あかマイン｜QA確認・不具合報告の起票トレーニング</title>
     <meta name="theme-color" content="#cf2026" />
     <link rel="canonical" href="https://akamain.com/" />
     <meta property="og:type" content="website" />
@@ -24,7 +24,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./welcome.css?v=20260813a" />
+    <link rel="stylesheet" href="./welcome.css?v=20260822a" />
   </head>
   <body>
     <div class="page-shell">
@@ -53,8 +53,8 @@
           </div>
 
           <div class="hero-copy">
-            <p class="hero-brand-name"><span>あか</span>マイン</p>
-            <h1 id="welcomeTitle">問いと気づきに、<strong>伝わる技術</strong>を。</h1>
+            <h1 id="welcomeTitle" class="hero-brand-name"><span>あか</span>マイン</h1>
+            <p class="hero-tagline">問いと気づきに、<strong>伝わる技術</strong>を。</p>
             <p class="lead">現場でそのまま使えるQA確認と不具合報告の力を、実務シナリオとAIレビューで鍛える。</p>
           </div>
 
@@ -94,6 +94,7 @@
             </div>
 
             <p id="authMessage" class="auth-message" role="status"></p>
+            <p class="auth-legal-note">利用開始前に<a href="./terms.html">利用規約</a>と<a href="./privacy.html">プライバシーポリシー</a>をご確認ください。</p>
           </div>
         </section>
 
@@ -150,6 +151,7 @@
       <footer class="site-footer">
         <p>問いと気づきに、伝わる技術を。</p>
         <small>© 2026 あかマイン <span aria-hidden="true">·</span> Developed by <a href="https://nakayamaworks.jp/" target="_blank" rel="noopener noreferrer">Nakayama Works</a></small>
+        <nav class="footer-legal-links" aria-label="法務メニュー"><a href="./terms.html">利用規約</a><a href="./privacy.html">プライバシーポリシー</a></nav>
       </footer>
     </div>
 
@@ -159,18 +161,34 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "あかマイン",
-        "url": "https://akamain.com/",
-        "image": "https://akamain.com/assets/images/brand/akamain-main-visual.png",
-        "description": "現場でそのまま使えるQA確認と不具合報告の力を、実務シナリオとAIレビューで鍛えるテストエンジニア向け起票トレーニングサービス",
-        "applicationCategory": "EducationalApplication",
-        "operatingSystem": "Web",
-        "creator": {
-          "@type": "Organization",
-          "name": "Nakayama Works",
-          "url": "https://nakayamaworks.jp/"
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://akamain.com/#website",
+            "name": "あかマイン",
+            "alternateName": ["akamain", "アカマイン", "akamain.com"],
+            "url": "https://akamain.com/",
+            "inLanguage": "ja"
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://akamain.com/#webapp",
+            "name": "あかマイン",
+            "url": "https://akamain.com/",
+            "image": "https://akamain.com/assets/images/brand/akamain-main-visual.png",
+            "description": "現場でそのまま使えるQA確認と不具合報告の力を、実務シナリオとAIレビューで鍛えるテストエンジニア向け起票トレーニングサービス",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web",
+            "isPartOf": {
+              "@id": "https://akamain.com/#website"
+            },
+            "creator": {
+              "@type": "Organization",
+              "name": "Nakayama Works",
+              "url": "https://nakayamaworks.jp/"
+            }
+          }
+        ]
       }
     </script>
   </body>

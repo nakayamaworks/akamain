@@ -59,7 +59,9 @@ const publicFiles = [
   "auth-client.js",
   "evidence-library.js",
   "guide.css",
+  "legal.css",
   "main.js",
+  "privacy.html",
   "profile-api.js",
   "qa-scenario-authoring-library.js",
   "runtime-config.js",
@@ -69,6 +71,7 @@ const publicFiles = [
   "scoring-api.js",
   "scoring-preview.js",
   "styles.css",
+  "terms.html",
   "welcome.css",
   "welcome.js",
 ];

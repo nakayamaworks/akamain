@@ -12,7 +12,9 @@ const allowedTopLevelFiles = new Set([
   "evidence-library.js",
   "guide.css",
   "index.html",
+  "legal.css",
   "main.js",
+  "privacy.html",
   "profile-api.js",
   "qa-scenario-authoring-library.js",
   "robots.txt",
@@ -25,6 +27,7 @@ const allowedTopLevelFiles = new Set([
   "site.webmanifest",
   "sitemap.xml",
   "styles.css",
+  "terms.html",
   "welcome.css",
   "welcome.js",
 ]);
@@ -64,6 +67,8 @@ const welcomeHtml = await readFile(join(outputDirectory, "index.html"), "utf8");
 const appHtml = await readFile(join(outputDirectory, "app.html"), "utf8");
 const bugReportGuideHtml = await readFile(join(outputDirectory, "bug-report-writing", "index.html"), "utf8");
 const qaQuestionGuideHtml = await readFile(join(outputDirectory, "qa-question-writing", "index.html"), "utf8");
+const privacyHtml = await readFile(join(outputDirectory, "privacy.html"), "utf8");
+const termsHtml = await readFile(join(outputDirectory, "terms.html"), "utf8");
 const manifest = await readFile(join(outputDirectory, "site.webmanifest"), "utf8");
 
 async function verifyLocalReferences(html, sourceFile) {
@@ -98,20 +103,29 @@ await verifyLocalReferences(welcomeHtml, "index.html");
 await verifyLocalReferences(appHtml, "app.html");
 await verifyLocalReferences(bugReportGuideHtml, "bug-report-writing/index.html");
 await verifyLocalReferences(qaQuestionGuideHtml, "qa-question-writing/index.html");
+await verifyLocalReferences(privacyHtml, "privacy.html");
+await verifyLocalReferences(termsHtml, "terms.html");
 
 const requiredWelcomeFragments = [
+  '<title>あかマイン｜QA確認・不具合報告の起票トレーニング</title>',
+  'href="./welcome.css?v=20260822a"',
   'href="./"',
   'href="./app.html?guest=1"',
   'href="./app.html"',
   'href="https://akamain.com/"',
   'content="https://akamain.com/assets/images/brand/akamain-main-visual.png"',
   'テストエンジニアのための起票トレーニング',
+  '<h1 id="welcomeTitle" class="hero-brand-name"><span>あか</span>マイン</h1>',
   '問いと気づきに、<strong>伝わる技術</strong>を。',
   '現場でそのまま使えるQA確認と不具合報告の力',
+  '"@type": "WebSite"',
+  '"alternateName": ["akamain", "アカマイン", "akamain.com"]',
   'href="./qa-question-writing">QA確認</a>',
   'href="./bug-report-writing">不具合報告</a>',
   'QA確認の書き方を読む',
   '不具合報告の書き方を読む',
+  'href="./terms.html"',
+  'href="./privacy.html"',
 ];
 for (const fragment of requiredWelcomeFragments) {
   if (!welcomeHtml.includes(fragment)) {
@@ -139,12 +153,30 @@ if (!qaQuestionGuideHtml.includes('<link rel="canonical" href="https://akamain.c
 if (!qaQuestionGuideHtml.includes('href="/app.html?guest=1"')) {
   throw new Error("QA確認ガイドからゲスト体験への導線がありません。");
 }
+if (!bugReportGuideHtml.includes('href="/terms.html"') || !bugReportGuideHtml.includes('href="/privacy.html"')) {
+  throw new Error("バグ報告ガイドに法務ページへの導線がありません。");
+}
+if (!qaQuestionGuideHtml.includes('href="/terms.html"') || !qaQuestionGuideHtml.includes('href="/privacy.html"')) {
+  throw new Error("QA確認ガイドに法務ページへの導線がありません。");
+}
+if (!privacyHtml.includes("AIレビューへの情報送信") || !privacyHtml.includes("個人情報・機密情報を入力しないでください")) {
+  throw new Error("プライバシーポリシーにAIレビューのデータ取扱いがありません。");
+}
+if (!termsHtml.includes("入力してはいけない情報") || !termsHtml.includes("プライバシーポリシー")) {
+  throw new Error("利用規約にトレーニングデータの利用条件がありません。");
+}
 const sitemap = await readFile(join(outputDirectory, "sitemap.xml"), "utf8");
 if (!sitemap.includes("https://akamain.com/bug-report-writing")) {
   throw new Error("sitemapにバグ報告ガイドが登録されていません。");
 }
 if (!sitemap.includes("https://akamain.com/qa-question-writing")) {
   throw new Error("sitemapにQA確認ガイドが登録されていません。");
+}
+if (!sitemap.includes("https://akamain.com/privacy.html")) {
+  throw new Error("sitemapにプライバシーポリシーが登録されていません。");
+}
+if (!sitemap.includes("https://akamain.com/terms.html")) {
+  throw new Error("sitemapに利用規約が登録されていません。");
 }
 if (!manifest.includes('"start_url": "./"')) {
   throw new Error("Webアプリの開始URLが公開トップになっていません。");
