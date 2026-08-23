@@ -31,6 +31,11 @@ const projectEnvironments = {
     { text: "Hardware Rev: C", answer: "hardware rev c" },
     { text: "Vehicle profile: TEST-02", answer: "vehicle profile test-02" },
   ],
+  "automotive-multimedia": [
+    { text: "IVI Software: v3.8.0", answer: "ivi software v3.8.0" },
+    { text: "Display Unit Rev: D", answer: "display unit rev d" },
+    { text: "Vehicle profile: MM-04", answer: "vehicle profile mm-04" },
+  ],
   payment: [
     { text: "API version: 2024-06-20", answer: "api version 2024-06-20" },
     { text: "Environment: Sandbox", answer: "environment sandbox" },
@@ -97,6 +102,14 @@ const projectEnvironmentChoices = {
       "Hardware Rev: C / Vehicle profile: TEST-03",
     ],
   },
+  "automotive-multimedia": {
+    versions: ["IVI Software: v3.7.4", "IVI Software: v3.8.0", "IVI Software: v3.8.1"],
+    configurations: [
+      "Display Unit Rev: C / Vehicle profile: MM-03",
+      "Display Unit Rev: D / Vehicle profile: MM-04",
+      "Display Unit Rev: D / Vehicle profile: MM-05",
+    ],
+  },
   payment: {
     versions: ["API version: 2024-03-15", "API version: 2024-06-20", "API version: 2025-01-10"],
     configurations: [
@@ -117,7 +130,9 @@ const projectEnvironmentChoices = {
 
 const environmentLabelRules = [
   [/^ECU Software$/i, "ECUソフトウェア"],
+  [/^IVI Software$/i, "IVIソフトウェア"],
   [/^Hardware Rev$/i, "ハードウェア"],
+  [/^Display Unit Rev$/i, "ディスプレイユニット"],
   [/^Vehicle profile$/i, "車両プロファイル"],
   [/^(App|Web|Client) version$/i, "ソフトウェア"],
   [/^Release$/i, "リリース"],
@@ -231,6 +246,16 @@ const projectCatalog = [
       { id: "hayami", name: "速水 駆", role: "走行制御担当" },
       { id: "wajima", name: "輪島 操", role: "HMI担当" },
       { id: "michigami", name: "道上 守", role: "機能安全担当" },
+    ],
+  },
+  {
+    id: "automotive-multimedia", name: "車載マルチメディア", level: "上級",
+    testTargetImage: "./assets/images/test-targets/automotive-multimedia.webp",
+    members: [
+      { id: "michibe", name: "道辺 案", role: "ナビゲーション担当" },
+      { id: "otowa", name: "音羽 奏", role: "オーディオ・Bluetooth担当" },
+      { id: "kurumado", name: "車戸 連", role: "車両連携担当" },
+      { id: "mamoriya", name: "守屋 安", role: "先進安全HMI担当" },
     ],
   },
   {
@@ -521,6 +546,7 @@ const projectCategoryDefaults = {
   inventory: "workflow",
   mobile: "ui",
   automotive: "api",
+  "automotive-multimedia": "ui",
   payment: "api",
   medical: "api",
 };
@@ -549,6 +575,10 @@ const scenarioCategoryRules = {
     [/速度表示/, "ui"],
     [/CAN|Bus-Off/, "api"],
   ],
+  "automotive-multimedia": [
+    [/ナビ|案内|オーディオ|音量/, "ui"],
+    [/先進安全|車線逸脱|車両状態|CAN|信号/, "api"],
+  ],
   payment: [[/決済|返金|冪等キー|与信|タイムアウト/, "api"]],
   medical: [
     [/別の患者/, "ui"],
@@ -572,6 +602,7 @@ const projectAssignmentDefaults = {
   inventory: { assignee: "nimotsu", watchers: ["tanahashi"] },
   mobile: { assignee: "gamen", watchers: ["hashiru"] },
   automotive: { assignee: "wajima", watchers: ["michigami"] },
+  "automotive-multimedia": { assignee: "kurumado", watchers: ["mamoriya"] },
   payment: { assignee: "kinjo", watchers: ["haraikawa"] },
   medical: { assignee: "kenmi", watchers: ["yakushiji"] },
 };
@@ -604,6 +635,11 @@ function getScenarioAssignment(rawScenario) {
     automotive: [
       [/速度表示|メーター/, { assignee: "wajima", watchers: ["michigami"] }],
       [/CAN|Bus-Off/, { assignee: "kurumatani", watchers: ["michigami"] }],
+    ],
+    "automotive-multimedia": [
+      [/ナビ|案内/, { assignee: "michibe", watchers: ["otowa"] }],
+      [/オーディオ|音量|Bluetooth/, { assignee: "otowa", watchers: ["mamoriya"] }],
+      [/先進安全|車線逸脱|車両状態|CAN|信号/, { assignee: "kurumado", watchers: ["mamoriya"] }],
     ],
     payment: [
       [/返金/, { assignee: "modorikawa", watchers: ["kinjo"] }],
@@ -699,6 +735,10 @@ const scenarioIncidentalNotes = [
   [/ロット番号をCSV出力/, "対象ロットには商品画像が登録されていますが、PDF出力では画像の有無にかかわらず番号が保持されます"],
   [/通知許可を再度オン/, "端末の省電力モードは無効で、同じ時間帯のアプリ内お知らせは取得できています"],
   [/ローリングカウンタが15から0/, "計測中のバス負荷は28%で、同じフレームのデータ値とチェックサムは正常でした"],
+  [/ハンズフリー通話終了後.*音声案内/, "通話中のルート線と自車位置更新は正常で、案内音声だけが復帰しませんでした"],
+  [/オーディオ音量が最大値/, "音量異常の発生時も選局中の放送局と再生位置は保持されていました"],
+  [/車線逸脱警報をOFF/, "同じ画面にある車間距離設定は車両ECUへ正しく反映されていました"],
+  [/右後席ドア.*閉状態/, "運転席と左後席ドアの開閉状態は同じ試験中も正しく更新されていました"],
   [/返金WebhookがAPI応答より先/, "検証用カードのブランドを変えてもイベントの到着順と状態遷移は同じでした"],
   [/ng\/dLをμg\/Lへ換算/, "検査装置の表示言語は日本語ですが、英語へ変更しても受信値と単位は同一でした"],
 ];
@@ -952,7 +992,8 @@ function buildDefaultEvaluation(rawScenario) {
   const subject = rawScenario.subject?.text || "";
   const judgementProfile = getScenarioJudgementProfile(rawScenario);
   const critical = /別の患者|投薬量|決済|売上|データが消|在庫数がマイナス/.test(subject);
-  const legalRisk = rawScenario.projectId === "automotive" && /速度|メーター|CAN/.test(subject);
+  const legalRisk = ["automotive", "automotive-multimedia"].includes(rawScenario.projectId)
+    && /速度|メーター|CAN|先進安全|車線逸脱|車両状態/.test(subject);
   const highImpact = critical || legalRisk || /二重|重複|登録でき|同期データ/.test(subject);
   const difficulty = rawScenario.difficulty || "beginner";
   const severity = judgementProfile?.severity

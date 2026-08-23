@@ -74,6 +74,7 @@ const projectIds = [
   "inventory",
   "mobile",
   "automotive",
+  "automotive-multimedia",
   "payment",
   "medical",
 ];
@@ -659,8 +660,8 @@ const allScenarioRefs = scenarios.map((scenario) => ({
 const allSubjects = scenarios.map((scenario) => scenario.subject);
 const briefingProfiles = briefingContext.window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS || {};
 const uniqueScenarioIds = Object.keys(authoredScenarios);
-if (uniqueScenarioIds.length !== 36 || scenarios.length !== 36) {
-  errors.push("authoring registry and compatibility view must both contain 36 scenarios");
+if (uniqueScenarioIds.length !== 40 || scenarios.length !== 40) {
+  errors.push("authoring registry and compatibility view must both contain 40 scenarios");
 }
 
 uniqueScenarioIds.forEach((scenarioId) => {
@@ -771,12 +772,12 @@ const requiredQaSections = [
 ];
 const requiredQaTypes = new Set(["specification", "behavior", "conflict"]);
 if (
-  qaScenarioIds.length !== 36
-  || qaScenarios.length !== 36
-  || new Set(qaScenarioIds).size !== 36
+  qaScenarioIds.length !== 40
+  || qaScenarios.length !== 40
+  || new Set(qaScenarioIds).size !== 40
   || qaScenarios.some((scenario) => !requiredQaTypes.has(scenario.qaType))
 ) {
-  errors.push("QA authoring registry and runtime view must both contain 36 valid scenarios");
+  errors.push("QA authoring registry and runtime view must both contain 40 valid scenarios");
 }
 
 validProjectIds.forEach((projectId) => {
@@ -1562,14 +1563,14 @@ try {
   };
   const registryScenarioIds = Object.keys(scoringRubricRegistry.scenarios);
   if (
-    registryScenarioIds.length !== 36
-    || new Set(registryScenarioIds).size !== 36
+    registryScenarioIds.length !== 40
+    || new Set(registryScenarioIds).size !== 40
     || scoringRubricRegistry.dimensions.reduce(
       (sum, dimension) => sum + dimension.weight,
       0
     ) !== 100
   ) {
-    errors.push("scoring rubric registry must cover 36 scenarios with dimensions totaling 100");
+    errors.push("scoring rubric registry must cover 40 scenarios with dimensions totaling 100");
   }
   Object.values(scoringRubricRegistry.scenarios).forEach((rubric) => {
     const facts = Object.values(rubric.requiredFacts).flat();
@@ -1625,7 +1626,7 @@ try {
         || !fixtureSet.fixtures.some(({ fixtureId }) => fixtureId === "alternative-excellent");
     })
   ) {
-    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 36 rubrics");
+    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 40 rubrics");
   }
   fixtureScenarioIds.forEach((scenarioId) => {
     const rubric = scoringRubricRegistry.scenarios[scenarioId];
@@ -1793,7 +1794,7 @@ try {
     smokeContext
   );
   if (
-    runtimeScenarioIds.length !== 36 ||
+    runtimeScenarioIds.length !== 40 ||
     new Set(runtimeScenarioIds).size !== runtimeScenarioIds.length ||
     runtimeScenarioIds.some(
       (scenarioId) =>
@@ -1801,7 +1802,7 @@ try {
         !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scenarioId)
     )
   ) {
-    errors.push("runtime smoke test expected 36 unique persistent scenario IDs");
+    errors.push("runtime smoke test expected 40 unique persistent scenario IDs");
   }
   const runtimeEnvironmentFailures = vm.runInContext(
     `scenarioBank.map((scenario) => {
@@ -2269,12 +2270,12 @@ try {
     scenarioNarrativeCoverage.map(({ incidental }) => incidental)
   ).size;
   if (
-    scenarioNarrativeCoverage.length !== 36 ||
+    scenarioNarrativeCoverage.length !== 40 ||
     invalidNarratives.length > 0 ||
-    uniqueIncidentalNotes !== 36
+    uniqueIncidentalNotes !== 40
   ) {
     errors.push(
-      `runtime smoke test expected 36 distinct raw field reports without expected-result leakage: ${JSON.stringify(
+      `runtime smoke test expected 40 distinct raw field reports without expected-result leakage: ${JSON.stringify(
         invalidNarratives
       )}`
     );
@@ -2362,9 +2363,9 @@ try {
       requiredCount >= fileCount ||
       invalidFiles > 0
   );
-  if (evidenceCoverage.length !== 36 || invalidEvidenceCoverage.length > 0) {
+  if (evidenceCoverage.length !== 40 || invalidEvidenceCoverage.length > 0) {
     errors.push(
-      `runtime smoke test expected complete evidence profiles for all 36 scenarios: ${JSON.stringify(
+      `runtime smoke test expected complete evidence profiles for all 40 scenarios: ${JSON.stringify(
         invalidEvidenceCoverage
       )}`
     );

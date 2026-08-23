@@ -37,7 +37,7 @@ typing_workbench/
 
 ## シナリオの手修正
 
-不具合36シナリオは `scenario-authoring-library.js`、QA 36シナリオは
+不具合40シナリオは `scenario-authoring-library.js`、QA 40シナリオは
 `qa-scenario-authoring-library.js` で、次の内容をまとめて編集できる。
 
 - `scenario.subject`: 題名とタイピング入力候補

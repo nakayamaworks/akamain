@@ -4896,6 +4896,550 @@
           }
         }
       ]
+    },
+    "automotive-multimedia-navigation-guidance-not-resumed-after-call": {
+      "scenarioId": "automotive-multimedia-navigation-guidance-not-resumed-after-call",
+      "rubricVersion": "automotive-multimedia-navigation-guidance-not-resumed-after-call.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "ハンズフリー通話終了後にナビの音声案内が再開されない",
+            "sections": {
+              "detail": "ハンズフリー通話終了後もナビの音声案内がミュートされたままになる",
+              "preconditions": "ルート案内中でBluetooth接続した電話から着信できること",
+              "steps": "1. 交差点案内の前にハンズフリー着信へ応答する\n2. 通話を終了して次の案内地点へ進む",
+              "expected": "通話終了から1秒以内にナビの音声案内が再開されること",
+              "actual": "通話終了後も音声案内が再開されず画面案内だけが継続する",
+              "remarks": "ルート線と自車位置は更新され案内を終了して再開すると音声も戻る",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "ハンズフリー通話終了後にナビの音声案内が再開されない",
+            "sections": {
+              "detail": "ハンズフリー通話終了後もナビの音声案内がミュートされたままになる",
+              "preconditions": "ルート案内中でBluetooth接続した電話から着信できること",
+              "steps": "交差点案内の前にハンズフリー着信へ応答する。通話を終了して次の案内地点へ進む",
+              "expected": "IVI音声制御仕様書 Rev.3.8「6.4 ハンズフリー通話終了時の音声復帰」\n通話終了から1秒以内にナビの音声案内が再開されること",
+              "actual": "通話終了後も音声案内が再開されず画面案内だけが継続する",
+              "remarks": "ルート線と自車位置は更新され案内を終了して再開すると音声も戻る",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "ハンズフリー通話終了後にナビの音声案内が再開されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりハンズフリー通話終了後にナビの音声案内が再開されない",
+            "sections": {
+              "detail": "ハンズフリー通話終了後もナビの音声案内がミュートされたままになる\n原因は実装不備であることを確認しました。",
+              "preconditions": "ルート案内中でBluetooth接続した電話から着信できること",
+              "steps": "1. 交差点案内の前にハンズフリー着信へ応答する\n2. 通話を終了して次の案内地点へ進む",
+              "expected": "通話終了から1秒以内にナビの音声案内が再開されること",
+              "actual": "通話終了後も音声案内が再開されず画面案内だけが継続する",
+              "remarks": "ルート線と自車位置は更新され案内を終了して再開すると音声も戻る",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "ハンズフリー通話終了後にナビの音声案内が再開されない",
+            "sections": {
+              "detail": "ルート案内中でBluetooth接続した電話から着信できること",
+              "preconditions": "1. 交差点案内の前にハンズフリー着信へ応答する\n2. 通話を終了して次の案内地点へ進む",
+              "steps": "通話終了から1秒以内にナビの音声案内が再開されること",
+              "expected": "通話終了後も音声案内が再開されず画面案内だけが継続する",
+              "actual": "ルート線と自車位置は更新され案内を終了して再開すると音声も戻る",
+              "remarks": "5/5",
+              "reproducibility": "ハンズフリー通話終了後もナビの音声案内がミュートされたままになる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "ハンズフリー通話終了後にナビの音声案内が再開されない",
+            "sections": {
+              "detail": "ハンズフリー通話終了後もナビの音声案内がミュートされたままになる\n上記について継続して確認が必要です。",
+              "preconditions": "ルート案内中でBluetooth接続した電話から着信できること\n上記について継続して確認が必要です。",
+              "steps": "1. 交差点案内の前にハンズフリー着信へ応答する\n2. 通話を終了して次の案内地点へ進む\n上記について継続して確認が必要です。",
+              "expected": "通話終了から1秒以内にナビの音声案内が再開されること\n上記について継続して確認が必要です。",
+              "actual": "通話終了後も音声案内が再開されず画面案内だけが継続する\n上記について継続して確認が必要です。",
+              "remarks": "ルート線と自車位置は更新され案内を終了して再開すると音声も戻る\n上記について継続して確認が必要です。",
+              "reproducibility": "5/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-multimedia-audio-volume-max-after-ignition-restart": {
+      "scenarioId": "automotive-multimedia-audio-volume-max-after-ignition-restart",
+      "rubricVersion": "automotive-multimedia-audio-volume-max-after-ignition-restart.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "イグニッション再投入後にオーディオ音量が最大値で再生される",
+            "sections": {
+              "detail": "音量8でラジオを再生して終了した後の再起動で音量40に変わる",
+              "preconditions": "ラジオを選択し音量を8に設定して再生していること",
+              "steps": "1. イグニッションをOFFにして30秒待つ\n2. イグニッションをONにしてオーディオを再生する",
+              "expected": "前回終了時の音量8でラジオ再生が再開されること",
+              "actual": "起動直後に最大音量40でラジオ再生が始まる",
+              "remarks": "音量履歴には8が保存されBluetoothオーディオでは正常に復元される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "イグニッション再投入後にオーディオ音量が最大値で再生される",
+            "sections": {
+              "detail": "音量8でラジオを再生して終了した後の再起動で音量40に変わる",
+              "preconditions": "ラジオを選択し音量を8に設定して再生していること",
+              "steps": "イグニッションをOFFにして30秒待つ。イグニッションをONにしてオーディオを再生する",
+              "expected": "IVIオーディオ状態復元仕様書 Rev.3.7「4.3 起動時音量」\n前回終了時の音量8でラジオ再生が再開されること",
+              "actual": "起動直後に最大音量40でラジオ再生が始まる",
+              "remarks": "音量履歴には8が保存されBluetoothオーディオでは正常に復元される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "イグニッション再投入後にオーディオ音量が最大値で再生される",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりイグニッション再投入後にオーディオ音量が最大値で再生される",
+            "sections": {
+              "detail": "音量8でラジオを再生して終了した後の再起動で音量40に変わる\n原因は実装不備であることを確認しました。",
+              "preconditions": "ラジオを選択し音量を8に設定して再生していること",
+              "steps": "1. イグニッションをOFFにして30秒待つ\n2. イグニッションをONにしてオーディオを再生する",
+              "expected": "前回終了時の音量8でラジオ再生が再開されること",
+              "actual": "起動直後に最大音量40でラジオ再生が始まる",
+              "remarks": "音量履歴には8が保存されBluetoothオーディオでは正常に復元される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "イグニッション再投入後にオーディオ音量が最大値で再生される",
+            "sections": {
+              "detail": "ラジオを選択し音量を8に設定して再生していること",
+              "preconditions": "1. イグニッションをOFFにして30秒待つ\n2. イグニッションをONにしてオーディオを再生する",
+              "steps": "前回終了時の音量8でラジオ再生が再開されること",
+              "expected": "起動直後に最大音量40でラジオ再生が始まる",
+              "actual": "音量履歴には8が保存されBluetoothオーディオでは正常に復元される",
+              "remarks": "4/4",
+              "reproducibility": "音量8でラジオを再生して終了した後の再起動で音量40に変わる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "イグニッション再投入後にオーディオ音量が最大値で再生される",
+            "sections": {
+              "detail": "音量8でラジオを再生して終了した後の再起動で音量40に変わる\n上記について継続して確認が必要です。",
+              "preconditions": "ラジオを選択し音量を8に設定して再生していること\n上記について継続して確認が必要です。",
+              "steps": "1. イグニッションをOFFにして30秒待つ\n2. イグニッションをONにしてオーディオを再生する\n上記について継続して確認が必要です。",
+              "expected": "前回終了時の音量8でラジオ再生が再開されること\n上記について継続して確認が必要です。",
+              "actual": "起動直後に最大音量40でラジオ再生が始まる\n上記について継続して確認が必要です。",
+              "remarks": "音量履歴には8が保存されBluetoothオーディオでは正常に復元される\n上記について継続して確認が必要です。",
+              "reproducibility": "4/4\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-multimedia-lane-departure-toggle-not-sent": {
+      "scenarioId": "automotive-multimedia-lane-departure-toggle-not-sent",
+      "rubricVersion": "automotive-multimedia-lane-departure-toggle-not-sent.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "マルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+            "sections": {
+              "detail": "先進安全設定で車線逸脱警報をOFFにすると画面だけがOFFになり設定信号が送信されない",
+              "preconditions": "停車中で車線逸脱警報の車両状態がONであること",
+              "steps": "1. 先進安全設定画面を開く\n2. 車線逸脱警報をOFFに変更する\n3. 車両ECUの設定信号を確認する",
+              "expected": "画面変更後にOFF要求が送信され車両状態もOFFへ更新されること",
+              "actual": "画面はOFFになるがOFF要求が送信されず車両状態はONのままになる",
+              "remarks": "画面を開き直してもOFF表示のままで車間距離設定は正常に反映される",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "マルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+            "sections": {
+              "detail": "先進安全設定で車線逸脱警報をOFFにすると画面だけがOFFになり設定信号が送信されない",
+              "preconditions": "停車中で車線逸脱警報の車両状態がONであること",
+              "steps": "先進安全設定画面を開く。車線逸脱警報をOFFに変更する。車両ECUの設定信号を確認する",
+              "expected": "先進安全HMI連携仕様書 Rev.4.2「7.5 車線逸脱警報設定」\n画面変更後にOFF要求が送信され車両状態もOFFへ更新されること",
+              "actual": "画面はOFFになるがOFF要求が送信されず車両状態はONのままになる",
+              "remarks": "画面を開き直してもOFF表示のままで車間距離設定は正常に反映される",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "マルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりマルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+            "sections": {
+              "detail": "先進安全設定で車線逸脱警報をOFFにすると画面だけがOFFになり設定信号が送信されない\n原因は実装不備であることを確認しました。",
+              "preconditions": "停車中で車線逸脱警報の車両状態がONであること",
+              "steps": "1. 先進安全設定画面を開く\n2. 車線逸脱警報をOFFに変更する\n3. 車両ECUの設定信号を確認する",
+              "expected": "画面変更後にOFF要求が送信され車両状態もOFFへ更新されること",
+              "actual": "画面はOFFになるがOFF要求が送信されず車両状態はONのままになる",
+              "remarks": "画面を開き直してもOFF表示のままで車間距離設定は正常に反映される",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "マルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+            "sections": {
+              "detail": "停車中で車線逸脱警報の車両状態がONであること",
+              "preconditions": "1. 先進安全設定画面を開く\n2. 車線逸脱警報をOFFに変更する\n3. 車両ECUの設定信号を確認する",
+              "steps": "画面変更後にOFF要求が送信され車両状態もOFFへ更新されること",
+              "expected": "画面はOFFになるがOFF要求が送信されず車両状態はONのままになる",
+              "actual": "画面を開き直してもOFF表示のままで車間距離設定は正常に反映される",
+              "remarks": "10/10",
+              "reproducibility": "先進安全設定で車線逸脱警報をOFFにすると画面だけがOFFになり設定信号が送信されない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "マルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+            "sections": {
+              "detail": "先進安全設定で車線逸脱警報をOFFにすると画面だけがOFFになり設定信号が送信されない\n上記について継続して確認が必要です。",
+              "preconditions": "停車中で車線逸脱警報の車両状態がONであること\n上記について継続して確認が必要です。",
+              "steps": "1. 先進安全設定画面を開く\n2. 車線逸脱警報をOFFに変更する\n3. 車両ECUの設定信号を確認する\n上記について継続して確認が必要です。",
+              "expected": "画面変更後にOFF要求が送信され車両状態もOFFへ更新されること\n上記について継続して確認が必要です。",
+              "actual": "画面はOFFになるがOFF要求が送信されず車両状態はONのままになる\n上記について継続して確認が必要です。",
+              "remarks": "画面を開き直してもOFF表示のままで車間距離設定は正常に反映される\n上記について継続して確認が必要です。",
+              "reproducibility": "10/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-multimedia-rear-door-status-stale-after-wake": {
+      "scenarioId": "automotive-multimedia-rear-door-status-stale-after-wake",
+      "rubricVersion": "automotive-multimedia-rear-door-status-stale-after-wake.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "スリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+            "sections": {
+              "detail": "IVIのスリープ復帰後に右後席ドアを開いても車両状態画面へ開状態が反映されない",
+              "preconditions": "全ドアを閉じてIVIを30分以上スリープさせていること",
+              "steps": "1. ドアロック解除でIVIを復帰させる\n2. 右後席ドアを開く\n3. 車両状態画面のドア表示を確認する",
+              "expected": "ドア信号受信から500ms以内に右後席ドアが開状態で表示されること",
+              "actual": "右後席ドアの開信号を受信しても画面は閉状態を表示し続ける",
+              "remarks": "運転席と左後席は正常で車両状態画面を開き直すと右後席も開表示になる",
+              "reproducibility": "6/6"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "スリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+            "sections": {
+              "detail": "IVIのスリープ復帰後に右後席ドアを開いても車両状態画面へ開状態が反映されない",
+              "preconditions": "全ドアを閉じてIVIを30分以上スリープさせていること",
+              "steps": "ドアロック解除でIVIを復帰させる。右後席ドアを開く。車両状態画面のドア表示を確認する",
+              "expected": "IVI車両状態表示仕様書 Rev.3.8「5.2 ドア開閉状態」\nドア信号受信から500ms以内に右後席ドアが開状態で表示されること",
+              "actual": "右後席ドアの開信号を受信しても画面は閉状態を表示し続ける",
+              "remarks": "運転席と左後席は正常で車両状態画面を開き直すと右後席も開表示になる",
+              "reproducibility": "6/6"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "スリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりスリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+            "sections": {
+              "detail": "IVIのスリープ復帰後に右後席ドアを開いても車両状態画面へ開状態が反映されない\n原因は実装不備であることを確認しました。",
+              "preconditions": "全ドアを閉じてIVIを30分以上スリープさせていること",
+              "steps": "1. ドアロック解除でIVIを復帰させる\n2. 右後席ドアを開く\n3. 車両状態画面のドア表示を確認する",
+              "expected": "ドア信号受信から500ms以内に右後席ドアが開状態で表示されること",
+              "actual": "右後席ドアの開信号を受信しても画面は閉状態を表示し続ける",
+              "remarks": "運転席と左後席は正常で車両状態画面を開き直すと右後席も開表示になる",
+              "reproducibility": "6/6"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "スリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+            "sections": {
+              "detail": "全ドアを閉じてIVIを30分以上スリープさせていること",
+              "preconditions": "1. ドアロック解除でIVIを復帰させる\n2. 右後席ドアを開く\n3. 車両状態画面のドア表示を確認する",
+              "steps": "ドア信号受信から500ms以内に右後席ドアが開状態で表示されること",
+              "expected": "右後席ドアの開信号を受信しても画面は閉状態を表示し続ける",
+              "actual": "運転席と左後席は正常で車両状態画面を開き直すと右後席も開表示になる",
+              "remarks": "6/6",
+              "reproducibility": "IVIのスリープ復帰後に右後席ドアを開いても車両状態画面へ開状態が反映されない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "スリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+            "sections": {
+              "detail": "IVIのスリープ復帰後に右後席ドアを開いても車両状態画面へ開状態が反映されない\n上記について継続して確認が必要です。",
+              "preconditions": "全ドアを閉じてIVIを30分以上スリープさせていること\n上記について継続して確認が必要です。",
+              "steps": "1. ドアロック解除でIVIを復帰させる\n2. 右後席ドアを開く\n3. 車両状態画面のドア表示を確認する\n上記について継続して確認が必要です。",
+              "expected": "ドア信号受信から500ms以内に右後席ドアが開状態で表示されること\n上記について継続して確認が必要です。",
+              "actual": "右後席ドアの開信号を受信しても画面は閉状態を表示し続ける\n上記について継続して確認が必要です。",
+              "remarks": "運転席と左後席は正常で車両状態画面を開き直すと右後席も開表示になる\n上記について継続して確認が必要です。",
+              "reproducibility": "6/6\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
     }
   }
 }

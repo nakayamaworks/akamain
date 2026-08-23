@@ -1474,6 +1474,10 @@
     "inventory-lot-leading-zero-lost-export",
     "mobile-notification-token-not-reregistered",
     "automotive-can-rolling-counter-rollover-rejected",
+    "automotive-multimedia-navigation-guidance-not-resumed-after-call",
+    "automotive-multimedia-audio-volume-max-after-ignition-restart",
+    "automotive-multimedia-lane-departure-toggle-not-sent",
+    "automotive-multimedia-rear-door-status-stale-after-wake",
     "payment-refund-event-before-response-stale",
     "medical-lab-result-unit-conversion-wrong",
   ];

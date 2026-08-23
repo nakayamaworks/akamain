@@ -9461,7 +9461,7 @@
           "name": "payment-refund_state.json",
           "summary": "発生時の内部状態。返金API実行後、API応答を遅延させて返金完了Webhookを先に受信しました。いったん返金完了になりましたが、API応答の処理後に返金処理中へ戻りました。",
           "contentPreview": [
-            "{\"scenarioId\":\"payment-refund-event-before-response-stale\",\"result\":\"observed\",\"sequence\":8}"
+            "{\"scenarioId\":\"payment-refund-event-before-response-stale\",\"result\":\"observed\",\"sequence\":12}"
           ],
           "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
           "required": true
@@ -9714,7 +9714,7 @@
           "name": "medical-lab_state.json",
           "summary": "発生時の内部状態。検査項目TEST-17へ25ng/dLの結果を連携しました。診療画面の表示単位はμg/Lで、本来250μg/Lとなるところ2500μg/Lと表示されました。",
           "contentPreview": [
-            "{\"scenarioId\":\"medical-lab-result-unit-conversion-wrong\",\"result\":\"observed\",\"sequence\":9}"
+            "{\"scenarioId\":\"medical-lab-result-unit-conversion-wrong\",\"result\":\"observed\",\"sequence\":13}"
           ],
           "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
           "required": true
@@ -9741,6 +9741,1018 @@
           "actual": "25ng/dLが2500μg/Lと表示される",
           "remarks": "ng/mLからμg/Lへの変換と単位変換なしの項目は正常",
           "reproducibility": "10/10"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-multimedia-navigation-guidance-not-resumed-after-call": {
+      "scenarioId": "automotive-multimedia-navigation-guidance-not-resumed-after-call",
+      "projectId": "automotive-multimedia",
+      "rubricVersion": "automotive-multimedia-navigation-guidance-not-resumed-after-call.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "ナビ案内中のハンズフリー通話終了後に、音声案内が自動復帰することをテストしています。",
+        "environment": [
+          "IVI Software: v3.8.0",
+          "Display Unit Rev: D",
+          "Vehicle profile: MM-04"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "ルート案内中、交差点案内の直前にBluetooth接続した電話へ着信させ、ハンズフリーで応答しました。通話終了後もナビ音声はミュート状態のままで、次の交差点案内は画面表示だけになりました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ手順を5回実施して5回とも音声が復帰しませんでした。着信へ応答せず拒否した場合は案内音声が継続し、ナビ案内を終了して同じルートを再開すると音声が戻ります。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "ナビ・電話音声制御仕様では、ハンズフリー通話終了から1秒以内に通話前のナビ音声状態へ復帰すると規定されています。 通話中もルート線と自車位置の更新は継続し、経路計算結果に変化はありませんでした。"
+          }
+        ],
+        "specificationReference": "IVI音声制御仕様書 Rev.3.8「6.4 ハンズフリー通話終了時の音声復帰」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、ルート案内中にハンズフリー通話へ応答した利用者です。画面上の経路案内は継続します。",
+          "confirmedWorkaround": "修正までは、通話終了後にナビ案内を一度終了し、同じ目的地で案内を再開します。",
+          "confirmedRecovery": "ナビ案内を再開すると音声が復帰します。恒久的な復旧には音声フォーカス制御の修正が必要です。",
+          "riskAssessment": "運転者が画面を見ないと案内地点を把握できず、右左折を逃したり運転中の画面注視が増えたりする可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『ルート案内中、交差点案内の直前にBluetooth接続した電話へ着信させ、ハンズフリーで応答しました。通話終了後もナビ音声はミュート状態のままで、次の交差点案内は画面表示だけになりました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ手順を5回実施して5回とも音声が復帰しませんでした。着信へ応答せず拒否した場合は案内音声が継続し、ナビ案内を終了して同じルートを再開すると音声が戻ります。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『ナビ・電話音声制御仕様では、ハンズフリー通話終了から1秒以内に通話前のナビ音声状態へ復帰すると規定されています。 通話中もルート線と自車位置の更新は継続し、経路計算結果に変化はありませんでした。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "IVI Software: v3.8.0",
+        "environment": "Display Unit Rev: D / Vehicle profile: MM-04",
+        "assigneeId": "michibe",
+        "watcherIds": [
+          "michibe",
+          "otowa"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-multimedia-operation",
+          "name": "automotive-multimedia_operation.mp4",
+          "summary": "ルート案内中、交差点案内の直前にBluetooth接続した電話へ着信させ、ハンズフリーで応答しました。通話終了後もナビ音声はミュート状態のままで、次の交差点案内は画面表示だけになりました。",
+          "contentPreview": [
+            "操作開始",
+            "ルート案内中、交差点案内の直前にBluetooth接続した電話へ着信させ、ハンズフリーで応答しました。通話終了後もナビ音声はミュート状態のままで、次の交差点案内は画面表示だけになりました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-comparison",
+          "name": "automotive-multimedia_comparison.log",
+          "summary": "同じ手順を5回実施して5回とも音声が復帰しませんでした。着信へ応答せず拒否した場合は案内音声が継続し、ナビ案内を終了して同じルートを再開すると音声が戻ります。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ手順を5回実施して5回とも音声が復帰しませんでした。着信へ応答せず拒否した場合は案内音声が継続し、ナビ案内を終了して同じルートを再開すると音声が戻ります。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-state",
+          "name": "automotive-multimedia_state.json",
+          "summary": "発生時の内部状態。ルート案内中、交差点案内の直前にBluetooth接続した電話へ着信させ、ハンズフリーで応答しました。通話終了後もナビ音声はミュート状態のままで、次の交差点案内は画面表示だけになりました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-multimedia-navigation-guidance-not-resumed-after-call\",\"result\":\"observed\",\"sequence\":8}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-unrelated",
+          "name": "automotive-multimedia_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "ハンズフリー通話終了後にナビの音声案内が再開されない",
+        "sections": {
+          "detail": "ハンズフリー通話終了後もナビの音声案内がミュートされたままになる",
+          "preconditions": "ルート案内中でBluetooth接続した電話から着信できること",
+          "steps": "1. 交差点案内の前にハンズフリー着信へ応答する\n2. 通話を終了して次の案内地点へ進む",
+          "expected": "通話終了から1秒以内にナビの音声案内が再開されること",
+          "actual": "通話終了後も音声案内が再開されず画面案内だけが継続する",
+          "remarks": "ルート線と自車位置は更新され案内を終了して再開すると音声も戻る",
+          "reproducibility": "5/5"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-multimedia-audio-volume-max-after-ignition-restart": {
+      "scenarioId": "automotive-multimedia-audio-volume-max-after-ignition-restart",
+      "projectId": "automotive-multimedia",
+      "rubricVersion": "automotive-multimedia-audio-volume-max-after-ignition-restart.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "イグニッション再投入時に、ラジオの前回音量が安全に復元されることをテストしています。",
+        "environment": [
+          "IVI Software: v3.8.0",
+          "Display Unit Rev: D",
+          "Vehicle profile: MM-04"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "ラジオを音量8で再生した状態からイグニッションをOFFにし、30秒後にONへ戻しました。IVI起動直後、ラジオが最大音量40で再生されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を4回実施して4回ともラジオだけが音量40になりました。Bluetoothオーディオは前回値8で復元し、音量履歴ログにも終了時の値として8が記録されています。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "オーディオ状態復元仕様では、起動時にソース別の前回音量を復元し、保存値を取得できない場合も安全上限値12を超えて再生しないと規定されています。 選局中の放送局と再生ソースは正しく復元され、音量値だけが異なっていました。"
+          }
+        ],
+        "specificationReference": "IVIオーディオ状態復元仕様書 Rev.3.7「4.3 起動時音量」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、ラジオを選択した状態でIVIを再起動する利用者です。Bluetoothオーディオでは確認されていません。",
+          "confirmedWorkaround": "修正までは、イグニッションOFF前にラジオを停止し、起動後に音量表示を確認してから再生します。",
+          "confirmedRecovery": "起動後に音量を下げれば通常再生へ戻ります。修正版では保存値と安全上限値の両方を確認します。",
+          "riskAssessment": "起動直後の大音量で運転者が驚き、注意がそれたり聴覚へ負担がかかったりする可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『ラジオを音量8で再生した状態からイグニッションをOFFにし、30秒後にONへ戻しました。IVI起動直後、ラジオが最大音量40で再生されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を4回実施して4回ともラジオだけが音量40になりました。Bluetoothオーディオは前回値8で復元し、音量履歴ログにも終了時の値として8が記録されています。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『オーディオ状態復元仕様では、起動時にソース別の前回音量を復元し、保存値を取得できない場合も安全上限値12を超えて再生しないと規定されています。 選局中の放送局と再生ソースは正しく復元され、音量値だけが異なっていました。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "ui",
+        "version": "IVI Software: v3.8.0",
+        "environment": "Display Unit Rev: D / Vehicle profile: MM-04",
+        "assigneeId": "otowa",
+        "watcherIds": [
+          "otowa",
+          "mamoriya"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-multimedia-operation",
+          "name": "automotive-multimedia_operation.mp4",
+          "summary": "ラジオを音量8で再生した状態からイグニッションをOFFにし、30秒後にONへ戻しました。IVI起動直後、ラジオが最大音量40で再生されました。",
+          "contentPreview": [
+            "操作開始",
+            "ラジオを音量8で再生した状態からイグニッションをOFFにし、30秒後にONへ戻しました。IVI起動直後、ラジオが最大音量40で再生されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-comparison",
+          "name": "automotive-multimedia_comparison.log",
+          "summary": "同じ操作を4回実施して4回ともラジオだけが音量40になりました。Bluetoothオーディオは前回値8で復元し、音量履歴ログにも終了時の値として8が記録されています。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を4回実施して4回ともラジオだけが音量40になりました。Bluetoothオーディオは前回値8で復元し、音量履歴ログにも終了時の値として8が記録されています。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-state",
+          "name": "automotive-multimedia_state.json",
+          "summary": "発生時の内部状態。ラジオを音量8で再生した状態からイグニッションをOFFにし、30秒後にONへ戻しました。IVI起動直後、ラジオが最大音量40で再生されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-multimedia-audio-volume-max-after-ignition-restart\",\"result\":\"observed\",\"sequence\":9}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-unrelated",
+          "name": "automotive-multimedia_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "イグニッション再投入後にオーディオ音量が最大値で再生される",
+        "sections": {
+          "detail": "音量8でラジオを再生して終了した後の再起動で音量40に変わる",
+          "preconditions": "ラジオを選択し音量を8に設定して再生していること",
+          "steps": "1. イグニッションをOFFにして30秒待つ\n2. イグニッションをONにしてオーディオを再生する",
+          "expected": "前回終了時の音量8でラジオ再生が再開されること",
+          "actual": "起動直後に最大音量40でラジオ再生が始まる",
+          "remarks": "音量履歴には8が保存されBluetoothオーディオでは正常に復元される",
+          "reproducibility": "4/4"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-multimedia-lane-departure-toggle-not-sent": {
+      "scenarioId": "automotive-multimedia-lane-departure-toggle-not-sent",
+      "projectId": "automotive-multimedia",
+      "rubricVersion": "automotive-multimedia-lane-departure-toggle-not-sent.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "車線逸脱警報の画面設定が車両ECUへ反映されることをテストしています。",
+        "environment": [
+          "IVI Software: v3.8.0",
+          "Display Unit Rev: D",
+          "Vehicle profile: MM-04"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "停車中に先進安全設定画面を開き、車線逸脱警報をONからOFFへ変更しました。画面のトグルはOFFになりましたが、設定要求CAN信号は送信されず、車両ECUの実状態はONのままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を10回実施して10回とも要求信号が出ませんでした。同じ画面の車間距離設定は要求信号と実状態が更新され、車線逸脱警報を車両診断ツールからOFFにした場合は画面もOFFへ同期します。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "先進安全HMI連携仕様では、停車中に車線逸脱警報設定を変更した場合、200ms以内に設定要求を送信し、車両ECUから受信した実状態で画面表示を更新すると規定されています。 設定画面を閉じて開き直してもトグルはOFF表示のままで、実状態との不一致を画面から判別できませんでした。"
+          }
+        ],
+        "specificationReference": "先進安全HMI連携仕様書 Rev.4.2「7.5 車線逸脱警報設定」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、マルチメディア画面から車線逸脱警報設定を変更する利用者です。車両ECUの警報機能自体はONで動作を継続します。",
+          "confirmedWorkaround": "修正までは、対象設定をマルチメディア画面から変更せず、車両側の専用スイッチまたは診断手順で実状態を確認します。",
+          "confirmedRecovery": "車両側の専用スイッチで設定し直すと画面と実状態を同期できます。修正版では要求送信と応答反映を確認します。",
+          "riskAssessment": "画面表示と実際の先進安全設定が一致せず、運転者が機能の作動状態を誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『停車中に先進安全設定画面を開き、車線逸脱警報をONからOFFへ変更しました。画面のトグルはOFFになりましたが、設定要求CAN信号は送信されず、車両ECUの実状態はONのままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を10回実施して10回とも要求信号が出ませんでした。同じ画面の車間距離設定は要求信号と実状態が更新され、車線逸脱警報を車両診断ツールからOFFにした場合は画面もOFFへ同期します。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『先進安全HMI連携仕様では、停車中に車線逸脱警報設定を変更した場合、200ms以内に設定要求を送信し、車両ECUから受信した実状態で画面表示を更新すると規定されています。 設定画面を閉じて開き直してもトグルはOFF表示のままで、実状態との不一致を画面から判別できませんでした。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "api",
+        "version": "IVI Software: v3.8.0",
+        "environment": "Display Unit Rev: D / Vehicle profile: MM-04",
+        "assigneeId": "kurumado",
+        "watcherIds": [
+          "kurumado",
+          "mamoriya"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-multimedia-operation",
+          "name": "automotive-multimedia_operation.mp4",
+          "summary": "停車中に先進安全設定画面を開き、車線逸脱警報をONからOFFへ変更しました。画面のトグルはOFFになりましたが、設定要求CAN信号は送信されず、車両ECUの実状態はONのままでした。",
+          "contentPreview": [
+            "操作開始",
+            "停車中に先進安全設定画面を開き、車線逸脱警報をONからOFFへ変更しました。画面のトグルはOFFになりましたが、設定要求CAN信号は送信されず、車両ECUの実状態はONのままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-comparison",
+          "name": "automotive-multimedia_comparison.log",
+          "summary": "同じ操作を10回実施して10回とも要求信号が出ませんでした。同じ画面の車間距離設定は要求信号と実状態が更新され、車線逸脱警報を車両診断ツールからOFFにした場合は画面もOFFへ同期します。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を10回実施して10回とも要求信号が出ませんでした。同じ画面の車間距離設定は要求信号と実状態が更新され、車線逸脱警報を車両診断ツールからOFFにした場合は画面もOFFへ同期します。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-state",
+          "name": "automotive-multimedia_state.json",
+          "summary": "発生時の内部状態。停車中に先進安全設定画面を開き、車線逸脱警報をONからOFFへ変更しました。画面のトグルはOFFになりましたが、設定要求CAN信号は送信されず、車両ECUの実状態はONのままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-multimedia-lane-departure-toggle-not-sent\",\"result\":\"observed\",\"sequence\":10}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-unrelated",
+          "name": "automotive-multimedia_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "マルチメディア画面で車線逸脱警報をOFFにしても車両ECUではONのままになる",
+        "sections": {
+          "detail": "先進安全設定で車線逸脱警報をOFFにすると画面だけがOFFになり設定信号が送信されない",
+          "preconditions": "停車中で車線逸脱警報の車両状態がONであること",
+          "steps": "1. 先進安全設定画面を開く\n2. 車線逸脱警報をOFFに変更する\n3. 車両ECUの設定信号を確認する",
+          "expected": "画面変更後にOFF要求が送信され車両状態もOFFへ更新されること",
+          "actual": "画面はOFFになるがOFF要求が送信されず車両状態はONのままになる",
+          "remarks": "画面を開き直してもOFF表示のままで車間距離設定は正常に反映される",
+          "reproducibility": "10/10"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-multimedia-rear-door-status-stale-after-wake": {
+      "scenarioId": "automotive-multimedia-rear-door-status-stale-after-wake",
+      "projectId": "automotive-multimedia",
+      "rubricVersion": "automotive-multimedia-rear-door-status-stale-after-wake.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "IVIのスリープ復帰直後に、各ドアの開閉状態が車両状態画面へ反映されることをテストしています。",
+        "environment": [
+          "IVI Software: v3.8.0",
+          "Display Unit Rev: D",
+          "Vehicle profile: MM-04"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "全ドアを閉じてIVIを30分間スリープさせ、ドアロック解除で復帰させました。右後席ドアを開くとCANモニターは開状態を受信しましたが、車両状態画面は閉状態を表示し続けました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "スリープ復帰後に6回確認して6回とも右後席だけが更新されませんでした。運転席と左後席は即時更新し、車両状態画面を閉じて開き直すと右後席も開表示になります。通常起動直後は再現しません。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "車両状態表示仕様では、ドア開閉信号を受信してから500ms以内に該当ドアの表示を更新し、スリープ復帰時も最新の実状態を使用すると規定されています。 メーター側のドア開警告は右後席を正しく表示しており、車両信号自体の欠落はありませんでした。"
+          }
+        ],
+        "specificationReference": "IVI車両状態表示仕様書 Rev.3.8「5.2 ドア開閉状態」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、IVIスリープ復帰後に右後席ドアを開いた車両状態画面です。メーターのドア警告は正常です。",
+          "confirmedWorkaround": "修正までは、車両状態画面を一度閉じて開き直すか、メーター側のドア警告で確認します。",
+          "confirmedRecovery": "車両状態画面を再表示すると最新状態を取得できます。修正版では復帰直後の購読再開を確認します。",
+          "riskAssessment": "利用者が右後席ドアを閉状態と誤認し、発進前の確認を誤る可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『全ドアを閉じてIVIを30分間スリープさせ、ドアロック解除で復帰させました。右後席ドアを開くとCANモニターは開状態を受信しましたが、車両状態画面は閉状態を表示し続けました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『スリープ復帰後に6回確認して6回とも右後席だけが更新されませんでした。運転席と左後席は即時更新し、車両状態画面を閉じて開き直すと右後席も開表示になります。通常起動直後は再現しません。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『車両状態表示仕様では、ドア開閉信号を受信してから500ms以内に該当ドアの表示を更新し、スリープ復帰時も最新の実状態を使用すると規定されています。 メーター側のドア開警告は右後席を正しく表示しており、車両信号自体の欠落はありませんでした。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "api",
+        "version": "IVI Software: v3.8.0",
+        "environment": "Display Unit Rev: D / Vehicle profile: MM-04",
+        "assigneeId": "kurumado",
+        "watcherIds": [
+          "kurumado",
+          "mamoriya"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-multimedia-operation",
+          "name": "automotive-multimedia_operation.mp4",
+          "summary": "全ドアを閉じてIVIを30分間スリープさせ、ドアロック解除で復帰させました。右後席ドアを開くとCANモニターは開状態を受信しましたが、車両状態画面は閉状態を表示し続けました。",
+          "contentPreview": [
+            "操作開始",
+            "全ドアを閉じてIVIを30分間スリープさせ、ドアロック解除で復帰させました。右後席ドアを開くとCANモニターは開状態を受信しましたが、車両状態画面は閉状態を表示し続けました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-comparison",
+          "name": "automotive-multimedia_comparison.log",
+          "summary": "スリープ復帰後に6回確認して6回とも右後席だけが更新されませんでした。運転席と左後席は即時更新し、車両状態画面を閉じて開き直すと右後席も開表示になります。通常起動直後は再現しません。",
+          "contentPreview": [
+            "comparison-check",
+            "スリープ復帰後に6回確認して6回とも右後席だけが更新されませんでした。運転席と左後席は即時更新し、車両状態画面を閉じて開き直すと右後席も開表示になります。通常起動直後は再現しません。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-state",
+          "name": "automotive-multimedia_state.json",
+          "summary": "発生時の内部状態。全ドアを閉じてIVIを30分間スリープさせ、ドアロック解除で復帰させました。右後席ドアを開くとCANモニターは開状態を受信しましたが、車両状態画面は閉状態を表示し続けました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-multimedia-rear-door-status-stale-after-wake\",\"result\":\"observed\",\"sequence\":11}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-unrelated",
+          "name": "automotive-multimedia_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "スリープ復帰後に右後席ドアを開いても車両状態画面が閉状態のままになる",
+        "sections": {
+          "detail": "IVIのスリープ復帰後に右後席ドアを開いても車両状態画面へ開状態が反映されない",
+          "preconditions": "全ドアを閉じてIVIを30分以上スリープさせていること",
+          "steps": "1. ドアロック解除でIVIを復帰させる\n2. 右後席ドアを開く\n3. 車両状態画面のドア表示を確認する",
+          "expected": "ドア信号受信から500ms以内に右後席ドアが開状態で表示されること",
+          "actual": "右後席ドアの開信号を受信しても画面は閉状態を表示し続ける",
+          "remarks": "運転席と左後席は正常で車両状態画面を開き直すと右後席も開表示になる",
+          "reproducibility": "6/6"
         }
       },
       "rubricNotes": [
