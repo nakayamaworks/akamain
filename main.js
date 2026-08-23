@@ -1411,6 +1411,7 @@ const elements = {
   scenarioIntroTargetCard: document.getElementById("scenarioIntroTargetCard"),
   scenarioIntroTargetImage: document.getElementById("scenarioIntroTargetImage"),
   scenarioIntroTargetName: document.getElementById("scenarioIntroTargetName"),
+  scenarioIntroChangeButton: document.getElementById("scenarioIntroChangeButton"),
   scenarioIntroStartButton: document.getElementById("scenarioIntroStartButton"),
   scenarioIntroPracticeButton: document.getElementById("scenarioIntroPracticeButton"),
   scenarioIntroBackButton: document.getElementById("scenarioIntroBackButton"),
@@ -1704,7 +1705,7 @@ const ticketDefaults = {
 
 const authoringModeConfig = {
   reference: {
-    label: "記載例入力",
+    label: "見本入力",
   },
   practice: {
     label: "実践起票",
@@ -5269,7 +5270,7 @@ function renderMyPageHistory() {
           <td>${escapeHtml(formatMyPageDate(attempt.completedAt))}</td>
           <td>${escapeHtml(getProjectLabel(attempt.projectId))}</td>
           <td>${escapeHtml(getScenarioLabel(attempt.scenarioId))}</td>
-          <td>${attempt.authoringMode === "practice" ? "実践起票" : "記載例入力"}</td>
+          <td>${attempt.authoringMode === "practice" ? "実践起票" : "見本入力"}</td>
           <td><span class="my-page-score-pill">${escapeHtml(getHistoryScoreLabel(attempt))}</span></td>
           <td><a class="my-page-detail-button" href="#/tickets/${encodeURIComponent(attempt.attemptId)}">起票を見る</a></td>
         </tr>
@@ -5835,7 +5836,7 @@ function finishSession() {
   setLoadingIndicator(elements.resultTitle, practiceMode);
   setTextContent(
     elements.retryButton,
-    practiceMode ? "指摘を元に修正" : "もう一度記載例を入力"
+    practiceMode ? "指摘を元に修正" : "もう一度見本入力"
   );
   elements.retryButton?.classList.toggle("primary-button", practiceMode);
   elements.retryButton?.classList.toggle("secondary-button", !practiceMode);
@@ -6017,6 +6018,12 @@ function syncControls() {
   if (elements.qaStartButton) {
     elements.qaStartButton.disabled = !canStart;
   }
+  if (elements.scenarioIntroChangeButton) {
+    elements.scenarioIntroChangeButton.disabled =
+      state.view !== "scenario" ||
+      state.scenarioSelectionPending ||
+      getProjectScenarioEntries(state.projectId, state.trainingTicketType).length < 2;
+  }
 
   if (elements.resumeDraftButton) {
     const hasProjectDraft = Boolean(getLatestPracticeDraft(state.projectId));
@@ -6193,6 +6200,13 @@ function handleScenarioIntroStart() {
   beginSessionForCurrentScenario();
 }
 
+function handleScenarioIntroChange() {
+  startSession({
+    refreshProgress: false,
+    ticketType: state.trainingTicketType,
+  });
+}
+
 function handleScenarioIntroPractice() {
   if (state.authStatus !== "signed_in") {
     window.alert?.("実践起票を保存するにはGoogleログインが必要です。上部のログインボタンからログインしてください。");
@@ -6273,6 +6287,7 @@ elements.ticketTypeFilterButtons.forEach((button) => on(button, "click", handleT
 on(elements.ticketDetailBackButton, "click", () => navigateToHash("#/tickets"));
 on(elements.ticketDetailContent, "click", handleTicketDetailAction);
 on(elements.stopButton, "click", handleStopButton);
+on(elements.scenarioIntroChangeButton, "click", handleScenarioIntroChange);
 on(elements.scenarioIntroStartButton, "click", handleScenarioIntroStart);
 on(elements.scenarioIntroPracticeButton, "click", handleScenarioIntroPractice);
 on(elements.scenarioIntroBackButton, "click", handleScenarioIntroBack);

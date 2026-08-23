@@ -236,6 +236,7 @@ if (indexSource.indexOf('id="severitySelect"') > indexSource.indexOf('id="status
   "resumeDraftButton",
   "draftSaveButton",
   "draftSaveStatus",
+  "scenarioIntroChangeButton",
   "scenarioIntroStartButton",
   "scenarioIntroPracticeButton",
   "practiceWritingCompleteButton",
@@ -351,8 +352,11 @@ if (
 if (indexSource.includes('id="practiceStartButton"')) {
   errors.push("the ticket list must not ask users to choose an authoring mode");
 }
-if ((indexSource.match(/記載例を入力/g) || []).length !== 1) {
+if ((indexSource.match(/見本入力を開始/g) || []).length !== 1) {
   errors.push("reference mode must be selected only on the scenario intro");
+}
+if ((indexSource.match(/別のシナリオを選ぶ/g) || []).length !== 1) {
+  errors.push("scenario intro must provide one action for choosing another scenario");
 }
 if ((indexSource.match(/実践起票を開始/g) || []).length !== 1) {
   errors.push("practice mode must be selected only on the scenario intro");
@@ -515,6 +519,10 @@ if (!/padding-bottom:\s*(?!0)/.test(scenarioViewStyles)) {
 }
 [
   ['on(elements.startButton, "click", handleStartButton)', 'ticket creation handler'],
+  [
+    'on(elements.scenarioIntroChangeButton, "click", handleScenarioIntroChange)',
+    'scenario change handler',
+  ],
   [
     'on(elements.scenarioIntroStartButton, "click", handleScenarioIntroStart)',
     'scenario reference start handler',
