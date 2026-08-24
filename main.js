@@ -1886,6 +1886,10 @@ function getProjectMemberName(projectId, memberId) {
   return project?.members.find((member) => member.id === memberId)?.name || memberId;
 }
 
+function getTicketListEmptyFieldLabel(row) {
+  return normalizeTrainingLevel(row.trainingLevel) === "beginner" ? "—" : "未設定";
+}
+
 function formatTicketListDate(value) {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) {
@@ -1943,9 +1947,11 @@ function renderTicketList() {
               <td><span class="ticket-type-pill is-${row.tracker === "qa" ? "qa" : "bug"}">${row.tracker === "qa" ? "QA" : "バグ"}</span></td>
               <td><span class="training-level-pill is-${escapeHtml(normalizeTrainingLevel(row.trainingLevel))}">${escapeHtml(getTrainingLevelConfig(row.trainingLevel).label)}</span></td>
               <td><span class="ticket-review-pill is-${escapeHtml(String(row.reviewStatus || "pending"))}">${escapeHtml(ticketReviewLabels[row.reviewStatus] || "採点待ち")}${Number.isInteger(row.totalScore) ? ` ${row.totalScore}点` : ""}</span></td>
-              <td>${escapeHtml(ticketPriorityLabels[row.priority] || "未設定")}</td>
+              <td>${escapeHtml(ticketPriorityLabels[row.priority] || getTicketListEmptyFieldLabel(row))}</td>
               <td><a class="ticket-subject-link" href="#/tickets/${encodeURIComponent(row.ticketId || row.attemptId)}">${escapeHtml(row.subject || "（題名なし）")}</a></td>
-              <td>${escapeHtml(getProjectMemberName(row.projectId, row.assigneeId))}</td>
+              <td>${escapeHtml(row.assigneeId
+                ? getProjectMemberName(row.projectId, row.assigneeId)
+                : getTicketListEmptyFieldLabel(row))}</td>
               <td>${escapeHtml(formatTicketListDate(row.completedAt))}</td>
             </tr>
           `

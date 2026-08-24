@@ -2785,6 +2785,51 @@ try {
       `persisted practice attempts must render as linked ticket rows: ${JSON.stringify(persistedPracticeTicket)}`
     );
   }
+  const ticketListEmptyFieldLabels = vm.runInContext(
+    `(() => {
+      state.ticketListItems = [
+        {
+          attemptId: "beginner-ticket",
+          displayId: "BEGINNER",
+          projectId: "customer",
+          trainingLevel: "beginner",
+          subject: "初級チケット",
+          priority: null,
+          assigneeId: null,
+          reviewStatus: "succeeded",
+          totalScore: 100,
+          completedAt: "2026-08-24T07:33:00.000Z",
+        },
+        {
+          attemptId: "advanced-ticket",
+          displayId: "ADVANCED",
+          projectId: "customer",
+          trainingLevel: "advanced",
+          subject: "上級チケット",
+          priority: null,
+          assigneeId: null,
+          reviewStatus: "succeeded",
+          totalScore: 80,
+          completedAt: "2026-08-24T07:34:00.000Z",
+        },
+      ];
+      renderTicketList();
+      const markup = elements.ticketListBody.innerHTML;
+      const beginnerRow = markup.match(/<tr>[\\s\\S]*?#BEGINNER[\\s\\S]*?<\\/tr>/)?.[0] || "";
+      const advancedRow = markup.match(/<tr>[\\s\\S]*?#ADVANCED[\\s\\S]*?<\\/tr>/)?.[0] || "";
+      return { beginnerRow, advancedRow };
+    })()`,
+    smokeContext
+  );
+  if (
+    (ticketListEmptyFieldLabels.beginnerRow.match(/<td>—<\/td>/g) || []).length !== 2
+    || ticketListEmptyFieldLabels.beginnerRow.includes("未設定")
+    || (ticketListEmptyFieldLabels.advancedRow.match(/<td>未設定<\/td>/g) || []).length !== 2
+  ) {
+    errors.push(
+      `beginner ticket fields outside the exercise must use dashes while advanced omissions remain unset: ${JSON.stringify(ticketListEmptyFieldLabels)}`
+    );
+  }
   const persistedTicketDetail = vm.runInContext(
     `(() => {
       state.ticketDetail = {
