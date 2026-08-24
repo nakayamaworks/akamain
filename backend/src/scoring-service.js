@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v30";
+export const PROMPT_VERSION = "practice-review.v31";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS_BY_LEVEL = Object.freeze({
@@ -224,6 +224,18 @@ function getTrainingLevelScope(rubric, requestedLevel = "advanced") {
         : trainingLevel === "intermediate"
           ? new Set(["subject", "detail", "steps", "expected", "actual", "boundary"])
           : null,
+  };
+}
+
+function buildTrainingScopedModelRubric(rubric, requestedLevel = "advanced") {
+  const { activeFactGroups } = getTrainingLevelScope(rubric, requestedLevel);
+  return {
+    ...rubric,
+    requiredFacts: Object.fromEntries(
+      Object.entries(rubric.requiredFacts || {}).filter(
+        ([group]) => activeFactGroups === null || activeFactGroups.has(group)
+      )
+    ),
   };
 }
 
@@ -782,6 +794,7 @@ export function buildScoringPrompt(attempt, options = {}) {
     }));
   const trainingLevel = normalizeTrainingLevel(attempt.answer?.trainingLevel);
   const trainingScope = getTrainingLevelScope(scoringRubric, trainingLevel);
+  const trainingScopedRubric = buildTrainingScopedModelRubric(scoringRubric, trainingLevel);
   const activeDimensionIds = trainingScope.activeDimensionIds;
   const activeFactGroups = trainingScope.activeFactGroups;
   const activeTicketFields = trainingScope.activeTicketFields;
@@ -790,7 +803,7 @@ export function buildScoringPrompt(attempt, options = {}) {
     dimensions: scoringRubric.dimensions.filter(
       ({ id }) => activeDimensionIds === null || activeDimensionIds.has(id)
     ),
-    requiredFacts: scoringRubric.requiredFacts,
+    requiredFacts: trainingScopedRubric.requiredFacts,
     expectedTicketFields: Object.fromEntries(
       Object.entries(scoringRubric.expectedTicketFields || {}).filter(
         ([field]) =>
@@ -1098,11 +1111,16 @@ function createAttemptEvidenceChecker(attempt) {
   };
 }
 
-export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID, attempt = null) {
+export function normalizeModelOutput(
+  rawOutput,
+  scenarioId = DEFAULT_SCENARIO_ID,
+  attempt = null,
+  rubricOverride = null
+) {
   if (!rawOutput || typeof rawOutput !== "object") {
     throw new Error("Gemini output must be an object");
   }
-  const rubric = getScenarioRubric(scenarioId);
+  const rubric = rubricOverride || getScenarioRubric(scenarioId);
   if (!rubric) {
     throw new Error("scenario rubric was not found");
   }
@@ -2245,6 +2263,10 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
   }
   const apiKey = requireNonEmptyString(options.apiKey, "GEMINI_API_KEY");
   const rubric = getScenarioRubric(attempt.scenarioId);
+  const modelRubric = buildTrainingScopedModelRubric(
+    rubric,
+    attempt.answer?.trainingLevel
+  );
   const modelId = options.modelId || DEFAULT_MODEL;
   const fetchImplementation = options.fetchImplementation || fetch;
   const endpoint =
@@ -2262,7 +2284,7 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
       contents: [{ role: "user", parts: [{ text: buildScoringPrompt(attempt, options) }] }],
       generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: buildModelOutputSchema(rubric),
+        responseSchema: buildModelOutputSchema(modelRubric),
         seed: scoringSeedForAttempt(attempt),
       },
     }),
@@ -2314,7 +2336,12 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
   }
   let normalized;
   try {
-    normalized = normalizeModelOutput(modelOutput, attempt.scenarioId, attempt);
+    normalized = normalizeModelOutput(
+      modelOutput,
+      attempt.scenarioId,
+      attempt,
+      modelRubric
+    );
   } catch (cause) {
     const error = new Error("Gemini returned an invalid scoring result", { cause });
     error.code = "INVALID_MODEL_OUTPUT";

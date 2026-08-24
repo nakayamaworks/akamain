@@ -881,8 +881,8 @@ test("beginner scoring removes advanced review demands and scores writing only",
     reader: "開発担当者",
     question: "別のアカウントでも比較確認しましたか？",
     whyItMatters: "切り分けに必要なためです。",
-    classification: "不足情報",
-    factId: rubric.requiredFacts.steps[0].id,
+    classification: "調査提案",
+    factId: "not-applicable",
   }];
   output.investigationAdvice = [{
     action: "ログを確認する",
@@ -895,20 +895,39 @@ test("beginner scoring removes advanced review demands and scores writing only",
     reason: "再現手順を明確にするためです。",
   }];
   output.strengths = [];
+  const beginnerFactIds = new Set([
+    ...rubric.requiredFacts.subject,
+    ...rubric.requiredFacts.detail,
+    ...rubric.requiredFacts.expected,
+    ...rubric.requiredFacts.actual,
+  ].map(({ id }) => id));
+  output.factAssessments = output.factAssessments.filter(({ factId }) =>
+    beginnerFactIds.has(factId)
+  );
+  let scoringRequestBody;
 
   const result = await scoreAttemptRecordWithGemini(attempt, {
     apiKey: "server-only-key",
-    fetchImplementation: async () => ({
-      ok: true,
-      async json() {
-        return {
-          candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
-        };
-      },
-    }),
+    fetchImplementation: async (_url, request) => {
+      scoringRequestBody = JSON.parse(request.body);
+      return {
+        ok: true,
+        async json() {
+          return {
+            candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
+          };
+        },
+      };
+    },
   });
 
   assert.equal(result.status, "succeeded");
+  assert.deepEqual(
+    new Set(scoringRequestBody.generationConfig.responseSchema
+      .properties.factAssessments.items.properties.factId.enum),
+    beginnerFactIds
+  );
+  assert.equal(result.rubricFindings.factAssessments.length, beginnerFactIds.size);
   assert.equal(result.dimensions.reproducibility, 100);
   assert.equal(result.dimensions.investigationReadiness, 100);
   assert.deepEqual(
