@@ -188,6 +188,7 @@ function toTicketSummary(attempt) {
     projectId: attempt.projectId,
     scenarioId: attempt.scenarioId,
     subject: attempt.answer?.subject || "",
+    trainingLevel: attempt.answer?.trainingLevel || "advanced",
     tracker: ticketFields.tracker || "bug",
     priority: ticketFields.priority || null,
     assigneeId: ticketFields.assigneeId || null,

@@ -54,7 +54,7 @@ Googleアカウントと公開プロフィールを管理する。
 | `scenario_id` | 固定シナリオID |
 | `project_id` | プロジェクトID |
 | `authoring_mode` | `reference` または `practice` |
-| `answer_json` | 題名、セクション別回答、起票時に選択したチケット設定 |
+| `answer_json` | トレーニングレベル、題名、セクション別回答、起票時に選択したチケット設定 |
 | `selected_evidence_ids_json` | 選択した証跡ID |
 | `started_at` | 開始日時 |
 | `completed_at` | 完了日時 |
@@ -140,7 +140,7 @@ getLeaderboard(options)
 3. 内容が変わった修正版は前回版と前回レビューをGeminiへ渡し、前回基準からの変化を評価する
 4. 明確な事実・設定・添付の後退がないのに総合点が下がった場合、バックエンドが前回点を下限として評価軸を安定化する
 
-内容指紋には`scenarioId`、`projectId`、題名、本文、チケット項目、選択添付、添付説明を含める。Attempt ID、版番号、開始・完了日時は含めない。
+内容指紋には`scenarioId`、`projectId`、トレーニングレベル、題名、本文、チケット項目、選択添付、添付説明を含める。Attempt ID、版番号、開始・完了日時は含めない。
 
 `answer_json.ticketFields`は`tracker`、`private`、`status`、`severity`、`priority`、`assigneeId`、`category`、`version`、`environment`、`startDate`、`dueDate`、`progress`、`watcherIds`を保持する。Sheetsの列追加は行わない。
 

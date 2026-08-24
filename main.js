@@ -471,8 +471,26 @@ function getScenarioEvidenceProfile(rawScenario) {
   ) || null;
 }
 
-function buildScenario(rawScenario) {
+function getReportSectionTitlesForTraining(level, ticketType) {
+  if (level === "advanced") return null;
+  if (ticketType === "qa") {
+    return new Set(level === "beginner"
+      ? ["■質問", "■確認した状況・事実"]
+      : ["■質問", "■確認した状況・事実", "■参照情報", "■現在の解釈", "■確認理由・影響"]
+    );
+  }
+  return new Set(level === "beginner"
+    ? ["■詳細", "■期待結果", "■実際の動作"]
+    : ["■詳細", "■前提条件", "■操作手順", "■期待結果", "■実際の動作"]
+  );
+}
+
+function buildScenario(rawScenario, requestedTrainingLevel = "advanced") {
   let editableOrder = 1;
+  const trainingLevel = ["beginner", "intermediate", "advanced"].includes(requestedTrainingLevel)
+    ? requestedTrainingLevel
+    : "advanced";
+  const ticketType = rawScenario.ticketType || "bug";
   const specificationReference = getScenarioSpecificationReference(rawScenario);
 
   const subjectEntry = {
@@ -482,7 +500,16 @@ function buildScenario(rawScenario) {
     order: 0,
   };
 
-  const reportSource = rawScenario.report.flatMap((entry) => {
+  const visibleSectionTitles = getReportSectionTitlesForTraining(trainingLevel, ticketType);
+  let includeCurrentSection = visibleSectionTitles === null;
+  const visibleReport = rawScenario.report.filter((entry) => {
+    if (entry.kind === "section") {
+      includeCurrentSection = visibleSectionTitles === null || visibleSectionTitles.has(entry.text);
+    }
+    return includeCurrentSection;
+  });
+
+  const reportSource = visibleReport.flatMap((entry) => {
     if (entry.kind === "section" && entry.text === "■期待結果" && specificationReference) {
       return [
         { kind: "section", text: "■仕様根拠" },
@@ -525,7 +552,8 @@ function buildScenario(rawScenario) {
   return {
     scenarioId: rawScenario.scenarioId,
     projectId: rawScenario.projectId,
-    ticketType: rawScenario.ticketType || "bug",
+    ticketType,
+    trainingLevel,
     qaType: rawScenario.qaType || null,
     difficulty: rawScenario.difficulty || "beginner",
     evaluation: rawScenario.evaluation || buildDefaultEvaluation(rawScenario),
@@ -1048,7 +1076,7 @@ function getQaTypeLabel(qaType) {
 function getLastScenarioIndex(projectId, ticketType = state.trainingTicketType) {
   try {
     const storedValue = window.sessionStorage.getItem(
-      `typing-workbench:last-scenario:${projectId}:${ticketType}`
+      `typing-workbench:last-scenario:${projectId}:${ticketType}:${state.trainingLevel}`
     );
     const parsedValue = Number.parseInt(storedValue ?? "", 10);
     return Number.isInteger(parsedValue) ? parsedValue : -1;
@@ -1060,7 +1088,7 @@ function getLastScenarioIndex(projectId, ticketType = state.trainingTicketType) 
 function saveLastScenarioIndex(projectId, scenarioIndex, ticketType = state.trainingTicketType) {
   try {
     window.sessionStorage.setItem(
-      `typing-workbench:last-scenario:${projectId}:${ticketType}`,
+      `typing-workbench:last-scenario:${projectId}:${ticketType}:${state.trainingLevel}`,
       String(scenarioIndex)
     );
   } catch {
@@ -1072,11 +1100,13 @@ function getProjectScenarioEntries(
   projectId = state.projectId,
   ticketType = state.trainingTicketType
 ) {
+  const selectedLevel = normalizeTrainingLevel(state.trainingLevel);
   return scenarioBank
     .map((scenario, index) => ({ scenario, index }))
     .filter(({ scenario }) =>
       scenario.projectId === projectId
       && getScenarioTicketType(scenario) === ticketType
+      && (selectedLevel === "advanced" || scenario.difficulty === selectedLevel)
     );
 }
 
@@ -1087,7 +1117,10 @@ function getAvailableScenarioEntries(ticketType = state.trainingTicketType) {
   }
   return scenarioBank
     .map((scenario, index) => ({ scenario, index }))
-    .filter(({ scenario }) => getScenarioTicketType(scenario) === ticketType);
+    .filter(({ scenario }) =>
+      getScenarioTicketType(scenario) === ticketType
+      && (state.trainingLevel === "advanced" || scenario.difficulty === state.trainingLevel)
+    );
 }
 
 function getKnownAttemptedScenarioIds() {
@@ -1165,22 +1198,23 @@ function drawNextScenario() {
   state.trainingTicketType = getScenarioTicketType(rawScenario);
   state.projectId = rawScenario.projectId;
   saveLastScenarioIndex(state.projectId, nextIndex, state.trainingTicketType);
-  state.scenario = buildScenario(rawScenario);
+  state.scenario = buildScenario(rawScenario, state.trainingLevel);
   saveListPreferences();
   renderProject();
   return true;
 }
 
-function selectScenarioById(scenarioId) {
+function selectScenarioById(scenarioId, trainingLevel = "advanced") {
   const scenarioIndex = scenarioBank.findIndex((scenario) => scenario.scenarioId === scenarioId);
   if (scenarioIndex < 0) {
     return false;
   }
   state.projectId = scenarioBank[scenarioIndex].projectId;
   state.trainingTicketType = getScenarioTicketType(scenarioBank[scenarioIndex]);
+  state.trainingLevel = normalizeTrainingLevel(trainingLevel);
   state.scenarioIndex = scenarioIndex;
   state.scenarioQueue = [];
-  state.scenario = buildScenario(scenarioBank[scenarioIndex]);
+  state.scenario = buildScenario(scenarioBank[scenarioIndex], state.trainingLevel);
   saveLastScenarioIndex(state.projectId, scenarioIndex, state.trainingTicketType);
   saveListPreferences();
   renderProject();
@@ -1227,7 +1261,7 @@ function beginTicketRevision(ticket) {
   if (!ticket?.scenarioId || !selectAuthoringMode("practice")) {
     return false;
   }
-  if (!selectScenarioById(ticket.scenarioId)) {
+  if (!selectScenarioById(ticket.scenarioId, ticket.answer?.trainingLevel)) {
     return false;
   }
   const previousScore = successfulTicketScore(ticket);
@@ -1414,6 +1448,10 @@ const elements = {
   resultExitButton: document.getElementById("resultExitButton"),
   lineClearCue: document.getElementById("lineClearCue"),
   ticketListView: document.getElementById("ticketListView"),
+  trainingLevelView: document.getElementById("trainingLevelView"),
+  trainingLevelTitle: document.getElementById("trainingLevelTitle"),
+  trainingLevelBackButton: document.getElementById("trainingLevelBackButton"),
+  trainingLevelButtons: document.querySelectorAll("[data-training-level]"),
   ticketDetailView: document.getElementById("ticketDetailView"),
   scenarioIntroView: document.getElementById("scenarioIntroView"),
   ticketCreateView: document.getElementById("ticketCreateView"),
@@ -1457,6 +1495,7 @@ const elements = {
   scenarioIntroPracticeButton: document.getElementById("scenarioIntroPracticeButton"),
   scenarioIntroBackButton: document.getElementById("scenarioIntroBackButton"),
   scenarioIntroTitle: document.getElementById("scenarioIntroTitle"),
+  scenarioIntroLevelBadge: document.getElementById("scenarioIntroLevelBadge"),
   scenarioIntroSeverityRules: document.getElementById("scenarioIntroSeverityRules"),
   scenarioPanel: document.getElementById("scenarioPanel"),
   scenarioPanelTitle: document.getElementById("scenarioPanelTitle"),
@@ -1488,6 +1527,8 @@ const elements = {
   clearTicketFiltersButton: document.getElementById("clearTicketFiltersButton"),
   ticketSortButtons: document.querySelectorAll(".ticket-sort-button"),
   scenarioPanelMode: document.getElementById("scenarioPanelMode"),
+  scenarioPanelLevelBadge: document.getElementById("scenarioPanelLevelBadge"),
+  ticketFormDetails: document.getElementById("ticketFormDetails"),
   scenarioBrief: document.getElementById("scenarioBrief"),
   scenarioGlossary: document.getElementById("scenarioGlossary"),
   scenarioPanelBody: document.getElementById("scenarioPanelBody"),
@@ -1579,6 +1620,9 @@ function normalizePracticeDraft(rawDraft) {
     schemaVersion: "practice-draft.v1",
     scenarioId: rawDraft.scenarioId,
     projectId: rawDraft.projectId,
+    trainingLevel: new Set(["beginner", "intermediate", "advanced"]).has(rawDraft.trainingLevel)
+      ? rawDraft.trainingLevel
+      : "advanced",
     savedAt: typeof rawDraft.savedAt === "string" ? rawDraft.savedAt : "",
     startedAt: typeof rawDraft.startedAt === "string" ? rawDraft.startedAt : "",
     practiceWritingComplete: Boolean(rawDraft.practiceWritingComplete),
@@ -1653,6 +1697,7 @@ const state = {
   view: "list",
   projectId: initialListPreferences.projectId,
   trainingTicketType: "bug",
+  trainingLevel: "advanced",
   authoringMode: initialListPreferences.authoringMode,
   completedSessionsByProject: {},
   scenarioIndex: -1,
@@ -1752,6 +1797,45 @@ const authoringModeConfig = {
     label: "実践起票",
   },
 };
+
+const trainingLevelConfig = {
+  beginner: {
+    label: "初級",
+  },
+  intermediate: {
+    label: "中級",
+  },
+  advanced: {
+    label: "上級",
+  },
+};
+
+function normalizeTrainingLevel(value) {
+  return trainingLevelConfig[value] ? value : "advanced";
+}
+
+function getTrainingLevelConfig(level = state.trainingLevel) {
+  return trainingLevelConfig[normalizeTrainingLevel(level)];
+}
+
+function renderTrainingLevel() {
+  const level = normalizeTrainingLevel(state.trainingLevel);
+  const config = getTrainingLevelConfig(level);
+  [elements.scenarioIntroLevelBadge, elements.scenarioPanelLevelBadge].forEach((badge) => {
+    if (!badge) return;
+    badge.textContent = config.label;
+    badge.classList.remove("is-beginner", "is-intermediate", "is-advanced");
+    badge.classList.add(`is-${level}`);
+  });
+  elements.ticketFormDetails?.classList.toggle("training-level-hidden", level === "beginner");
+  document.querySelectorAll(".training-field-advanced").forEach((field) => {
+    field.classList.toggle("training-level-hidden", level !== "advanced");
+  });
+  setTextContent(
+    elements.practiceWritingCompleteButton,
+    level === "beginner" ? "入力内容を確認する" : "チケット情報の設定へ"
+  );
+}
 
 function getAuthoringModeConfig() {
   return authoringModeConfig[state.authoringMode] || authoringModeConfig.reference;
@@ -1853,6 +1937,7 @@ function renderTicketList() {
             <tr>
               <td>#${escapeHtml(String(row.displayId || ""))}</td>
               <td><span class="ticket-type-pill is-${row.tracker === "qa" ? "qa" : "bug"}">${row.tracker === "qa" ? "QA" : "バグ"}</span></td>
+              <td><span class="training-level-pill is-${escapeHtml(normalizeTrainingLevel(row.trainingLevel))}">${escapeHtml(getTrainingLevelConfig(row.trainingLevel).label)}</span></td>
               <td><span class="ticket-review-pill is-${escapeHtml(String(row.reviewStatus || "pending"))}">${escapeHtml(ticketReviewLabels[row.reviewStatus] || "採点待ち")}${Number.isInteger(row.totalScore) ? ` ${row.totalScore}点` : ""}</span></td>
               <td>${escapeHtml(ticketPriorityLabels[row.priority] || "未設定")}</td>
               <td><a class="ticket-subject-link" href="#/tickets/${encodeURIComponent(row.ticketId || row.attemptId)}">${escapeHtml(row.subject || "（題名なし）")}</a></td>
@@ -1862,7 +1947,7 @@ function renderTicketList() {
           `
         )
         .join("")
-    : `<tr><td colspan="7" class="ticket-list-empty">${state.ticketListItems.length === 0
+    : `<tr><td colspan="8" class="ticket-list-empty">${state.ticketListItems.length === 0
       ? "まだ作成したチケットはありません。バグ起票またはQA起票から始めましょう。"
       : "条件に一致するチケットはありません。"}</td></tr>`;
 }
@@ -2304,6 +2389,10 @@ function setView(view) {
 
   if (elements.ticketListView) {
     elements.ticketListView.classList.toggle("hidden", view !== "list");
+  }
+
+  if (elements.trainingLevelView) {
+    elements.trainingLevelView.classList.toggle("hidden", view !== "level");
   }
 
   if (elements.ticketDetailView) {
@@ -2884,14 +2973,27 @@ function getScenarioGlossaryItems(context) {
 }
 
 function renderScenarioBrief() {
+  renderTrainingLevel();
   const context = state.scenario.evaluation.context || {};
   const qaScenario = isQaScenario();
   setTextContent(elements.scenarioIntroTitle, qaScenario ? "QAシナリオ" : "バグシナリオ");
   setTextContent(elements.scenarioPanelTitle, qaScenario ? "QAシナリオ" : "バグシナリオ");
   setTextContent(elements.ticketCreateTitle, qaScenario ? "新しいQA" : "新しいチケット");
   elements.scenarioPanel?.setAttribute("aria-label", qaScenario ? "QAシナリオ" : "バグシナリオ");
-  elements.scenarioIntroSeverityRules?.classList.toggle("hidden", qaScenario);
-  elements.scenarioPanelSeverityRules?.classList.toggle("hidden", qaScenario);
+  document.querySelectorAll(".scenario-category-rules").forEach((rules) => {
+    rules.classList.toggle("hidden", state.trainingLevel === "beginner");
+  });
+  document.querySelectorAll(".scenario-priority-rules").forEach((rules) => {
+    rules.classList.toggle("hidden", state.trainingLevel !== "advanced");
+  });
+  elements.scenarioIntroSeverityRules?.classList.toggle(
+    "hidden",
+    qaScenario || state.trainingLevel !== "advanced"
+  );
+  elements.scenarioPanelSeverityRules?.classList.toggle(
+    "hidden",
+    qaScenario || state.trainingLevel !== "advanced"
+  );
   if (elements.trackerSelect) {
     elements.trackerSelect.setAttribute(
       "aria-label",
@@ -2948,8 +3050,33 @@ function renderScenarioBrief() {
     assignee ? `${assignee.name}（${assignee.role}）` : "",
     relatedMember ? `${relatedMember.name}（${relatedMember.role}）` : "",
   ].filter(Boolean).join("\n");
+  const beginnerSummary = (() => {
+    if (state.trainingLevel !== "beginner") return "";
+    const sectionLines = new Map();
+    let currentSection = "";
+    state.scenario.reportEntries.forEach((entry) => {
+      if (entry.kind === "section") {
+        currentSection = entry.text;
+        sectionLines.set(currentSection, []);
+      } else if (entry.kind === "line" && currentSection) {
+        sectionLines.get(currentSection)?.push(entry.text);
+      }
+    });
+    if (qaScenario) {
+      return [
+        context.testTarget,
+        `確認した状況：${(sectionLines.get("■確認した状況・事実") || []).join(" ")}`,
+        `確認したいこと：${(sectionLines.get("■質問") || []).join(" ")}`,
+      ].filter(Boolean).join("\n\n");
+    }
+    return [
+      context.testTarget,
+      `仕様上の動作：${(sectionLines.get("■期待結果") || []).join(" ")}`,
+      `確認した事実：${(sectionLines.get("■実際の動作") || []).join(" ")}`,
+    ].filter(Boolean).join("\n\n");
+  })();
   const factItems = [
-    ["", context.workMemo, "testTarget observation scope risk recovery workaround"],
+    ["", beginnerSummary || context.workMemo, "testTarget observation scope risk recovery workaround"],
   ].filter(([, value]) => value);
   const specificationInfo = [
     context.specification,
@@ -2959,8 +3086,10 @@ function renderScenarioBrief() {
     ...(qaScenario ? [["質問種別", getQaTypeLabel(state.scenario.qaType), "qaType"]] : []),
     ["確認日時・環境", environmentMemo, "occurredAt environment"],
     ["関連資料", specificationInfo, "specification"],
-    ["対応日程", formatPeripheralSchedule(context.schedule), "schedule risk"],
-    ["関係者", peopleInfo, "assignee related"],
+    ...(state.trainingLevel === "beginner" ? [] : [
+      ["対応日程", formatPeripheralSchedule(context.schedule), "schedule risk"],
+      ["関係者", peopleInfo, "assignee related"],
+    ]),
   ].filter(([, value]) => value);
   const renderBriefValue = (value, key) => {
     if (key.split(/\s+/u).includes("schedule")) {
@@ -3094,6 +3223,17 @@ function showScenarioReferences(config) {
 }
 
 function getSetupFields() {
+  const level = normalizeTrainingLevel(state.trainingLevel);
+  if (level === "beginner") {
+    return [];
+  }
+  if (level === "intermediate") {
+    return [
+      elements.categorySelect,
+      elements.versionSelect,
+      elements.environmentSelect,
+    ].filter(Boolean);
+  }
   return [
     ...(isQaScenario() ? [] : [elements.severitySelect]),
     elements.prioritySelect,
@@ -3137,6 +3277,10 @@ function focusCurrentSetupField() {
 }
 
 function beginSetupFlow() {
+  if (getSetupFields().length === 0) {
+    finishSetupFlow();
+    return;
+  }
   state.setupComplete = false;
   state.setupStepIndex = 0;
   focusCurrentSetupField();
@@ -3221,7 +3365,11 @@ function advanceSetupField(targetField, allowEmpty = false) {
     return;
   }
 
-  beginEvidenceSetup();
+  if (state.trainingLevel === "advanced") {
+    beginEvidenceSetup();
+    return;
+  }
+  finishSetupFlow();
 }
 
 function advanceSetupFlow(event) {
@@ -3235,6 +3383,23 @@ function handleDueDateUnset() {
   }
   setControlValue(elements.dueDateInput, "");
   advanceSetupField(elements.dueDateInput, true);
+}
+
+function getPracticeSectionTitlesForLevel() {
+  const level = normalizeTrainingLevel(state.trainingLevel);
+  if (level === "advanced") {
+    return null;
+  }
+  if (isQaScenario()) {
+    return new Set(level === "beginner"
+      ? ["■質問", "■確認した状況・事実"]
+      : ["■質問", "■確認した状況・事実", "■参照情報", "■現在の解釈", "■確認理由・影響"]
+    );
+  }
+  return new Set(level === "beginner"
+    ? ["■詳細", "■期待結果", "■実際の動作"]
+    : ["■詳細", "■前提条件", "■操作手順", "■期待結果", "■実際の動作"]
+  );
 }
 
 function getPracticeSectionGroups() {
@@ -3263,7 +3428,8 @@ function getPracticeSectionGroups() {
     }
   });
 
-  return groups;
+  const visibleTitles = getPracticeSectionTitlesForLevel();
+  return visibleTitles ? groups.filter((group) => visibleTitles.has(group.title)) : groups;
 }
 
 function renderPracticeReport() {
@@ -4025,6 +4191,7 @@ function buildCurrentPracticeDraft() {
     schemaVersion: "practice-draft.v1",
     scenarioId: state.scenario.scenarioId,
     projectId: state.projectId,
+    trainingLevel: state.trainingLevel,
     savedAt: new Date().toISOString(),
     startedAt: state.sessionStartAt
       ? new Date(state.sessionStartAt).toISOString()
@@ -4080,7 +4247,7 @@ function resumePracticeDraft(draft) {
     state.authStatus !== "signed_in" ||
     !draft ||
     !selectAuthoringMode("practice") ||
-    !selectScenarioById(draft.scenarioId)
+    !selectScenarioById(draft.scenarioId, draft.trainingLevel)
   ) {
     return false;
   }
@@ -4935,6 +5102,7 @@ function getPracticeAttemptPayload() {
     projectId: state.projectId,
     authoringMode: "practice",
     answer: {
+      trainingLevel: state.trainingLevel,
       subject: state.practiceSubject,
       sections: Object.fromEntries(
         getPracticeSectionGroups()
@@ -5565,7 +5733,10 @@ function renderTicketDetail() {
   elements.ticketDetailContent.innerHTML = `
     ${revisionNavigation}
     <article class="ticket-detail-card">
-      <h2 id="ticketDetailTitle" class="ticket-detail-title">${escapeHtml(ticket.answer?.subject || "（題名なし）")}</h2>
+      <div class="scenario-title-line">
+        <h2 id="ticketDetailTitle" class="ticket-detail-title">${escapeHtml(ticket.answer?.subject || "（題名なし）")}</h2>
+        <span class="training-level-pill is-${escapeHtml(normalizeTrainingLevel(ticket.answer?.trainingLevel))}">${escapeHtml(getTrainingLevelConfig(ticket.answer?.trainingLevel).label)}</span>
+      </div>
       <p class="ticket-detail-created"><strong>${escapeHtml(authorName)}</strong> が <time>${escapeHtml(formatTicketListDate(ticket.completedAt))}</time> に${revisionNumber > 1 ? "更新" : "追加"}。<span class="ticket-revision-label">${escapeHtml(ticketRevisionLabel(revisionNumber))}</span></p>
       <div class="ticket-detail-meta-grid">
         <div class="ticket-detail-meta-column">
@@ -5618,7 +5789,7 @@ function renderTicketDetail() {
     </article>
     <div class="ticket-detail-actions">
       <button class="primary-button" type="button" data-detail-edit-ticket-id="${escapeHtml(String(latestRevision.ticketId || state.ticketDetailId || latestRevision.attemptId))}">${result?.status === "succeeded" ? "指摘を元に修正" : "内容を修正"}</button>
-      <button class="secondary-button" type="button" data-detail-retry-scenario-id="${escapeHtml(String(ticket.scenarioId || ""))}">同じシナリオに再挑戦</button>
+      <button class="secondary-button" type="button" data-detail-retry-scenario-id="${escapeHtml(String(ticket.scenarioId || ""))}" data-detail-retry-training-level="${escapeHtml(normalizeTrainingLevel(ticket.answer?.trainingLevel))}">同じシナリオに再挑戦</button>
     </div>
   `;
   elements.ticketDetailStatus?.classList.add("hidden");
@@ -5762,7 +5933,10 @@ function handleTicketDetailAction(event) {
     return;
   }
   selectAuthoringMode("practice");
-  if (selectScenarioById(retryButton.dataset.detailRetryScenarioId)) {
+  if (selectScenarioById(
+    retryButton.dataset.detailRetryScenarioId,
+    retryButton.dataset.detailRetryTrainingLevel
+  )) {
     showScenarioIntro();
   }
 }
@@ -6154,15 +6328,41 @@ function selectAuthoringMode(nextMode) {
   return true;
 }
 
+function showTrainingLevelSelection(ticketType) {
+  state.trainingTicketType = ticketType === "qa" ? "qa" : "bug";
+  state.scenarioQueue = [];
+  state.scenarioIndex = -1;
+  setTextContent(
+    elements.trainingLevelTitle,
+    `${state.trainingTicketType === "qa" ? "QA" : "バグ"}起票のレベルを選択`
+  );
+  setView("level");
+  syncControls();
+  elements.trainingLevelButtons?.[0]?.focus();
+}
+
+function handleTrainingLevelSelect(event) {
+  const level = normalizeTrainingLevel(event.currentTarget.dataset.trainingLevel);
+  state.trainingLevel = level;
+  state.scenarioQueue = [];
+  state.scenarioIndex = -1;
+  startSession({ ticketType: state.trainingTicketType });
+}
+
+function handleTrainingLevelBack() {
+  resetSession();
+  loadTicketList();
+}
+
 function handleStartButton() {
   if (!state.running && !state.awaitingCreate) {
-    startSession({ ticketType: "bug" });
+    showTrainingLevelSelection("bug");
   }
 }
 
 function handleQaStartButton() {
   if (!state.running && !state.awaitingCreate) {
-    startSession({ ticketType: "qa" });
+    showTrainingLevelSelection("qa");
   }
 }
 
@@ -6309,6 +6509,8 @@ function handleExitButton() {
 
 on(elements.startButton, "click", handleStartButton);
 on(elements.qaStartButton, "click", handleQaStartButton);
+elements.trainingLevelButtons.forEach((button) => on(button, "click", handleTrainingLevelSelect));
+on(elements.trainingLevelBackButton, "click", handleTrainingLevelBack);
 on(elements.resumeDraftButton, "click", handleResumeDraftButton);
 on(elements.draftSaveButton, "click", saveCurrentPracticeDraft);
 on(elements.homeNavButton, "click", () => {

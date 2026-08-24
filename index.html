@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260823a" />
+    <link rel="stylesheet" href="./styles.css?v=20260824c" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -100,6 +100,7 @@
                   <tr>
                     <th>#</th>
                     <th>種別</th>
+                    <th>レベル</th>
                     <th>AIレビュー</th>
                     <th>優先度</th>
                     <th>題名</th>
@@ -115,6 +116,51 @@
             </div>
             </div>
           </article>
+        </section>
+
+        <section id="trainingLevelView" class="training-level-view hidden">
+          <div class="training-level-shell">
+            <div class="training-level-heading">
+              <h1 id="trainingLevelTitle">トレーニングレベルを選択</h1>
+            </div>
+
+            <div class="training-level-grid" role="group" aria-label="トレーニングレベル">
+              <button class="training-level-card is-beginner" type="button" data-training-level="beginner">
+                <span class="training-level-card-tag">初級</span>
+                <strong>事実を正確に伝える</strong>
+                <span class="training-level-illustration" aria-hidden="true">
+                  <img src="./assets/images/training-levels/beginner-observation.svg" alt="" decoding="async" />
+                </span>
+                <span>一目で分かる不具合を使い、タイトルと確認できた事実を中心に練習します。</span>
+                <span class="training-level-audience">対象：実務未経験〜起票経験が浅い人向け<br />経験目安：0〜6か月</span>
+                <small>タイトル設計 / 事実と推測の分離</small>
+              </button>
+              <button class="training-level-card is-intermediate" type="button" data-training-level="intermediate">
+                <span class="training-level-card-tag">中級</span>
+                <strong>再現できる情報に整理する</strong>
+                <span class="training-level-illustration" aria-hidden="true">
+                  <img src="./assets/images/training-levels/intermediate-analysis.svg" alt="" decoding="async" />
+                </span>
+                <span>複雑な操作や発生条件を整理し、開発者が再現できる情報にまとめます。</span>
+                <span class="training-level-audience">対象：起票経験はあるが、レビュー支援が必要な人向け<br />経験目安：6か月〜2年</span>
+                <small>簡潔さ / 再現手順 / 切り分け</small>
+              </button>
+              <button class="training-level-card is-advanced" type="button" data-training-level="advanced">
+                <span class="training-level-card-tag">上級</span>
+                <strong>一人で調査から起票まで完結させる</strong>
+                <span class="training-level-illustration" aria-hidden="true">
+                  <img src="./assets/images/training-levels/advanced-investigation.svg" alt="" decoding="async" />
+                </span>
+                <span>実務を想定し、再現率や復帰手順まで含めた、必要な情報がそろった不具合報告に挑戦します。</span>
+                <span class="training-level-audience">対象：調査から起票まで自律して進められる人向け<br />経験目安：2年以上</span>
+                <small>総合的な不具合報告 / 実務水準の起票</small>
+              </button>
+            </div>
+
+            <div class="training-level-actions">
+              <button id="trainingLevelBackButton" class="secondary-button" type="button">一覧へ戻る</button>
+            </div>
+          </div>
         </section>
 
         <section id="ticketDetailView" class="ticket-detail-view hidden">
@@ -254,7 +300,10 @@
         <section id="scenarioIntroView" class="scenario-intro-view hidden">
           <div class="ticket-page-head">
             <div class="ticket-page-copy">
-              <h1 id="scenarioIntroTitle">バグシナリオ</h1>
+              <div class="scenario-title-line">
+                <h1 id="scenarioIntroTitle">バグシナリオ</h1>
+                <span id="scenarioIntroLevelBadge" class="training-level-pill is-advanced">上級</span>
+              </div>
             </div>
           </div>
 
@@ -378,9 +427,9 @@
                 <div id="practiceWritingStatus" class="practice-writing-status hidden" role="alert"></div>
               </div>
 
-              <div class="ticket-form-details">
+              <div id="ticketFormDetails" class="ticket-form-details">
                 <div class="ticket-form-column">
-                  <label id="severityField" class="ticket-field">
+                  <label id="severityField" class="ticket-field training-field-advanced">
                     <span>障害レベル</span>
                     <select id="severitySelect">
                       <option value="">--- 選択してください ---</option>
@@ -398,7 +447,7 @@
                     </select>
                   </label>
 
-                  <label class="ticket-field">
+                  <label class="ticket-field training-field-advanced">
                     <span>優先度</span>
                     <select id="prioritySelect">
                       <option value="">--- 選択してください ---</option>
@@ -409,7 +458,7 @@
                     </select>
                   </label>
 
-                  <label class="ticket-field">
+                  <label class="ticket-field training-field-advanced">
                     <span>担当者</span>
                     <select id="assigneeSelect"></select>
                   </label>
@@ -441,12 +490,12 @@
                     </select>
                   </label>
 
-                  <label class="ticket-field">
+                  <label class="ticket-field training-field-advanced">
                     <span>開始日</span>
                     <input id="startDateInput" type="date" value="2023-03-24" />
                   </label>
 
-                  <div class="ticket-field">
+                  <div class="ticket-field training-field-advanced">
                     <span>期日</span>
                     <div class="ticket-date-choice">
                       <input id="dueDateInput" type="date" value="2023-03-28" />
@@ -454,7 +503,7 @@
                     </div>
                   </div>
 
-                  <label class="ticket-field">
+                  <label class="ticket-field training-field-advanced">
                     <span>進捗率</span>
                     <select id="progressSelect">
                       <option value="0">0%</option>
@@ -473,7 +522,7 @@
                 </div>
               </div>
 
-              <fieldset id="evidenceAttachmentSection" class="ticket-attachments hidden">
+              <fieldset id="evidenceAttachmentSection" class="ticket-attachments hidden training-field-advanced">
                 <legend>ファイル</legend>
                 <div class="ticket-attachments-head">
                   <span>添付エビデンス</span>
@@ -486,7 +535,7 @@
                 </div>
               </fieldset>
 
-              <fieldset class="ticket-watchers">
+              <fieldset class="ticket-watchers training-field-advanced">
                 <legend>ウォッチャー</legend>
                 <div id="ticketWatchersList" class="ticket-watchers-list"></div>
               </fieldset>
@@ -503,6 +552,7 @@
               </div>
               <div class="scenario-panel-status">
                 <span id="scenarioPanelMode" class="scenario-mode-badge">見本入力</span>
+                <span id="scenarioPanelLevelBadge" class="training-level-pill is-advanced">上級</span>
                 <span id="scenarioReferenceHint" class="scenario-reference-hint hidden"></span>
               </div>
             </div>
@@ -841,6 +891,6 @@
     <script src="./qa-scenario-authoring-library.js?v=20260823a"></script>
     <script src="./evidence-library.js?v=20260823a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260823b"></script>
+    <script src="./main.js?v=20260824f"></script>
   </body>
 </html>

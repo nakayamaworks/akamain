@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v28";
+export const PROMPT_VERSION = "practice-review.v29";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS = Object.freeze({
@@ -233,6 +233,11 @@ export function attemptContentFingerprint(attempt) {
     scenarioId: attempt?.scenarioId || "",
     projectId: attempt?.projectId || "",
     answer: {
+      trainingLevel: optionalEnum(
+        attempt?.answer?.trainingLevel ?? "advanced",
+        ["beginner", "intermediate", "advanced"],
+        "answer.trainingLevel"
+      ),
       subject: attempt?.answer?.subject || "",
       sections: attempt?.answer?.sections || {},
       ticketFields,
@@ -653,6 +658,11 @@ export function validateAttemptInput(input) {
       projectId: requireNonEmptyString(input.projectId, "projectId"),
       authoringMode: "practice",
       answer: {
+        trainingLevel: optionalEnum(
+          input.answer?.trainingLevel ?? "advanced",
+          ["beginner", "intermediate", "advanced"],
+          "answer.trainingLevel"
+        ),
         subject,
         sections,
         ticketFields: normalizeTicketFields(input.answer?.ticketFields),
@@ -723,8 +733,15 @@ export function buildScoringPrompt(attempt, options = {}) {
       ({ contentPreview: _contentPreview, confirmedFinding: _confirmedFinding, ...file }) => file
     ),
   };
+  const trainingLevel = attempt.answer?.trainingLevel || "advanced";
+  const trainingLevelInstruction = trainingLevel === "beginner"
+    ? "これは初級課題です。評価対象は題名、確認した事実、期待結果と実際結果の分離だけです。画面で出題していない再現手順、再現率、影響範囲、復帰方法、チケット設定、添付証跡の不足を減点・改善提案・聞き返しの理由にしてはいけません。評価対象外のdimensionsは100点にしてください。"
+    : trainingLevel === "intermediate"
+      ? "これは中級課題です。簡潔さ、再現手順、期待結果と実際結果、切り分けに必要な情報を評価してください。画面で出題していない再現率、周辺補足、影響範囲、復帰方法、担当者、期日、添付証跡の不足を減点・改善提案・聞き返しの理由にしてはいけません。評価対象外のdimensionsは100点にしてください。"
+      : "これは上級課題です。採点基準に含まれる全項目を実務形式で評価してください。";
   if (rubric.ticketType === "qa") {
     return [
+      trainingLevelInstruction,
       "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、reviewSourceと受講者のQA起票を照合してください。",
       "質問をYesまたはNoだけに制限する必要はありません。必要なら回答者が正しい条件を短く補足でき、不要な聞き返しが生じにくいことを評価してください。",
       "一つのQAに独立した複数の判断事項が混在している場合は、どの回答がどの論点に対応するか曖昧になる点を指摘してください。",
@@ -768,6 +785,7 @@ export function buildScoringPrompt(attempt, options = {}) {
     ].join("\n");
   }
   return [
+    trainingLevelInstruction,
     "このレビューに唯一の正解文はありません。記載例との文面・構成・情報量の一致ではなく、提示された観測記録、仕様、証跡と受講者の起票内容に照らして評価してください。",
     "記載例と異なる表現や構成でも、事実に根差し、読み手が調査を始めやすい内容なら同等以上に評価してください。記載例より有効な比較確認や切り分けが含まれる場合は積極的に評価してください。",
     "点数だけでなく、実際の読み手が疑問に思うこと、誤解される表現、有効な切り分けを具体的に助言してください。",
@@ -1481,10 +1499,29 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
   if (!rubric) {
     throw new Error("scenario rubric was not found");
   }
+  const trainingLevel = attempt.answer?.trainingLevel || "advanced";
+  const activeTicketFields = trainingLevel === "beginner"
+    ? new Set()
+    : trainingLevel === "intermediate"
+      ? new Set(["category", "version", "environment"])
+      : null;
+  const activeFactGroups = rubric.ticketType === "qa"
+    ? trainingLevel === "beginner"
+      ? new Set(["subject", "question", "situation"])
+      : trainingLevel === "intermediate"
+        ? new Set(["subject", "question", "situation", "references", "interpretation", "impact"])
+        : null
+    : trainingLevel === "beginner"
+      ? new Set(["subject", "detail", "expected", "actual"])
+      : trainingLevel === "intermediate"
+        ? new Set(["subject", "detail", "steps", "expected", "actual", "boundary"])
+        : null;
   const actualFields = attempt.answer?.ticketFields || {};
   const expectedFields = Object.fromEntries(
     Object.entries(rubric.expectedTicketFields || {}).filter(
-      ([field]) => rubric.ticketType !== "qa" || field !== "severity"
+      ([field]) =>
+        (rubric.ticketType !== "qa" || field !== "severity")
+        && (activeTicketFields === null || activeTicketFields.has(field))
     )
   );
   const ticketFieldChecks = Object.entries(expectedFields).map(([field, expected]) => {
@@ -1525,7 +1562,7 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
       : actual === expected;
     return { field, expected, actual, matched };
   });
-  const expectedEvidenceIds = rubric.evidenceFiles
+  const expectedEvidenceIds = (trainingLevel === "advanced" ? rubric.evidenceFiles : [])
     .filter((file) => file.required)
     .map((file) => file.id);
   const selectedEvidenceIds = [...new Set(attempt.selectedEvidenceIds || [])];
@@ -1536,7 +1573,10 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
     (fileId) => !expectedEvidenceIds.includes(fileId)
   );
   const factById = new Map(
-    Object.values(rubric.requiredFacts).flat().map((fact) => [fact.id, fact])
+    Object.entries(rubric.requiredFacts)
+      .filter(([group]) => activeFactGroups === null || activeFactGroups.has(group))
+      .flatMap(([, facts]) => facts)
+      .map((fact) => [fact.id, fact])
   );
   const missingCriticalFactIds = normalizedOutput.factAssessments
     .filter(({ factId, status }) =>
@@ -1565,7 +1605,9 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
     ? Math.min(...scoreCaps.map(({ maximum }) => maximum))
     : null;
   return {
-    factAssessments: normalizedOutput.factAssessments,
+    factAssessments: normalizedOutput.factAssessments.filter(
+      ({ factId }) => factById.has(factId)
+    ),
     forbiddenClaimIds: normalizedOutput.forbiddenClaimIds,
     workflowConsistency: normalizedOutput.workflowConsistency,
     missingCriticalFactIds,
@@ -1903,7 +1945,11 @@ export function createFailedScoringResult(attempt, error, options = {}) {
 
 async function requestWorkflowConsistencyAssessment(attempt, options) {
   const rubric = getScenarioRubric(attempt.scenarioId);
-  if (rubric.ticketType === "qa" || !(rubric.requiredFacts?.steps || []).length) {
+  if (
+    attempt.answer?.trainingLevel === "beginner"
+    || rubric.ticketType === "qa"
+    || !(rubric.requiredFacts?.steps || []).length
+  ) {
     return {
       status: "not-applicable",
       factId: "not-applicable",
