@@ -1829,6 +1829,62 @@ try {
       `all beginner bug briefs must explain context, action, expectation, and observation: ${JSON.stringify(incompleteBeginnerBugBriefs)}`
     );
   }
+  const beginnerQaBriefCoverage = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      const previousTrainingLevel = state.trainingLevel;
+      const previousQaAuthoring = window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING;
+      const qaProfiles = ${JSON.stringify(qaAuthoredScenarios)};
+      window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = qaProfiles;
+      state.trainingLevel = "beginner";
+      state.scenario = buildScenario(
+        qaProfiles["customer-qa-default-filter-inactive-users"].scenario,
+        "beginner"
+      );
+      renderScenarioBrief();
+      const sampleMarkup = elements.scenarioIntroFacts.innerHTML;
+      const failures = Object.values(qaProfiles)
+        .map(({ scenario }) => scenario)
+        .filter((scenario) => scenario.difficulty === "beginner")
+        .map((scenario) => {
+          state.scenario = buildScenario(scenario, "beginner");
+          renderScenarioBrief();
+          const markup = elements.scenarioIntroFacts.innerHTML;
+          return {
+            scenarioId: scenario.scenarioId,
+            complete: [
+              "確認した操作・結果：",
+              "資料で分からない点：",
+              "現在の考え：",
+              "確認したいこと：",
+              "確認する理由：",
+            ].every((label) => markup.includes(label)),
+          };
+        })
+        .filter((item) => !item.complete);
+      state.scenario = previousScenario;
+      state.trainingLevel = previousTrainingLevel;
+      window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = previousQaAuthoring;
+      return { sampleMarkup, failures };
+    })()`,
+    smokeContext
+  );
+  [
+    "確認した操作・結果：顧客一覧を初期表示すると、ステータス未指定で退会済みを含む全件が表示される",
+    "資料で分からない点：顧客一覧画面仕様書には初期フィルター値の記載がない",
+    "現在の考え：日常業務では有効な顧客だけを初期表示すると解釈している",
+    "確認したいこと：顧客一覧の初期表示は退会済みを除外する認識でよいですか",
+    "確認する理由：回答によって初期表示の期待値と検索テストが変わる",
+  ].forEach((phrase) => {
+    if (!beginnerQaBriefCoverage.sampleMarkup.includes(phrase)) {
+      errors.push(`beginner QA brief must include essential context: ${phrase}`);
+    }
+  });
+  if (beginnerQaBriefCoverage.failures.length > 0) {
+    errors.push(
+      `all beginner QA briefs must explain observation, source gap, interpretation, question, and reason: ${JSON.stringify(beginnerQaBriefCoverage.failures)}`
+    );
+  }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";
   const leakedInitialSubjects = vm.runInContext(
     `scenarioBank
