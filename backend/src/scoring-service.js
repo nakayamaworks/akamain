@@ -165,14 +165,67 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v29";
+export const PROMPT_VERSION = "practice-review.v30";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
-const SCORE_MAXIMUMS = Object.freeze({
-  writingQuality: 70,
-  ticketSettings: 20,
-  evidenceSelection: 10,
+const SCORE_MAXIMUMS_BY_LEVEL = Object.freeze({
+  beginner: Object.freeze({
+    writingQuality: 100,
+    ticketSettings: 0,
+    evidenceSelection: 0,
+  }),
+  intermediate: Object.freeze({
+    writingQuality: 80,
+    ticketSettings: 20,
+    evidenceSelection: 0,
+  }),
+  advanced: Object.freeze({
+    writingQuality: 70,
+    ticketSettings: 20,
+    evidenceSelection: 10,
+  }),
 });
+
+function normalizeTrainingLevel(value) {
+  return ["beginner", "intermediate", "advanced"].includes(value)
+    ? value
+    : "advanced";
+}
+
+function getTrainingLevelScope(rubric, requestedLevel = "advanced") {
+  const trainingLevel = normalizeTrainingLevel(requestedLevel);
+  const beginnerDimensionIds = rubric.ticketType === "qa"
+    ? ["questionFocus", "answerability", "factInterpretationSeparation"]
+    : [
+        "factualGrounding",
+        "informationCoverage",
+        "expectedActualSeparation",
+        "interpretiveClarity",
+      ];
+  return {
+    trainingLevel,
+    scoreMaximums: SCORE_MAXIMUMS_BY_LEVEL[trainingLevel],
+    activeDimensionIds: trainingLevel === "beginner"
+      ? new Set(beginnerDimensionIds)
+      : null,
+    activeTicketFields: trainingLevel === "beginner"
+      ? new Set()
+      : trainingLevel === "intermediate"
+        ? new Set(["category", "version", "environment"])
+        : null,
+    activeFactGroups: rubric.ticketType === "qa"
+      ? trainingLevel === "beginner"
+        ? new Set(["subject", "question", "situation"])
+        : trainingLevel === "intermediate"
+          ? new Set(["subject", "question", "situation", "references", "interpretation", "impact"])
+          : null
+      : trainingLevel === "beginner"
+        ? new Set(["subject", "detail", "expected", "actual"])
+        : trainingLevel === "intermediate"
+          ? new Set(["subject", "detail", "steps", "expected", "actual", "boundary"])
+          : null,
+  };
+}
 
 const BUG_SCORING_SYSTEM_INSTRUCTION = [
   "あなたは、不具合票を受け取って調査を始めるシニア開発者兼QAリードです。",
@@ -727,15 +780,45 @@ export function buildScoringPrompt(attempt, options = {}) {
       contentPreview,
       confirmedFinding,
     }));
+  const trainingLevel = normalizeTrainingLevel(attempt.answer?.trainingLevel);
+  const trainingScope = getTrainingLevelScope(scoringRubric, trainingLevel);
+  const activeDimensionIds = trainingScope.activeDimensionIds;
+  const activeFactGroups = trainingScope.activeFactGroups;
+  const activeTicketFields = trainingScope.activeTicketFields;
   const scoringRubricForPrompt = {
     ...scoringRubric,
-    evidenceFiles: (scoringRubric.evidenceFiles || []).map(
-      ({ contentPreview: _contentPreview, confirmedFinding: _confirmedFinding, ...file }) => file
+    dimensions: scoringRubric.dimensions.filter(
+      ({ id }) => activeDimensionIds === null || activeDimensionIds.has(id)
     ),
+    requiredFacts: scoringRubric.requiredFacts,
+    expectedTicketFields: Object.fromEntries(
+      Object.entries(scoringRubric.expectedTicketFields || {}).filter(
+        ([field]) =>
+          (scoringRubric.ticketType !== "qa" || field !== "severity")
+          && (activeTicketFields === null || activeTicketFields.has(field))
+      )
+    ),
+    evidenceFiles: trainingLevel === "advanced"
+      ? (scoringRubric.evidenceFiles || []).map(
+          ({ contentPreview: _contentPreview, confirmedFinding: _confirmedFinding, ...file }) => file
+        )
+      : [],
+    trainingScope: {
+      level: trainingLevel,
+      evaluatedDimensionIds: scoringRubric.dimensions
+        .filter(({ id }) => activeDimensionIds === null || activeDimensionIds.has(id))
+        .map(({ id }) => id),
+      evaluatedFactGroups: Object.keys(scoringRubric.requiredFacts || {})
+        .filter((group) => activeFactGroups === null || activeFactGroups.has(group)),
+      excludedFactGroups: Object.keys(scoringRubric.requiredFacts || {})
+        .filter((group) => activeFactGroups !== null && !activeFactGroups.has(group)),
+      excludedDimensionIds: scoringRubric.dimensions
+        .filter(({ id }) => activeDimensionIds !== null && !activeDimensionIds.has(id))
+        .map(({ id }) => id),
+    },
   };
-  const trainingLevel = attempt.answer?.trainingLevel || "advanced";
   const trainingLevelInstruction = trainingLevel === "beginner"
-    ? "これは初級課題です。評価対象は題名、確認した事実、期待結果と実際結果の分離だけです。画面で出題していない再現手順、再現率、影響範囲、復帰方法、チケット設定、添付証跡の不足を減点・改善提案・聞き返しの理由にしてはいけません。評価対象外のdimensionsは100点にしてください。"
+    ? "これは初級課題です。この指示は後続の一般的な実務レビュー指示より優先されます。評価対象は題名、確認した事実、期待結果と実際結果の分離だけです。画面で出題していない再現手順、再現率、比較確認、切り分け、影響範囲、復帰方法、チケット設定、添付証跡の不足を減点・改善提案・聞き返し・書き換えの理由にしてはいけません。初級の学習目標を満たした記述は、フォーム上の基本事項であってもstrengthsとして具体的に評価してください。評価対象外のdimensionsは100点にしてください。"
     : trainingLevel === "intermediate"
       ? "これは中級課題です。簡潔さ、再現手順、期待結果と実際結果、切り分けに必要な情報を評価してください。画面で出題していない再現率、周辺補足、影響範囲、復帰方法、担当者、期日、添付証跡の不足を減点・改善提案・聞き返しの理由にしてはいけません。評価対象外のdimensionsは100点にしてください。"
       : "これは上級課題です。採点基準に含まれる全項目を実務形式で評価してください。";
@@ -1027,6 +1110,7 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   const factIdValues = ["not-applicable", ...validFactIds];
   const isGroundedQuote = createAttemptEvidenceChecker(attempt);
   const attemptAnswerText = JSON.stringify(attempt?.answer || {});
+  const trainingLevel = normalizeTrainingLevel(attempt?.answer?.trainingLevel);
   const workflowFactIds = new Set(
     (rubric.requiredFacts?.steps || []).map(({ id }) => id)
   );
@@ -1425,7 +1509,10 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
     return { evidenceQuote, evaluation, whyItHelps };
   }).filter((item) =>
     isGroundedQuote(item.evidenceQuote)
-    && !isGenericStructurePraise(item.evaluation, item.whyItHelps)
+    && (
+      trainingLevel === "beginner"
+      || !isGenericStructurePraise(item.evaluation, item.whyItHelps)
+    )
   ).map(({ evidenceQuote, evaluation, whyItHelps }) =>
     `「${evidenceQuote}」という記述から、${removeTerminalPunctuation(evaluation)}。${whyItHelps}`
   );
@@ -1456,17 +1543,157 @@ export function normalizeModelOutput(rawOutput, scenarioId = DEFAULT_SCENARIO_ID
   };
 }
 
-export function calculateWeightedTotal(dimensions, scenarioId = DEFAULT_SCENARIO_ID) {
+function textFallsOutsideTrainingScope(value, trainingLevel) {
+  if (trainingLevel !== "beginner") {
+    return false;
+  }
+  return /(?:再現手順|操作手順|再現率|比較確認|比較条件|別条件|切り分け|影響範囲|復帰方法|回避方法|担当者|期日|ウォッチャー|添付証跡|添付ファイル|ログ確認)/u.test(
+    String(value || "")
+  );
+}
+
+function scopedDimensionAverage(dimensions, rubric, activeDimensionIds = null) {
+  const activeDimensions = rubric.dimensions.filter(
+    ({ id }) => activeDimensionIds === null || activeDimensionIds.has(id)
+  );
+  const totalWeight = activeDimensions.reduce((sum, dimension) => sum + dimension.weight, 0);
+  if (totalWeight <= 0) {
+    return 100;
+  }
+  return Math.round(
+    activeDimensions.reduce(
+      (total, dimension) => total + dimensions[dimension.id] * dimension.weight,
+      0
+    ) / totalWeight
+  );
+}
+
+function buildTrainingLevelOverallAssessment(trainingLevel, rubric, score) {
+  const qaTicket = rubric.ticketType === "qa";
+  if (trainingLevel === "beginner") {
+    if (score >= 90) {
+      return qaTicket
+        ? "初級の学習目標である、質問の焦点と確認した事実・解釈の分離ができています。"
+        : "初級の学習目標である、題名と確認した事実、期待結果と実際の動作の分離ができています。";
+    }
+    if (score >= 75) {
+      return qaTicket
+        ? "質問の焦点と確認した事実は概ね整理できています。下の改善点に絞って、事実と解釈の伝わり方を見直しましょう。"
+        : "題名と確認した事実は概ね整理できています。下の改善点に絞って、事実と推測の分け方を見直しましょう。";
+    }
+    return qaTicket
+      ? "初級で確認する質問の焦点と事実の書き方に不足があります。表示された基本項目だけを見直しましょう。"
+      : "初級で確認する題名と事実の書き方に不足があります。表示された基本項目だけを見直しましょう。";
+  }
+  if (trainingLevel === "intermediate") {
+    if (score >= 90) {
+      return qaTicket
+        ? "中級の学習目標に沿って、回答に必要な根拠と影響を簡潔に整理できています。"
+        : "中級の学習目標に沿って、再現手順と切り分けに必要な情報を簡潔に整理できています。";
+    }
+    if (score >= 75) {
+      return qaTicket
+        ? "回答に必要な情報は概ね整理できています。下の改善点に絞って、根拠と影響を見直しましょう。"
+        : "再現に必要な情報は概ね整理できています。下の改善点に絞って、手順と切り分け情報を見直しましょう。";
+    }
+    return qaTicket
+      ? "中級で確認する根拠と影響の整理に不足があります。表示された改善点を順に見直しましょう。"
+      : "中級で確認する再現手順と切り分け情報に不足があります。表示された改善点を順に見直しましょう。";
+  }
+  return null;
+}
+
+function applyTrainingLevelReviewScope(normalized, attempt, rubric) {
+  const scope = getTrainingLevelScope(rubric, attempt?.answer?.trainingLevel);
+  if (scope.trainingLevel === "advanced") {
+    return normalized;
+  }
+  const activeDimensionIds = scope.activeDimensionIds;
+  const activeFactIds = new Set(
+    Object.entries(rubric.requiredFacts || {})
+      .filter(([group]) => scope.activeFactGroups === null || scope.activeFactGroups.has(group))
+      .flatMap(([, facts]) => facts.map(({ id }) => id))
+  );
+  const dimensions = { ...normalized.dimensions };
+  const dimensionFeedback = { ...normalized.dimensionFeedback };
+  rubric.dimensions.forEach(({ id }) => {
+    if (activeDimensionIds !== null && !activeDimensionIds.has(id)) {
+      dimensions[id] = 100;
+      dimensionFeedback[id] = { reason: "このレベルでは評価対象外です。" };
+    }
+  });
+  const improvementItems = normalized.improvementItems
+    .map((item) => ({
+      ...item,
+      relatedDimensionIds: item.relatedDimensionIds.filter(
+        (id) => activeDimensionIds === null || activeDimensionIds.has(id)
+      ),
+    }))
+    .filter((item) => item.relatedDimensionIds.length > 0)
+    .filter((item) => !textFallsOutsideTrainingScope(
+      `${item.title} ${item.detail} ${item.whyItMatters}`,
+      scope.trainingLevel
+    ));
+  const readerQuestions = normalized.readerQuestions
+    .filter((item) => item.factId === "not-applicable" || activeFactIds.has(item.factId))
+    .filter((item) => !textFallsOutsideTrainingScope(
+      `${item.question} ${item.whyItMatters}`,
+      scope.trainingLevel
+    ));
+  const ambiguityRisks = normalized.ambiguityRisks.filter((item) =>
+    !textFallsOutsideTrainingScope(`${item.risk} ${item.advice}`, scope.trainingLevel)
+  );
+  const rewriteSuggestions = normalized.rewriteSuggestions.filter((item) =>
+    !textFallsOutsideTrainingScope(
+      `${item.section} ${item.suggested} ${item.reason}`,
+      scope.trainingLevel
+    )
+  );
+  const activeScore = scopedDimensionAverage(dimensions, rubric, activeDimensionIds);
+  let strengths = normalized.strengths;
+  if (scope.trainingLevel === "beginner" && strengths.length === 0) {
+    const separationDimension = rubric.ticketType === "qa"
+      ? dimensions.factInterpretationSeparation
+      : dimensions.expectedActualSeparation;
+    if (separationDimension >= 90) {
+      strengths = [rubric.ticketType === "qa"
+        ? "確認した事実と現在の解釈を分けており、回答者が未確定事項を判別しやすくなっています。"
+        : "期待結果と実際の動作を分けており、確認した事実を推測と混ぜずに伝えています。"
+      ];
+    }
+  }
+  return {
+    ...normalized,
+    dimensions,
+    dimensionFeedback,
+    improvementItems,
+    overallAssessment: buildTrainingLevelOverallAssessment(
+      scope.trainingLevel,
+      rubric,
+      activeScore
+    ),
+    readerQuestions,
+    ambiguityRisks,
+    investigationAdvice: scope.trainingLevel === "beginner"
+      ? []
+      : normalized.investigationAdvice,
+    rewriteSuggestions,
+    strengths,
+    factAssessments: normalized.factAssessments.filter(({ factId }) => activeFactIds.has(factId)),
+  };
+}
+
+export function calculateWeightedTotal(
+  dimensions,
+  scenarioId = DEFAULT_SCENARIO_ID,
+  trainingLevel = "advanced"
+) {
   const rubric = getScenarioRubric(scenarioId);
   if (!rubric) {
     throw new Error("scenario rubric was not found");
   }
-  return Math.round(
-    rubric.dimensions.reduce(
-      (total, dimension) => total + dimensions[dimension.id] * dimension.weight / 100,
-      0
-    )
-  );
+  const scope = getTrainingLevelScope(rubric, trainingLevel);
+  return scopedDimensionAverage(dimensions, rubric, scope.activeDimensionIds);
 }
 
 function dateInJapan(value) {
@@ -1499,23 +1726,11 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
   if (!rubric) {
     throw new Error("scenario rubric was not found");
   }
-  const trainingLevel = attempt.answer?.trainingLevel || "advanced";
-  const activeTicketFields = trainingLevel === "beginner"
-    ? new Set()
-    : trainingLevel === "intermediate"
-      ? new Set(["category", "version", "environment"])
-      : null;
-  const activeFactGroups = rubric.ticketType === "qa"
-    ? trainingLevel === "beginner"
-      ? new Set(["subject", "question", "situation"])
-      : trainingLevel === "intermediate"
-        ? new Set(["subject", "question", "situation", "references", "interpretation", "impact"])
-        : null
-    : trainingLevel === "beginner"
-      ? new Set(["subject", "detail", "expected", "actual"])
-      : trainingLevel === "intermediate"
-        ? new Set(["subject", "detail", "steps", "expected", "actual", "boundary"])
-        : null;
+  const {
+    trainingLevel,
+    activeTicketFields,
+    activeFactGroups,
+  } = getTrainingLevelScope(rubric, attempt.answer?.trainingLevel);
   const actualFields = attempt.answer?.ticketFields || {};
   const expectedFields = Object.fromEntries(
     Object.entries(rubric.expectedTicketFields || {}).filter(
@@ -1605,6 +1820,7 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
     ? Math.min(...scoreCaps.map(({ maximum }) => maximum))
     : null;
   return {
+    trainingLevel,
     factAssessments: normalizedOutput.factAssessments.filter(
       ({ factId }) => factById.has(factId)
     ),
@@ -1627,17 +1843,21 @@ export function buildRubricFindings(attempt, normalizedOutput, rawWeightedScore)
 }
 
 export function calculateScoreBreakdown(rubricFindings, writingQualityRawScore) {
+  const trainingLevel = normalizeTrainingLevel(rubricFindings?.trainingLevel);
+  const scoreMaximums = SCORE_MAXIMUMS_BY_LEVEL[trainingLevel];
   const writingRaw = Math.max(0, Math.min(100, Math.round(writingQualityRawScore || 0)));
   const writingQuality = Math.round(
-    writingRaw * SCORE_MAXIMUMS.writingQuality / 100
+    writingRaw * scoreMaximums.writingQuality / 100
   );
 
   const ticketChecks = rubricFindings?.ticketFieldChecks || [];
   const matchedTicketFields = ticketChecks.filter(({ matched }) => matched).length;
-  const ticketSettings = ticketChecks.length === 0
-    ? SCORE_MAXIMUMS.ticketSettings
+  const ticketSettings = scoreMaximums.ticketSettings === 0
+    ? 0
+    : ticketChecks.length === 0
+      ? scoreMaximums.ticketSettings
     : Math.round(
-        matchedTicketFields * SCORE_MAXIMUMS.ticketSettings / ticketChecks.length
+        matchedTicketFields * scoreMaximums.ticketSettings / ticketChecks.length
       );
 
   const evidenceCheck = rubricFindings?.evidenceCheck || {};
@@ -1645,11 +1865,13 @@ export function calculateScoreBreakdown(rubricFindings, writingQualityRawScore) 
   const selectedEvidenceIds = new Set(evidenceCheck.selectedEvidenceIds || []);
   const correctEvidenceCount = expectedEvidenceIds.filter((id) => selectedEvidenceIds.has(id)).length;
   const unrelatedEvidenceCount = (evidenceCheck.unrelatedEvidenceIds || []).length;
-  const evidenceSelection = expectedEvidenceIds.length === 0
-    ? (selectedEvidenceIds.size === 0 ? SCORE_MAXIMUMS.evidenceSelection : 0)
+  const evidenceSelection = scoreMaximums.evidenceSelection === 0
+    ? 0
+    : expectedEvidenceIds.length === 0
+      ? (selectedEvidenceIds.size === 0 ? scoreMaximums.evidenceSelection : 0)
     : Math.round(
         Math.max(0, correctEvidenceCount - unrelatedEvidenceCount)
-        * SCORE_MAXIMUMS.evidenceSelection
+        * scoreMaximums.evidenceSelection
         / expectedEvidenceIds.length
       );
   const uncappedTotalScore = writingQuality + ticketSettings + evidenceSelection;
@@ -1664,20 +1886,20 @@ export function calculateScoreBreakdown(rubricFindings, writingQualityRawScore) 
     writingQuality: {
       rawScore: writingRaw,
       awardedPoints: writingQuality,
-      maximumPoints: SCORE_MAXIMUMS.writingQuality,
+      maximumPoints: scoreMaximums.writingQuality,
     },
     ticketSettings: {
       matchedCount: matchedTicketFields,
       totalCount: ticketChecks.length,
       awardedPoints: ticketSettings,
-      maximumPoints: SCORE_MAXIMUMS.ticketSettings,
+      maximumPoints: scoreMaximums.ticketSettings,
     },
     evidenceSelection: {
       correctCount: correctEvidenceCount,
       requiredCount: expectedEvidenceIds.length,
       unrelatedCount: unrelatedEvidenceCount,
       awardedPoints: evidenceSelection,
-      maximumPoints: SCORE_MAXIMUMS.evidenceSelection,
+      maximumPoints: scoreMaximums.evidenceSelection,
     },
     uncappedTotalScore,
     appliedMaximum,
@@ -1841,7 +2063,11 @@ export function stabilizeRevisionScoringResult(
   const rubric = getScenarioRubric(currentAttempt.scenarioId);
   const raisedDimensionIds = new Set();
   const previousWritingScore = resultWritingQualityScore(previousResult);
-  let adjustedWritingScore = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
+  let adjustedWritingScore = calculateWeightedTotal(
+    dimensions,
+    currentAttempt.scenarioId,
+    currentAttempt.answer?.trainingLevel
+  );
   while (adjustedWritingScore < previousWritingScore) {
     const candidate = rubric.dimensions
       .map(({ id, weight }) => ({
@@ -1856,7 +2082,11 @@ export function stabilizeRevisionScoringResult(
     }
     dimensions[candidate.id] += 1;
     raisedDimensionIds.add(candidate.id);
-    adjustedWritingScore = calculateWeightedTotal(dimensions, currentAttempt.scenarioId);
+    adjustedWritingScore = calculateWeightedTotal(
+      dimensions,
+      currentAttempt.scenarioId,
+      currentAttempt.answer?.trainingLevel
+    );
   }
   raisedDimensionIds.forEach((dimensionId) => {
     dimensionFeedback[dimensionId] = {
@@ -2090,9 +2320,11 @@ export async function scoreAttemptRecordWithGemini(attempt, options) {
     error.code = "INVALID_MODEL_OUTPUT";
     throw error;
   }
+  normalized = applyTrainingLevelReviewScope(normalized, attempt, rubric);
   const rawWeightedScore = calculateWeightedTotal(
     normalized.dimensions,
-    attempt.scenarioId
+    attempt.scenarioId,
+    attempt.answer?.trainingLevel
   );
   const rubricFindings = buildRubricFindings(
     attempt,

@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260824c" />
+    <link rel="stylesheet" href="./styles.css?v=20260824d" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -356,7 +356,7 @@
           </article>
 
           <div class="scenario-intro-actions">
-            <button id="scenarioIntroBackButton" class="secondary-button" type="button">一覧へ戻る</button>
+            <button id="scenarioIntroBackButton" class="secondary-button" type="button">レベル選択へ戻る</button>
             <button id="scenarioIntroChangeButton" class="secondary-button" type="button">別のシナリオを選ぶ</button>
             <button id="scenarioIntroStartButton" class="primary-button reference-mode-button" type="button">見本入力を開始</button>
             <button id="scenarioIntroPracticeButton" class="primary-button" type="button">実践起票を開始</button>
@@ -688,7 +688,7 @@
           </button>
 
           <div id="practiceScoringResult" class="hidden">
-            <div class="practice-ai-review-hero">
+            <div id="practiceAiReviewHero" class="practice-ai-review-hero">
               <article class="practice-ai-summary">
                 <div class="practice-ai-summary-meta">
                   <span id="practiceScoringVerdict" class="practice-ai-verdict">--</span>
@@ -705,8 +705,8 @@
                 </div>
               </article>
 
-              <div class="practice-ai-radar-panel">
-                <div class="practice-ai-radar-title">文章品質の6つの観点</div>
+              <div id="practiceAiRadarPanel" class="practice-ai-radar-panel">
+                <div id="practiceAiRadarTitle" class="practice-ai-radar-title">文章品質の6つの観点</div>
                 <div class="practice-ai-radar-shell">
                   <svg
                     id="practiceScoringRadar"
@@ -788,7 +788,7 @@
         </section>
 
         <div id="resultReviewLayout" class="result-review-layout">
-          <section class="result-review-card">
+          <section id="resultFieldReviewCard" class="result-review-card">
             <div class="result-section-title">チケット設定チェック</div>
             <div id="resultFieldReview" class="result-field-review"></div>
             <div id="resultEvidenceReviewSection" class="result-evidence-review-section hidden">
@@ -891,6 +891,6 @@
     <script src="./qa-scenario-authoring-library.js?v=20260823a"></script>
     <script src="./evidence-library.js?v=20260823a"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260824f"></script>
+    <script src="./main.js?v=20260824g"></script>
   </body>
 </html>

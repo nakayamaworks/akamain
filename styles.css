@@ -3605,6 +3605,10 @@ th[aria-sort="descending"] .ticket-sort-button::after {
   border-bottom: 1px solid #d8e3ec;
 }
 
+.practice-ai-review-hero.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .practice-ai-summary {
   min-width: 0;
 }

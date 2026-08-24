@@ -417,6 +417,38 @@ test("overall score combines writing, ticket settings, and evidence selection", 
   assert.equal(capped.uncappedTotalScore, 100);
   assert.equal(capped.appliedMaximum, 74);
   assert.equal(capped.totalScore, 74);
+
+  const beginner = calculateScoreBreakdown({
+    trainingLevel: "beginner",
+    ticketFieldChecks: [],
+    evidenceCheck: {
+      expectedEvidenceIds: [],
+      selectedEvidenceIds: [],
+      unrelatedEvidenceIds: [],
+    },
+  }, 83);
+  assert.deepEqual(beginner.writingQuality, {
+    rawScore: 83,
+    awardedPoints: 83,
+    maximumPoints: 100,
+  });
+  assert.equal(beginner.ticketSettings.maximumPoints, 0);
+  assert.equal(beginner.evidenceSelection.maximumPoints, 0);
+  assert.equal(beginner.totalScore, 83);
+
+  const intermediate = calculateScoreBreakdown({
+    trainingLevel: "intermediate",
+    ticketFieldChecks: [{ field: "category", matched: true }],
+    evidenceCheck: {
+      expectedEvidenceIds: [],
+      selectedEvidenceIds: [],
+      unrelatedEvidenceIds: [],
+    },
+  }, 75);
+  assert.equal(intermediate.writingQuality.awardedPoints, 60);
+  assert.equal(intermediate.ticketSettings.awardedPoints, 20);
+  assert.equal(intermediate.evidenceSelection.maximumPoints, 0);
+  assert.equal(intermediate.totalScore, 80);
 });
 
 test("attempt fingerprints ignore revision metadata and order-only changes", () => {
@@ -796,6 +828,101 @@ test("training level is persisted and narrows the AI review scope", () => {
     }),
     /answer\.trainingLevel/
   );
+});
+
+test("beginner scoring removes advanced review demands and scores writing only", async () => {
+  const scenarioId = "customer-context-menu-not-shown";
+  const rubric = getScenarioRubric(scenarioId);
+  const attempt = createAttemptRecord({
+    scenarioId,
+    projectId: rubric.projectId,
+    answer: {
+      trainingLevel: "beginner",
+      subject: "コンテキストメニューが表示されない",
+      sections: {
+        詳細: "顧客一覧で右クリックしてもコンテキストメニューが表示されない",
+        期待結果: "コンテキストメニューが表示されること",
+        実際の動作: "コンテキストメニューが表示されない",
+      },
+      ticketFields: {},
+    },
+    selectedEvidenceIds: [],
+    startedAt: fixedAttemptStartedAt,
+  }, { userId: "verified-google-sub" });
+  const output = completeOutputForScenario(scenarioId);
+  output.dimensions = {
+    factualGrounding: 95,
+    informationCoverage: 75,
+    reproducibility: 40,
+    expectedActualSeparation: 100,
+    interpretiveClarity: 95,
+    investigationReadiness: 35,
+  };
+  output.dimensionFeedback = Object.fromEntries(
+    rubric.dimensions.map(({ id }) => [id, { reason: `${id}の評価理由` }])
+  );
+  output.improvementItems = [
+    {
+      priority: "任意改善",
+      title: "確認した事実をもう少し具体化する",
+      detail: "右クリック後に画面上で確認できた変化を短く補足してください。",
+      whyItMatters: "事実を読み手が正確に理解するためです。",
+      relatedDimensionIds: ["informationCoverage"],
+    },
+    {
+      priority: "修正推奨",
+      title: "再現手順と比較確認を追加する",
+      detail: "別アカウントとの比較確認と詳細な再現手順を追加してください。",
+      whyItMatters: "切り分けと調査開始に必要なためです。",
+      relatedDimensionIds: ["reproducibility", "investigationReadiness"],
+    },
+  ];
+  output.readerQuestions = [{
+    reader: "開発担当者",
+    question: "別のアカウントでも比較確認しましたか？",
+    whyItMatters: "切り分けに必要なためです。",
+    classification: "不足情報",
+    factId: rubric.requiredFacts.steps[0].id,
+  }];
+  output.investigationAdvice = [{
+    action: "ログを確認する",
+    purpose: "切り分けるためです。",
+  }];
+  output.rewriteSuggestions = [{
+    section: "操作手順",
+    original: "",
+    suggested: "対象行を選択して右クリックする",
+    reason: "再現手順を明確にするためです。",
+  }];
+  output.strengths = [];
+
+  const result = await scoreAttemptRecordWithGemini(attempt, {
+    apiKey: "server-only-key",
+    fetchImplementation: async () => ({
+      ok: true,
+      async json() {
+        return {
+          candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
+        };
+      },
+    }),
+  });
+
+  assert.equal(result.status, "succeeded");
+  assert.equal(result.dimensions.reproducibility, 100);
+  assert.equal(result.dimensions.investigationReadiness, 100);
+  assert.deepEqual(
+    result.improvementItems.map(({ title }) => title),
+    ["確認した事実をもう少し具体化する"]
+  );
+  assert.deepEqual(result.readerQuestions, []);
+  assert.deepEqual(result.investigationAdvice, []);
+  assert.deepEqual(result.rewriteSuggestions, []);
+  assert.match(result.overallAssessment, /初級の学習目標/);
+  assert.equal(result.strengths.length, 1);
+  assert.equal(result.rubricFindings.scoreBreakdown.writingQuality.maximumPoints, 100);
+  assert.equal(result.rubricFindings.scoreBreakdown.ticketSettings.maximumPoints, 0);
+  assert.equal(result.rubricFindings.scoreBreakdown.evidenceSelection.maximumPoints, 0);
 });
 
 test("attachment descriptions are normalized and included in the existing AI review prompt", () => {

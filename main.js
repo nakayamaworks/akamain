@@ -1379,6 +1379,9 @@ const elements = {
   practiceScoringRetryButton: document.getElementById("practiceScoringRetryButton"),
   practiceSaveRetryButton: document.getElementById("practiceSaveRetryButton"),
   practiceScoringResult: document.getElementById("practiceScoringResult"),
+  practiceAiReviewHero: document.getElementById("practiceAiReviewHero"),
+  practiceAiRadarPanel: document.getElementById("practiceAiRadarPanel"),
+  practiceAiRadarTitle: document.getElementById("practiceAiRadarTitle"),
   practiceScoringPreviewTotal: document.getElementById("practiceScoringPreviewTotal"),
   practiceScoringComparison: document.getElementById("practiceScoringComparison"),
   practiceScoringBreakdown: document.getElementById("practiceScoringBreakdown"),
@@ -1435,6 +1438,7 @@ const elements = {
   resultRadarReport: document.getElementById("resultRadarReport"),
   resultRadarTyping: document.getElementById("resultRadarTyping"),
   resultFieldReview: document.getElementById("resultFieldReview"),
+  resultFieldReviewCard: document.getElementById("resultFieldReviewCard"),
   resultEvidenceReviewSection: document.getElementById("resultEvidenceReviewSection"),
   resultEvidenceReview: document.getElementById("resultEvidenceReview"),
   resultChart: document.getElementById("resultChart"),
@@ -4630,6 +4634,24 @@ function getPracticeDimensionDefinitions(qaTicket = isQaScenario()) {
       ];
 }
 
+function getActivePracticeDimensionIds(
+  trainingLevel = state.trainingLevel,
+  qaTicket = isQaScenario()
+) {
+  if (normalizeTrainingLevel(trainingLevel) !== "beginner") {
+    return null;
+  }
+  return new Set(qaTicket
+    ? ["questionFocus", "answerability", "factInterpretationSeparation"]
+    : [
+        "factualGrounding",
+        "informationCoverage",
+        "expectedActualSeparation",
+        "interpretiveClarity",
+      ]
+  );
+}
+
 function renderPracticeScoringRadar(preview) {
   const slots = [
     [elements.practiceRadarLabelFactual, elements.practiceRadarFactual],
@@ -4657,7 +4679,11 @@ function renderPracticeScoringRadar(preview) {
 }
 
 function getDimensionFeedbackItems(result, qaTicket = isQaScenario()) {
-  return getPracticeDimensionDefinitions(qaTicket)
+  const activeDimensionIds = getActivePracticeDimensionIds(state.trainingLevel, qaTicket);
+  const definitions = getPracticeDimensionDefinitions(qaTicket)
+    .filter(([, key]) => activeDimensionIds === null || activeDimensionIds.has(key));
+  const totalWeight = definitions.reduce((sum, [, , weight]) => sum + weight, 0) || 100;
+  return definitions
     .map(([label, key, weight]) => {
       const score = result?.dimensions?.[key];
       const feedback = result?.dimensionFeedback?.[key];
@@ -4670,7 +4696,7 @@ function getDimensionFeedbackItems(result, qaTicket = isQaScenario()) {
       return {
         label,
         score,
-        weightedGap: (100 - score) * weight / 100,
+        weightedGap: (100 - score) * weight / totalWeight,
         reason: feedback?.reason
           || relatedImprovement?.detail
           || "この観点の個別理由を取得できませんでした。総合評価と改善提案を確認してください。",
@@ -4692,7 +4718,12 @@ function formatDimensionScoreImpact(item) {
 function renderPracticeDimensionFeedback(preview) {
   const items = getDimensionFeedbackItems(preview);
   elements.practiceScoringDimensionFeedbackSection?.classList.toggle("hidden", items.length === 0);
-  setTextContent(elements.practiceScoringDimensionFeedbackTitle, "観点別の採点理由");
+  setTextContent(
+    elements.practiceScoringDimensionFeedbackTitle,
+    normalizeTrainingLevel(state.trainingLevel) === "beginner"
+      ? "初級で評価した観点"
+      : "観点別の採点理由"
+  );
   if (!elements.practiceScoringDimensionFeedback) {
     return items;
   }
@@ -4942,7 +4973,40 @@ const scoringVerdictPresentation = {
   },
 };
 
-function getScoringVerdictPresentation(verdict) {
+function getScoringVerdictPresentation(
+  verdict,
+  trainingLevel = state.trainingLevel,
+  totalScore = state.practiceScoringResult?.totalScore,
+  qaTicket = isQaScenario()
+) {
+  const level = normalizeTrainingLevel(trainingLevel);
+  if (level !== "advanced" && Number.isInteger(totalScore)) {
+    const levelLabel = getTrainingLevelConfig(level).label;
+    if (totalScore >= 90) {
+      return {
+        label: `${levelLabel}課題クリア`,
+        description: qaTicket
+          ? "このレベルで学ぶ質問整理の目標を達成しています。"
+          : "このレベルで学ぶ不具合報告の目標を達成しています。",
+      };
+    }
+    if (totalScore >= 80) {
+      return {
+        label: `${levelLabel}課題クリア・改善あり`,
+        description: "学習目標は概ね達成しています。表示された改善点を確認しましょう。",
+      };
+    }
+    if (totalScore >= 70) {
+      return {
+        label: `${levelLabel}課題をもう一度確認`,
+        description: "このレベルの評価対象に絞って、入力内容を見直しましょう。",
+      };
+    }
+    return {
+      label: `${levelLabel}の基本項目を再整理`,
+      description: "表示された基本項目を一つずつ整理すると改善できます。",
+    };
+  }
   return scoringVerdictPresentation[verdict] || {
     label: verdict || "判定なし",
     description: "",
@@ -4966,22 +5030,26 @@ function scoreBreakdownMarkup(result) {
     && breakdown.totalScore < breakdown.uncappedTotalScore
       ? `<p class="practice-score-cap">重大な不足または事実誤認により、総合点は${escapeHtml(String(breakdown.appliedMaximum))}点が上限です。</p>`
       : "";
+  const ticketMarkup = ticket.maximumPoints > 0 ? `
+    <div>
+      <span>チケット設定</span>
+      <strong>${escapeHtml(String(ticket.awardedPoints))} / ${escapeHtml(String(ticket.maximumPoints))}</strong>
+      <small>${escapeHtml(String(ticket.matchedCount))} / ${escapeHtml(String(ticket.totalCount))}項目が正解</small>
+    </div>` : "";
+  const evidenceMarkup = evidence.maximumPoints > 0 ? `
+    <div>
+      <span>添付証跡</span>
+      <strong>${escapeHtml(String(evidence.awardedPoints))} / ${escapeHtml(String(evidence.maximumPoints))}</strong>
+      <small>${escapeHtml(evidenceDetail)}</small>
+    </div>` : "";
   return `
     <div>
       <span>文章品質</span>
       <strong>${escapeHtml(String(writing.awardedPoints))} / ${escapeHtml(String(writing.maximumPoints))}</strong>
       <small>AI評価 ${escapeHtml(String(writing.rawScore))}点</small>
     </div>
-    <div>
-      <span>チケット設定</span>
-      <strong>${escapeHtml(String(ticket.awardedPoints))} / ${escapeHtml(String(ticket.maximumPoints))}</strong>
-      <small>${escapeHtml(String(ticket.matchedCount))} / ${escapeHtml(String(ticket.totalCount))}項目が正解</small>
-    </div>
-    <div>
-      <span>添付証跡</span>
-      <strong>${escapeHtml(String(evidence.awardedPoints))} / ${escapeHtml(String(evidence.maximumPoints))}</strong>
-      <small>${escapeHtml(evidenceDetail)}</small>
-    </div>
+    ${ticketMarkup}
+    ${evidenceMarkup}
     ${capNotice}`;
 }
 
@@ -5049,33 +5117,54 @@ function renderPracticeScoringPreview() {
     return;
   }
 
-  const verdictPresentation = getScoringVerdictPresentation(preview.verdict);
+  const trainingLevel = normalizeTrainingLevel(state.trainingLevel);
+  const simplifiedReview = trainingLevel === "beginner";
+  const verdictPresentation = getScoringVerdictPresentation(
+    preview.verdict,
+    trainingLevel,
+    preview.totalScore
+  );
+  elements.practiceAiRadarPanel?.classList.toggle("hidden", simplifiedReview);
+  elements.practiceAiReviewHero?.classList.toggle("is-single", simplifiedReview);
+  setTextContent(elements.practiceAiRadarTitle, "文章品質の6つの観点");
   setTextContent(elements.practiceScoringPreviewTotal, String(preview.totalScore));
   renderPracticeScoreBreakdown(preview);
   setTextContent(elements.practiceScoringVerdict, verdictPresentation.label);
   setTextContent(elements.practiceScoringOverallAssessment, preview.overallAssessment);
+  const scopedVerdictReady = trainingLevel !== "advanced" && preview.totalScore >= 90;
+  const scopedVerdictWarning = trainingLevel !== "advanced"
+    && preview.totalScore >= 70
+    && preview.totalScore < 90;
+  const scopedVerdictDanger = trainingLevel !== "advanced" && preview.totalScore < 70;
   elements.practiceScoringVerdict?.classList.toggle(
     "is-ready",
-    ["開発着手可能", "回答依頼可能"].includes(preview.verdict)
+    scopedVerdictReady
+      || (trainingLevel === "advanced" && ["開発着手可能", "回答依頼可能"].includes(preview.verdict))
   );
   elements.practiceScoringVerdict?.classList.toggle(
     "is-warning",
-    ["開発着手可能（軽微な改善あり）", "回答依頼可能（軽微な改善あり）", "追加確認を推奨", "追加整理を推奨"].includes(preview.verdict)
+    scopedVerdictWarning
+      || (trainingLevel === "advanced" && ["開発着手可能（軽微な改善あり）", "回答依頼可能（軽微な改善あり）", "追加確認を推奨", "追加整理を推奨"].includes(preview.verdict))
   );
   elements.practiceScoringVerdict?.classList.toggle(
     "is-danger",
-    ["再整理を推奨", "質問の再整理を推奨"].includes(preview.verdict)
+    scopedVerdictDanger
+      || (trainingLevel === "advanced" && ["再整理を推奨", "質問の再整理を推奨"].includes(preview.verdict))
   );
   if (elements.practiceScoringDetails) {
     elements.practiceScoringDetails.open = false;
   }
-  renderPracticeScoringRadar(preview);
+  if (!simplifiedReview) {
+    renderPracticeScoringRadar(preview);
+  }
   renderPracticeDimensionFeedback(preview);
   const improvementItems = renderPracticeImprovementItems(preview);
   renderPracticeScoringPreviewList(
     elements.practiceScoringPreviewStrengths,
     preview.strengths,
-    "明確に評価できる記述はありません"
+    simplifiedReview
+      ? "今回の入力では、評価できる記述をまだ特定できませんでした"
+      : "明確に評価できる記述はありません"
   );
   const qaTicket = isQaScenario();
   const readerQuestions = getVisibleReaderQuestions(preview.readerQuestions || [], qaTicket);
@@ -6013,6 +6102,17 @@ async function handleRankingProfileSubmit(event) {
   }
 }
 
+function getPracticeResultReviewKeys(trainingLevel = state.trainingLevel) {
+  const level = normalizeTrainingLevel(trainingLevel);
+  if (level === "beginner") {
+    return new Set();
+  }
+  if (level === "intermediate") {
+    return new Set(["category", "version", "environment"]);
+  }
+  return null;
+}
+
 function finishSession() {
   const practiceMode = isPracticeMode();
   state.running = false;
@@ -6071,8 +6171,16 @@ function finishSession() {
   setTextContent(elements.resultEvidenceScore, `${result.evidenceScore} / 10`);
   setTextContent(elements.resultTypingScore, `${result.typingScore} / 20`);
   setTextContent(elements.resultTimeScore, `${result.timeScore} / 10`);
+  const activePracticeReviewKeys = practiceMode
+    ? getPracticeResultReviewKeys(state.trainingLevel)
+    : null;
+  const visibleReviews = result.reviews.filter(
+    ({ key }) => activePracticeReviewKeys === null || activePracticeReviewKeys.has(key)
+  );
+  const showFieldReview = visibleReviews.length > 0;
+  elements.resultFieldReviewCard?.classList.toggle("hidden", !showFieldReview);
   if (elements.resultFieldReview) {
-    elements.resultFieldReview.innerHTML = result.reviews
+    elements.resultFieldReview.innerHTML = visibleReviews
       .map((review) => {
         const acceptable = review.status === "acceptable";
         const correction = review.status === "correct"
@@ -6091,9 +6199,15 @@ function finishSession() {
       })
       .join("");
   }
-  renderEvidenceResult(result.evidenceResult);
+  const showEvidenceReview = !practiceMode
+    || normalizeTrainingLevel(state.trainingLevel) === "advanced";
+  renderEvidenceResult(showEvidenceReview ? result.evidenceResult : { applicable: false });
   elements.resultRankBlock?.classList.toggle("hidden", practiceMode);
   elements.resultSummaryCard?.classList.toggle("hidden", practiceMode);
+  elements.resultReviewLayout?.classList.toggle(
+    "hidden",
+    practiceMode && !showFieldReview && !showEvidenceReview
+  );
   elements.resultReviewLayout?.classList.toggle("is-practice", practiceMode);
   elements.practiceResultSection?.classList.toggle("hidden", !practiceMode);
   elements.sameScenarioPracticeButton?.classList.toggle("hidden", practiceMode);
@@ -6459,7 +6573,7 @@ function handleScenarioIntroPractice() {
 
 function handleScenarioIntroBack() {
   resetSession();
-  loadTicketList();
+  showTrainingLevelSelection(state.trainingTicketType);
 }
 
 function handleCreateButton() {
