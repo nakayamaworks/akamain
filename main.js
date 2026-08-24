@@ -3058,7 +3058,11 @@ function renderScenarioBrief() {
     if (state.trainingLevel !== "beginner") return "";
     const sectionLines = new Map();
     let currentSection = "";
-    state.scenario.reportEntries.forEach((entry) => {
+    const briefingReportEntries = qaScenario
+      ? state.scenario.reportEntries
+      : window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[state.scenario.scenarioId]
+        ?.scenario?.report || state.scenario.reportEntries;
+    briefingReportEntries.forEach((entry) => {
       if (entry.kind === "section") {
         currentSection = entry.text;
         sectionLines.set(currentSection, []);
@@ -3073,8 +3077,12 @@ function renderScenarioBrief() {
         `確認したいこと：${(sectionLines.get("■質問") || []).join(" ")}`,
       ].filter(Boolean).join("\n\n");
     }
+    const preconditions = (sectionLines.get("■前提条件") || []).join(" ");
+    const steps = (sectionLines.get("■操作手順") || []).join(" ");
     return [
       context.testTarget,
+      preconditions ? `前提状態：${preconditions}` : "",
+      steps ? `実行した操作：${steps}` : "",
       `仕様上の動作：${(sectionLines.get("■期待結果") || []).join(" ")}`,
       `確認した事実：${(sectionLines.get("■実際の動作") || []).join(" ")}`,
     ].filter(Boolean).join("\n\n");

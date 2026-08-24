@@ -1774,6 +1774,61 @@ try {
   ) {
     errors.push("related material and schedule must use concise, line-separated peripheral copy");
   }
+  const beginnerBugBrief = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      const previousTrainingLevel = state.trainingLevel;
+      state.trainingLevel = "beginner";
+      state.scenario = buildScenario(scenarioBank.find((scenario) =>
+        scenario.scenarioId === "customer-search-nonexistent-name-all-results"
+      ), "beginner");
+      renderScenarioBrief();
+      const markup = elements.scenarioIntroFacts.innerHTML;
+      state.scenario = previousScenario;
+      state.trainingLevel = previousTrainingLevel;
+      return markup;
+    })()`,
+    smokeContext
+  );
+  [
+    "前提状態：一般ユーザーでログインしていること",
+    "実行した操作：1. 顧客一覧画面を開く 2. 検索欄に「ZZZZZZ」と入力する 3. 検索ボタンをクリックする",
+    "仕様上の動作：検索結果が0件と表示されること",
+    "確認した事実：検索前と同じ248件が表示される",
+  ].forEach((phrase) => {
+    if (!beginnerBugBrief.includes(phrase)) {
+      errors.push(`beginner bug brief must include essential context: ${phrase}`);
+    }
+  });
+  const incompleteBeginnerBugBriefs = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      const previousTrainingLevel = state.trainingLevel;
+      const failures = scenarioBank
+        .filter((scenario) => scenario.ticketType !== "qa" && scenario.difficulty === "beginner")
+        .map((scenario) => {
+          state.trainingLevel = "beginner";
+          state.scenario = buildScenario(scenario, "beginner");
+          renderScenarioBrief();
+          const markup = elements.scenarioIntroFacts.innerHTML;
+          return {
+            scenarioId: scenario.scenarioId,
+            complete: ["前提状態：", "実行した操作：", "仕様上の動作：", "確認した事実："]
+              .every((label) => markup.includes(label)),
+          };
+        })
+        .filter((item) => !item.complete);
+      state.scenario = previousScenario;
+      state.trainingLevel = previousTrainingLevel;
+      return failures;
+    })()`,
+    smokeContext
+  );
+  if (incompleteBeginnerBugBriefs.length > 0) {
+    errors.push(
+      `all beginner bug briefs must explain context, action, expectation, and observation: ${JSON.stringify(incompleteBeginnerBugBriefs)}`
+    );
+  }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";
   const leakedInitialSubjects = vm.runInContext(
     `scenarioBank
