@@ -827,6 +827,12 @@ Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
     errors.push(`${scenarioId}: QA report must provide the six QA sections and typeable answers`);
   }
   if (
+    scenario?.difficulty === "beginner"
+    && (!reportLines[0]?.text?.endsWith("か") || /です|ます|でしょう/u.test(reportLines[0]?.text || ""))
+  ) {
+    errors.push(`${scenarioId}: beginner QA question must use the concise plain-form ending 〜するか`);
+  }
+  if (
     !briefing?.testTarget
     || !Array.isArray(briefing?.notes)
     || briefing.notes.length < 3
@@ -1158,6 +1164,91 @@ try {
   vm.runInContext(evidenceSource, smokeContext, { filename: "evidence-library.js" });
   vm.runInContext(scoringPreviewSource, smokeContext, { filename: "scoring-preview.js" });
   vm.runInContext(mainSource, smokeContext, { filename: "main.js" });
+  const localTrainingScoreResults = vm.runInContext(
+    `(() => {
+      const originalScenario = state.scenario;
+      const originalTrainingLevel = state.trainingLevel;
+      const originalCompletedLines = state.completedLines;
+      const originalCorrectChars = state.correctChars;
+      const originalWrongChars = state.wrongChars;
+      const originalFinalElapsedMs = state.finalElapsedMs;
+      try {
+        applyTicketFieldValues({});
+        state.correctChars = 100;
+        state.wrongChars = 0;
+        state.finalElapsedMs = 60000;
+
+        state.trainingLevel = "beginner";
+        state.scenario = buildScenario(scenarioBank[0], "beginner");
+        state.completedLines = state.scenario.totalEditableLines;
+        const beginner = calculateResult();
+
+        state.trainingLevel = "intermediate";
+        state.scenario = buildScenario(scenarioBank[0], "intermediate");
+        state.completedLines = state.scenario.totalEditableLines;
+        const intermediate = calculateResult();
+
+        state.trainingLevel = "advanced";
+        state.scenario = buildScenario(scenarioBank[0], "advanced");
+        state.completedLines = state.scenario.totalEditableLines;
+        const advanced = calculateResult();
+
+        return {
+          beginner: {
+            reviewCount: beginner.reviews.length,
+            decisionScore: beginner.decisionScore,
+            evidenceScore: beginner.evidenceScore,
+            reportScore: beginner.reportScore,
+            timeScore: beginner.timeScore,
+            total: beginner.total,
+            maximums: { ...beginner.scoreMaximums },
+          },
+          intermediate: {
+            reviewKeys: intermediate.reviews.map(({ key }) => key),
+            maximums: { ...intermediate.scoreMaximums },
+          },
+          advanced: {
+            reviewCount: advanced.reviews.length,
+            maximums: { ...advanced.scoreMaximums },
+          },
+        };
+      } finally {
+        state.scenario = originalScenario;
+        state.trainingLevel = originalTrainingLevel;
+        state.completedLines = originalCompletedLines;
+        state.correctChars = originalCorrectChars;
+        state.wrongChars = originalWrongChars;
+        state.finalElapsedMs = originalFinalElapsedMs;
+      }
+    })()`,
+    smokeContext
+  );
+  if (
+    localTrainingScoreResults.beginner.reviewCount !== 0
+    || localTrainingScoreResults.beginner.decisionScore !== 0
+    || localTrainingScoreResults.beginner.evidenceScore !== 0
+    || localTrainingScoreResults.beginner.reportScore !== 70
+    || localTrainingScoreResults.beginner.timeScore !== 10
+    || localTrainingScoreResults.beginner.total !== 100
+    || JSON.stringify(localTrainingScoreResults.beginner.maximums)
+      !== JSON.stringify({ decision: 0, report: 70, evidence: 0, typing: 20, time: 10 })
+  ) {
+    errors.push("beginner local scoring must ignore unrequested ticket fields and evidence");
+  }
+  if (
+    localTrainingScoreResults.intermediate.reviewKeys.join(",") !== "category,version,environment"
+    || JSON.stringify(localTrainingScoreResults.intermediate.maximums)
+      !== JSON.stringify({ decision: 30, report: 40, evidence: 0, typing: 20, time: 10 })
+  ) {
+    errors.push("intermediate local scoring must review only category, version, and environment");
+  }
+  if (
+    localTrainingScoreResults.advanced.reviewCount === 0
+    || JSON.stringify(localTrainingScoreResults.advanced.maximums)
+      !== JSON.stringify({ decision: 30, report: 30, evidence: 10, typing: 20, time: 10 })
+  ) {
+    errors.push("advanced local scoring must retain all ticket-field and evidence scoring");
+  }
   const workMemos = vm.runInContext(
     `scenarioBank.map((scenario) => {
       const profile = getScenarioJudgementProfile(scenario);
@@ -1853,11 +1944,9 @@ try {
           return {
             scenarioId: scenario.scenarioId,
             complete: [
-              "確認した操作・結果：",
-              "資料で分からない点：",
-              "現在の考え：",
-              "確認したいこと：",
-              "確認する理由：",
+              "<dt>確認した状況</dt>",
+              "<dt>仕様書で不明な点</dt>",
+              "<dt>確認したいこと</dt>",
             ].every((label) => markup.includes(label)),
           };
         })
@@ -1870,19 +1959,20 @@ try {
     smokeContext
   );
   [
-    "確認した操作・結果：顧客一覧を初期表示すると、ステータス未指定で退会済みを含む全件が表示される",
-    "資料で分からない点：顧客一覧画面仕様書には初期フィルター値の記載がない",
-    "現在の考え：日常業務では有効な顧客だけを初期表示すると解釈している",
-    "確認したいこと：顧客一覧の初期表示は退会済みを除外する認識でよいですか",
-    "確認する理由：回答によって初期表示の期待値と検索テストが変わる",
+    "<dt>確認した状況</dt><dd>顧客一覧を初期表示すると、ステータス未指定で退会済みを含む全件が表示される</dd>",
+    "<dt>仕様書で不明な点</dt><dd>顧客一覧画面仕様書には初期フィルター値の記載がない</dd>",
+    "<dt>確認したいこと</dt><dd>顧客一覧の初期表示で退会済み顧客を表示対象に含めるか</dd>",
   ].forEach((phrase) => {
     if (!beginnerQaBriefCoverage.sampleMarkup.includes(phrase)) {
       errors.push(`beginner QA brief must include essential context: ${phrase}`);
     }
   });
+  if (/現在の考え|確認する理由|です|ます/u.test(beginnerQaBriefCoverage.sampleMarkup)) {
+    errors.push("beginner QA brief must stay concise and use plain-form copy");
+  }
   if (beginnerQaBriefCoverage.failures.length > 0) {
     errors.push(
-      `all beginner QA briefs must explain observation, source gap, interpretation, question, and reason: ${JSON.stringify(beginnerQaBriefCoverage.failures)}`
+      `all beginner QA briefs must explain observation, source gap, and question: ${JSON.stringify(beginnerQaBriefCoverage.failures)}`
     );
   }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";

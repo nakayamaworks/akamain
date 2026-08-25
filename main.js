@@ -1422,10 +1422,15 @@ const elements = {
   practiceRadarLabelInvestigation: document.getElementById("practiceRadarLabelInvestigation"),
   resultRank: document.getElementById("resultRank"),
   resultScore: document.getElementById("resultScore"),
+  resultDecisionScoreRow: document.getElementById("resultDecisionScoreRow"),
   resultDecisionScore: document.getElementById("resultDecisionScore"),
+  resultReportScoreRow: document.getElementById("resultReportScoreRow"),
   resultReportScore: document.getElementById("resultReportScore"),
+  resultEvidenceScoreRow: document.getElementById("resultEvidenceScoreRow"),
   resultEvidenceScore: document.getElementById("resultEvidenceScore"),
+  resultTypingScoreRow: document.getElementById("resultTypingScoreRow"),
   resultTypingScore: document.getElementById("resultTypingScore"),
+  resultTimeScoreRow: document.getElementById("resultTimeScoreRow"),
   resultTimeScore: document.getElementById("resultTimeScore"),
   resultRadar: document.getElementById("resultRadar"),
   resultRadarShell: document.getElementById("resultRadarShell"),
@@ -3060,6 +3065,7 @@ function renderScenarioBrief() {
     assignee ? `${assignee.name}（${assignee.role}）` : "",
     relatedMember ? `${relatedMember.name}（${relatedMember.role}）` : "",
   ].filter(Boolean).join("\n");
+  let beginnerQaItems = [];
   const beginnerSummary = (() => {
     if (state.trainingLevel !== "beginner") return "";
     const sectionLines = new Map();
@@ -3077,14 +3083,13 @@ function renderScenarioBrief() {
       }
     });
     if (qaScenario) {
-      return [
-        context.testTarget,
-        `確認した操作・結果：${(sectionLines.get("■確認した状況・事実") || []).join(" ")}`,
-        `資料で分からない点：${(sectionLines.get("■参照情報") || []).join(" ")}`,
-        `現在の考え：${(sectionLines.get("■現在の解釈") || []).join(" ")}`,
-        `確認したいこと：${(sectionLines.get("■質問") || []).join(" ")}`,
-        `確認する理由：${(sectionLines.get("■確認理由・影響") || []).join(" ")}`,
-      ].filter(Boolean).join("\n\n");
+      beginnerQaItems = [
+        ["", context.testTarget, "testTarget"],
+        ["確認した状況", (sectionLines.get("■確認した状況・事実") || []).join(" "), "observation"],
+        ["仕様書で不明な点", (sectionLines.get("■参照情報") || []).join(" "), "sourceGap"],
+        ["確認したいこと", (sectionLines.get("■質問") || []).join(" "), "question"],
+      ].filter(([, value]) => value);
+      return "";
     }
     const preconditions = (sectionLines.get("■前提条件") || []).join(" ");
     const steps = (sectionLines.get("■操作手順") || []).join("\n");
@@ -3096,9 +3101,11 @@ function renderScenarioBrief() {
       `確認した事実：${(sectionLines.get("■実際の動作") || []).join(" ")}`,
     ].filter(Boolean).join("\n\n");
   })();
-  const factItems = [
-    ["", beginnerSummary || context.workMemo, "testTarget observation scope risk recovery workaround"],
-  ].filter(([, value]) => value);
+  const factItems = beginnerQaItems.length > 0
+    ? beginnerQaItems
+    : [
+        ["", beginnerSummary || context.workMemo, "testTarget observation scope risk recovery workaround"],
+      ].filter(([, value]) => value);
   const specificationInfo = [
     context.specification,
     ...getScenarioSpecificationDetails(state.scenario),
@@ -4361,9 +4368,12 @@ function calculateEvidenceResult() {
 function calculateResult() {
   const expected = state.scenario.evaluation;
   const selected = getSelectedTicketFields();
-  const keys = Object.keys(fieldLabels).filter(
-    (key) => !isQaScenario() || key !== "severity"
-  );
+  const activeReviewKeys = getResultReviewKeys(state.trainingLevel);
+  const scoreMaximums = getLocalResultScoreMaximums(state.trainingLevel);
+  const keys = Object.keys(fieldLabels).filter((key) => (
+    (!isQaScenario() || key !== "severity")
+    && (activeReviewKeys === null || activeReviewKeys.has(key))
+  ));
   const reviews = keys.map((key) => {
     if (key === "category") {
       const acceptedValues = expected.acceptedCategories || [expected.category];
@@ -4415,19 +4425,28 @@ function calculateResult() {
       expected: fieldValueLabels[key]?.[expected[key]] || expected[key] || "未設定",
     };
   });
-  const decisionScore = Math.round(
-    (reviews.reduce((sum, review) => sum + review.scoreRatio, 0) / reviews.length) * 30
-  );
-  const reportScore = state.completedLines === state.scenario.totalEditableLines ? 30 : 0;
+  const decisionScore = scoreMaximums.decision === 0 || reviews.length === 0
+    ? 0
+    : Math.round(
+      (reviews.reduce((sum, review) => sum + review.scoreRatio, 0) / reviews.length)
+      * scoreMaximums.decision
+    );
+  const reportScore = state.completedLines === state.scenario.totalEditableLines
+    ? scoreMaximums.report
+    : 0;
   const evidenceResult = calculateEvidenceResult();
-  const evidenceScore = evidenceResult.score;
+  const evidenceScore = scoreMaximums.evidence === 0
+    ? 0
+    : Math.round((evidenceResult.score / 10) * scoreMaximums.evidence);
   const typingScore = getTypingScore(getAccuracyRate());
   const targetTimeMs = state.scenario.difficulty === "beginner"
     ? 180000
     : state.scenario.difficulty === "intermediate"
       ? 240000
       : 300000;
-  const timeScore = Math.max(0, Math.round(10 * Math.min(1, targetTimeMs / Math.max(1, state.finalElapsedMs))));
+  const timeScore = Math.max(0, Math.round(
+    scoreMaximums.time * Math.min(1, targetTimeMs / Math.max(1, state.finalElapsedMs))
+  ));
   let total = Math.min(100, decisionScore + reportScore + evidenceScore + typingScore + timeScore);
   const severityReview = reviews.find((review) => review.key === "severity");
   if (severityReview && !severityReview.correct) {
@@ -4465,12 +4484,16 @@ function calculateResult() {
     },
     {
       label: "報告・証跡",
-      value: Math.round(((reportScore + evidenceScore) / 40) * 100),
+      value: Math.round(
+        ((reportScore + evidenceScore) / (scoreMaximums.report + scoreMaximums.evidence)) * 100
+      ),
       element: elements.resultRadarReport,
     },
     {
       label: "入力品質",
-      value: Math.round(((typingScore + timeScore) / 30) * 100),
+      value: Math.round(
+        ((typingScore + timeScore) / (scoreMaximums.typing + scoreMaximums.time)) * 100
+      ),
       element: elements.resultRadarTyping,
     },
   ];
@@ -4482,6 +4505,7 @@ function calculateResult() {
     evidenceResult,
     typingScore,
     timeScore,
+    scoreMaximums,
     total,
     rank,
     radarParameters,
@@ -6119,7 +6143,7 @@ async function handleRankingProfileSubmit(event) {
   }
 }
 
-function getPracticeResultReviewKeys(trainingLevel = state.trainingLevel) {
+function getResultReviewKeys(trainingLevel = state.trainingLevel) {
   const level = normalizeTrainingLevel(trainingLevel);
   if (level === "beginner") {
     return new Set();
@@ -6128,6 +6152,17 @@ function getPracticeResultReviewKeys(trainingLevel = state.trainingLevel) {
     return new Set(["category", "version", "environment"]);
   }
   return null;
+}
+
+function getLocalResultScoreMaximums(trainingLevel = state.trainingLevel) {
+  const level = normalizeTrainingLevel(trainingLevel);
+  if (level === "beginner") {
+    return { decision: 0, report: 70, evidence: 0, typing: 20, time: 10 };
+  }
+  if (level === "intermediate") {
+    return { decision: 30, report: 40, evidence: 0, typing: 20, time: 10 };
+  }
+  return { decision: 30, report: 30, evidence: 10, typing: 20, time: 10 };
 }
 
 function finishSession() {
@@ -6183,16 +6218,20 @@ function finishSession() {
   }
   setTextContent(elements.resultRank, result.rank);
   setTextContent(elements.resultScore, `${result.total} / 100`);
-  setTextContent(elements.resultDecisionScore, `${result.decisionScore} / 30`);
-  setTextContent(elements.resultReportScore, `${result.reportScore} / 30`);
-  setTextContent(elements.resultEvidenceScore, `${result.evidenceScore} / 10`);
-  setTextContent(elements.resultTypingScore, `${result.typingScore} / 20`);
-  setTextContent(elements.resultTimeScore, `${result.timeScore} / 10`);
-  const activePracticeReviewKeys = practiceMode
-    ? getPracticeResultReviewKeys(state.trainingLevel)
-    : null;
+  const { scoreMaximums } = result;
+  setTextContent(elements.resultDecisionScore, `${result.decisionScore} / ${scoreMaximums.decision}`);
+  setTextContent(elements.resultReportScore, `${result.reportScore} / ${scoreMaximums.report}`);
+  setTextContent(elements.resultEvidenceScore, `${result.evidenceScore} / ${scoreMaximums.evidence}`);
+  setTextContent(elements.resultTypingScore, `${result.typingScore} / ${scoreMaximums.typing}`);
+  setTextContent(elements.resultTimeScore, `${result.timeScore} / ${scoreMaximums.time}`);
+  elements.resultDecisionScoreRow?.classList.toggle("hidden", scoreMaximums.decision === 0);
+  elements.resultReportScoreRow?.classList.toggle("hidden", scoreMaximums.report === 0);
+  elements.resultEvidenceScoreRow?.classList.toggle("hidden", scoreMaximums.evidence === 0);
+  elements.resultTypingScoreRow?.classList.toggle("hidden", scoreMaximums.typing === 0);
+  elements.resultTimeScoreRow?.classList.toggle("hidden", scoreMaximums.time === 0);
+  const activeReviewKeys = getResultReviewKeys(state.trainingLevel);
   const visibleReviews = result.reviews.filter(
-    ({ key }) => activePracticeReviewKeys === null || activePracticeReviewKeys.has(key)
+    ({ key }) => activeReviewKeys === null || activeReviewKeys.has(key)
   );
   const showFieldReview = visibleReviews.length > 0;
   elements.resultFieldReviewCard?.classList.toggle("hidden", !showFieldReview);
@@ -6216,9 +6255,10 @@ function finishSession() {
       })
       .join("");
   }
-  const showEvidenceReview = !practiceMode
-    || normalizeTrainingLevel(state.trainingLevel) === "advanced";
+  const level = normalizeTrainingLevel(state.trainingLevel);
+  const showEvidenceReview = level === "advanced";
   renderEvidenceResult(showEvidenceReview ? result.evidenceResult : { applicable: false });
+  elements.resultRadarShell?.classList.toggle("hidden", level !== "advanced");
   elements.resultRankBlock?.classList.toggle("hidden", practiceMode);
   elements.resultSummaryCard?.classList.toggle("hidden", practiceMode);
   elements.resultReviewLayout?.classList.toggle(
@@ -6236,7 +6276,7 @@ function finishSession() {
   if (elements.resultOverlay) {
     elements.resultOverlay.classList.remove("hidden");
   }
-  if (!practiceMode) {
+  if (!practiceMode && level === "advanced") {
     animateResultRadar(result);
   }
   pushMetrics();
