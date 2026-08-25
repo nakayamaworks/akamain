@@ -645,10 +645,13 @@ if (!Array.isArray(scenarios)) {
     const projectScenarios = scenarios.filter((scenario) => scenario.projectId === projectId);
     const projectDifficulties = new Set(projectScenarios.map((scenario) => scenario.difficulty));
     if (
-      projectScenarios.length !== 4
+      projectScenarios.length !== 6
       || [...allowedDifficulties].some((difficulty) => !projectDifficulties.has(difficulty))
+      || projectScenarios.filter((scenario) => scenario.difficulty === "beginner").length < 2
+      || projectScenarios.filter((scenario) => scenario.difficulty === "intermediate").length < 2
+      || projectScenarios.filter((scenario) => scenario.difficulty === "advanced").length < 2
     ) {
-      errors.push(`${projectId}: bug bank must contain four scenarios and cover all difficulties`);
+      errors.push(`${projectId}: bug bank must contain six scenarios and provide two scenarios at every difficulty`);
     }
   });
 }
@@ -660,8 +663,8 @@ const allScenarioRefs = scenarios.map((scenario) => ({
 const allSubjects = scenarios.map((scenario) => scenario.subject);
 const briefingProfiles = briefingContext.window.TYPING_WORKBENCH_SCENARIO_BRIEFINGS || {};
 const uniqueScenarioIds = Object.keys(authoredScenarios);
-if (uniqueScenarioIds.length !== 40 || scenarios.length !== 40) {
-  errors.push("authoring registry and compatibility view must both contain 40 scenarios");
+if (uniqueScenarioIds.length !== 60 || scenarios.length !== 60) {
+  errors.push("authoring registry and compatibility view must both contain 60 scenarios");
 }
 
 uniqueScenarioIds.forEach((scenarioId) => {
@@ -772,12 +775,12 @@ const requiredQaSections = [
 ];
 const requiredQaTypes = new Set(["specification", "behavior", "conflict"]);
 if (
-  qaScenarioIds.length !== 40
-  || qaScenarios.length !== 40
-  || new Set(qaScenarioIds).size !== 40
+  qaScenarioIds.length !== 60
+  || qaScenarios.length !== 60
+  || new Set(qaScenarioIds).size !== 60
   || qaScenarios.some((scenario) => !requiredQaTypes.has(scenario.qaType))
 ) {
-  errors.push("QA authoring registry and runtime view must both contain 40 valid scenarios");
+  errors.push("QA authoring registry and runtime view must both contain 60 valid scenarios");
 }
 
 validProjectIds.forEach((projectId) => {
@@ -785,12 +788,15 @@ validProjectIds.forEach((projectId) => {
   const projectQaTypes = new Set(projectQaScenarios.map((scenario) => scenario.qaType));
   const projectDifficulties = new Set(projectQaScenarios.map((scenario) => scenario.difficulty));
   if (
-    projectQaScenarios.length !== 4
+    projectQaScenarios.length !== 6
     || [...requiredQaTypes].some((qaType) => !projectQaTypes.has(qaType))
     || [...allowedDifficulties].some((difficulty) => !projectDifficulties.has(difficulty))
+    || projectQaScenarios.filter((scenario) => scenario.difficulty === "beginner").length < 2
+    || projectQaScenarios.filter((scenario) => scenario.difficulty === "intermediate").length < 2
+    || projectQaScenarios.filter((scenario) => scenario.difficulty === "advanced").length < 2
   ) {
     errors.push(
-      `${projectId}: QA bank must contain four scenarios and cover all QA types and difficulties`
+      `${projectId}: QA bank must contain six scenarios, cover all QA types, and provide two scenarios at every difficulty`
     );
   }
 });
@@ -1666,14 +1672,14 @@ try {
   };
   const registryScenarioIds = Object.keys(scoringRubricRegistry.scenarios);
   if (
-    registryScenarioIds.length !== 40
-    || new Set(registryScenarioIds).size !== 40
+    registryScenarioIds.length !== 60
+    || new Set(registryScenarioIds).size !== 60
     || scoringRubricRegistry.dimensions.reduce(
       (sum, dimension) => sum + dimension.weight,
       0
     ) !== 100
   ) {
-    errors.push("scoring rubric registry must cover 40 scenarios with dimensions totaling 100");
+    errors.push("scoring rubric registry must cover 60 scenarios with dimensions totaling 100");
   }
   Object.values(scoringRubricRegistry.scenarios).forEach((rubric) => {
     const facts = Object.values(rubric.requiredFacts).flat();
@@ -1729,7 +1735,7 @@ try {
         || !fixtureSet.fixtures.some(({ fixtureId }) => fixtureId === "alternative-excellent");
     })
   ) {
-    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 40 rubrics");
+    errors.push("scoring fixture registry must contain six fixtures, including an alternative excellent answer, for all 60 rubrics");
   }
   fixtureScenarioIds.forEach((scenarioId) => {
     const rubric = scoringRubricRegistry.scenarios[scenarioId];
@@ -1987,6 +1993,114 @@ try {
       `all beginner QA briefs must explain observation, source gap, and question: ${JSON.stringify(beginnerQaBriefCoverage.failures)}`
     );
   }
+  const intermediateBugBriefCoverage = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      const previousTrainingLevel = state.trainingLevel;
+      state.trainingLevel = "intermediate";
+      const failures = scenarioBank
+        .filter((scenario) => scenario.ticketType !== "qa" && scenario.difficulty === "intermediate")
+        .map((scenario) => {
+          state.scenario = buildScenario(scenario, "intermediate");
+          renderScenarioBrief();
+          const markup = elements.scenarioIntroFacts.innerHTML;
+          return {
+            scenarioId: scenario.scenarioId,
+            complete: [
+              "<dt>確認した事象</dt>",
+              "<dt>前提条件</dt>",
+              "<dt>実行した操作</dt>",
+              "<dt>期待結果</dt>",
+              "<dt>確認した結果</dt>",
+              "<dt>比較確認</dt>",
+            ].every((label) => markup.includes(label)),
+            scoped: ![
+              "<dt>対応日程</dt>",
+              "<dt>関係者</dt>",
+              "現時点で確認できている影響範囲",
+              "改修版の確認までは",
+            ].some((phrase) => markup.includes(phrase)),
+          };
+        })
+        .filter((item) => !item.complete || !item.scoped);
+      state.scenario = buildScenario(
+        scenarioBank.find((scenario) => scenario.scenarioId === "automotive-can-byte-order-reversed"),
+        "intermediate"
+      );
+      renderScenarioBrief();
+      const automotiveMarkup = elements.scenarioIntroFacts.innerHTML;
+      state.scenario = previousScenario;
+      state.trainingLevel = previousTrainingLevel;
+      return { failures, automotiveMarkup };
+    })()`,
+    smokeContext
+  );
+  if (intermediateBugBriefCoverage.failures.length > 0) {
+    errors.push(
+      `intermediate bug briefs must stay within operation, result, specification, and basic comparison: ${JSON.stringify(intermediateBugBriefCoverage.failures)}`
+    );
+  }
+  [
+    "同一フレームを3回送信",
+    "診断ツールでは30.00Vとして復号",
+    "影響を受けるのは、メーターECU",
+    "車両制御は別経路",
+  ].forEach((advancedDetail) => {
+    if (intermediateBugBriefCoverage.automotiveMarkup.includes(advancedDetail)) {
+      errors.push(`intermediate automotive brief must not reveal advanced investigation detail: ${advancedDetail}`);
+    }
+  });
+  if (
+    !intermediateBugBriefCoverage.automotiveMarkup.includes("0x0BB8")
+    || !intermediateBugBriefCoverage.automotiveMarkup.includes("471.15V")
+    || !intermediateBugBriefCoverage.automotiveMarkup.includes("1バイト長信号")
+  ) {
+    errors.push("intermediate automotive brief must retain the operation, observed result, and one basic comparison");
+  }
+  const intermediateQaBriefCoverage = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      const previousTrainingLevel = state.trainingLevel;
+      const previousQaAuthoring = window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING;
+      const qaProfiles = ${JSON.stringify(qaAuthoredScenarios)};
+      window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = qaProfiles;
+      state.trainingLevel = "intermediate";
+      const failures = Object.values(qaProfiles)
+        .map(({ scenario }) => scenario)
+        .filter((scenario) => scenario.difficulty === "intermediate")
+        .map((scenario) => {
+          state.scenario = buildScenario(scenario, "intermediate");
+          renderScenarioBrief();
+          const markup = elements.scenarioIntroFacts.innerHTML;
+          return {
+            scenarioId: scenario.scenarioId,
+            complete: [
+              "<dt>確認した状況</dt>",
+              "<dt>仕様書で不明な点</dt>",
+              "<dt>現在の解釈</dt>",
+              "<dt>確認したいこと</dt>",
+              "<dt>回答が必要な理由</dt>",
+            ].every((label) => markup.includes(label)),
+            scoped: ![
+              "<dt>周辺確認・補足</dt>",
+              "<dt>対応日程</dt>",
+              "<dt>関係者</dt>",
+            ].some((phrase) => markup.includes(phrase)),
+          };
+        })
+        .filter((item) => !item.complete || !item.scoped);
+      state.scenario = previousScenario;
+      state.trainingLevel = previousTrainingLevel;
+      window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = previousQaAuthoring;
+      return failures;
+    })()`,
+    smokeContext
+  );
+  if (intermediateQaBriefCoverage.length > 0) {
+    errors.push(
+      `intermediate QA briefs must stay within situation, source gap, interpretation, question, and impact: ${JSON.stringify(intermediateQaBriefCoverage)}`
+    );
+  }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";
   const leakedInitialSubjects = vm.runInContext(
     `scenarioBank
@@ -2007,7 +2121,7 @@ try {
     smokeContext
   );
   if (
-    runtimeScenarioIds.length !== 40 ||
+    runtimeScenarioIds.length !== 60 ||
     new Set(runtimeScenarioIds).size !== runtimeScenarioIds.length ||
     runtimeScenarioIds.some(
       (scenarioId) =>
@@ -2015,7 +2129,7 @@ try {
         !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scenarioId)
     )
   ) {
-    errors.push("runtime smoke test expected 40 unique persistent scenario IDs");
+    errors.push("runtime smoke test expected 60 unique persistent scenario IDs");
   }
   const runtimeEnvironmentFailures = vm.runInContext(
     `scenarioBank.map((scenario) => {
@@ -2039,37 +2153,109 @@ try {
     );
   }
   const scenarioQueueCoverage = vm.runInContext(
-    `projectCatalog.map((project) => {
-      state.projectId = project.id;
+    `(() => {
+      const previousProjectId = state.projectId;
+      const previousTrainingLevel = state.trainingLevel;
+      const previousTicketType = state.trainingTicketType;
+      const failures = ["beginner", "intermediate", "advanced"].flatMap((trainingLevel) =>
+        projectCatalog.map((project) => {
+          state.projectId = project.id;
+          state.trainingLevel = trainingLevel;
+          state.trainingTicketType = "bug";
+          state.scenarioQueue = [];
+          refillScenarioQueue();
+          const expected = scenarioBank
+            .map((scenario, index) => ({ scenario, index }))
+            .filter(({ scenario }) =>
+              scenario.projectId === project.id
+              && scenario.ticketType !== "qa"
+              && scenario.difficulty === trainingLevel
+            )
+            .map(({ index }) => index)
+            .sort((left, right) => left - right);
+          const actual = [...state.scenarioQueue].sort((left, right) => left - right);
+          return {
+            projectId: project.id,
+            trainingLevel,
+            expected,
+            actual,
+            complete: expected.length > 0 && JSON.stringify(expected) === JSON.stringify(actual),
+          };
+        })
+      ).filter((item) => !item.complete);
+      state.projectId = previousProjectId;
+      state.trainingLevel = previousTrainingLevel;
+      state.trainingTicketType = previousTicketType;
       state.scenarioQueue = [];
-      refillScenarioQueue();
-      const expected = scenarioBank
-        .map((scenario, index) => ({ scenario, index }))
-        .filter(({ scenario }) => scenario.projectId === project.id)
-        .map(({ index }) => index)
-        .sort((left, right) => left - right);
-      const actual = [...state.scenarioQueue].sort((left, right) => left - right);
-      return {
-        projectId: project.id,
-        expected,
-        actual,
-        complete: JSON.stringify(expected) === JSON.stringify(actual),
-      };
-    }).filter((item) => !item.complete)`,
+      return failures;
+    })()`,
     smokeContext
   );
   if (scenarioQueueCoverage.length > 0) {
     errors.push(
-      `ticket creation must reach every hidden scenario: ${JSON.stringify(scenarioQueueCoverage)}`
+      `bug ticket creation must use only scenarios matching the selected level: ${JSON.stringify(scenarioQueueCoverage)}`
+    );
+  }
+  const qaScenarioQueueCoverage = vm.runInContext(
+    `(() => {
+      const previousProjectId = state.projectId;
+      const previousTrainingLevel = state.trainingLevel;
+      const previousTicketType = state.trainingTicketType;
+      const originalScenarioCount = scenarioBank.length;
+      scenarioBank.push(...Object.values(${JSON.stringify(qaAuthoredScenarios)}).map(({ scenario }) => scenario));
+      try {
+        return ["beginner", "intermediate", "advanced"].flatMap((trainingLevel) =>
+          projectCatalog.map((project) => {
+            state.projectId = project.id;
+            state.trainingLevel = trainingLevel;
+            state.trainingTicketType = "qa";
+            state.scenarioQueue = [];
+            refillScenarioQueue();
+            const selected = getProjectScenarioEntries(project.id, "qa");
+            return {
+              projectId: project.id,
+              trainingLevel,
+              selectedCount: selected.length,
+              matching: selected.length > 0 && selected.every(
+                ({ scenario }) => scenario.ticketType === "qa" && scenario.difficulty === trainingLevel
+              ),
+            };
+          })
+        ).filter((item) => !item.matching);
+      } finally {
+        scenarioBank.splice(originalScenarioCount);
+        state.projectId = previousProjectId;
+        state.trainingLevel = previousTrainingLevel;
+        state.trainingTicketType = previousTicketType;
+        state.scenarioQueue = [];
+      }
+    })()`,
+    smokeContext
+  );
+  if (qaScenarioQueueCoverage.length > 0) {
+    errors.push(
+      `QA ticket creation must use only scenarios matching the selected level: ${JSON.stringify(qaScenarioQueueCoverage)}`
     );
   }
   const unattemptedSelection = vm.runInContext(
     `(() => {
+      const previousProjectId = state.projectId;
+      const previousTrainingLevel = state.trainingLevel;
+      const previousTicketType = state.trainingTicketType;
+      const previousScenarioIndex = state.scenarioIndex;
+      const previousProgress = state.myPageProgress;
+      const previousSessionAttempts = state.sessionPracticeAttemptsByScenario;
       state.projectId = "customer";
+      state.trainingLevel = "beginner";
+      state.trainingTicketType = "bug";
       state.scenarioIndex = -1;
       state.scenarioQueue = [];
       state.sessionPracticeAttemptsByScenario = {};
-      const projectScenarios = scenarioBank.filter((scenario) => scenario.projectId === state.projectId);
+      const projectScenarios = scenarioBank.filter((scenario) =>
+        scenario.projectId === state.projectId
+        && scenario.ticketType !== "qa"
+        && scenario.difficulty === state.trainingLevel
+      );
       const attempted = projectScenarios[0];
       state.myPageProgress = [{
         scenarioId: attempted.scenarioId,
@@ -2082,13 +2268,19 @@ try {
       refillScenarioQueue();
       const queuedIds = state.scenarioQueue.map((index) => scenarioBank[index].scenarioId);
       const expectedUnattemptedIds = projectScenarios.slice(1).map((scenario) => scenario.scenarioId);
-      state.myPageProgress = [];
-      state.scenarioQueue = [];
-      return {
+      const result = {
         attemptedId: attempted.scenarioId,
         queuedIds,
         expectedUnattemptedIds,
       };
+      state.projectId = previousProjectId;
+      state.trainingLevel = previousTrainingLevel;
+      state.trainingTicketType = previousTicketType;
+      state.scenarioIndex = previousScenarioIndex;
+      state.myPageProgress = previousProgress;
+      state.sessionPracticeAttemptsByScenario = previousSessionAttempts;
+      state.scenarioQueue = [];
+      return result;
     })()`,
     smokeContext
   );
@@ -2483,12 +2675,12 @@ try {
     scenarioNarrativeCoverage.map(({ incidental }) => incidental)
   ).size;
   if (
-    scenarioNarrativeCoverage.length !== 40 ||
+    scenarioNarrativeCoverage.length !== 60 ||
     invalidNarratives.length > 0 ||
-    uniqueIncidentalNotes !== 40
+    uniqueIncidentalNotes !== 60
   ) {
     errors.push(
-      `runtime smoke test expected 40 distinct raw field reports without expected-result leakage: ${JSON.stringify(
+      `runtime smoke test expected 60 distinct raw field reports without expected-result leakage: ${JSON.stringify(
         invalidNarratives
       )}`
     );
@@ -2576,9 +2768,9 @@ try {
       requiredCount >= fileCount ||
       invalidFiles > 0
   );
-  if (evidenceCoverage.length !== 40 || invalidEvidenceCoverage.length > 0) {
+  if (evidenceCoverage.length !== 60 || invalidEvidenceCoverage.length > 0) {
     errors.push(
-      `runtime smoke test expected complete evidence profiles for all 40 scenarios: ${JSON.stringify(
+      `runtime smoke test expected complete evidence profiles for all 60 scenarios: ${JSON.stringify(
         invalidEvidenceCoverage
       )}`
     );

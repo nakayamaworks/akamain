@@ -584,34 +584,47 @@ const scenarioCategoryRules = {
     [/右クリック|メニュー/, "ui"],
     [/検索|氏名/, "input"],
     [/保存ボタン|重複登録/, "workflow"],
+    [/退会済み.*2ページ/, "input"],
+    [/CSV取込/, "workflow"],
   ],
   attendance: [[/退勤|休憩|打刻|残業/, "workflow"]],
   salon: [[/予約|キャンセル/, "workflow"]],
   ec: [
     [/決済通知|注文API/, "api"],
     [/在庫切れ|税込価格|端数/, "workflow"],
+    [/クーポン/, "workflow"],
+    [/カートから商品を削除/, "workflow"],
   ],
   inventory: [
     [/在庫数を超える|出庫数を登録/, "input"],
     [/ロット|同時出庫|在庫数がマイナス/, "workflow"],
+    [/在庫移動/, "workflow"],
+    [/棚卸.*出荷API/, "api"],
   ],
   mobile: [
     [/画面回転|通知/, "ui"],
     [/バックグラウンド|同期データ/, "api"],
+    [/ダークモード/, "ui"],
+    [/別アカウント|未送信下書き/, "api"],
   ],
   automotive: [
     [/速度表示/, "ui"],
+    [/速度単位/, "ui"],
     [/CAN|Bus-Off/, "api"],
+    [/ウインカー/, "ui"],
   ],
   "automotive-multimedia": [
     [/ナビ|案内|オーディオ|音量/, "ui"],
     [/先進安全|車線逸脱|車両状態|CAN|信号/, "api"],
+    [/後方カメラ|着信/, "ui"],
   ],
   payment: [[/決済|返金|冪等キー|与信|タイムアウト/, "api"]],
   medical: [
     [/別の患者/, "ui"],
+    [/患者サマリー/, "ui"],
     [/投薬量|単位変換/, "workflow"],
     [/検査結果の再送|重複登録/, "api"],
+    [/生年月日.*患者.*検索/, "input"],
   ],
 };
 
@@ -769,6 +782,26 @@ const scenarioIncidentalNotes = [
   [/右後席ドア.*閉状態/, "運転席と左後席ドアの開閉状態は同じ試験中も正しく更新されていました"],
   [/返金WebhookがAPI応答より先/, "検証用カードのブランドを変えてもイベントの到着順と状態遷移は同じでした"],
   [/ng\/dLをμg\/Lへ換算/, "検査装置の表示言語は日本語ですが、英語へ変更しても受信値と単位は同一でした"],
+  [/退会済みを除外.*2ページ目/, "確認に使用した顧客名には同姓同名が含まれていますが、ステータス条件を再指定すると表示対象は正しく戻りました"],
+  [/休憩時間を修正.*日次勤務合計/, "休憩理由の備考欄も同時に変更しましたが、備考だけを変更した場合は勤務合計に影響しませんでした"],
+  [/数量を変更.*クーポン/, "商品の配送方法は通常便のままで、数量変更の前後に配送先と会員ランクは変えていません"],
+  [/在庫移動.*移動先ロケーション/, "移動伝票には備考を入力しましたが、備考なしで登録しても移動先の表示結果は同じでした"],
+  [/速度単位.*平均速度/, "試験中はオーディオを停止していました。オーディオ再生中でも単位切替の結果は同じでした"],
+  [/一部返金後.*返金可能額/, "返金理由には検証用の定型文を入力しました。理由を変更しても返金可能額の表示結果は同じでした"],
+  [/検査結果を訂正.*患者サマリー/, "対象患者には同日の別検査結果もありますが、訂正していない検査値の表示は変わりませんでした"],
+  [/出勤打刻が完了.*打刻一覧/, "対象者は同じ日に有給申請も登録していますが、有給申請の表示と出勤打刻の保存には影響していません"],
+  [/予約を登録.*顧客名が空欄/, "顧客の電話番号にはハイフンが含まれていますが、別の顧客を選択しても確認画面の氏名は空欄になりました"],
+  [/カートから商品を削除.*合計金額/, "削除した商品には商品画像が登録されていますが、画像のない商品でも合計金額の表示結果は同じでした"],
+  [/ダークモード.*保存ボタン/, "端末の文字サイズは標準です。文字サイズを一段階大きくしても保存ボタンの配色は変わりませんでした"],
+  [/右ウインカー.*矢印/, "試験車両のハザードランプでは左右両方の矢印が点滅し、メーターの照度設定も正常に変更できました"],
+  [/領収書PDF.*支払金額/, "決済に使用したカードは検証用VISAです。別の検証カードでもPDFの金額欄は空欄になりました"],
+  [/生年月日.*患者を検索/, "患者の氏名には外字を含みません。同じ生年月日の別患者でも検索結果は0件になりました"],
+  [/ミュートを解除.*消音アイコン/, "通話機能は使用していません。ラジオとBluetoothオーディオのどちらでも消音アイコンが残りました"],
+  [/顧客CSV取込.*エラー行より前/, "CSVの文字コードはUTF-8で、同じファイルの画像項目と住所項目には入力エラーがありませんでした"],
+  [/予約キャンセル.*来店受付.*状態が一致しない/, "対象予約ではクーポンを使用しておらず、キャンセル通知メールと来店受付通知はそれぞれ1通送信されました"],
+  [/棚卸中.*出荷API.*在庫減少/, "棚卸端末とAPIクライアントの時刻は同期済みで、対象商品以外の棚卸数量には差異がありませんでした"],
+  [/別アカウント.*未送信下書き/, "端末の生体認証は無効です。認証方法をパスコードへ固定してもアカウント間の表示結果は変わりませんでした"],
+  [/後退中の着信.*後方カメラ/, "着信元は連絡先登録済みの検証番号です。未登録番号からの着信でも画面優先度は同じでした"],
 ];
 
 function getScenarioIncidentalNote(rawScenario) {
@@ -792,6 +825,18 @@ function buildFieldObservation(rawScenario) {
 function getScenarioTestTarget(rawScenario) {
   return getScenarioBriefingProfile(rawScenario.scenarioId)?.testTarget
     || "対象機能の動作をテストしています。";
+}
+
+function getIntermediateComparison(scenarioId) {
+  const verification = getScenarioBriefingProfile(scenarioId)?.notes?.[1] || "";
+  const comparisonSentence = verification
+    .split("。")
+    .map((sentence) => trimJapanesePeriod(sentence))
+    .find((sentence) =>
+      sentence
+      && !/(?:[0-9]+回|[0-9]+\/[0-9]+|再現|いずれも|毎回)/u.test(sentence)
+    );
+  return comparisonSentence || "";
 }
 
 function getScenarioNarrativePatternIndex(scenarioId, patternCount = 10) {
@@ -1106,7 +1151,7 @@ function getProjectScenarioEntries(
     .filter(({ scenario }) =>
       scenario.projectId === projectId
       && getScenarioTicketType(scenario) === ticketType
-      && (selectedLevel === "advanced" || scenario.difficulty === selectedLevel)
+      && scenario.difficulty === selectedLevel
     );
 }
 
@@ -1119,7 +1164,7 @@ function getAvailableScenarioEntries(ticketType = state.trainingTicketType) {
     .map((scenario, index) => ({ scenario, index }))
     .filter(({ scenario }) =>
       getScenarioTicketType(scenario) === ticketType
-      && (state.trainingLevel === "advanced" || scenario.difficulty === state.trainingLevel)
+      && scenario.difficulty === normalizeTrainingLevel(state.trainingLevel)
     );
 }
 
@@ -3065,47 +3110,74 @@ function renderScenarioBrief() {
     assignee ? `${assignee.name}（${assignee.role}）` : "",
     relatedMember ? `${relatedMember.name}（${relatedMember.role}）` : "",
   ].filter(Boolean).join("\n");
-  let beginnerQaItems = [];
-  const beginnerSummary = (() => {
-    if (state.trainingLevel !== "beginner") return "";
-    const sectionLines = new Map();
-    let currentSection = "";
-    const briefingReportEntries = (qaScenario
-      ? window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING?.[state.scenario.scenarioId]
-      : window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[state.scenario.scenarioId])
-        ?.scenario?.report || state.scenario.reportEntries;
-    briefingReportEntries.forEach((entry) => {
-      if (entry.kind === "section") {
-        currentSection = entry.text;
-        sectionLines.set(currentSection, []);
-      } else if (entry.kind === "line" && currentSection) {
-        sectionLines.get(currentSection)?.push(entry.text);
-      }
-    });
-    if (qaScenario) {
-      beginnerQaItems = [
-        ["", context.testTarget, "testTarget"],
-        ["確認した状況", (sectionLines.get("■確認した状況・事実") || []).join(" "), "observation"],
-        ["仕様書で不明な点", (sectionLines.get("■参照情報") || []).join(" "), "sourceGap"],
-        ["確認したいこと", (sectionLines.get("■質問") || []).join(" "), "question"],
-      ].filter(([, value]) => value);
-      return "";
+  const sectionLines = new Map();
+  let currentSection = "";
+  const briefingReportEntries = (qaScenario
+    ? window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING?.[state.scenario.scenarioId]
+    : window.TYPING_WORKBENCH_SCENARIO_AUTHORING?.[state.scenario.scenarioId])
+      ?.scenario?.report || state.scenario.reportEntries;
+  briefingReportEntries.forEach((entry) => {
+    if (entry.kind === "section") {
+      currentSection = entry.text;
+      sectionLines.set(currentSection, []);
+    } else if (entry.kind === "line" && currentSection) {
+      sectionLines.get(currentSection)?.push(entry.text);
     }
-    const preconditions = (sectionLines.get("■前提条件") || []).join(" ");
-    const steps = (sectionLines.get("■操作手順") || []).join("\n");
-    return [
+  });
+  const sectionText = (sectionName, separator = " ") =>
+    (sectionLines.get(sectionName) || []).join(separator);
+  let scopedFactItems = [];
+  if (state.trainingLevel === "beginner" && qaScenario) {
+    scopedFactItems = [
+      ["", context.testTarget, "testTarget"],
+      ["確認した状況", sectionText("■確認した状況・事実"), "observation"],
+      ["仕様書で不明な点", sectionText("■参照情報"), "sourceGap"],
+      ["確認したいこと", sectionText("■質問"), "question"],
+    ];
+  } else if (state.trainingLevel === "beginner") {
+    const preconditions = sectionText("■前提条件");
+    const steps = sectionText("■操作手順", "\n");
+    const beginnerSummary = [
       context.testTarget,
       preconditions ? `前提状態：${preconditions}` : "",
       steps ? `実行した操作：\n${steps}` : "",
-      `仕様上の動作：${(sectionLines.get("■期待結果") || []).join(" ")}`,
-      `確認した事実：${(sectionLines.get("■実際の動作") || []).join(" ")}`,
+      `仕様上の動作：${sectionText("■期待結果")}`,
+      `確認した事実：${sectionText("■実際の動作")}`,
     ].filter(Boolean).join("\n\n");
-  })();
-  const factItems = beginnerQaItems.length > 0
-    ? beginnerQaItems
-    : [
-        ["", beginnerSummary || context.workMemo, "testTarget observation scope risk recovery workaround"],
-      ].filter(([, value]) => value);
+    scopedFactItems = [["", beginnerSummary, "testTarget observation"]];
+  } else if (state.trainingLevel === "intermediate" && qaScenario) {
+    scopedFactItems = [
+      ["", context.testTarget, "testTarget"],
+      ["確認した状況", sectionText("■確認した状況・事実"), "observation"],
+      ["仕様書で不明な点", sectionText("■参照情報"), "sourceGap"],
+      ["現在の解釈", sectionText("■現在の解釈"), "interpretation"],
+      ["確認したいこと", sectionText("■質問"), "question"],
+      ["回答が必要な理由", sectionText("■確認理由・影響"), "impact"],
+    ];
+  } else if (state.trainingLevel === "intermediate") {
+    scopedFactItems = [
+      ["", context.testTarget, "testTarget"],
+      ["確認した事象", sectionText("■詳細"), "observation category"],
+      ["前提条件", sectionText("■前提条件"), "observation"],
+      ["実行した操作", sectionText("■操作手順", "\n"), "observation"],
+      ["期待結果", sectionText("■期待結果"), "expected"],
+      ["確認した結果", sectionText("■実際の動作"), "observation"],
+      [
+        "比較確認",
+        getIntermediateComparison(state.scenario.scenarioId) || sectionText("■備考"),
+        "observation",
+      ],
+    ];
+  }
+  const factItems = scopedFactItems
+    .filter(([, value]) => value);
+  if (factItems.length === 0 && context.workMemo) {
+    factItems.push([
+      "",
+      context.workMemo,
+      "testTarget observation scope risk recovery workaround",
+    ]);
+  }
   const specificationInfo = [
     context.specification,
     ...getScenarioSpecificationDetails(state.scenario),
@@ -3114,10 +3186,10 @@ function renderScenarioBrief() {
     ...(qaScenario ? [["質問種別", getQaTypeLabel(state.scenario.qaType), "qaType"]] : []),
     ["確認日時・環境", environmentMemo, "occurredAt environment"],
     ["関連資料", specificationInfo, "specification"],
-    ...(state.trainingLevel === "beginner" ? [] : [
+    ...(state.trainingLevel === "advanced" ? [
       ["対応日程", formatPeripheralSchedule(context.schedule), "schedule risk"],
       ["関係者", peopleInfo, "assignee related"],
-    ]),
+    ] : []),
   ].filter(([, value]) => value);
   const renderBriefValue = (value, key) => {
     if (key.split(/\s+/u).includes("schedule")) {

@@ -5440,6 +5440,2726 @@
           }
         }
       ]
+    },
+    "customer-status-filter-lost-on-next-page": {
+      "scenarioId": "customer-status-filter-lost-on-next-page",
+      "rubricVersion": "customer-status-filter-lost-on-next-page.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+            "sections": {
+              "detail": "有効顧客だけに絞り込んだ一覧で2ページ目へ移動すると退会済み顧客も表示される",
+              "preconditions": "有効顧客が25件、退会済み顧客が5件登録されていること",
+              "steps": "1. ステータスを有効にして検索する\n2. 検索結果の2ページ目を開く",
+              "expected": "2ページ目にも有効顧客だけが表示されること",
+              "actual": "2ページ目では絞り込みが解除され退会済み顧客も表示される",
+              "remarks": "1ページ目へ戻ると有効顧客だけの表示に戻る",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+            "sections": {
+              "detail": "有効顧客だけに絞り込んだ一覧で2ページ目へ移動すると退会済み顧客も表示される",
+              "preconditions": "有効顧客が25件、退会済み顧客が5件登録されていること",
+              "steps": "ステータスを有効にして検索する。検索結果の2ページ目を開く",
+              "expected": "顧客一覧画面仕様書 Rev.2.4「3.8 ページ移動」\n2ページ目にも有効顧客だけが表示されること",
+              "actual": "2ページ目では絞り込みが解除され退会済み顧客も表示される",
+              "remarks": "1ページ目へ戻ると有効顧客だけの表示に戻る",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+            "sections": {
+              "detail": "有効顧客だけに絞り込んだ一覧で2ページ目へ移動すると退会済み顧客も表示される\n原因は実装不備であることを確認しました。",
+              "preconditions": "有効顧客が25件、退会済み顧客が5件登録されていること",
+              "steps": "1. ステータスを有効にして検索する\n2. 検索結果の2ページ目を開く",
+              "expected": "2ページ目にも有効顧客だけが表示されること",
+              "actual": "2ページ目では絞り込みが解除され退会済み顧客も表示される",
+              "remarks": "1ページ目へ戻ると有効顧客だけの表示に戻る",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+            "sections": {
+              "detail": "有効顧客が25件、退会済み顧客が5件登録されていること",
+              "preconditions": "1. ステータスを有効にして検索する\n2. 検索結果の2ページ目を開く",
+              "steps": "2ページ目にも有効顧客だけが表示されること",
+              "expected": "2ページ目では絞り込みが解除され退会済み顧客も表示される",
+              "actual": "1ページ目へ戻ると有効顧客だけの表示に戻る",
+              "remarks": "3/3",
+              "reproducibility": "有効顧客だけに絞り込んだ一覧で2ページ目へ移動すると退会済み顧客も表示される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+            "sections": {
+              "detail": "有効顧客だけに絞り込んだ一覧で2ページ目へ移動すると退会済み顧客も表示される\n上記について継続して確認が必要です。",
+              "preconditions": "有効顧客が25件、退会済み顧客が5件登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. ステータスを有効にして検索する\n2. 検索結果の2ページ目を開く\n上記について継続して確認が必要です。",
+              "expected": "2ページ目にも有効顧客だけが表示されること\n上記について継続して確認が必要です。",
+              "actual": "2ページ目では絞り込みが解除され退会済み顧客も表示される\n上記について継続して確認が必要です。",
+              "remarks": "1ページ目へ戻ると有効顧客だけの表示に戻る\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "attendance-break-edit-total-not-updated": {
+      "scenarioId": "attendance-break-edit-total-not-updated",
+      "rubricVersion": "attendance-break-edit-total-not-updated.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "休憩時間を修正しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "休憩を60分から45分へ修正して保存しても日次勤務合計が8時間のままになる",
+              "preconditions": "9時から18時まで勤務し休憩60分で登録されていること",
+              "steps": "1. 日次勤怠で休憩を45分へ変更する\n2. 保存して勤務合計を確認する",
+              "expected": "勤務合計が8時間15分へ更新されること",
+              "actual": "休憩は45分で保存されるが勤務合計は8時間のままになる",
+              "remarks": "画面を再読み込みすると勤務合計が8時間15分になる",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "休憩時間を修正しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "休憩を60分から45分へ修正して保存しても日次勤務合計が8時間のままになる",
+              "preconditions": "9時から18時まで勤務し休憩60分で登録されていること",
+              "steps": "日次勤怠で休憩を45分へ変更する。保存して勤務合計を確認する",
+              "expected": "日次勤怠画面仕様書 Rev.4.6「5.3 休憩時間の修正」\n勤務合計が8時間15分へ更新されること",
+              "actual": "休憩は45分で保存されるが勤務合計は8時間のままになる",
+              "remarks": "画面を再読み込みすると勤務合計が8時間15分になる",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "休憩時間を修正しても日次勤務合計が更新されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により休憩時間を修正しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "休憩を60分から45分へ修正して保存しても日次勤務合計が8時間のままになる\n原因は実装不備であることを確認しました。",
+              "preconditions": "9時から18時まで勤務し休憩60分で登録されていること",
+              "steps": "1. 日次勤怠で休憩を45分へ変更する\n2. 保存して勤務合計を確認する",
+              "expected": "勤務合計が8時間15分へ更新されること",
+              "actual": "休憩は45分で保存されるが勤務合計は8時間のままになる",
+              "remarks": "画面を再読み込みすると勤務合計が8時間15分になる",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "休憩時間を修正しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "9時から18時まで勤務し休憩60分で登録されていること",
+              "preconditions": "1. 日次勤怠で休憩を45分へ変更する\n2. 保存して勤務合計を確認する",
+              "steps": "勤務合計が8時間15分へ更新されること",
+              "expected": "休憩は45分で保存されるが勤務合計は8時間のままになる",
+              "actual": "画面を再読み込みすると勤務合計が8時間15分になる",
+              "remarks": "4/4",
+              "reproducibility": "休憩を60分から45分へ修正して保存しても日次勤務合計が8時間のままになる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "休憩時間を修正しても日次勤務合計が更新されない",
+            "sections": {
+              "detail": "休憩を60分から45分へ修正して保存しても日次勤務合計が8時間のままになる\n上記について継続して確認が必要です。",
+              "preconditions": "9時から18時まで勤務し休憩60分で登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 日次勤怠で休憩を45分へ変更する\n2. 保存して勤務合計を確認する\n上記について継続して確認が必要です。",
+              "expected": "勤務合計が8時間15分へ更新されること\n上記について継続して確認が必要です。",
+              "actual": "休憩は45分で保存されるが勤務合計は8時間のままになる\n上記について継続して確認が必要です。",
+              "remarks": "画面を再読み込みすると勤務合計が8時間15分になる\n上記について継続して確認が必要です。",
+              "reproducibility": "4/4\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "ec-coupon-lost-after-quantity-change": {
+      "scenarioId": "ec-coupon-lost-after-quantity-change",
+      "rubricVersion": "ec-coupon-lost-after-quantity-change.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "カートで数量を変更すると適用済みクーポンが解除される",
+            "sections": {
+              "detail": "クーポン適用後に商品の数量を2個へ変更すると割引が0円になる",
+              "preconditions": "対象商品1個と10パーセント割引クーポンがカートへ適用済みであること",
+              "steps": "1. カートの商品数量を1個から2個へ変更する\n2. 注文金額の内訳を確認する",
+              "expected": "数量変更後の小計に10パーセント割引が適用されること",
+              "actual": "クーポンコードは表示されたままだが割引額が0円になる",
+              "remarks": "クーポンを適用し直すと2個分の小計へ割引される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "カートで数量を変更すると適用済みクーポンが解除される",
+            "sections": {
+              "detail": "クーポン適用後に商品の数量を2個へ変更すると割引が0円になる",
+              "preconditions": "対象商品1個と10パーセント割引クーポンがカートへ適用済みであること",
+              "steps": "カートの商品数量を1個から2個へ変更する。注文金額の内訳を確認する",
+              "expected": "カート割引仕様書 Rev.5.2「4.6 数量変更時の再計算」\n数量変更後の小計に10パーセント割引が適用されること",
+              "actual": "クーポンコードは表示されたままだが割引額が0円になる",
+              "remarks": "クーポンを適用し直すと2個分の小計へ割引される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "カートで数量を変更すると適用済みクーポンが解除される",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりカートで数量を変更すると適用済みクーポンが解除される",
+            "sections": {
+              "detail": "クーポン適用後に商品の数量を2個へ変更すると割引が0円になる\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象商品1個と10パーセント割引クーポンがカートへ適用済みであること",
+              "steps": "1. カートの商品数量を1個から2個へ変更する\n2. 注文金額の内訳を確認する",
+              "expected": "数量変更後の小計に10パーセント割引が適用されること",
+              "actual": "クーポンコードは表示されたままだが割引額が0円になる",
+              "remarks": "クーポンを適用し直すと2個分の小計へ割引される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "カートで数量を変更すると適用済みクーポンが解除される",
+            "sections": {
+              "detail": "対象商品1個と10パーセント割引クーポンがカートへ適用済みであること",
+              "preconditions": "1. カートの商品数量を1個から2個へ変更する\n2. 注文金額の内訳を確認する",
+              "steps": "数量変更後の小計に10パーセント割引が適用されること",
+              "expected": "クーポンコードは表示されたままだが割引額が0円になる",
+              "actual": "クーポンを適用し直すと2個分の小計へ割引される",
+              "remarks": "3/3",
+              "reproducibility": "クーポン適用後に商品の数量を2個へ変更すると割引が0円になる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "カートで数量を変更すると適用済みクーポンが解除される",
+            "sections": {
+              "detail": "クーポン適用後に商品の数量を2個へ変更すると割引が0円になる\n上記について継続して確認が必要です。",
+              "preconditions": "対象商品1個と10パーセント割引クーポンがカートへ適用済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. カートの商品数量を1個から2個へ変更する\n2. 注文金額の内訳を確認する\n上記について継続して確認が必要です。",
+              "expected": "数量変更後の小計に10パーセント割引が適用されること\n上記について継続して確認が必要です。",
+              "actual": "クーポンコードは表示されたままだが割引額が0円になる\n上記について継続して確認が必要です。",
+              "remarks": "クーポンを適用し直すと2個分の小計へ割引される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "inventory-transfer-destination-quantity-stale": {
+      "scenarioId": "inventory-transfer-destination-quantity-stale",
+      "rubricVersion": "inventory-transfer-destination-quantity-stale.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "在庫移動を確定しても移動先ロケーションの数量が更新されない",
+            "sections": {
+              "detail": "倉庫Aから倉庫Bへ10個移動すると移動元だけ減り移動先は移動前の数量を表示する",
+              "preconditions": "対象商品が倉庫Aに30個、倉庫Bに5個登録されていること",
+              "steps": "1. 倉庫Aから倉庫Bへ10個の在庫移動を登録する\n2. 移動を確定して両倉庫の数量を確認する",
+              "expected": "倉庫Aが20個、倉庫Bが15個で表示されること",
+              "actual": "倉庫Aは20個になるが倉庫Bは5個のまま表示される",
+              "remarks": "倉庫Bの一覧を再読み込みすると15個で表示される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "在庫移動を確定しても移動先ロケーションの数量が更新されない",
+            "sections": {
+              "detail": "倉庫Aから倉庫Bへ10個移動すると移動元だけ減り移動先は移動前の数量を表示する",
+              "preconditions": "対象商品が倉庫Aに30個、倉庫Bに5個登録されていること",
+              "steps": "倉庫Aから倉庫Bへ10個の在庫移動を登録する。移動を確定して両倉庫の数量を確認する",
+              "expected": "在庫移動仕様書 Rev.4.8「6.2 移動確定後の在庫反映」\n倉庫Aが20個、倉庫Bが15個で表示されること",
+              "actual": "倉庫Aは20個になるが倉庫Bは5個のまま表示される",
+              "remarks": "倉庫Bの一覧を再読み込みすると15個で表示される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "在庫移動を確定しても移動先ロケーションの数量が更新されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により在庫移動を確定しても移動先ロケーションの数量が更新されない",
+            "sections": {
+              "detail": "倉庫Aから倉庫Bへ10個移動すると移動元だけ減り移動先は移動前の数量を表示する\n原因は実装不備であることを確認しました。",
+              "preconditions": "対象商品が倉庫Aに30個、倉庫Bに5個登録されていること",
+              "steps": "1. 倉庫Aから倉庫Bへ10個の在庫移動を登録する\n2. 移動を確定して両倉庫の数量を確認する",
+              "expected": "倉庫Aが20個、倉庫Bが15個で表示されること",
+              "actual": "倉庫Aは20個になるが倉庫Bは5個のまま表示される",
+              "remarks": "倉庫Bの一覧を再読み込みすると15個で表示される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "在庫移動を確定しても移動先ロケーションの数量が更新されない",
+            "sections": {
+              "detail": "対象商品が倉庫Aに30個、倉庫Bに5個登録されていること",
+              "preconditions": "1. 倉庫Aから倉庫Bへ10個の在庫移動を登録する\n2. 移動を確定して両倉庫の数量を確認する",
+              "steps": "倉庫Aが20個、倉庫Bが15個で表示されること",
+              "expected": "倉庫Aは20個になるが倉庫Bは5個のまま表示される",
+              "actual": "倉庫Bの一覧を再読み込みすると15個で表示される",
+              "remarks": "4/4",
+              "reproducibility": "倉庫Aから倉庫Bへ10個移動すると移動元だけ減り移動先は移動前の数量を表示する"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "在庫移動を確定しても移動先ロケーションの数量が更新されない",
+            "sections": {
+              "detail": "倉庫Aから倉庫Bへ10個移動すると移動元だけ減り移動先は移動前の数量を表示する\n上記について継続して確認が必要です。",
+              "preconditions": "対象商品が倉庫Aに30個、倉庫Bに5個登録されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 倉庫Aから倉庫Bへ10個の在庫移動を登録する\n2. 移動を確定して両倉庫の数量を確認する\n上記について継続して確認が必要です。",
+              "expected": "倉庫Aが20個、倉庫Bが15個で表示されること\n上記について継続して確認が必要です。",
+              "actual": "倉庫Aは20個になるが倉庫Bは5個のまま表示される\n上記について継続して確認が必要です。",
+              "remarks": "倉庫Bの一覧を再読み込みすると15個で表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "4/4\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-speed-unit-trip-average-stale": {
+      "scenarioId": "automotive-speed-unit-trip-average-stale",
+      "rubricVersion": "automotive-speed-unit-trip-average-stale.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+            "sections": {
+              "detail": "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる",
+              "preconditions": "トリップ平均速度が40km/hで表示されていること",
+              "steps": "1. 表示設定で速度単位をmphへ変更する\n2. メーターの現在速度と平均速度を確認する",
+              "expected": "現在速度と平均速度がどちらもmphへ換算されること",
+              "actual": "現在速度はmphになるが平均速度は40km/hのまま表示される",
+              "remarks": "メーターを再起動すると平均速度も25mphへ切り替わる",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+            "sections": {
+              "detail": "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる",
+              "preconditions": "トリップ平均速度が40km/hで表示されていること",
+              "steps": "表示設定で速度単位をmphへ変更する。メーターの現在速度と平均速度を確認する",
+              "expected": "メーター表示仕様書 Rev.5.6「4.4 速度単位の変更」\n現在速度と平均速度がどちらもmphへ換算されること",
+              "actual": "現在速度はmphになるが平均速度は40km/hのまま表示される",
+              "remarks": "メーターを再起動すると平均速度も25mphへ切り替わる",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+            "sections": {
+              "detail": "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる\n原因は実装不備であることを確認しました。",
+              "preconditions": "トリップ平均速度が40km/hで表示されていること",
+              "steps": "1. 表示設定で速度単位をmphへ変更する\n2. メーターの現在速度と平均速度を確認する",
+              "expected": "現在速度と平均速度がどちらもmphへ換算されること",
+              "actual": "現在速度はmphになるが平均速度は40km/hのまま表示される",
+              "remarks": "メーターを再起動すると平均速度も25mphへ切り替わる",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+            "sections": {
+              "detail": "トリップ平均速度が40km/hで表示されていること",
+              "preconditions": "1. 表示設定で速度単位をmphへ変更する\n2. メーターの現在速度と平均速度を確認する",
+              "steps": "現在速度と平均速度がどちらもmphへ換算されること",
+              "expected": "現在速度はmphになるが平均速度は40km/hのまま表示される",
+              "actual": "メーターを再起動すると平均速度も25mphへ切り替わる",
+              "remarks": "5/5",
+              "reproducibility": "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+            "sections": {
+              "detail": "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる\n上記について継続して確認が必要です。",
+              "preconditions": "トリップ平均速度が40km/hで表示されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 表示設定で速度単位をmphへ変更する\n2. メーターの現在速度と平均速度を確認する\n上記について継続して確認が必要です。",
+              "expected": "現在速度と平均速度がどちらもmphへ換算されること\n上記について継続して確認が必要です。",
+              "actual": "現在速度はmphになるが平均速度は40km/hのまま表示される\n上記について継続して確認が必要です。",
+              "remarks": "メーターを再起動すると平均速度も25mphへ切り替わる\n上記について継続して確認が必要です。",
+              "reproducibility": "5/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "payment-partial-refund-remaining-amount-stale": {
+      "scenarioId": "payment-partial-refund-remaining-amount-stale",
+      "rubricVersion": "payment-partial-refund-remaining-amount-stale.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "一部返金後も返金可能額が決済金額のまま更新されない",
+            "sections": {
+              "detail": "1万円の決済から3000円を返金しても返金可能額が1万円と表示される",
+              "preconditions": "1万円の売上確定済み決済があり返金履歴がないこと",
+              "steps": "1. 決済詳細から3000円の一部返金を実行する\n2. 返金完了後に返金可能額を確認する",
+              "expected": "返金可能額が7000円へ更新されること",
+              "actual": "返金履歴は3000円で追加されるが返金可能額は1万円のままになる",
+              "remarks": "画面を再読み込みすると返金可能額が7000円になる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "一部返金後も返金可能額が決済金額のまま更新されない",
+            "sections": {
+              "detail": "1万円の決済から3000円を返金しても返金可能額が1万円と表示される",
+              "preconditions": "1万円の売上確定済み決済があり返金履歴がないこと",
+              "steps": "決済詳細から3000円の一部返金を実行する。返金完了後に返金可能額を確認する",
+              "expected": "返金管理画面仕様書 Rev.5.4「3.7 一部返金後の残額」\n返金可能額が7000円へ更新されること",
+              "actual": "返金履歴は3000円で追加されるが返金可能額は1万円のままになる",
+              "remarks": "画面を再読み込みすると返金可能額が7000円になる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "一部返金後も返金可能額が決済金額のまま更新されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により一部返金後も返金可能額が決済金額のまま更新されない",
+            "sections": {
+              "detail": "1万円の決済から3000円を返金しても返金可能額が1万円と表示される\n原因は実装不備であることを確認しました。",
+              "preconditions": "1万円の売上確定済み決済があり返金履歴がないこと",
+              "steps": "1. 決済詳細から3000円の一部返金を実行する\n2. 返金完了後に返金可能額を確認する",
+              "expected": "返金可能額が7000円へ更新されること",
+              "actual": "返金履歴は3000円で追加されるが返金可能額は1万円のままになる",
+              "remarks": "画面を再読み込みすると返金可能額が7000円になる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "一部返金後も返金可能額が決済金額のまま更新されない",
+            "sections": {
+              "detail": "1万円の売上確定済み決済があり返金履歴がないこと",
+              "preconditions": "1. 決済詳細から3000円の一部返金を実行する\n2. 返金完了後に返金可能額を確認する",
+              "steps": "返金可能額が7000円へ更新されること",
+              "expected": "返金履歴は3000円で追加されるが返金可能額は1万円のままになる",
+              "actual": "画面を再読み込みすると返金可能額が7000円になる",
+              "remarks": "3/3",
+              "reproducibility": "1万円の決済から3000円を返金しても返金可能額が1万円と表示される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "一部返金後も返金可能額が決済金額のまま更新されない",
+            "sections": {
+              "detail": "1万円の決済から3000円を返金しても返金可能額が1万円と表示される\n上記について継続して確認が必要です。",
+              "preconditions": "1万円の売上確定済み決済があり返金履歴がないこと\n上記について継続して確認が必要です。",
+              "steps": "1. 決済詳細から3000円の一部返金を実行する\n2. 返金完了後に返金可能額を確認する\n上記について継続して確認が必要です。",
+              "expected": "返金可能額が7000円へ更新されること\n上記について継続して確認が必要です。",
+              "actual": "返金履歴は3000円で追加されるが返金可能額は1万円のままになる\n上記について継続して確認が必要です。",
+              "remarks": "画面を再読み込みすると返金可能額が7000円になる\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "medical-corrected-result-list-not-updated": {
+      "scenarioId": "medical-corrected-result-list-not-updated",
+      "rubricVersion": "medical-corrected-result-list-not-updated.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+            "sections": {
+              "detail": "血糖値を訂正して保存すると検査結果詳細は更新されるが患者サマリーには旧値が残る",
+              "preconditions": "患者の血糖値が180mg/dLで確定済みであること",
+              "steps": "1. 検査結果詳細で血糖値を160mg/dLへ訂正する\n2. 保存後に患者サマリーを開く",
+              "expected": "患者サマリーにも訂正後の160mg/dLが表示されること",
+              "actual": "検査結果詳細は160mg/dLになるが患者サマリーは180mg/dLのままになる",
+              "remarks": "患者サマリーを再読み込みすると160mg/dLへ更新される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+            "sections": {
+              "detail": "血糖値を訂正して保存すると検査結果詳細は更新されるが患者サマリーには旧値が残る",
+              "preconditions": "患者の血糖値が180mg/dLで確定済みであること",
+              "steps": "検査結果詳細で血糖値を160mg/dLへ訂正する。保存後に患者サマリーを開く",
+              "expected": "患者サマリー表示仕様書 Rev.6.9「7.4 訂正済み検査結果」\n患者サマリーにも訂正後の160mg/dLが表示されること",
+              "actual": "検査結果詳細は160mg/dLになるが患者サマリーは180mg/dLのままになる",
+              "remarks": "患者サマリーを再読み込みすると160mg/dLへ更新される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+            "sections": {
+              "detail": "血糖値を訂正して保存すると検査結果詳細は更新されるが患者サマリーには旧値が残る\n原因は実装不備であることを確認しました。",
+              "preconditions": "患者の血糖値が180mg/dLで確定済みであること",
+              "steps": "1. 検査結果詳細で血糖値を160mg/dLへ訂正する\n2. 保存後に患者サマリーを開く",
+              "expected": "患者サマリーにも訂正後の160mg/dLが表示されること",
+              "actual": "検査結果詳細は160mg/dLになるが患者サマリーは180mg/dLのままになる",
+              "remarks": "患者サマリーを再読み込みすると160mg/dLへ更新される",
+              "reproducibility": "4/4"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+            "sections": {
+              "detail": "患者の血糖値が180mg/dLで確定済みであること",
+              "preconditions": "1. 検査結果詳細で血糖値を160mg/dLへ訂正する\n2. 保存後に患者サマリーを開く",
+              "steps": "患者サマリーにも訂正後の160mg/dLが表示されること",
+              "expected": "検査結果詳細は160mg/dLになるが患者サマリーは180mg/dLのままになる",
+              "actual": "患者サマリーを再読み込みすると160mg/dLへ更新される",
+              "remarks": "4/4",
+              "reproducibility": "血糖値を訂正して保存すると検査結果詳細は更新されるが患者サマリーには旧値が残る"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+            "sections": {
+              "detail": "血糖値を訂正して保存すると検査結果詳細は更新されるが患者サマリーには旧値が残る\n上記について継続して確認が必要です。",
+              "preconditions": "患者の血糖値が180mg/dLで確定済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. 検査結果詳細で血糖値を160mg/dLへ訂正する\n2. 保存後に患者サマリーを開く\n上記について継続して確認が必要です。",
+              "expected": "患者サマリーにも訂正後の160mg/dLが表示されること\n上記について継続して確認が必要です。",
+              "actual": "検査結果詳細は160mg/dLになるが患者サマリーは180mg/dLのままになる\n上記について継続して確認が必要です。",
+              "remarks": "患者サマリーを再読み込みすると160mg/dLへ更新される\n上記について継続して確認が必要です。",
+              "reproducibility": "4/4\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "attendance-clock-in-success-not-listed": {
+      "scenarioId": "attendance-clock-in-success-not-listed",
+      "rubricVersion": "attendance-clock-in-success-not-listed.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "出勤打刻が完了しても当日の打刻一覧に表示されない",
+            "sections": {
+              "detail": "出勤ボタンを押すと完了メッセージが出るが当日の打刻一覧は未打刻のままになる",
+              "preconditions": "当日の出勤打刻が未登録であること",
+              "steps": "1. 打刻画面で出勤ボタンを押す\n2. 当日の打刻一覧を開く",
+              "expected": "当日の打刻一覧に出勤時刻が表示されること",
+              "actual": "完了メッセージは出るが打刻一覧は未打刻のままになる",
+              "remarks": "画面を再読み込みすると出勤時刻が表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "出勤打刻が完了しても当日の打刻一覧に表示されない",
+            "sections": {
+              "detail": "出勤ボタンを押すと完了メッセージが出るが当日の打刻一覧は未打刻のままになる",
+              "preconditions": "当日の出勤打刻が未登録であること",
+              "steps": "打刻画面で出勤ボタンを押す。当日の打刻一覧を開く",
+              "expected": "打刻画面仕様書 Rev.4.5「2.2 出勤打刻」\n当日の打刻一覧に出勤時刻が表示されること",
+              "actual": "完了メッセージは出るが打刻一覧は未打刻のままになる",
+              "remarks": "画面を再読み込みすると出勤時刻が表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "出勤打刻が完了しても当日の打刻一覧に表示されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により出勤打刻が完了しても当日の打刻一覧に表示されない",
+            "sections": {
+              "detail": "出勤ボタンを押すと完了メッセージが出るが当日の打刻一覧は未打刻のままになる\n原因は実装不備であることを確認しました。",
+              "preconditions": "当日の出勤打刻が未登録であること",
+              "steps": "1. 打刻画面で出勤ボタンを押す\n2. 当日の打刻一覧を開く",
+              "expected": "当日の打刻一覧に出勤時刻が表示されること",
+              "actual": "完了メッセージは出るが打刻一覧は未打刻のままになる",
+              "remarks": "画面を再読み込みすると出勤時刻が表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "出勤打刻が完了しても当日の打刻一覧に表示されない",
+            "sections": {
+              "detail": "当日の出勤打刻が未登録であること",
+              "preconditions": "1. 打刻画面で出勤ボタンを押す\n2. 当日の打刻一覧を開く",
+              "steps": "当日の打刻一覧に出勤時刻が表示されること",
+              "expected": "完了メッセージは出るが打刻一覧は未打刻のままになる",
+              "actual": "画面を再読み込みすると出勤時刻が表示される",
+              "remarks": "3/3",
+              "reproducibility": "出勤ボタンを押すと完了メッセージが出るが当日の打刻一覧は未打刻のままになる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "出勤打刻が完了しても当日の打刻一覧に表示されない",
+            "sections": {
+              "detail": "出勤ボタンを押すと完了メッセージが出るが当日の打刻一覧は未打刻のままになる\n上記について継続して確認が必要です。",
+              "preconditions": "当日の出勤打刻が未登録であること\n上記について継続して確認が必要です。",
+              "steps": "1. 打刻画面で出勤ボタンを押す\n2. 当日の打刻一覧を開く\n上記について継続して確認が必要です。",
+              "expected": "当日の打刻一覧に出勤時刻が表示されること\n上記について継続して確認が必要です。",
+              "actual": "完了メッセージは出るが打刻一覧は未打刻のままになる\n上記について継続して確認が必要です。",
+              "remarks": "画面を再読み込みすると出勤時刻が表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "salon-reservation-confirmation-name-blank": {
+      "scenarioId": "salon-reservation-confirmation-name-blank",
+      "rubricVersion": "salon-reservation-confirmation-name-blank.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "予約を登録すると確認画面の顧客名が空欄になる",
+            "sections": {
+              "detail": "顧客を選択して予約を登録しても確認画面に顧客名が表示されない",
+              "preconditions": "顧客の山田花子が登録済みであること",
+              "steps": "1. 山田花子を選択して予約を登録する",
+              "expected": "予約確認画面に山田花子と表示されること",
+              "actual": "予約確認画面の顧客名が空欄で表示される",
+              "remarks": "予約一覧には山田花子と正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "予約を登録すると確認画面の顧客名が空欄になる",
+            "sections": {
+              "detail": "顧客を選択して予約を登録しても確認画面に顧客名が表示されない",
+              "preconditions": "顧客の山田花子が登録済みであること",
+              "steps": "山田花子を選択して予約を登録する",
+              "expected": "予約確認画面仕様書 Rev.3.5「2.1 表示項目」\n予約確認画面に山田花子と表示されること",
+              "actual": "予約確認画面の顧客名が空欄で表示される",
+              "remarks": "予約一覧には山田花子と正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "予約を登録すると確認画面の顧客名が空欄になる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により予約を登録すると確認画面の顧客名が空欄になる",
+            "sections": {
+              "detail": "顧客を選択して予約を登録しても確認画面に顧客名が表示されない\n原因は実装不備であることを確認しました。",
+              "preconditions": "顧客の山田花子が登録済みであること",
+              "steps": "1. 山田花子を選択して予約を登録する",
+              "expected": "予約確認画面に山田花子と表示されること",
+              "actual": "予約確認画面の顧客名が空欄で表示される",
+              "remarks": "予約一覧には山田花子と正しく表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "予約を登録すると確認画面の顧客名が空欄になる",
+            "sections": {
+              "detail": "顧客の山田花子が登録済みであること",
+              "preconditions": "1. 山田花子を選択して予約を登録する",
+              "steps": "予約確認画面に山田花子と表示されること",
+              "expected": "予約確認画面の顧客名が空欄で表示される",
+              "actual": "予約一覧には山田花子と正しく表示される",
+              "remarks": "3/3",
+              "reproducibility": "顧客を選択して予約を登録しても確認画面に顧客名が表示されない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "予約を登録すると確認画面の顧客名が空欄になる",
+            "sections": {
+              "detail": "顧客を選択して予約を登録しても確認画面に顧客名が表示されない\n上記について継続して確認が必要です。",
+              "preconditions": "顧客の山田花子が登録済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. 山田花子を選択して予約を登録する\n上記について継続して確認が必要です。",
+              "expected": "予約確認画面に山田花子と表示されること\n上記について継続して確認が必要です。",
+              "actual": "予約確認画面の顧客名が空欄で表示される\n上記について継続して確認が必要です。",
+              "remarks": "予約一覧には山田花子と正しく表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "ec-removed-item-total-not-updated": {
+      "scenarioId": "ec-removed-item-total-not-updated",
+      "rubricVersion": "ec-removed-item-total-not-updated.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "カートから商品を削除しても合計金額が変わらない",
+            "sections": {
+              "detail": "1000円の商品をカートから削除しても合計金額に1000円が残る",
+              "preconditions": "1000円と2000円の商品がカートに入っていること",
+              "steps": "1. 1000円の商品をカートから削除する",
+              "expected": "合計金額が2000円になること",
+              "actual": "商品は消えるが合計金額は3000円のままになる",
+              "remarks": "画面を再読み込みすると合計金額が2000円になる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "カートから商品を削除しても合計金額が変わらない",
+            "sections": {
+              "detail": "1000円の商品をカートから削除しても合計金額に1000円が残る",
+              "preconditions": "1000円と2000円の商品がカートに入っていること",
+              "steps": "1000円の商品をカートから削除する",
+              "expected": "カート画面仕様書 Rev.5.0「3.3 商品削除」\n合計金額が2000円になること",
+              "actual": "商品は消えるが合計金額は3000円のままになる",
+              "remarks": "画面を再読み込みすると合計金額が2000円になる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "カートから商品を削除しても合計金額が変わらない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりカートから商品を削除しても合計金額が変わらない",
+            "sections": {
+              "detail": "1000円の商品をカートから削除しても合計金額に1000円が残る\n原因は実装不備であることを確認しました。",
+              "preconditions": "1000円と2000円の商品がカートに入っていること",
+              "steps": "1. 1000円の商品をカートから削除する",
+              "expected": "合計金額が2000円になること",
+              "actual": "商品は消えるが合計金額は3000円のままになる",
+              "remarks": "画面を再読み込みすると合計金額が2000円になる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "カートから商品を削除しても合計金額が変わらない",
+            "sections": {
+              "detail": "1000円と2000円の商品がカートに入っていること",
+              "preconditions": "1. 1000円の商品をカートから削除する",
+              "steps": "合計金額が2000円になること",
+              "expected": "商品は消えるが合計金額は3000円のままになる",
+              "actual": "画面を再読み込みすると合計金額が2000円になる",
+              "remarks": "3/3",
+              "reproducibility": "1000円の商品をカートから削除しても合計金額に1000円が残る"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "カートから商品を削除しても合計金額が変わらない",
+            "sections": {
+              "detail": "1000円の商品をカートから削除しても合計金額に1000円が残る\n上記について継続して確認が必要です。",
+              "preconditions": "1000円と2000円の商品がカートに入っていること\n上記について継続して確認が必要です。",
+              "steps": "1. 1000円の商品をカートから削除する\n上記について継続して確認が必要です。",
+              "expected": "合計金額が2000円になること\n上記について継続して確認が必要です。",
+              "actual": "商品は消えるが合計金額は3000円のままになる\n上記について継続して確認が必要です。",
+              "remarks": "画面を再読み込みすると合計金額が2000円になる\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "mobile-dark-mode-button-text-invisible": {
+      "scenarioId": "mobile-dark-mode-button-text-invisible",
+      "rubricVersion": "mobile-dark-mode-button-text-invisible.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "ダークモードで保存ボタンの文字が見えない",
+            "sections": {
+              "detail": "ダークモードにすると設定画面の保存ボタンが背景と同じ色になり文字を読めない",
+              "preconditions": "端末の外観モードがダークに設定されていること",
+              "steps": "1. アプリの設定画面を開く",
+              "expected": "保存ボタンの文字を背景と区別して読めること",
+              "actual": "保存ボタンの文字と背景が同じ黒色で文字を読めない",
+              "remarks": "ライトモードでは保存の文字を読める",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "ダークモードで保存ボタンの文字が見えない",
+            "sections": {
+              "detail": "ダークモードにすると設定画面の保存ボタンが背景と同じ色になり文字を読めない",
+              "preconditions": "端末の外観モードがダークに設定されていること",
+              "steps": "アプリの設定画面を開く",
+              "expected": "モバイル画面デザイン仕様書 Rev.3.7「4.2 ダークモード」\n保存ボタンの文字を背景と区別して読めること",
+              "actual": "保存ボタンの文字と背景が同じ黒色で文字を読めない",
+              "remarks": "ライトモードでは保存の文字を読める",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "ダークモードで保存ボタンの文字が見えない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりダークモードで保存ボタンの文字が見えない",
+            "sections": {
+              "detail": "ダークモードにすると設定画面の保存ボタンが背景と同じ色になり文字を読めない\n原因は実装不備であることを確認しました。",
+              "preconditions": "端末の外観モードがダークに設定されていること",
+              "steps": "1. アプリの設定画面を開く",
+              "expected": "保存ボタンの文字を背景と区別して読めること",
+              "actual": "保存ボタンの文字と背景が同じ黒色で文字を読めない",
+              "remarks": "ライトモードでは保存の文字を読める",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "ダークモードで保存ボタンの文字が見えない",
+            "sections": {
+              "detail": "端末の外観モードがダークに設定されていること",
+              "preconditions": "1. アプリの設定画面を開く",
+              "steps": "保存ボタンの文字を背景と区別して読めること",
+              "expected": "保存ボタンの文字と背景が同じ黒色で文字を読めない",
+              "actual": "ライトモードでは保存の文字を読める",
+              "remarks": "3/3",
+              "reproducibility": "ダークモードにすると設定画面の保存ボタンが背景と同じ色になり文字を読めない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "ダークモードで保存ボタンの文字が見えない",
+            "sections": {
+              "detail": "ダークモードにすると設定画面の保存ボタンが背景と同じ色になり文字を読めない\n上記について継続して確認が必要です。",
+              "preconditions": "端末の外観モードがダークに設定されていること\n上記について継続して確認が必要です。",
+              "steps": "1. アプリの設定画面を開く\n上記について継続して確認が必要です。",
+              "expected": "保存ボタンの文字を背景と区別して読めること\n上記について継続して確認が必要です。",
+              "actual": "保存ボタンの文字と背景が同じ黒色で文字を読めない\n上記について継続して確認が必要です。",
+              "remarks": "ライトモードでは保存の文字を読める\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-turn-signal-indicator-not-blinking": {
+      "scenarioId": "automotive-turn-signal-indicator-not-blinking",
+      "rubricVersion": "automotive-turn-signal-indicator-not-blinking.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "右ウインカーを操作してもメーターの矢印が点滅しない",
+            "sections": {
+              "detail": "右ウインカーをONにしてもメーターの右向き矢印が消灯したままになる",
+              "preconditions": "イグニッションがONで車両が停車していること",
+              "steps": "1. 右ウインカーレバーを操作する",
+              "expected": "メーターの右向き矢印が緑色で点滅すること",
+              "actual": "車外ランプは点滅するがメーターの矢印は消灯したままになる",
+              "remarks": "左ウインカーではメーターの左向き矢印が点滅する",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "右ウインカーを操作してもメーターの矢印が点滅しない",
+            "sections": {
+              "detail": "右ウインカーをONにしてもメーターの右向き矢印が消灯したままになる",
+              "preconditions": "イグニッションがONで車両が停車していること",
+              "steps": "右ウインカーレバーを操作する",
+              "expected": "メーター表示仕様書 Rev.5.5「3.1 方向指示表示」\nメーターの右向き矢印が緑色で点滅すること",
+              "actual": "車外ランプは点滅するがメーターの矢印は消灯したままになる",
+              "remarks": "左ウインカーではメーターの左向き矢印が点滅する",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "右ウインカーを操作してもメーターの矢印が点滅しない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により右ウインカーを操作してもメーターの矢印が点滅しない",
+            "sections": {
+              "detail": "右ウインカーをONにしてもメーターの右向き矢印が消灯したままになる\n原因は実装不備であることを確認しました。",
+              "preconditions": "イグニッションがONで車両が停車していること",
+              "steps": "1. 右ウインカーレバーを操作する",
+              "expected": "メーターの右向き矢印が緑色で点滅すること",
+              "actual": "車外ランプは点滅するがメーターの矢印は消灯したままになる",
+              "remarks": "左ウインカーではメーターの左向き矢印が点滅する",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "右ウインカーを操作してもメーターの矢印が点滅しない",
+            "sections": {
+              "detail": "イグニッションがONで車両が停車していること",
+              "preconditions": "1. 右ウインカーレバーを操作する",
+              "steps": "メーターの右向き矢印が緑色で点滅すること",
+              "expected": "車外ランプは点滅するがメーターの矢印は消灯したままになる",
+              "actual": "左ウインカーではメーターの左向き矢印が点滅する",
+              "remarks": "3/3",
+              "reproducibility": "右ウインカーをONにしてもメーターの右向き矢印が消灯したままになる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "右ウインカーを操作してもメーターの矢印が点滅しない",
+            "sections": {
+              "detail": "右ウインカーをONにしてもメーターの右向き矢印が消灯したままになる\n上記について継続して確認が必要です。",
+              "preconditions": "イグニッションがONで車両が停車していること\n上記について継続して確認が必要です。",
+              "steps": "1. 右ウインカーレバーを操作する\n上記について継続して確認が必要です。",
+              "expected": "メーターの右向き矢印が緑色で点滅すること\n上記について継続して確認が必要です。",
+              "actual": "車外ランプは点滅するがメーターの矢印は消灯したままになる\n上記について継続して確認が必要です。",
+              "remarks": "左ウインカーではメーターの左向き矢印が点滅する\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "payment-receipt-pdf-amount-blank": {
+      "scenarioId": "payment-receipt-pdf-amount-blank",
+      "rubricVersion": "payment-receipt-pdf-amount-blank.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "決済完了後の領収書PDFに支払金額が表示されない",
+            "sections": {
+              "detail": "1000円の決済後に領収書PDFを開くと支払金額の欄が空欄になる",
+              "preconditions": "1000円の決済が完了していること",
+              "steps": "1. 決済詳細から領収書PDFを開く",
+              "expected": "領収書PDFの支払金額に1000円と表示されること",
+              "actual": "領収書PDFの支払金額が空欄で表示される",
+              "remarks": "決済詳細画面には1000円と表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "決済完了後の領収書PDFに支払金額が表示されない",
+            "sections": {
+              "detail": "1000円の決済後に領収書PDFを開くと支払金額の欄が空欄になる",
+              "preconditions": "1000円の決済が完了していること",
+              "steps": "決済詳細から領収書PDFを開く",
+              "expected": "領収書出力仕様書 Rev.5.2「2.3 支払情報」\n領収書PDFの支払金額に1000円と表示されること",
+              "actual": "領収書PDFの支払金額が空欄で表示される",
+              "remarks": "決済詳細画面には1000円と表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "決済完了後の領収書PDFに支払金額が表示されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により決済完了後の領収書PDFに支払金額が表示されない",
+            "sections": {
+              "detail": "1000円の決済後に領収書PDFを開くと支払金額の欄が空欄になる\n原因は実装不備であることを確認しました。",
+              "preconditions": "1000円の決済が完了していること",
+              "steps": "1. 決済詳細から領収書PDFを開く",
+              "expected": "領収書PDFの支払金額に1000円と表示されること",
+              "actual": "領収書PDFの支払金額が空欄で表示される",
+              "remarks": "決済詳細画面には1000円と表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "決済完了後の領収書PDFに支払金額が表示されない",
+            "sections": {
+              "detail": "1000円の決済が完了していること",
+              "preconditions": "1. 決済詳細から領収書PDFを開く",
+              "steps": "領収書PDFの支払金額に1000円と表示されること",
+              "expected": "領収書PDFの支払金額が空欄で表示される",
+              "actual": "決済詳細画面には1000円と表示される",
+              "remarks": "3/3",
+              "reproducibility": "1000円の決済後に領収書PDFを開くと支払金額の欄が空欄になる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "決済完了後の領収書PDFに支払金額が表示されない",
+            "sections": {
+              "detail": "1000円の決済後に領収書PDFを開くと支払金額の欄が空欄になる\n上記について継続して確認が必要です。",
+              "preconditions": "1000円の決済が完了していること\n上記について継続して確認が必要です。",
+              "steps": "1. 決済詳細から領収書PDFを開く\n上記について継続して確認が必要です。",
+              "expected": "領収書PDFの支払金額に1000円と表示されること\n上記について継続して確認が必要です。",
+              "actual": "領収書PDFの支払金額が空欄で表示される\n上記について継続して確認が必要です。",
+              "remarks": "決済詳細画面には1000円と表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "medical-patient-search-birthdate-no-result": {
+      "scenarioId": "medical-patient-search-birthdate-no-result",
+      "rubricVersion": "medical-patient-search-birthdate-no-result.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "生年月日で患者を検索しても該当患者が表示されない",
+            "sections": {
+              "detail": "生年月日1990年5月10日の患者を同じ日付で検索しても0件になる",
+              "preconditions": "生年月日が1990年5月10日の患者が登録済みであること",
+              "steps": "1. 患者検索で生年月日を1990年5月10日に指定する\n2. 検索ボタンを押す",
+              "expected": "登録済みの患者が検索結果に表示されること",
+              "actual": "検索結果が0件と表示される",
+              "remarks": "患者IDで検索すると同じ患者が表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "生年月日で患者を検索しても該当患者が表示されない",
+            "sections": {
+              "detail": "生年月日1990年5月10日の患者を同じ日付で検索しても0件になる",
+              "preconditions": "生年月日が1990年5月10日の患者が登録済みであること",
+              "steps": "患者検索で生年月日を1990年5月10日に指定する。検索ボタンを押す",
+              "expected": "患者検索仕様書 Rev.6.7「3.2 生年月日検索」\n登録済みの患者が検索結果に表示されること",
+              "actual": "検索結果が0件と表示される",
+              "remarks": "患者IDで検索すると同じ患者が表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "生年月日で患者を検索しても該当患者が表示されない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により生年月日で患者を検索しても該当患者が表示されない",
+            "sections": {
+              "detail": "生年月日1990年5月10日の患者を同じ日付で検索しても0件になる\n原因は実装不備であることを確認しました。",
+              "preconditions": "生年月日が1990年5月10日の患者が登録済みであること",
+              "steps": "1. 患者検索で生年月日を1990年5月10日に指定する\n2. 検索ボタンを押す",
+              "expected": "登録済みの患者が検索結果に表示されること",
+              "actual": "検索結果が0件と表示される",
+              "remarks": "患者IDで検索すると同じ患者が表示される",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "生年月日で患者を検索しても該当患者が表示されない",
+            "sections": {
+              "detail": "生年月日が1990年5月10日の患者が登録済みであること",
+              "preconditions": "1. 患者検索で生年月日を1990年5月10日に指定する\n2. 検索ボタンを押す",
+              "steps": "登録済みの患者が検索結果に表示されること",
+              "expected": "検索結果が0件と表示される",
+              "actual": "患者IDで検索すると同じ患者が表示される",
+              "remarks": "3/3",
+              "reproducibility": "生年月日1990年5月10日の患者を同じ日付で検索しても0件になる"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "生年月日で患者を検索しても該当患者が表示されない",
+            "sections": {
+              "detail": "生年月日1990年5月10日の患者を同じ日付で検索しても0件になる\n上記について継続して確認が必要です。",
+              "preconditions": "生年月日が1990年5月10日の患者が登録済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. 患者検索で生年月日を1990年5月10日に指定する\n2. 検索ボタンを押す\n上記について継続して確認が必要です。",
+              "expected": "登録済みの患者が検索結果に表示されること\n上記について継続して確認が必要です。",
+              "actual": "検索結果が0件と表示される\n上記について継続して確認が必要です。",
+              "remarks": "患者IDで検索すると同じ患者が表示される\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-multimedia-unmute-icon-stays-muted": {
+      "scenarioId": "automotive-multimedia-unmute-icon-stays-muted",
+      "rubricVersion": "automotive-multimedia-unmute-icon-stays-muted.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "ミュートを解除してもオーディオ画面の消音アイコンが消えない",
+            "sections": {
+              "detail": "音量ボタンでミュートを解除して音が出ても画面には消音アイコンが表示され続ける",
+              "preconditions": "オーディオがミュート状態であること",
+              "steps": "1. 音量ボタンを押してミュートを解除する",
+              "expected": "音が再生され消音アイコンが消えること",
+              "actual": "音は再生されるが消音アイコンが表示されたままになる",
+              "remarks": "オーディオ画面を開き直すと消音アイコンが消える",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "ミュートを解除してもオーディオ画面の消音アイコンが消えない",
+            "sections": {
+              "detail": "音量ボタンでミュートを解除して音が出ても画面には消音アイコンが表示され続ける",
+              "preconditions": "オーディオがミュート状態であること",
+              "steps": "音量ボタンを押してミュートを解除する",
+              "expected": "IVIオーディオ画面仕様書 Rev.3.8「2.6 ミュート表示」\n音が再生され消音アイコンが消えること",
+              "actual": "音は再生されるが消音アイコンが表示されたままになる",
+              "remarks": "オーディオ画面を開き直すと消音アイコンが消える",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "ミュートを解除してもオーディオ画面の消音アイコンが消えない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備によりミュートを解除してもオーディオ画面の消音アイコンが消えない",
+            "sections": {
+              "detail": "音量ボタンでミュートを解除して音が出ても画面には消音アイコンが表示され続ける\n原因は実装不備であることを確認しました。",
+              "preconditions": "オーディオがミュート状態であること",
+              "steps": "1. 音量ボタンを押してミュートを解除する",
+              "expected": "音が再生され消音アイコンが消えること",
+              "actual": "音は再生されるが消音アイコンが表示されたままになる",
+              "remarks": "オーディオ画面を開き直すと消音アイコンが消える",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "ミュートを解除してもオーディオ画面の消音アイコンが消えない",
+            "sections": {
+              "detail": "オーディオがミュート状態であること",
+              "preconditions": "1. 音量ボタンを押してミュートを解除する",
+              "steps": "音が再生され消音アイコンが消えること",
+              "expected": "音は再生されるが消音アイコンが表示されたままになる",
+              "actual": "オーディオ画面を開き直すと消音アイコンが消える",
+              "remarks": "3/3",
+              "reproducibility": "音量ボタンでミュートを解除して音が出ても画面には消音アイコンが表示され続ける"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "ミュートを解除してもオーディオ画面の消音アイコンが消えない",
+            "sections": {
+              "detail": "音量ボタンでミュートを解除して音が出ても画面には消音アイコンが表示され続ける\n上記について継続して確認が必要です。",
+              "preconditions": "オーディオがミュート状態であること\n上記について継続して確認が必要です。",
+              "steps": "1. 音量ボタンを押してミュートを解除する\n上記について継続して確認が必要です。",
+              "expected": "音が再生され消音アイコンが消えること\n上記について継続して確認が必要です。",
+              "actual": "音は再生されるが消音アイコンが表示されたままになる\n上記について継続して確認が必要です。",
+              "remarks": "オーディオ画面を開き直すと消音アイコンが消える\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "customer-csv-import-validation-partial-commit": {
+      "scenarioId": "customer-csv-import-validation-partial-commit",
+      "rubricVersion": "customer-csv-import-validation-partial-commit.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+            "sections": {
+              "detail": "100件の顧客CSVで51行目が入力エラーになると1行目から50行目だけが登録され取込全体が中断する",
+              "preconditions": "新規顧客100件のCSVで51行目の電話番号だけが不正形式であること",
+              "steps": "1. 顧客CSV取込画面で対象ファイルを選択する\n2. 事前チェックを実行して51行目のエラーを確認する\n3. 取込を実行する",
+              "expected": "入力エラーがある場合は100件すべてを登録せずエラー内容を表示すること",
+              "actual": "取込はエラー終了するが1行目から50行目の顧客が登録される",
+              "remarks": "51行目を修正して同じCSVを再取込すると先に登録された50件が重複エラーになる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+            "sections": {
+              "detail": "100件の顧客CSVで51行目が入力エラーになると1行目から50行目だけが登録され取込全体が中断する",
+              "preconditions": "新規顧客100件のCSVで51行目の電話番号だけが不正形式であること",
+              "steps": "顧客CSV取込画面で対象ファイルを選択する。事前チェックを実行して51行目のエラーを確認する。取込を実行する",
+              "expected": "顧客CSV取込仕様書 Rev.2.9「6.4 エラー時の登録制御」\n入力エラーがある場合は100件すべてを登録せずエラー内容を表示すること",
+              "actual": "取込はエラー終了するが1行目から50行目の顧客が登録される",
+              "remarks": "51行目を修正して同じCSVを再取込すると先に登録された50件が重複エラーになる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+            "sections": {
+              "detail": "100件の顧客CSVで51行目が入力エラーになると1行目から50行目だけが登録され取込全体が中断する\n原因は実装不備であることを確認しました。",
+              "preconditions": "新規顧客100件のCSVで51行目の電話番号だけが不正形式であること",
+              "steps": "1. 顧客CSV取込画面で対象ファイルを選択する\n2. 事前チェックを実行して51行目のエラーを確認する\n3. 取込を実行する",
+              "expected": "入力エラーがある場合は100件すべてを登録せずエラー内容を表示すること",
+              "actual": "取込はエラー終了するが1行目から50行目の顧客が登録される",
+              "remarks": "51行目を修正して同じCSVを再取込すると先に登録された50件が重複エラーになる",
+              "reproducibility": "3/3"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+            "sections": {
+              "detail": "新規顧客100件のCSVで51行目の電話番号だけが不正形式であること",
+              "preconditions": "1. 顧客CSV取込画面で対象ファイルを選択する\n2. 事前チェックを実行して51行目のエラーを確認する\n3. 取込を実行する",
+              "steps": "入力エラーがある場合は100件すべてを登録せずエラー内容を表示すること",
+              "expected": "取込はエラー終了するが1行目から50行目の顧客が登録される",
+              "actual": "51行目を修正して同じCSVを再取込すると先に登録された50件が重複エラーになる",
+              "remarks": "3/3",
+              "reproducibility": "100件の顧客CSVで51行目が入力エラーになると1行目から50行目だけが登録され取込全体が中断する"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+            "sections": {
+              "detail": "100件の顧客CSVで51行目が入力エラーになると1行目から50行目だけが登録され取込全体が中断する\n上記について継続して確認が必要です。",
+              "preconditions": "新規顧客100件のCSVで51行目の電話番号だけが不正形式であること\n上記について継続して確認が必要です。",
+              "steps": "1. 顧客CSV取込画面で対象ファイルを選択する\n2. 事前チェックを実行して51行目のエラーを確認する\n3. 取込を実行する\n上記について継続して確認が必要です。",
+              "expected": "入力エラーがある場合は100件すべてを登録せずエラー内容を表示すること\n上記について継続して確認が必要です。",
+              "actual": "取込はエラー終了するが1行目から50行目の顧客が登録される\n上記について継続して確認が必要です。",
+              "remarks": "51行目を修正して同じCSVを再取込すると先に登録された50件が重複エラーになる\n上記について継続して確認が必要です。",
+              "reproducibility": "3/3\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "salon-cancel-checkin-race-state-split": {
+      "scenarioId": "salon-cancel-checkin-race-state-split",
+      "rubricVersion": "salon-cancel-checkin-race-state-split.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+            "sections": {
+              "detail": "同じ予約をWebからキャンセルすると同時に店舗で来店受付すると予約一覧はキャンセル済みだが会計には受付済みで登録される",
+              "preconditions": "当日10時の未受付予約がWebと店舗端末の両方に表示されていること",
+              "steps": "1. 顧客Webで予約のキャンセル確認画面を開く\n2. 店舗端末で同じ予約の来店受付画面を開く\n3. キャンセル確定と来店受付を同時に実行する",
+              "expected": "先に完了した操作だけを受け付け後続操作をエラーにして全画面で同じ予約状態を表示すること",
+              "actual": "予約一覧はキャンセル済みになるが会計には受付済みの伝票が作成される",
+              "remarks": "画面更新後も状態は分かれたままで会計伝票を取消すと予約枠だけ空きになる",
+              "reproducibility": "7/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+            "sections": {
+              "detail": "同じ予約をWebからキャンセルすると同時に店舗で来店受付すると予約一覧はキャンセル済みだが会計には受付済みで登録される",
+              "preconditions": "当日10時の未受付予約がWebと店舗端末の両方に表示されていること",
+              "steps": "顧客Webで予約のキャンセル確認画面を開く。店舗端末で同じ予約の来店受付画面を開く。キャンセル確定と来店受付を同時に実行する",
+              "expected": "予約状態遷移仕様書 Rev.3.9「7.2 同時更新」\n先に完了した操作だけを受け付け後続操作をエラーにして全画面で同じ予約状態を表示すること",
+              "actual": "予約一覧はキャンセル済みになるが会計には受付済みの伝票が作成される",
+              "remarks": "画面更新後も状態は分かれたままで会計伝票を取消すと予約枠だけ空きになる",
+              "reproducibility": "7/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+            "sections": {
+              "detail": "同じ予約をWebからキャンセルすると同時に店舗で来店受付すると予約一覧はキャンセル済みだが会計には受付済みで登録される\n原因は実装不備であることを確認しました。",
+              "preconditions": "当日10時の未受付予約がWebと店舗端末の両方に表示されていること",
+              "steps": "1. 顧客Webで予約のキャンセル確認画面を開く\n2. 店舗端末で同じ予約の来店受付画面を開く\n3. キャンセル確定と来店受付を同時に実行する",
+              "expected": "先に完了した操作だけを受け付け後続操作をエラーにして全画面で同じ予約状態を表示すること",
+              "actual": "予約一覧はキャンセル済みになるが会計には受付済みの伝票が作成される",
+              "remarks": "画面更新後も状態は分かれたままで会計伝票を取消すと予約枠だけ空きになる",
+              "reproducibility": "7/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+            "sections": {
+              "detail": "当日10時の未受付予約がWebと店舗端末の両方に表示されていること",
+              "preconditions": "1. 顧客Webで予約のキャンセル確認画面を開く\n2. 店舗端末で同じ予約の来店受付画面を開く\n3. キャンセル確定と来店受付を同時に実行する",
+              "steps": "先に完了した操作だけを受け付け後続操作をエラーにして全画面で同じ予約状態を表示すること",
+              "expected": "予約一覧はキャンセル済みになるが会計には受付済みの伝票が作成される",
+              "actual": "画面更新後も状態は分かれたままで会計伝票を取消すと予約枠だけ空きになる",
+              "remarks": "7/10",
+              "reproducibility": "同じ予約をWebからキャンセルすると同時に店舗で来店受付すると予約一覧はキャンセル済みだが会計には受付済みで登録される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+            "sections": {
+              "detail": "同じ予約をWebからキャンセルすると同時に店舗で来店受付すると予約一覧はキャンセル済みだが会計には受付済みで登録される\n上記について継続して確認が必要です。",
+              "preconditions": "当日10時の未受付予約がWebと店舗端末の両方に表示されていること\n上記について継続して確認が必要です。",
+              "steps": "1. 顧客Webで予約のキャンセル確認画面を開く\n2. 店舗端末で同じ予約の来店受付画面を開く\n3. キャンセル確定と来店受付を同時に実行する\n上記について継続して確認が必要です。",
+              "expected": "先に完了した操作だけを受け付け後続操作をエラーにして全画面で同じ予約状態を表示すること\n上記について継続して確認が必要です。",
+              "actual": "予約一覧はキャンセル済みになるが会計には受付済みの伝票が作成される\n上記について継続して確認が必要です。",
+              "remarks": "画面更新後も状態は分かれたままで会計伝票を取消すと予約枠だけ空きになる\n上記について継続して確認が必要です。",
+              "reproducibility": "7/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "inventory-stocktake-shipment-lost-update": {
+      "scenarioId": "inventory-stocktake-shipment-lost-update",
+      "rubricVersion": "inventory-stocktake-shipment-lost-update.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+            "sections": {
+              "detail": "帳簿在庫100個を棚卸中に10個出荷し実数90個で確定すると在庫が90個ではなく100個へ戻る",
+              "preconditions": "商品Aの帳簿在庫が100個で倉庫Aの棚卸が開始済みであること",
+              "steps": "1. 棚卸画面に商品Aの実数90個を入力する\n2. 棚卸確定前に出荷APIで商品Aを10個出庫する\n3. 棚卸を確定して在庫履歴と現在庫を確認する",
+              "expected": "出荷10個を反映した現在庫90個を維持し棚卸差異を0個として確定すること",
+              "actual": "出荷履歴は残るが棚卸確定後の現在庫が100個へ戻り在庫が10個増える",
+              "remarks": "棚卸確定後に出荷した場合は現在庫が90個になり履歴と一致する",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+            "sections": {
+              "detail": "帳簿在庫100個を棚卸中に10個出荷し実数90個で確定すると在庫が90個ではなく100個へ戻る",
+              "preconditions": "商品Aの帳簿在庫が100個で倉庫Aの棚卸が開始済みであること",
+              "steps": "棚卸画面に商品Aの実数90個を入力する。棚卸確定前に出荷APIで商品Aを10個出庫する。棚卸を確定して在庫履歴と現在庫を確認する",
+              "expected": "棚卸連携仕様書 Rev.4.9「8.4 棚卸中の在庫更新」\n出荷10個を反映した現在庫90個を維持し棚卸差異を0個として確定すること",
+              "actual": "出荷履歴は残るが棚卸確定後の現在庫が100個へ戻り在庫が10個増える",
+              "remarks": "棚卸確定後に出荷した場合は現在庫が90個になり履歴と一致する",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+            "sections": {
+              "detail": "帳簿在庫100個を棚卸中に10個出荷し実数90個で確定すると在庫が90個ではなく100個へ戻る\n原因は実装不備であることを確認しました。",
+              "preconditions": "商品Aの帳簿在庫が100個で倉庫Aの棚卸が開始済みであること",
+              "steps": "1. 棚卸画面に商品Aの実数90個を入力する\n2. 棚卸確定前に出荷APIで商品Aを10個出庫する\n3. 棚卸を確定して在庫履歴と現在庫を確認する",
+              "expected": "出荷10個を反映した現在庫90個を維持し棚卸差異を0個として確定すること",
+              "actual": "出荷履歴は残るが棚卸確定後の現在庫が100個へ戻り在庫が10個増える",
+              "remarks": "棚卸確定後に出荷した場合は現在庫が90個になり履歴と一致する",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+            "sections": {
+              "detail": "商品Aの帳簿在庫が100個で倉庫Aの棚卸が開始済みであること",
+              "preconditions": "1. 棚卸画面に商品Aの実数90個を入力する\n2. 棚卸確定前に出荷APIで商品Aを10個出庫する\n3. 棚卸を確定して在庫履歴と現在庫を確認する",
+              "steps": "出荷10個を反映した現在庫90個を維持し棚卸差異を0個として確定すること",
+              "expected": "出荷履歴は残るが棚卸確定後の現在庫が100個へ戻り在庫が10個増える",
+              "actual": "棚卸確定後に出荷した場合は現在庫が90個になり履歴と一致する",
+              "remarks": "5/5",
+              "reproducibility": "帳簿在庫100個を棚卸中に10個出荷し実数90個で確定すると在庫が90個ではなく100個へ戻る"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+            "sections": {
+              "detail": "帳簿在庫100個を棚卸中に10個出荷し実数90個で確定すると在庫が90個ではなく100個へ戻る\n上記について継続して確認が必要です。",
+              "preconditions": "商品Aの帳簿在庫が100個で倉庫Aの棚卸が開始済みであること\n上記について継続して確認が必要です。",
+              "steps": "1. 棚卸画面に商品Aの実数90個を入力する\n2. 棚卸確定前に出荷APIで商品Aを10個出庫する\n3. 棚卸を確定して在庫履歴と現在庫を確認する\n上記について継続して確認が必要です。",
+              "expected": "出荷10個を反映した現在庫90個を維持し棚卸差異を0個として確定すること\n上記について継続して確認が必要です。",
+              "actual": "出荷履歴は残るが棚卸確定後の現在庫が100個へ戻り在庫が10個増える\n上記について継続して確認が必要です。",
+              "remarks": "棚卸確定後に出荷した場合は現在庫が90個になり履歴と一致する\n上記について継続して確認が必要です。",
+              "reproducibility": "5/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "mobile-account-switch-shows-previous-offline-draft": {
+      "scenarioId": "mobile-account-switch-shows-previous-offline-draft",
+      "rubricVersion": "mobile-account-switch-shows-previous-offline-draft.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+            "sections": {
+              "detail": "利用者Aがオフラインで保存した下書きがログアウト後に利用者Bでログインすると編集一覧へ表示される",
+              "preconditions": "利用者AとBが同じ端末を使用しAで未送信下書きが1件保存されていること",
+              "steps": "1. オフラインのまま利用者Aからログアウトする\n2. 通信を戻して利用者Bでログインする\n3. 未送信データ一覧を開く",
+              "expected": "利用者BにはAの下書きを表示せずAで再ログインした場合だけ復元すること",
+              "actual": "利用者Bの未送信データ一覧にAの下書き内容と添付画像が表示される",
+              "remarks": "Bで下書きを削除するとAで再ログインしても復元できない",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+            "sections": {
+              "detail": "利用者Aがオフラインで保存した下書きがログアウト後に利用者Bでログインすると編集一覧へ表示される",
+              "preconditions": "利用者AとBが同じ端末を使用しAで未送信下書きが1件保存されていること",
+              "steps": "オフラインのまま利用者Aからログアウトする。通信を戻して利用者Bでログインする。未送信データ一覧を開く",
+              "expected": "モバイルデータ管理仕様書 Rev.3.9「7.5 アカウント切替」\n利用者BにはAの下書きを表示せずAで再ログインした場合だけ復元すること",
+              "actual": "利用者Bの未送信データ一覧にAの下書き内容と添付画像が表示される",
+              "remarks": "Bで下書きを削除するとAで再ログインしても復元できない",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+            "sections": {
+              "detail": "利用者Aがオフラインで保存した下書きがログアウト後に利用者Bでログインすると編集一覧へ表示される\n原因は実装不備であることを確認しました。",
+              "preconditions": "利用者AとBが同じ端末を使用しAで未送信下書きが1件保存されていること",
+              "steps": "1. オフラインのまま利用者Aからログアウトする\n2. 通信を戻して利用者Bでログインする\n3. 未送信データ一覧を開く",
+              "expected": "利用者BにはAの下書きを表示せずAで再ログインした場合だけ復元すること",
+              "actual": "利用者Bの未送信データ一覧にAの下書き内容と添付画像が表示される",
+              "remarks": "Bで下書きを削除するとAで再ログインしても復元できない",
+              "reproducibility": "5/5"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+            "sections": {
+              "detail": "利用者AとBが同じ端末を使用しAで未送信下書きが1件保存されていること",
+              "preconditions": "1. オフラインのまま利用者Aからログアウトする\n2. 通信を戻して利用者Bでログインする\n3. 未送信データ一覧を開く",
+              "steps": "利用者BにはAの下書きを表示せずAで再ログインした場合だけ復元すること",
+              "expected": "利用者Bの未送信データ一覧にAの下書き内容と添付画像が表示される",
+              "actual": "Bで下書きを削除するとAで再ログインしても復元できない",
+              "remarks": "5/5",
+              "reproducibility": "利用者Aがオフラインで保存した下書きがログアウト後に利用者Bでログインすると編集一覧へ表示される"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+            "sections": {
+              "detail": "利用者Aがオフラインで保存した下書きがログアウト後に利用者Bでログインすると編集一覧へ表示される\n上記について継続して確認が必要です。",
+              "preconditions": "利用者AとBが同じ端末を使用しAで未送信下書きが1件保存されていること\n上記について継続して確認が必要です。",
+              "steps": "1. オフラインのまま利用者Aからログアウトする\n2. 通信を戻して利用者Bでログインする\n3. 未送信データ一覧を開く\n上記について継続して確認が必要です。",
+              "expected": "利用者BにはAの下書きを表示せずAで再ログインした場合だけ復元すること\n上記について継続して確認が必要です。",
+              "actual": "利用者Bの未送信データ一覧にAの下書き内容と添付画像が表示される\n上記について継続して確認が必要です。",
+              "remarks": "Bで下書きを削除するとAで再ログインしても復元できない\n上記について継続して確認が必要です。",
+              "reproducibility": "5/5\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
+    },
+    "automotive-multimedia-incoming-call-hides-rear-camera": {
+      "scenarioId": "automotive-multimedia-incoming-call-hides-rear-camera",
+      "rubricVersion": "automotive-multimedia-incoming-call-hides-rear-camera.v5",
+      "fixtures": [
+        {
+          "fixtureId": "example-complete",
+          "label": "記載例に必要情報がそろっている回答",
+          "answer": {
+            "subject": "後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+            "sections": {
+              "detail": "シフトRで後方カメラ表示中に着信すると通話画面が全面表示され拒否後もカメラ映像へ戻らない",
+              "preconditions": "車両が停車中でBluetooth接続済みの電話がありシフト位置がRであること",
+              "steps": "1. シフトをRにして後方カメラ映像を表示する\n2. 接続済み電話へ着信させる\n3. 画面上で着信を拒否する",
+              "expected": "後方カメラ映像を維持して着信を小さく表示し拒否後もカメラ表示を継続すること",
+              "actual": "着信画面が後方カメラを覆い拒否後はホーム画面になってカメラ映像へ戻らない",
+              "remarks": "シフトをPへ戻して再度Rにすると後方カメラ映像を表示できる",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "alternative-excellent",
+          "label": "記載例と異なる表現・構成で観測事実と切り分けを伝える回答",
+          "answer": {
+            "subject": "後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+            "sections": {
+              "detail": "シフトRで後方カメラ表示中に着信すると通話画面が全面表示され拒否後もカメラ映像へ戻らない",
+              "preconditions": "車両が停車中でBluetooth接続済みの電話がありシフト位置がRであること",
+              "steps": "シフトをRにして後方カメラ映像を表示する。接続済み電話へ着信させる。画面上で着信を拒否する",
+              "expected": "IVI画面優先度仕様書 Rev.4.0「3.1 後方カメラ優先表示」\n後方カメラ映像を維持して着信を小さく表示し拒否後もカメラ表示を継続すること",
+              "actual": "着信画面が後方カメラを覆い拒否後はホーム画面になってカメラ映像へ戻らない",
+              "remarks": "シフトをPへ戻して再度Rにすると後方カメラ映像を表示できる",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 85,
+            "scoreMax": 100,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "missing-critical-facts",
+          "label": "現象だけを記載し重要な条件と結果が不足した回答",
+          "answer": {
+            "subject": "後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+            "sections": {}
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 79,
+            "missingFactIds": [
+              "detail-observation",
+              "expected-from-specification",
+              "actual-observed-result"
+            ],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "unsupported-root-cause",
+          "label": "未確認の実装原因を断定した回答",
+          "answer": {
+            "subject": "実装不備により後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+            "sections": {
+              "detail": "シフトRで後方カメラ表示中に着信すると通話画面が全面表示され拒否後もカメラ映像へ戻らない\n原因は実装不備であることを確認しました。",
+              "preconditions": "車両が停車中でBluetooth接続済みの電話がありシフト位置がRであること",
+              "steps": "1. シフトをRにして後方カメラ映像を表示する\n2. 接続済み電話へ着信させる\n3. 画面上で着信を拒否する",
+              "expected": "後方カメラ映像を維持して着信を小さく表示し拒否後もカメラ表示を継続すること",
+              "actual": "着信画面が後方カメラを覆い拒否後はホーム画面になってカメラ映像へ戻らない",
+              "remarks": "シフトをPへ戻して再度Rにすると後方カメラ映像を表示できる",
+              "reproducibility": "10/10"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 74,
+            "missingFactIds": [],
+            "forbiddenClaimIds": [
+              "claim-unverified-root-cause"
+            ]
+          }
+        },
+        {
+          "fixtureId": "misplaced-sections",
+          "label": "必要情報はあるが記載場所が入れ替わった回答",
+          "answer": {
+            "subject": "後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+            "sections": {
+              "detail": "車両が停車中でBluetooth接続済みの電話がありシフト位置がRであること",
+              "preconditions": "1. シフトをRにして後方カメラ映像を表示する\n2. 接続済み電話へ着信させる\n3. 画面上で着信を拒否する",
+              "steps": "後方カメラ映像を維持して着信を小さく表示し拒否後もカメラ表示を継続すること",
+              "expected": "着信画面が後方カメラを覆い拒否後はホーム画面になってカメラ映像へ戻らない",
+              "actual": "シフトをPへ戻して再度Rにすると後方カメラ映像を表示できる",
+              "remarks": "10/10",
+              "reproducibility": "シフトRで後方カメラ表示中に着信すると通話画面が全面表示され拒否後もカメラ映像へ戻らない"
+            }
+          },
+          "expected": {
+            "scoreMin": 0,
+            "scoreMax": 75,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        },
+        {
+          "fixtureId": "verbose",
+          "label": "必要情報はあるが重複表現が多い回答",
+          "answer": {
+            "subject": "後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+            "sections": {
+              "detail": "シフトRで後方カメラ表示中に着信すると通話画面が全面表示され拒否後もカメラ映像へ戻らない\n上記について継続して確認が必要です。",
+              "preconditions": "車両が停車中でBluetooth接続済みの電話がありシフト位置がRであること\n上記について継続して確認が必要です。",
+              "steps": "1. シフトをRにして後方カメラ映像を表示する\n2. 接続済み電話へ着信させる\n3. 画面上で着信を拒否する\n上記について継続して確認が必要です。",
+              "expected": "後方カメラ映像を維持して着信を小さく表示し拒否後もカメラ表示を継続すること\n上記について継続して確認が必要です。",
+              "actual": "着信画面が後方カメラを覆い拒否後はホーム画面になってカメラ映像へ戻らない\n上記について継続して確認が必要です。",
+              "remarks": "シフトをPへ戻して再度Rにすると後方カメラ映像を表示できる\n上記について継続して確認が必要です。",
+              "reproducibility": "10/10\n上記について継続して確認が必要です。"
+            }
+          },
+          "expected": {
+            "scoreMin": 65,
+            "scoreMax": 95,
+            "missingFactIds": [],
+            "forbiddenClaimIds": []
+          }
+        }
+      ]
     }
   }
 }

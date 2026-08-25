@@ -10766,6 +10766,5066 @@
         "同じ事実を複数セクションへ重複記載しても加点しない",
         "チケット項目と添付証跡はシナリオの期待値と照合する"
       ]
+    },
+    "customer-status-filter-lost-on-next-page": {
+      "scenarioId": "customer-status-filter-lost-on-next-page",
+      "projectId": "customer",
+      "rubricVersion": "customer-status-filter-lost-on-next-page.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "顧客一覧のページ移動後もステータス条件が維持されることをテストしています。",
+        "environment": [
+          "App version: 2.3.1",
+          "Google Chrome 126.0.6478.127",
+          "Windows 11 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "ステータスを有効にして25件へ絞り込み、検索結果の2ページ目を開きました。2ページ目には退会済み顧客を含む一覧が表示されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を3回行い、3回とも2ページ目で退会済み顧客が表示されました。1ページ目へ戻ると有効顧客だけの表示へ戻りました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "顧客一覧画面仕様では、ページ移動時も現在の検索条件を維持して次ページの結果を取得すると規定されています。 氏名検索だけを指定した場合は、2ページ目へ移動しても氏名条件が維持されました。"
+          }
+        ],
+        "specificationReference": "顧客一覧画面仕様書 Rev.2.4「3.8 ページ移動」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、ステータスで絞り込んだ顧客一覧を複数ページ確認する担当者です。",
+          "confirmedWorkaround": "修正までは、ページ移動後にステータス条件を再指定して検索します。",
+          "confirmedRecovery": "ステータスを再指定すると有効顧客だけの一覧へ戻ります。",
+          "riskAssessment": "退会済み顧客を対応対象と誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『ステータスを有効にして25件へ絞り込み、検索結果の2ページ目を開きました。2ページ目には退会済み顧客を含む一覧が表示されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を3回行い、3回とも2ページ目で退会済み顧客が表示されました。1ページ目へ戻ると有効顧客だけの表示へ戻りました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『顧客一覧画面仕様では、ページ移動時も現在の検索条件を維持して次ページの結果を取得すると規定されています。 氏名検索だけを指定した場合は、2ページ目へ移動しても氏名条件が維持されました。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "input",
+        "version": "App version: 2.3.1",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "tsunagi",
+        "watcherIds": [
+          "tsunagi",
+          "kikuta"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "customer-status-operation",
+          "name": "customer-status_operation.mp4",
+          "summary": "ステータスを有効にして25件へ絞り込み、検索結果の2ページ目を開きました。2ページ目には退会済み顧客を含む一覧が表示されました。",
+          "contentPreview": [
+            "操作開始",
+            "ステータスを有効にして25件へ絞り込み、検索結果の2ページ目を開きました。2ページ目には退会済み顧客を含む一覧が表示されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "customer-status-comparison",
+          "name": "customer-status_comparison.log",
+          "summary": "同じ操作を3回行い、3回とも2ページ目で退会済み顧客が表示されました。1ページ目へ戻ると有効顧客だけの表示へ戻りました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を3回行い、3回とも2ページ目で退会済み顧客が表示されました。1ページ目へ戻ると有効顧客だけの表示へ戻りました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "customer-status-state",
+          "name": "customer-status_state.json",
+          "summary": "発生時の内部状態。ステータスを有効にして25件へ絞り込み、検索結果の2ページ目を開きました。2ページ目には退会済み顧客を含む一覧が表示されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"customer-status-filter-lost-on-next-page\",\"result\":\"observed\",\"sequence\":14}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "customer-status-unrelated",
+          "name": "customer-status_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "退会済みを除外した顧客一覧で2ページ目へ移動すると全件表示に戻る",
+        "sections": {
+          "detail": "有効顧客だけに絞り込んだ一覧で2ページ目へ移動すると退会済み顧客も表示される",
+          "preconditions": "有効顧客が25件、退会済み顧客が5件登録されていること",
+          "steps": "1. ステータスを有効にして検索する\n2. 検索結果の2ページ目を開く",
+          "expected": "2ページ目にも有効顧客だけが表示されること",
+          "actual": "2ページ目では絞り込みが解除され退会済み顧客も表示される",
+          "remarks": "1ページ目へ戻ると有効顧客だけの表示に戻る",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "attendance-break-edit-total-not-updated": {
+      "scenarioId": "attendance-break-edit-total-not-updated",
+      "projectId": "attendance",
+      "rubricVersion": "attendance-break-edit-total-not-updated.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "休憩時間の修正結果が日次勤務合計へ反映されることをテストしています。",
+        "environment": [
+          "Web version: 4.12.0",
+          "Google Chrome 126.0.6478.127",
+          "Windows 11 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "9時から18時、休憩60分の勤務について、休憩を45分へ変更して保存しました。休憩欄は45分になりましたが、勤務合計は8時間のままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ勤務データで4回確認し、4回とも保存直後の合計が更新されませんでした。画面を再読み込みすると8時間15分へ更新されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "日次勤怠画面仕様では、休憩時間を保存した時点で実労働時間を再計算して画面へ反映すると規定されています。 出勤時刻を変更して保存した場合は、再読み込みせず勤務合計が更新されました。"
+          }
+        ],
+        "specificationReference": "日次勤怠画面仕様書 Rev.4.6「5.3 休憩時間の修正」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、日次勤怠画面で休憩時間を修正した直後の勤務合計表示です。",
+          "confirmedWorkaround": "修正までは、休憩時間の保存後に画面を再読み込みします。",
+          "confirmedRecovery": "画面を再読み込みすると保存済みの休憩時間で勤務合計を表示できます。",
+          "riskAssessment": "保存に失敗したと誤認して同じ修正を繰り返す可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『9時から18時、休憩60分の勤務について、休憩を45分へ変更して保存しました。休憩欄は45分になりましたが、勤務合計は8時間のままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ勤務データで4回確認し、4回とも保存直後の合計が更新されませんでした。画面を再読み込みすると8時間15分へ更新されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『日次勤怠画面仕様では、休憩時間を保存した時点で実労働時間を再計算して画面へ反映すると規定されています。 出勤時刻を変更して保存した場合は、再読み込みせず勤務合計が更新されました。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "high",
+        "category": "workflow",
+        "version": "Web version: 4.12.0",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "tokito",
+        "watcherIds": [
+          "tokito",
+          "yasuda"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 3
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "attendance-break-operation",
+          "name": "attendance-break_operation.mp4",
+          "summary": "9時から18時、休憩60分の勤務について、休憩を45分へ変更して保存しました。休憩欄は45分になりましたが、勤務合計は8時間のままでした。",
+          "contentPreview": [
+            "操作開始",
+            "9時から18時、休憩60分の勤務について、休憩を45分へ変更して保存しました。休憩欄は45分になりましたが、勤務合計は8時間のままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "attendance-break-comparison",
+          "name": "attendance-break_comparison.log",
+          "summary": "同じ勤務データで4回確認し、4回とも保存直後の合計が更新されませんでした。画面を再読み込みすると8時間15分へ更新されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ勤務データで4回確認し、4回とも保存直後の合計が更新されませんでした。画面を再読み込みすると8時間15分へ更新されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "attendance-break-state",
+          "name": "attendance-break_state.json",
+          "summary": "発生時の内部状態。9時から18時、休憩60分の勤務について、休憩を45分へ変更して保存しました。休憩欄は45分になりましたが、勤務合計は8時間のままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"attendance-break-edit-total-not-updated\",\"result\":\"observed\",\"sequence\":15}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "attendance-break-unrelated",
+          "name": "attendance-break_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "休憩時間を修正しても日次勤務合計が更新されない",
+        "sections": {
+          "detail": "休憩を60分から45分へ修正して保存しても日次勤務合計が8時間のままになる",
+          "preconditions": "9時から18時まで勤務し休憩60分で登録されていること",
+          "steps": "1. 日次勤怠で休憩を45分へ変更する\n2. 保存して勤務合計を確認する",
+          "expected": "勤務合計が8時間15分へ更新されること",
+          "actual": "休憩は45分で保存されるが勤務合計は8時間のままになる",
+          "remarks": "画面を再読み込みすると勤務合計が8時間15分になる",
+          "reproducibility": "4/4"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "ec-coupon-lost-after-quantity-change": {
+      "scenarioId": "ec-coupon-lost-after-quantity-change",
+      "projectId": "ec",
+      "rubricVersion": "ec-coupon-lost-after-quantity-change.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "クーポン適用後の数量変更でも割引が再計算されることをテストしています。",
+        "environment": [
+          "Storefront v8.4.2",
+          "Google Chrome 126.0.6478.127",
+          "Windows 11 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "10パーセント割引クーポンを適用した商品について、数量を1個から2個へ変更しました。クーポンコードは残りましたが、割引額は0円になりました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ商品で3回確認し、3回とも数量変更後に割引が0円になりました。クーポンを適用し直すと2個分の小計へ正しく割引されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "カート割引仕様では、対象商品の数量または価格が変わった場合、適用中のクーポン条件と割引額を再計算すると規定されています。 対象商品の価格とクーポンの有効期限は数量変更の前後で変わっていません。"
+          }
+        ],
+        "specificationReference": "カート割引仕様書 Rev.5.2「4.6 数量変更時の再計算」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、クーポン適用後に対象商品の数量を変更する注文です。",
+          "confirmedWorkaround": "修正までは、数量変更後にクーポンを適用し直します。",
+          "confirmedRecovery": "クーポンを再適用すると変更後の数量で割引額を計算できます。",
+          "riskAssessment": "利用者が割引されない金額で注文を確定する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『10パーセント割引クーポンを適用した商品について、数量を1個から2個へ変更しました。クーポンコードは残りましたが、割引額は0円になりました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ商品で3回確認し、3回とも数量変更後に割引が0円になりました。クーポンを適用し直すと2個分の小計へ正しく割引されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『カート割引仕様では、対象商品の数量または価格が変わった場合、適用中のクーポン条件と割引額を再計算すると規定されています。 対象商品の価格とクーポンの有効期限は数量変更の前後で変わっていません。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Storefront v8.4.2",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "kagotani",
+        "watcherIds": [
+          "kagotani",
+          "urino"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "ec-coupon-operation",
+          "name": "ec-coupon_operation.mp4",
+          "summary": "10パーセント割引クーポンを適用した商品について、数量を1個から2個へ変更しました。クーポンコードは残りましたが、割引額は0円になりました。",
+          "contentPreview": [
+            "操作開始",
+            "10パーセント割引クーポンを適用した商品について、数量を1個から2個へ変更しました。クーポンコードは残りましたが、割引額は0円になりました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "ec-coupon-comparison",
+          "name": "ec-coupon_comparison.log",
+          "summary": "同じ商品で3回確認し、3回とも数量変更後に割引が0円になりました。クーポンを適用し直すと2個分の小計へ正しく割引されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ商品で3回確認し、3回とも数量変更後に割引が0円になりました。クーポンを適用し直すと2個分の小計へ正しく割引されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "ec-coupon-state",
+          "name": "ec-coupon_state.json",
+          "summary": "発生時の内部状態。10パーセント割引クーポンを適用した商品について、数量を1個から2個へ変更しました。クーポンコードは残りましたが、割引額は0円になりました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"ec-coupon-lost-after-quantity-change\",\"result\":\"observed\",\"sequence\":16}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "ec-coupon-unrelated",
+          "name": "ec-coupon_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "カートで数量を変更すると適用済みクーポンが解除される",
+        "sections": {
+          "detail": "クーポン適用後に商品の数量を2個へ変更すると割引が0円になる",
+          "preconditions": "対象商品1個と10パーセント割引クーポンがカートへ適用済みであること",
+          "steps": "1. カートの商品数量を1個から2個へ変更する\n2. 注文金額の内訳を確認する",
+          "expected": "数量変更後の小計に10パーセント割引が適用されること",
+          "actual": "クーポンコードは表示されたままだが割引額が0円になる",
+          "remarks": "クーポンを適用し直すと2個分の小計へ割引される",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "inventory-transfer-destination-quantity-stale": {
+      "scenarioId": "inventory-transfer-destination-quantity-stale",
+      "projectId": "inventory",
+      "rubricVersion": "inventory-transfer-destination-quantity-stale.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "在庫移動の確定後に移動元と移動先の数量が更新されることをテストしています。",
+        "environment": [
+          "Client 5.7.0 (Build 1842)",
+          "Microsoft Edge 126.0.2592.102",
+          "Windows 10 22H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "倉庫Aに30個、倉庫Bに5個ある商品を10個移動して確定しました。倉庫Aは20個になりましたが、倉庫Bは5個のまま表示されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ商品で4回確認し、4回とも移動先の表示だけ更新されませんでした。倉庫Bの一覧を再読み込みすると15個で表示されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "在庫移動仕様では、移動確定後に移動元と移動先の在庫数を更新し、両方の一覧へ反映すると規定されています。 在庫移動履歴には倉庫Aから倉庫Bへ10個移動した記録が保存されています。"
+          }
+        ],
+        "specificationReference": "在庫移動仕様書 Rev.4.8「6.2 移動確定後の在庫反映」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、在庫移動を確定した直後の移動先ロケーションの数量表示です。",
+          "confirmedWorkaround": "修正までは、移動確定後に移動先の在庫一覧を再読み込みします。",
+          "confirmedRecovery": "一覧を再読み込みすると移動後の正しい数量を表示できます。",
+          "riskAssessment": "移動先に在庫がないと誤認して重複した移動を登録する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『倉庫Aに30個、倉庫Bに5個ある商品を10個移動して確定しました。倉庫Aは20個になりましたが、倉庫Bは5個のまま表示されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ商品で4回確認し、4回とも移動先の表示だけ更新されませんでした。倉庫Bの一覧を再読み込みすると15個で表示されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『在庫移動仕様では、移動確定後に移動元と移動先の在庫数を更新し、両方の一覧へ反映すると規定されています。 在庫移動履歴には倉庫Aから倉庫Bへ10個移動した記録が保存されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Client 5.7.0 (Build 1842)",
+        "environment": "Microsoft Edge 126.0.2592.102 / Windows 10 22H2",
+        "assigneeId": "nimotsu",
+        "watcherIds": [
+          "nimotsu",
+          "tanahashi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "inventory-transfer-operation",
+          "name": "inventory-transfer_operation.mp4",
+          "summary": "倉庫Aに30個、倉庫Bに5個ある商品を10個移動して確定しました。倉庫Aは20個になりましたが、倉庫Bは5個のまま表示されました。",
+          "contentPreview": [
+            "操作開始",
+            "倉庫Aに30個、倉庫Bに5個ある商品を10個移動して確定しました。倉庫Aは20個になりましたが、倉庫Bは5個のまま表示されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "inventory-transfer-comparison",
+          "name": "inventory-transfer_comparison.log",
+          "summary": "同じ商品で4回確認し、4回とも移動先の表示だけ更新されませんでした。倉庫Bの一覧を再読み込みすると15個で表示されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ商品で4回確認し、4回とも移動先の表示だけ更新されませんでした。倉庫Bの一覧を再読み込みすると15個で表示されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "inventory-transfer-state",
+          "name": "inventory-transfer_state.json",
+          "summary": "発生時の内部状態。倉庫Aに30個、倉庫Bに5個ある商品を10個移動して確定しました。倉庫Aは20個になりましたが、倉庫Bは5個のまま表示されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"inventory-transfer-destination-quantity-stale\",\"result\":\"observed\",\"sequence\":17}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "inventory-transfer-unrelated",
+          "name": "inventory-transfer_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "在庫移動を確定しても移動先ロケーションの数量が更新されない",
+        "sections": {
+          "detail": "倉庫Aから倉庫Bへ10個移動すると移動元だけ減り移動先は移動前の数量を表示する",
+          "preconditions": "対象商品が倉庫Aに30個、倉庫Bに5個登録されていること",
+          "steps": "1. 倉庫Aから倉庫Bへ10個の在庫移動を登録する\n2. 移動を確定して両倉庫の数量を確認する",
+          "expected": "倉庫Aが20個、倉庫Bが15個で表示されること",
+          "actual": "倉庫Aは20個になるが倉庫Bは5個のまま表示される",
+          "remarks": "倉庫Bの一覧を再読み込みすると15個で表示される",
+          "reproducibility": "4/4"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-speed-unit-trip-average-stale": {
+      "scenarioId": "automotive-speed-unit-trip-average-stale",
+      "projectId": "automotive",
+      "rubricVersion": "automotive-speed-unit-trip-average-stale.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "速度単位の変更が現在速度とトリップ平均速度へ反映されることをテストしています。",
+        "environment": [
+          "ECU Software: v5.12.3",
+          "Hardware Rev: C",
+          "Vehicle profile: TEST-02"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "平均速度40km/hの状態で表示単位をmphへ変更しました。現在速度はmphへ切り替わりましたが、平均速度は40km/hの表示を続けました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を5回行い、5回とも平均速度だけkm/h表示が残りました。メーターを再起動すると平均速度は25mphへ切り替わりました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "メーター表示仕様では、速度単位を変更した場合、現在速度と速度を使用するトリップ情報を選択単位へ換算すると規定されています。 走行距離の単位は設定変更と同時にkmからmileへ切り替わりました。"
+          }
+        ],
+        "specificationReference": "メーター表示仕様書 Rev.5.6「4.4 速度単位の変更」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、速度単位を変更した直後のトリップ平均速度表示です。",
+          "confirmedWorkaround": "修正までは、速度単位の変更後にメーターを再起動します。",
+          "confirmedRecovery": "メーターを再起動すると選択単位で平均速度を表示できます。",
+          "riskAssessment": "異なる単位の数値を比較して走行状態を誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『平均速度40km/hの状態で表示単位をmphへ変更しました。現在速度はmphへ切り替わりましたが、平均速度は40km/hの表示を続けました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を5回行い、5回とも平均速度だけkm/h表示が残りました。メーターを再起動すると平均速度は25mphへ切り替わりました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『メーター表示仕様では、速度単位を変更した場合、現在速度と速度を使用するトリップ情報を選択単位へ換算すると規定されています。 走行距離の単位は設定変更と同時にkmからmileへ切り替わりました。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "ECU Software: v5.12.3",
+        "environment": "Hardware Rev: C / Vehicle profile: TEST-02",
+        "assigneeId": "wajima",
+        "watcherIds": [
+          "wajima",
+          "michigami"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-speed-operation",
+          "name": "automotive-speed_operation.mp4",
+          "summary": "平均速度40km/hの状態で表示単位をmphへ変更しました。現在速度はmphへ切り替わりましたが、平均速度は40km/hの表示を続けました。",
+          "contentPreview": [
+            "操作開始",
+            "平均速度40km/hの状態で表示単位をmphへ変更しました。現在速度はmphへ切り替わりましたが、平均速度は40km/hの表示を続けました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-speed-comparison",
+          "name": "automotive-speed_comparison.log",
+          "summary": "同じ操作を5回行い、5回とも平均速度だけkm/h表示が残りました。メーターを再起動すると平均速度は25mphへ切り替わりました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を5回行い、5回とも平均速度だけkm/h表示が残りました。メーターを再起動すると平均速度は25mphへ切り替わりました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-speed-state",
+          "name": "automotive-speed_state.json",
+          "summary": "発生時の内部状態。平均速度40km/hの状態で表示単位をmphへ変更しました。現在速度はmphへ切り替わりましたが、平均速度は40km/hの表示を続けました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-speed-unit-trip-average-stale\",\"result\":\"observed\",\"sequence\":18}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-speed-unrelated",
+          "name": "automotive-speed_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "速度単位をmphへ変更しても平均速度だけkm/h表示のままになる",
+        "sections": {
+          "detail": "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる",
+          "preconditions": "トリップ平均速度が40km/hで表示されていること",
+          "steps": "1. 表示設定で速度単位をmphへ変更する\n2. メーターの現在速度と平均速度を確認する",
+          "expected": "現在速度と平均速度がどちらもmphへ換算されること",
+          "actual": "現在速度はmphになるが平均速度は40km/hのまま表示される",
+          "remarks": "メーターを再起動すると平均速度も25mphへ切り替わる",
+          "reproducibility": "5/5"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "payment-partial-refund-remaining-amount-stale": {
+      "scenarioId": "payment-partial-refund-remaining-amount-stale",
+      "projectId": "payment",
+      "rubricVersion": "payment-partial-refund-remaining-amount-stale.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "一部返金後の返金可能額が残額へ更新されることをテストしています。",
+        "environment": [
+          "API version: 2024-06-20",
+          "Environment: Sandbox",
+          "Gateway build: 7.18.4"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "1万円の売上確定済み決済から3000円を返金しました。返金履歴には3000円が追加されましたが、返金可能額は1万円のままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ条件で3回確認し、3回とも返金直後の可能額が更新されませんでした。画面を再読み込みすると7000円へ更新されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "返金管理画面仕様では、一部返金の完了後に決済金額から返金済み金額を差し引き、返金可能額を更新すると規定されています。 ゲートウェイ側の返金状態は完了で、返金履歴の金額も3000円と一致しています。"
+          }
+        ],
+        "specificationReference": "返金管理画面仕様書 Rev.5.4「3.7 一部返金後の残額」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、一部返金を完了した直後の返金可能額表示です。",
+          "confirmedWorkaround": "修正までは、返金完了後に決済詳細を再読み込みします。",
+          "confirmedRecovery": "画面を再読み込みすると返金済み金額を差し引いた残額を表示できます。",
+          "riskAssessment": "担当者が追加返金できる金額を誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『1万円の売上確定済み決済から3000円を返金しました。返金履歴には3000円が追加されましたが、返金可能額は1万円のままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ条件で3回確認し、3回とも返金直後の可能額が更新されませんでした。画面を再読み込みすると7000円へ更新されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『返金管理画面仕様では、一部返金の完了後に決済金額から返金済み金額を差し引き、返金可能額を更新すると規定されています。 ゲートウェイ側の返金状態は完了で、返金履歴の金額も3000円と一致しています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "api",
+        "version": "API version: 2024-06-20",
+        "environment": "Environment: Sandbox / Gateway build: 7.18.4",
+        "assigneeId": "modorikawa",
+        "watcherIds": [
+          "modorikawa",
+          "kinjo"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "payment-partial-operation",
+          "name": "payment-partial_operation.mp4",
+          "summary": "1万円の売上確定済み決済から3000円を返金しました。返金履歴には3000円が追加されましたが、返金可能額は1万円のままでした。",
+          "contentPreview": [
+            "操作開始",
+            "1万円の売上確定済み決済から3000円を返金しました。返金履歴には3000円が追加されましたが、返金可能額は1万円のままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "payment-partial-comparison",
+          "name": "payment-partial_comparison.log",
+          "summary": "同じ条件で3回確認し、3回とも返金直後の可能額が更新されませんでした。画面を再読み込みすると7000円へ更新されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ条件で3回確認し、3回とも返金直後の可能額が更新されませんでした。画面を再読み込みすると7000円へ更新されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "payment-partial-state",
+          "name": "payment-partial_state.json",
+          "summary": "発生時の内部状態。1万円の売上確定済み決済から3000円を返金しました。返金履歴には3000円が追加されましたが、返金可能額は1万円のままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"payment-partial-refund-remaining-amount-stale\",\"result\":\"observed\",\"sequence\":19}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "payment-partial-unrelated",
+          "name": "payment-partial_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "一部返金後も返金可能額が決済金額のまま更新されない",
+        "sections": {
+          "detail": "1万円の決済から3000円を返金しても返金可能額が1万円と表示される",
+          "preconditions": "1万円の売上確定済み決済があり返金履歴がないこと",
+          "steps": "1. 決済詳細から3000円の一部返金を実行する\n2. 返金完了後に返金可能額を確認する",
+          "expected": "返金可能額が7000円へ更新されること",
+          "actual": "返金履歴は3000円で追加されるが返金可能額は1万円のままになる",
+          "remarks": "画面を再読み込みすると返金可能額が7000円になる",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "medical-corrected-result-list-not-updated": {
+      "scenarioId": "medical-corrected-result-list-not-updated",
+      "projectId": "medical",
+      "rubricVersion": "medical-corrected-result-list-not-updated.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "検査結果の訂正値が患者サマリーへ反映されることをテストしています。",
+        "environment": [
+          "Client version: 4.8.2",
+          "Database schema: 2026.07",
+          "Windows 11 Enterprise 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "確定済みの血糖値180mg/dLを160mg/dLへ訂正して保存しました。検査結果詳細は160mg/dLになりましたが、患者サマリーは180mg/dLのままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "4件の患者データで確認し、4件とも訂正直後は旧値が残りました。患者サマリーを再読み込みすると160mg/dLへ更新されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "患者サマリー表示仕様では、確定済み検査結果を訂正した場合、保存完了後に最新の訂正値をサマリーへ反映すると規定されています。 訂正履歴には旧値180mg/dLと新値160mg/dLが正しく保存されています。"
+          }
+        ],
+        "specificationReference": "患者サマリー表示仕様書 Rev.6.9「7.4 訂正済み検査結果」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、検査結果を訂正した直後に表示する患者サマリーの最新値です。",
+          "confirmedWorkaround": "修正までは、訂正保存後に患者サマリーを再読み込みします。",
+          "confirmedRecovery": "患者サマリーを再読み込みすると訂正後の検査値を表示できます。",
+          "riskAssessment": "医療従事者が訂正前の値を最新結果と誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『確定済みの血糖値180mg/dLを160mg/dLへ訂正して保存しました。検査結果詳細は160mg/dLになりましたが、患者サマリーは180mg/dLのままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『4件の患者データで確認し、4件とも訂正直後は旧値が残りました。患者サマリーを再読み込みすると160mg/dLへ更新されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『患者サマリー表示仕様では、確定済み検査結果を訂正した場合、保存完了後に最新の訂正値をサマリーへ反映すると規定されています。 訂正履歴には旧値180mg/dLと新値160mg/dLが正しく保存されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "ui",
+        "version": "Client version: 4.8.2",
+        "environment": "Database schema: 2026.07 / Windows 11 Enterprise 23H2",
+        "assigneeId": "kenmi",
+        "watcherIds": [
+          "kenmi",
+          "yakushiji"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "medical-corrected-operation",
+          "name": "medical-corrected_operation.mp4",
+          "summary": "確定済みの血糖値180mg/dLを160mg/dLへ訂正して保存しました。検査結果詳細は160mg/dLになりましたが、患者サマリーは180mg/dLのままでした。",
+          "contentPreview": [
+            "操作開始",
+            "確定済みの血糖値180mg/dLを160mg/dLへ訂正して保存しました。検査結果詳細は160mg/dLになりましたが、患者サマリーは180mg/dLのままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "medical-corrected-comparison",
+          "name": "medical-corrected_comparison.log",
+          "summary": "4件の患者データで確認し、4件とも訂正直後は旧値が残りました。患者サマリーを再読み込みすると160mg/dLへ更新されました。",
+          "contentPreview": [
+            "comparison-check",
+            "4件の患者データで確認し、4件とも訂正直後は旧値が残りました。患者サマリーを再読み込みすると160mg/dLへ更新されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "medical-corrected-state",
+          "name": "medical-corrected_state.json",
+          "summary": "発生時の内部状態。確定済みの血糖値180mg/dLを160mg/dLへ訂正して保存しました。検査結果詳細は160mg/dLになりましたが、患者サマリーは180mg/dLのままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"medical-corrected-result-list-not-updated\",\"result\":\"observed\",\"sequence\":20}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "medical-corrected-unrelated",
+          "name": "medical-corrected_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "検査結果を訂正しても患者サマリーに訂正前の値が表示される",
+        "sections": {
+          "detail": "血糖値を訂正して保存すると検査結果詳細は更新されるが患者サマリーには旧値が残る",
+          "preconditions": "患者の血糖値が180mg/dLで確定済みであること",
+          "steps": "1. 検査結果詳細で血糖値を160mg/dLへ訂正する\n2. 保存後に患者サマリーを開く",
+          "expected": "患者サマリーにも訂正後の160mg/dLが表示されること",
+          "actual": "検査結果詳細は160mg/dLになるが患者サマリーは180mg/dLのままになる",
+          "remarks": "患者サマリーを再読み込みすると160mg/dLへ更新される",
+          "reproducibility": "4/4"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "attendance-clock-in-success-not-listed": {
+      "scenarioId": "attendance-clock-in-success-not-listed",
+      "projectId": "attendance",
+      "rubricVersion": "attendance-clock-in-success-not-listed.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "出勤打刻の完了後に当日の打刻時刻が表示されることをテストしています。",
+        "environment": [
+          "Web version: 4.12.0",
+          "Google Chrome 126.0.6478.127",
+          "Windows 11 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "当日の打刻がない状態で出勤ボタンを押しました。完了メッセージは表示されましたが、当日の打刻一覧は未打刻のままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を3回確認し、3回とも一覧は未打刻のままでした。画面を再読み込みすると出勤時刻が表示されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "打刻画面仕様では、出勤打刻の登録完了後に当日の打刻一覧へ登録時刻を表示すると規定されています。 登録完了メッセージにはエラー表示がなく、打刻時刻はサーバーへ保存されています。"
+          }
+        ],
+        "specificationReference": "打刻画面仕様書 Rev.4.5「2.2 出勤打刻」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、出勤打刻を行った直後の当日打刻一覧です。",
+          "confirmedWorkaround": "修正までは、打刻後に画面を再読み込みします。",
+          "confirmedRecovery": "画面を再読み込みすると保存済みの出勤時刻を表示できます。",
+          "riskAssessment": "利用者が打刻に失敗したと誤認して再度操作する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『当日の打刻がない状態で出勤ボタンを押しました。完了メッセージは表示されましたが、当日の打刻一覧は未打刻のままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を3回確認し、3回とも一覧は未打刻のままでした。画面を再読み込みすると出勤時刻が表示されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『打刻画面仕様では、出勤打刻の登録完了後に当日の打刻一覧へ登録時刻を表示すると規定されています。 登録完了メッセージにはエラー表示がなく、打刻時刻はサーバーへ保存されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Web version: 4.12.0",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "uchikoshi",
+        "watcherIds": [
+          "uchikoshi",
+          "yasuda"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "attendance-clock-operation",
+          "name": "attendance-clock_operation.mp4",
+          "summary": "当日の打刻がない状態で出勤ボタンを押しました。完了メッセージは表示されましたが、当日の打刻一覧は未打刻のままでした。",
+          "contentPreview": [
+            "操作開始",
+            "当日の打刻がない状態で出勤ボタンを押しました。完了メッセージは表示されましたが、当日の打刻一覧は未打刻のままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "attendance-clock-comparison",
+          "name": "attendance-clock_comparison.log",
+          "summary": "同じ操作を3回確認し、3回とも一覧は未打刻のままでした。画面を再読み込みすると出勤時刻が表示されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を3回確認し、3回とも一覧は未打刻のままでした。画面を再読み込みすると出勤時刻が表示されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "attendance-clock-state",
+          "name": "attendance-clock_state.json",
+          "summary": "発生時の内部状態。当日の打刻がない状態で出勤ボタンを押しました。完了メッセージは表示されましたが、当日の打刻一覧は未打刻のままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"attendance-clock-in-success-not-listed\",\"result\":\"observed\",\"sequence\":21}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "attendance-clock-unrelated",
+          "name": "attendance-clock_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "出勤打刻が完了しても当日の打刻一覧に表示されない",
+        "sections": {
+          "detail": "出勤ボタンを押すと完了メッセージが出るが当日の打刻一覧は未打刻のままになる",
+          "preconditions": "当日の出勤打刻が未登録であること",
+          "steps": "1. 打刻画面で出勤ボタンを押す\n2. 当日の打刻一覧を開く",
+          "expected": "当日の打刻一覧に出勤時刻が表示されること",
+          "actual": "完了メッセージは出るが打刻一覧は未打刻のままになる",
+          "remarks": "画面を再読み込みすると出勤時刻が表示される",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "salon-reservation-confirmation-name-blank": {
+      "scenarioId": "salon-reservation-confirmation-name-blank",
+      "projectId": "salon",
+      "rubricVersion": "salon-reservation-confirmation-name-blank.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "顧客を選択した予約の確認画面に顧客名が表示されることをテストしています。",
+        "environment": [
+          "Release 2026.07.2",
+          "Safari 18.5",
+          "macOS 15.5"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "登録済みの山田花子を選択して予約を登録しました。予約は完了しましたが、確認画面の顧客名は空欄でした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ顧客で3回確認し、3回とも確認画面だけ空欄になりました。予約一覧には山田花子と表示されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "予約確認画面仕様では、予約登録時に選択した顧客の氏名を予約日時や担当者とともに確認画面へ表示すると規定されています。 予約日時、担当者、メニューは確認画面へ正しく表示されています。"
+          }
+        ],
+        "specificationReference": "予約確認画面仕様書 Rev.3.5「2.1 表示項目」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、顧客を選択して登録した直後の予約確認画面です。",
+          "confirmedWorkaround": "修正までは、登録後に予約一覧で顧客名を確認します。",
+          "confirmedRecovery": "予約一覧を開くと登録した顧客名を確認できます。",
+          "riskAssessment": "別の顧客で予約したと誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『登録済みの山田花子を選択して予約を登録しました。予約は完了しましたが、確認画面の顧客名は空欄でした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ顧客で3回確認し、3回とも確認画面だけ空欄になりました。予約一覧には山田花子と表示されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『予約確認画面仕様では、予約登録時に選択した顧客の氏名を予約日時や担当者とともに確認画面へ表示すると規定されています。 予約日時、担当者、メニューは確認画面へ正しく表示されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Release 2026.07.2",
+        "environment": "Safari 18.5 / macOS 15.5",
+        "assigneeId": "kamino",
+        "watcherIds": [
+          "kamino",
+          "soroi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "salon-reservation-operation",
+          "name": "salon-reservation_operation.mp4",
+          "summary": "登録済みの山田花子を選択して予約を登録しました。予約は完了しましたが、確認画面の顧客名は空欄でした。",
+          "contentPreview": [
+            "操作開始",
+            "登録済みの山田花子を選択して予約を登録しました。予約は完了しましたが、確認画面の顧客名は空欄でした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "salon-reservation-comparison",
+          "name": "salon-reservation_comparison.log",
+          "summary": "同じ顧客で3回確認し、3回とも確認画面だけ空欄になりました。予約一覧には山田花子と表示されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ顧客で3回確認し、3回とも確認画面だけ空欄になりました。予約一覧には山田花子と表示されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "salon-reservation-state",
+          "name": "salon-reservation_state.json",
+          "summary": "発生時の内部状態。登録済みの山田花子を選択して予約を登録しました。予約は完了しましたが、確認画面の顧客名は空欄でした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"salon-reservation-confirmation-name-blank\",\"result\":\"observed\",\"sequence\":22}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "salon-reservation-unrelated",
+          "name": "salon-reservation_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "予約を登録すると確認画面の顧客名が空欄になる",
+        "sections": {
+          "detail": "顧客を選択して予約を登録しても確認画面に顧客名が表示されない",
+          "preconditions": "顧客の山田花子が登録済みであること",
+          "steps": "1. 山田花子を選択して予約を登録する",
+          "expected": "予約確認画面に山田花子と表示されること",
+          "actual": "予約確認画面の顧客名が空欄で表示される",
+          "remarks": "予約一覧には山田花子と正しく表示される",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "ec-removed-item-total-not-updated": {
+      "scenarioId": "ec-removed-item-total-not-updated",
+      "projectId": "ec",
+      "rubricVersion": "ec-removed-item-total-not-updated.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "カートから商品を削除した後に合計金額が更新されることをテストしています。",
+        "environment": [
+          "Storefront v8.4.2",
+          "Google Chrome 126.0.6478.127",
+          "Windows 11 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "1000円と2000円の商品が入ったカートから1000円の商品を削除しました。商品は消えましたが、合計金額は3000円のままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を3回確認し、3回とも合計金額が残りました。画面を再読み込みすると2000円になりました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "カート画面仕様では、商品を削除した場合、残っている商品の金額で合計を再計算すると規定されています。 削除した商品はカートの商品一覧から消えており、商品数は1点と表示されています。"
+          }
+        ],
+        "specificationReference": "カート画面仕様書 Rev.5.0「3.3 商品削除」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、カートから商品を削除した直後の合計金額表示です。",
+          "confirmedWorkaround": "修正までは、商品削除後にカート画面を再読み込みします。",
+          "confirmedRecovery": "画面を再読み込みすると残った商品の合計金額を表示できます。",
+          "riskAssessment": "利用者が誤った合計金額で注文すると認識する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『1000円と2000円の商品が入ったカートから1000円の商品を削除しました。商品は消えましたが、合計金額は3000円のままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を3回確認し、3回とも合計金額が残りました。画面を再読み込みすると2000円になりました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『カート画面仕様では、商品を削除した場合、残っている商品の金額で合計を再計算すると規定されています。 削除した商品はカートの商品一覧から消えており、商品数は1点と表示されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Storefront v8.4.2",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "kagotani",
+        "watcherIds": [
+          "kagotani",
+          "urino"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "ec-removed-operation",
+          "name": "ec-removed_operation.mp4",
+          "summary": "1000円と2000円の商品が入ったカートから1000円の商品を削除しました。商品は消えましたが、合計金額は3000円のままでした。",
+          "contentPreview": [
+            "操作開始",
+            "1000円と2000円の商品が入ったカートから1000円の商品を削除しました。商品は消えましたが、合計金額は3000円のままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "ec-removed-comparison",
+          "name": "ec-removed_comparison.log",
+          "summary": "同じ操作を3回確認し、3回とも合計金額が残りました。画面を再読み込みすると2000円になりました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を3回確認し、3回とも合計金額が残りました。画面を再読み込みすると2000円になりました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "ec-removed-state",
+          "name": "ec-removed_state.json",
+          "summary": "発生時の内部状態。1000円と2000円の商品が入ったカートから1000円の商品を削除しました。商品は消えましたが、合計金額は3000円のままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"ec-removed-item-total-not-updated\",\"result\":\"observed\",\"sequence\":23}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "ec-removed-unrelated",
+          "name": "ec-removed_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "カートから商品を削除しても合計金額が変わらない",
+        "sections": {
+          "detail": "1000円の商品をカートから削除しても合計金額に1000円が残る",
+          "preconditions": "1000円と2000円の商品がカートに入っていること",
+          "steps": "1. 1000円の商品をカートから削除する",
+          "expected": "合計金額が2000円になること",
+          "actual": "商品は消えるが合計金額は3000円のままになる",
+          "remarks": "画面を再読み込みすると合計金額が2000円になる",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "mobile-dark-mode-button-text-invisible": {
+      "scenarioId": "mobile-dark-mode-button-text-invisible",
+      "projectId": "mobile",
+      "rubricVersion": "mobile-dark-mode-button-text-invisible.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "ダークモードでも設定画面の保存ボタンを読めることをテストしています。",
+        "environment": [
+          "App 3.4.0 (34018)",
+          "iOS 18.5",
+          "iPhone 15"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "端末をダークモードにしてアプリの設定画面を開きました。保存ボタンの文字と背景が黒色になり、文字を読めませんでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ画面を3回開いて3回とも文字を読めませんでした。ライトモードでは保存の文字が表示されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "画面デザイン仕様では、ライトまたはダークモードを選択した場合もボタンの文字と背景を判別可能な配色で表示すると規定されています。 キャンセルボタンと画面タイトルはダークモードでも読むことができました。"
+          }
+        ],
+        "specificationReference": "モバイル画面デザイン仕様書 Rev.3.7「4.2 ダークモード」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、ダークモードで表示した設定画面の保存ボタンです。",
+          "confirmedWorkaround": "修正までは、端末をライトモードへ変更して操作します。",
+          "confirmedRecovery": "ライトモードへ変更すると保存ボタンの文字を確認できます。",
+          "riskAssessment": "利用者が保存操作を見つけられず設定を完了できない可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『端末をダークモードにしてアプリの設定画面を開きました。保存ボタンの文字と背景が黒色になり、文字を読めませんでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ画面を3回開いて3回とも文字を読めませんでした。ライトモードでは保存の文字が表示されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『画面デザイン仕様では、ライトまたはダークモードを選択した場合もボタンの文字と背景を判別可能な配色で表示すると規定されています。 キャンセルボタンと画面タイトルはダークモードでも読むことができました。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "App 3.4.0 (34018)",
+        "environment": "iOS 18.5 / iPhone 15",
+        "assigneeId": "gamen",
+        "watcherIds": [
+          "gamen",
+          "hashiru"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "mobile-dark-operation",
+          "name": "mobile-dark_operation.mp4",
+          "summary": "端末をダークモードにしてアプリの設定画面を開きました。保存ボタンの文字と背景が黒色になり、文字を読めませんでした。",
+          "contentPreview": [
+            "操作開始",
+            "端末をダークモードにしてアプリの設定画面を開きました。保存ボタンの文字と背景が黒色になり、文字を読めませんでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "mobile-dark-comparison",
+          "name": "mobile-dark_comparison.log",
+          "summary": "同じ画面を3回開いて3回とも文字を読めませんでした。ライトモードでは保存の文字が表示されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ画面を3回開いて3回とも文字を読めませんでした。ライトモードでは保存の文字が表示されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "mobile-dark-state",
+          "name": "mobile-dark_state.json",
+          "summary": "発生時の内部状態。端末をダークモードにしてアプリの設定画面を開きました。保存ボタンの文字と背景が黒色になり、文字を読めませんでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"mobile-dark-mode-button-text-invisible\",\"result\":\"observed\",\"sequence\":24}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "mobile-dark-unrelated",
+          "name": "mobile-dark_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "ダークモードで保存ボタンの文字が見えない",
+        "sections": {
+          "detail": "ダークモードにすると設定画面の保存ボタンが背景と同じ色になり文字を読めない",
+          "preconditions": "端末の外観モードがダークに設定されていること",
+          "steps": "1. アプリの設定画面を開く",
+          "expected": "保存ボタンの文字を背景と区別して読めること",
+          "actual": "保存ボタンの文字と背景が同じ黒色で文字を読めない",
+          "remarks": "ライトモードでは保存の文字を読める",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-turn-signal-indicator-not-blinking": {
+      "scenarioId": "automotive-turn-signal-indicator-not-blinking",
+      "projectId": "automotive",
+      "rubricVersion": "automotive-turn-signal-indicator-not-blinking.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "右ウインカー操作時にメーターの方向指示表示が点滅することをテストしています。",
+        "environment": [
+          "ECU Software: v5.12.3",
+          "Hardware Rev: C",
+          "Vehicle profile: TEST-02"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "停車中に右ウインカーレバーを操作しました。車外の右ランプは点滅しましたが、メーターの右向き矢印は消灯したままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を3回行い、3回とも右向き矢印は点滅しませんでした。左ウインカーの矢印は点滅しました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "メーター表示仕様では、方向指示器が作動している間、対応する方向の表示を緑色で点滅すると規定されています。 右ウインカーの作動音は鳴っており、車外のランプも正常に点滅しています。"
+          }
+        ],
+        "specificationReference": "メーター表示仕様書 Rev.5.5「3.1 方向指示表示」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、右ウインカーを作動させた際のメーター方向指示表示です。",
+          "confirmedWorkaround": "修正までは、作動音と車外ランプで右ウインカーの作動を確認します。",
+          "confirmedRecovery": "イグニッションを再起動すると一時的に矢印が点滅します。",
+          "riskAssessment": "運転者が方向指示器の作動状態を視覚的に確認できない可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『停車中に右ウインカーレバーを操作しました。車外の右ランプは点滅しましたが、メーターの右向き矢印は消灯したままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を3回行い、3回とも右向き矢印は点滅しませんでした。左ウインカーの矢印は点滅しました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『メーター表示仕様では、方向指示器が作動している間、対応する方向の表示を緑色で点滅すると規定されています。 右ウインカーの作動音は鳴っており、車外のランプも正常に点滅しています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "ui",
+        "version": "ECU Software: v5.12.3",
+        "environment": "Hardware Rev: C / Vehicle profile: TEST-02",
+        "assigneeId": "wajima",
+        "watcherIds": [
+          "wajima",
+          "michigami"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-turn-operation",
+          "name": "automotive-turn_operation.mp4",
+          "summary": "停車中に右ウインカーレバーを操作しました。車外の右ランプは点滅しましたが、メーターの右向き矢印は消灯したままでした。",
+          "contentPreview": [
+            "操作開始",
+            "停車中に右ウインカーレバーを操作しました。車外の右ランプは点滅しましたが、メーターの右向き矢印は消灯したままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-turn-comparison",
+          "name": "automotive-turn_comparison.log",
+          "summary": "同じ操作を3回行い、3回とも右向き矢印は点滅しませんでした。左ウインカーの矢印は点滅しました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を3回行い、3回とも右向き矢印は点滅しませんでした。左ウインカーの矢印は点滅しました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-turn-state",
+          "name": "automotive-turn_state.json",
+          "summary": "発生時の内部状態。停車中に右ウインカーレバーを操作しました。車外の右ランプは点滅しましたが、メーターの右向き矢印は消灯したままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-turn-signal-indicator-not-blinking\",\"result\":\"observed\",\"sequence\":25}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-turn-unrelated",
+          "name": "automotive-turn_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "右ウインカーを操作してもメーターの矢印が点滅しない",
+        "sections": {
+          "detail": "右ウインカーをONにしてもメーターの右向き矢印が消灯したままになる",
+          "preconditions": "イグニッションがONで車両が停車していること",
+          "steps": "1. 右ウインカーレバーを操作する",
+          "expected": "メーターの右向き矢印が緑色で点滅すること",
+          "actual": "車外ランプは点滅するがメーターの矢印は消灯したままになる",
+          "remarks": "左ウインカーではメーターの左向き矢印が点滅する",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "payment-receipt-pdf-amount-blank": {
+      "scenarioId": "payment-receipt-pdf-amount-blank",
+      "projectId": "payment",
+      "rubricVersion": "payment-receipt-pdf-amount-blank.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "決済完了後の領収書PDFに支払金額が表示されることをテストしています。",
+        "environment": [
+          "API version: 2024-06-20",
+          "Environment: Sandbox",
+          "Gateway build: 7.18.4"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "1000円の決済を完了し、決済詳細から領収書PDFを開きました。支払日時は表示されましたが、支払金額の欄は空欄でした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ決済で3回PDFを開き、3回とも金額が空欄でした。決済詳細画面には1000円と表示されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "領収書出力仕様では、完了した決済の取引番号、支払日時、支払金額を領収書PDFへ表示すると規定されています。 領収書PDFの取引番号、支払日時、加盟店名は正しく表示されています。"
+          }
+        ],
+        "specificationReference": "領収書出力仕様書 Rev.5.2「2.3 支払情報」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、決済完了後に出力する領収書PDFの支払金額欄です。",
+          "confirmedWorkaround": "修正までは、決済詳細画面の金額を確認して別途領収書を発行します。",
+          "confirmedRecovery": "修正版で領収書PDFを再出力すると支払金額を表示できます。",
+          "riskAssessment": "利用者が支払金額を確認できず領収書として使用できない可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『1000円の決済を完了し、決済詳細から領収書PDFを開きました。支払日時は表示されましたが、支払金額の欄は空欄でした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ決済で3回PDFを開き、3回とも金額が空欄でした。決済詳細画面には1000円と表示されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『領収書出力仕様では、完了した決済の取引番号、支払日時、支払金額を領収書PDFへ表示すると規定されています。 領収書PDFの取引番号、支払日時、加盟店名は正しく表示されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "api",
+        "version": "API version: 2024-06-20",
+        "environment": "Environment: Sandbox / Gateway build: 7.18.4",
+        "assigneeId": "kinjo",
+        "watcherIds": [
+          "kinjo",
+          "haraikawa"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "payment-receipt-operation",
+          "name": "payment-receipt_operation.mp4",
+          "summary": "1000円の決済を完了し、決済詳細から領収書PDFを開きました。支払日時は表示されましたが、支払金額の欄は空欄でした。",
+          "contentPreview": [
+            "操作開始",
+            "1000円の決済を完了し、決済詳細から領収書PDFを開きました。支払日時は表示されましたが、支払金額の欄は空欄でした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "payment-receipt-comparison",
+          "name": "payment-receipt_comparison.log",
+          "summary": "同じ決済で3回PDFを開き、3回とも金額が空欄でした。決済詳細画面には1000円と表示されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ決済で3回PDFを開き、3回とも金額が空欄でした。決済詳細画面には1000円と表示されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "payment-receipt-state",
+          "name": "payment-receipt_state.json",
+          "summary": "発生時の内部状態。1000円の決済を完了し、決済詳細から領収書PDFを開きました。支払日時は表示されましたが、支払金額の欄は空欄でした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"payment-receipt-pdf-amount-blank\",\"result\":\"observed\",\"sequence\":26}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "payment-receipt-unrelated",
+          "name": "payment-receipt_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "決済完了後の領収書PDFに支払金額が表示されない",
+        "sections": {
+          "detail": "1000円の決済後に領収書PDFを開くと支払金額の欄が空欄になる",
+          "preconditions": "1000円の決済が完了していること",
+          "steps": "1. 決済詳細から領収書PDFを開く",
+          "expected": "領収書PDFの支払金額に1000円と表示されること",
+          "actual": "領収書PDFの支払金額が空欄で表示される",
+          "remarks": "決済詳細画面には1000円と表示される",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "medical-patient-search-birthdate-no-result": {
+      "scenarioId": "medical-patient-search-birthdate-no-result",
+      "projectId": "medical",
+      "rubricVersion": "medical-patient-search-birthdate-no-result.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "登録済み患者を生年月日の条件で検索できることをテストしています。",
+        "environment": [
+          "Client version: 4.8.2",
+          "Database schema: 2026.07",
+          "Windows 11 Enterprise 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "生年月日が1990年5月10日の患者について、同じ日付を指定して検索しました。検索結果は0件と表示されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ条件で3回検索し、3回とも0件になりました。患者IDを指定すると同じ患者が表示されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "患者検索仕様では、指定した生年月日と登録値が一致する患者を検索結果へ表示すると規定されています。 患者詳細画面には生年月日が1990年5月10日と登録されています。"
+          }
+        ],
+        "specificationReference": "患者検索仕様書 Rev.6.7「3.2 生年月日検索」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、生年月日を条件に登録済み患者を検索する操作です。",
+          "confirmedWorkaround": "修正までは、患者IDまたは氏名で患者を検索します。",
+          "confirmedRecovery": "患者IDを指定すると対象患者を検索できます。",
+          "riskAssessment": "医療従事者が対象患者を見つけられず受付や診療が遅れる可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『生年月日が1990年5月10日の患者について、同じ日付を指定して検索しました。検索結果は0件と表示されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ条件で3回検索し、3回とも0件になりました。患者IDを指定すると同じ患者が表示されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『患者検索仕様では、指定した生年月日と登録値が一致する患者を検索結果へ表示すると規定されています。 患者詳細画面には生年月日が1990年5月10日と登録されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "input",
+        "version": "Client version: 4.8.2",
+        "environment": "Database schema: 2026.07 / Windows 11 Enterprise 23H2",
+        "assigneeId": "kenmi",
+        "watcherIds": [
+          "kenmi",
+          "yakushiji"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "medical-patient-operation",
+          "name": "medical-patient_operation.mp4",
+          "summary": "生年月日が1990年5月10日の患者について、同じ日付を指定して検索しました。検索結果は0件と表示されました。",
+          "contentPreview": [
+            "操作開始",
+            "生年月日が1990年5月10日の患者について、同じ日付を指定して検索しました。検索結果は0件と表示されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "medical-patient-comparison",
+          "name": "medical-patient_comparison.log",
+          "summary": "同じ条件で3回検索し、3回とも0件になりました。患者IDを指定すると同じ患者が表示されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ条件で3回検索し、3回とも0件になりました。患者IDを指定すると同じ患者が表示されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "medical-patient-state",
+          "name": "medical-patient_state.json",
+          "summary": "発生時の内部状態。生年月日が1990年5月10日の患者について、同じ日付を指定して検索しました。検索結果は0件と表示されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"medical-patient-search-birthdate-no-result\",\"result\":\"observed\",\"sequence\":27}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "medical-patient-unrelated",
+          "name": "medical-patient_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "生年月日で患者を検索しても該当患者が表示されない",
+        "sections": {
+          "detail": "生年月日1990年5月10日の患者を同じ日付で検索しても0件になる",
+          "preconditions": "生年月日が1990年5月10日の患者が登録済みであること",
+          "steps": "1. 患者検索で生年月日を1990年5月10日に指定する\n2. 検索ボタンを押す",
+          "expected": "登録済みの患者が検索結果に表示されること",
+          "actual": "検索結果が0件と表示される",
+          "remarks": "患者IDで検索すると同じ患者が表示される",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-multimedia-unmute-icon-stays-muted": {
+      "scenarioId": "automotive-multimedia-unmute-icon-stays-muted",
+      "projectId": "automotive-multimedia",
+      "rubricVersion": "automotive-multimedia-unmute-icon-stays-muted.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "ミュート解除後にオーディオ画面の消音表示が消えることをテストしています。",
+        "environment": [
+          "IVI Software: v3.8.0",
+          "Display Unit Rev: D",
+          "Vehicle profile: MM-04"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "オーディオをミュートした状態で音量ボタンを押しました。音は再生されましたが、画面の消音アイコンは表示されたままでした。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を3回行い、3回ともアイコンが残りました。オーディオ画面を開き直すとアイコンは消えました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "オーディオ画面仕様では、ミュートを解除した場合、音声出力の再開と同時に消音アイコンを非表示にすると規定されています。 ミュート解除後の音量値は解除前に設定していた10で表示されています。"
+          }
+        ],
+        "specificationReference": "IVIオーディオ画面仕様書 Rev.3.8「2.6 ミュート表示」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、ミュートを解除した直後のオーディオ画面の消音表示です。",
+          "confirmedWorkaround": "修正までは、ミュート解除後にオーディオ画面を開き直します。",
+          "confirmedRecovery": "オーディオ画面を再表示すると消音アイコンが消えます。",
+          "riskAssessment": "利用者が現在もミュート状態だと誤認する可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『オーディオをミュートした状態で音量ボタンを押しました。音は再生されましたが、画面の消音アイコンは表示されたままでした。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を3回行い、3回ともアイコンが残りました。オーディオ画面を開き直すとアイコンは消えました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『オーディオ画面仕様では、ミュートを解除した場合、音声出力の再開と同時に消音アイコンを非表示にすると規定されています。 ミュート解除後の音量値は解除前に設定していた10で表示されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s3",
+        "priority": "normal",
+        "category": "ui",
+        "version": "IVI Software: v3.8.0",
+        "environment": "Display Unit Rev: D / Vehicle profile: MM-04",
+        "assigneeId": "otowa",
+        "watcherIds": [
+          "otowa",
+          "mamoriya"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-multimedia-operation",
+          "name": "automotive-multimedia_operation.mp4",
+          "summary": "オーディオをミュートした状態で音量ボタンを押しました。音は再生されましたが、画面の消音アイコンは表示されたままでした。",
+          "contentPreview": [
+            "操作開始",
+            "オーディオをミュートした状態で音量ボタンを押しました。音は再生されましたが、画面の消音アイコンは表示されたままでした。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-comparison",
+          "name": "automotive-multimedia_comparison.log",
+          "summary": "同じ操作を3回行い、3回ともアイコンが残りました。オーディオ画面を開き直すとアイコンは消えました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を3回行い、3回ともアイコンが残りました。オーディオ画面を開き直すとアイコンは消えました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-state",
+          "name": "automotive-multimedia_state.json",
+          "summary": "発生時の内部状態。オーディオをミュートした状態で音量ボタンを押しました。音は再生されましたが、画面の消音アイコンは表示されたままでした。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-multimedia-unmute-icon-stays-muted\",\"result\":\"observed\",\"sequence\":28}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-unrelated",
+          "name": "automotive-multimedia_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "ミュートを解除してもオーディオ画面の消音アイコンが消えない",
+        "sections": {
+          "detail": "音量ボタンでミュートを解除して音が出ても画面には消音アイコンが表示され続ける",
+          "preconditions": "オーディオがミュート状態であること",
+          "steps": "1. 音量ボタンを押してミュートを解除する",
+          "expected": "音が再生され消音アイコンが消えること",
+          "actual": "音は再生されるが消音アイコンが表示されたままになる",
+          "remarks": "オーディオ画面を開き直すと消音アイコンが消える",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "customer-csv-import-validation-partial-commit": {
+      "scenarioId": "customer-csv-import-validation-partial-commit",
+      "projectId": "customer",
+      "rubricVersion": "customer-csv-import-validation-partial-commit.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "入力エラーを含む顧客CSV取込の登録単位とロールバックをテストしています。",
+        "environment": [
+          "App version: 2.3.1",
+          "Google Chrome 126.0.6478.127",
+          "Windows 11 23H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "新規顧客100件のCSVで51行目の電話番号だけを不正形式にし、事前チェック後に取込を実行しました。取込はエラー終了しましたが、1行目から50行目は顧客一覧へ登録されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "初期データへ戻して3回確認し、3回とも50件だけ登録されました。51行目を修正して再取込すると先に登録された50件は重複エラーになり、52行目以降も登録されませんでした。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "顧客CSV取込仕様では、取込対象に入力エラーが1件でもある場合はファイル単位で処理を中止し、顧客データを1件も登録しないと規定されています。 取込ジョブの履歴はエラー終了で、登録済み50件には同一の取込ジョブIDが保存されています。"
+          }
+        ],
+        "specificationReference": "顧客CSV取込仕様書 Rev.2.9「6.4 エラー時の登録制御」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、入力エラーを含む顧客CSVを取込した場合のエラー行より前の顧客データです。",
+          "confirmedWorkaround": "修正までは、事前チェックでエラーが1件でもあるCSVは取込せず、すべて修正してから実行します。",
+          "confirmedRecovery": "部分登録された顧客を取込ジョブIDで抽出して削除し、修正済みCSVを再取込します。",
+          "riskAssessment": "担当者が取込全体を失敗と認識したまま部分登録を見落とし、再取込時の重複や顧客データの欠落を招く可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『新規顧客100件のCSVで51行目の電話番号だけを不正形式にし、事前チェック後に取込を実行しました。取込はエラー終了しましたが、1行目から50行目は顧客一覧へ登録されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『初期データへ戻して3回確認し、3回とも50件だけ登録されました。51行目を修正して再取込すると先に登録された50件は重複エラーになり、52行目以降も登録されませんでした。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『顧客CSV取込仕様では、取込対象に入力エラーが1件でもある場合はファイル単位で処理を中止し、顧客データを1件も登録しないと規定されています。 取込ジョブの履歴はエラー終了で、登録済み50件には同一の取込ジョブIDが保存されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "App version: 2.3.1",
+        "environment": "Google Chrome 126.0.6478.127 / Windows 11 23H2",
+        "assigneeId": "tsunagi",
+        "watcherIds": [
+          "tsunagi",
+          "kikuta"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "customer-csv-operation",
+          "name": "customer-csv_operation.mp4",
+          "summary": "新規顧客100件のCSVで51行目の電話番号だけを不正形式にし、事前チェック後に取込を実行しました。取込はエラー終了しましたが、1行目から50行目は顧客一覧へ登録されました。",
+          "contentPreview": [
+            "操作開始",
+            "新規顧客100件のCSVで51行目の電話番号だけを不正形式にし、事前チェック後に取込を実行しました。取込はエラー終了しましたが、1行目から50行目は顧客一覧へ登録されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "customer-csv-comparison",
+          "name": "customer-csv_comparison.log",
+          "summary": "初期データへ戻して3回確認し、3回とも50件だけ登録されました。51行目を修正して再取込すると先に登録された50件は重複エラーになり、52行目以降も登録されませんでした。",
+          "contentPreview": [
+            "comparison-check",
+            "初期データへ戻して3回確認し、3回とも50件だけ登録されました。51行目を修正して再取込すると先に登録された50件は重複エラーになり、52行目以降も登録されませんでした。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "customer-csv-state",
+          "name": "customer-csv_state.json",
+          "summary": "発生時の内部状態。新規顧客100件のCSVで51行目の電話番号だけを不正形式にし、事前チェック後に取込を実行しました。取込はエラー終了しましたが、1行目から50行目は顧客一覧へ登録されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"customer-csv-import-validation-partial-commit\",\"result\":\"observed\",\"sequence\":29}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "customer-csv-unrelated",
+          "name": "customer-csv_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "顧客CSV取込で入力エラーが発生してもエラー行より前の顧客だけ登録される",
+        "sections": {
+          "detail": "100件の顧客CSVで51行目が入力エラーになると1行目から50行目だけが登録され取込全体が中断する",
+          "preconditions": "新規顧客100件のCSVで51行目の電話番号だけが不正形式であること",
+          "steps": "1. 顧客CSV取込画面で対象ファイルを選択する\n2. 事前チェックを実行して51行目のエラーを確認する\n3. 取込を実行する",
+          "expected": "入力エラーがある場合は100件すべてを登録せずエラー内容を表示すること",
+          "actual": "取込はエラー終了するが1行目から50行目の顧客が登録される",
+          "remarks": "51行目を修正して同じCSVを再取込すると先に登録された50件が重複エラーになる",
+          "reproducibility": "3/3"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "salon-cancel-checkin-race-state-split": {
+      "scenarioId": "salon-cancel-checkin-race-state-split",
+      "projectId": "salon",
+      "rubricVersion": "salon-cancel-checkin-race-state-split.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "予約キャンセルと来店受付が競合した場合の状態整合性をテストしています。",
+        "environment": [
+          "Release 2026.07.2",
+          "Safari 18.5",
+          "macOS 15.5"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "当日10時の未受付予約を顧客Webと店舗端末で開き、キャンセル確定と来店受付を同時に実行しました。予約一覧はキャンセル済みになりましたが、会計には受付済みの伝票が作成されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同時操作を10回行い7回で状態が分かれました。キャンセル完了後に受付した場合と受付完了後にキャンセルした場合は後続操作がエラーになり、画面間の状態は一致しました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "予約状態遷移仕様では、同一予約に対するキャンセルと来店受付を排他制御し、先に確定した状態だけを予約、受付、会計へ反映すると規定されています。 競合時の監査ログにはキャンセルと受付の両イベントが成功として記録され、同じ予約IDと異なる更新番号が付与されています。"
+          }
+        ],
+        "specificationReference": "予約状態遷移仕様書 Rev.3.9「7.2 同時更新」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、顧客Webのキャンセルと店舗の来店受付が同時に実行された予約の予約・受付・会計状態です。",
+          "confirmedWorkaround": "修正までは、来店時刻が近い予約のWebキャンセルを店舗へ通知し、受付前に最新状態を再取得します。",
+          "confirmedRecovery": "監査ログで先に完了した操作を確認し、誤った会計伝票またはキャンセル状態を管理者が訂正します。",
+          "riskAssessment": "キャンセル済み顧客への誤請求、予約枠の誤開放、来店実績の欠落につながる可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『当日10時の未受付予約を顧客Webと店舗端末で開き、キャンセル確定と来店受付を同時に実行しました。予約一覧はキャンセル済みになりましたが、会計には受付済みの伝票が作成されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同時操作を10回行い7回で状態が分かれました。キャンセル完了後に受付した場合と受付完了後にキャンセルした場合は後続操作がエラーになり、画面間の状態は一致しました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『予約状態遷移仕様では、同一予約に対するキャンセルと来店受付を排他制御し、先に確定した状態だけを予約、受付、会計へ反映すると規定されています。 競合時の監査ログにはキャンセルと受付の両イベントが成功として記録され、同じ予約IDと異なる更新番号が付与されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s2",
+        "priority": "normal",
+        "category": "workflow",
+        "version": "Release 2026.07.2",
+        "environment": "Safari 18.5 / macOS 15.5",
+        "assigneeId": "kamino",
+        "watcherIds": [
+          "kamino",
+          "soroi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "salon-cancel-operation",
+          "name": "salon-cancel_operation.mp4",
+          "summary": "当日10時の未受付予約を顧客Webと店舗端末で開き、キャンセル確定と来店受付を同時に実行しました。予約一覧はキャンセル済みになりましたが、会計には受付済みの伝票が作成されました。",
+          "contentPreview": [
+            "操作開始",
+            "当日10時の未受付予約を顧客Webと店舗端末で開き、キャンセル確定と来店受付を同時に実行しました。予約一覧はキャンセル済みになりましたが、会計には受付済みの伝票が作成されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "salon-cancel-comparison",
+          "name": "salon-cancel_comparison.log",
+          "summary": "同時操作を10回行い7回で状態が分かれました。キャンセル完了後に受付した場合と受付完了後にキャンセルした場合は後続操作がエラーになり、画面間の状態は一致しました。",
+          "contentPreview": [
+            "comparison-check",
+            "同時操作を10回行い7回で状態が分かれました。キャンセル完了後に受付した場合と受付完了後にキャンセルした場合は後続操作がエラーになり、画面間の状態は一致しました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "salon-cancel-state",
+          "name": "salon-cancel_state.json",
+          "summary": "発生時の内部状態。当日10時の未受付予約を顧客Webと店舗端末で開き、キャンセル確定と来店受付を同時に実行しました。予約一覧はキャンセル済みになりましたが、会計には受付済みの伝票が作成されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"salon-cancel-checkin-race-state-split\",\"result\":\"observed\",\"sequence\":30}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "salon-cancel-unrelated",
+          "name": "salon-cancel_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "予約キャンセルと来店受付を同時に行うと会計と予約一覧で状態が一致しない",
+        "sections": {
+          "detail": "同じ予約をWebからキャンセルすると同時に店舗で来店受付すると予約一覧はキャンセル済みだが会計には受付済みで登録される",
+          "preconditions": "当日10時の未受付予約がWebと店舗端末の両方に表示されていること",
+          "steps": "1. 顧客Webで予約のキャンセル確認画面を開く\n2. 店舗端末で同じ予約の来店受付画面を開く\n3. キャンセル確定と来店受付を同時に実行する",
+          "expected": "先に完了した操作だけを受け付け後続操作をエラーにして全画面で同じ予約状態を表示すること",
+          "actual": "予約一覧はキャンセル済みになるが会計には受付済みの伝票が作成される",
+          "remarks": "画面更新後も状態は分かれたままで会計伝票を取消すと予約枠だけ空きになる",
+          "reproducibility": "7/10"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "inventory-stocktake-shipment-lost-update": {
+      "scenarioId": "inventory-stocktake-shipment-lost-update",
+      "projectId": "inventory",
+      "rubricVersion": "inventory-stocktake-shipment-lost-update.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "棚卸確定と出荷処理が重なった場合の在庫整合性をテストしています。",
+        "environment": [
+          "Client 5.7.0 (Build 1842)",
+          "Microsoft Edge 126.0.2592.102",
+          "Windows 10 22H2"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "帳簿在庫100個の商品Aについて棚卸実数90個を入力し、確定前に出荷APIで10個を出庫しました。出荷は成功しましたが、棚卸確定後の現在庫は100個へ戻りました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "初期データへ戻して5回確認し、5回とも出荷履歴を残したまま在庫が10個増えました。棚卸確定後に出荷した場合は現在庫90個となり、履歴と一致しました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "棚卸連携仕様では、棚卸中の対象在庫に更新要求が発生した場合は確定時に更新差分を反映し、出庫履歴と現在庫の整合性を維持すると規定されています。 出荷APIの応答は200で、出荷伝票と在庫履歴には10個の出庫が正常に保存されています。"
+          }
+        ],
+        "specificationReference": "棚卸連携仕様書 Rev.4.9「8.4 棚卸中の在庫更新」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、棚卸開始後から確定前までにAPI出荷された対象商品の現在庫と出庫履歴です。",
+          "confirmedWorkaround": "修正までは、棚卸中のロケーションに対する出荷APIを停止し、確定後に保留した出荷を再開します。",
+          "confirmedRecovery": "棚卸期間中の出荷履歴を抽出し、対象商品の現在庫を履歴に一致する数量へ管理者が補正します。",
+          "riskAssessment": "帳簿在庫が実在庫より多くなり、欠品商品の出荷受付や棚卸差異の見落としにつながる可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『帳簿在庫100個の商品Aについて棚卸実数90個を入力し、確定前に出荷APIで10個を出庫しました。出荷は成功しましたが、棚卸確定後の現在庫は100個へ戻りました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『初期データへ戻して5回確認し、5回とも出荷履歴を残したまま在庫が10個増えました。棚卸確定後に出荷した場合は現在庫90個となり、履歴と一致しました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『棚卸連携仕様では、棚卸中の対象在庫に更新要求が発生した場合は確定時に更新差分を反映し、出庫履歴と現在庫の整合性を維持すると規定されています。 出荷APIの応答は200で、出荷伝票と在庫履歴には10個の出庫が正常に保存されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s1",
+        "priority": "normal",
+        "category": "api",
+        "version": "Client 5.7.0 (Build 1842)",
+        "environment": "Microsoft Edge 126.0.2592.102 / Windows 10 22H2",
+        "assigneeId": "nimotsu",
+        "watcherIds": [
+          "nimotsu",
+          "tanahashi"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "inventory-stocktake-operation",
+          "name": "inventory-stocktake_operation.mp4",
+          "summary": "帳簿在庫100個の商品Aについて棚卸実数90個を入力し、確定前に出荷APIで10個を出庫しました。出荷は成功しましたが、棚卸確定後の現在庫は100個へ戻りました。",
+          "contentPreview": [
+            "操作開始",
+            "帳簿在庫100個の商品Aについて棚卸実数90個を入力し、確定前に出荷APIで10個を出庫しました。出荷は成功しましたが、棚卸確定後の現在庫は100個へ戻りました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "inventory-stocktake-comparison",
+          "name": "inventory-stocktake_comparison.log",
+          "summary": "初期データへ戻して5回確認し、5回とも出荷履歴を残したまま在庫が10個増えました。棚卸確定後に出荷した場合は現在庫90個となり、履歴と一致しました。",
+          "contentPreview": [
+            "comparison-check",
+            "初期データへ戻して5回確認し、5回とも出荷履歴を残したまま在庫が10個増えました。棚卸確定後に出荷した場合は現在庫90個となり、履歴と一致しました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "inventory-stocktake-state",
+          "name": "inventory-stocktake_state.json",
+          "summary": "発生時の内部状態。帳簿在庫100個の商品Aについて棚卸実数90個を入力し、確定前に出荷APIで10個を出庫しました。出荷は成功しましたが、棚卸確定後の現在庫は100個へ戻りました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"inventory-stocktake-shipment-lost-update\",\"result\":\"observed\",\"sequence\":31}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "inventory-stocktake-unrelated",
+          "name": "inventory-stocktake_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "棚卸中に出荷APIを実行すると棚卸確定時に出庫分の在庫減少が失われる",
+        "sections": {
+          "detail": "帳簿在庫100個を棚卸中に10個出荷し実数90個で確定すると在庫が90個ではなく100個へ戻る",
+          "preconditions": "商品Aの帳簿在庫が100個で倉庫Aの棚卸が開始済みであること",
+          "steps": "1. 棚卸画面に商品Aの実数90個を入力する\n2. 棚卸確定前に出荷APIで商品Aを10個出庫する\n3. 棚卸を確定して在庫履歴と現在庫を確認する",
+          "expected": "出荷10個を反映した現在庫90個を維持し棚卸差異を0個として確定すること",
+          "actual": "出荷履歴は残るが棚卸確定後の現在庫が100個へ戻り在庫が10個増える",
+          "remarks": "棚卸確定後に出荷した場合は現在庫が90個になり履歴と一致する",
+          "reproducibility": "5/5"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "mobile-account-switch-shows-previous-offline-draft": {
+      "scenarioId": "mobile-account-switch-shows-previous-offline-draft",
+      "projectId": "mobile",
+      "rubricVersion": "mobile-account-switch-shows-previous-offline-draft.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "同一端末でアカウントを切り替えた場合の未送信データ分離をテストしています。",
+        "environment": [
+          "App 3.4.0 (34018)",
+          "iOS 18.5",
+          "iPhone 15"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "利用者Aで本文と画像を含む下書きをオフライン保存し、そのままログアウトしました。通信復帰後に利用者Bでログインすると、Aの下書き内容と画像が未送信一覧へ表示されました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "初期化した端末で5回確認し、5回ともBからAの下書きを参照できました。Aの下書きがない場合と、ログアウト前に送信完了した場合はBの一覧にデータは表示されませんでした。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "モバイルデータ管理仕様では、利用者がログインした場合、未送信データを利用者IDと端末IDの組み合わせで照合し、本人に紐づくデータだけを復元すると規定されています。 Bで下書きを削除すると端末内データも削除され、Aで再ログインしても復元できませんでした。"
+          }
+        ],
+        "specificationReference": "モバイルデータ管理仕様書 Rev.3.9「7.5 アカウント切替」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、同一端末を複数アカウントで使用し、前の利用者が未送信データを残してログアウトした場合です。",
+          "confirmedWorkaround": "修正までは、共有端末でアカウントを切り替えず、ログアウト前に未送信データを送信または破棄します。",
+          "confirmedRecovery": "端末を初期化して他利用者のキャッシュを削除し、サーバーに保存済みの本人データだけを再同期します。",
+          "riskAssessment": "別利用者の入力内容や添付画像が閲覧・削除され、個人情報漏えいとデータ消失につながる可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『利用者Aで本文と画像を含む下書きをオフライン保存し、そのままログアウトしました。通信復帰後に利用者Bでログインすると、Aの下書き内容と画像が未送信一覧へ表示されました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『初期化した端末で5回確認し、5回ともBからAの下書きを参照できました。Aの下書きがない場合と、ログアウト前に送信完了した場合はBの一覧にデータは表示されませんでした。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『モバイルデータ管理仕様では、利用者がログインした場合、未送信データを利用者IDと端末IDの組み合わせで照合し、本人に紐づくデータだけを復元すると規定されています。 Bで下書きを削除すると端末内データも削除され、Aで再ログインしても復元できませんでした。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s1",
+        "priority": "normal",
+        "category": "api",
+        "version": "App 3.4.0 (34018)",
+        "environment": "iOS 18.5 / iPhone 15",
+        "assigneeId": "gamen",
+        "watcherIds": [
+          "gamen",
+          "hashiru"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "mobile-account-operation",
+          "name": "mobile-account_operation.mp4",
+          "summary": "利用者Aで本文と画像を含む下書きをオフライン保存し、そのままログアウトしました。通信復帰後に利用者Bでログインすると、Aの下書き内容と画像が未送信一覧へ表示されました。",
+          "contentPreview": [
+            "操作開始",
+            "利用者Aで本文と画像を含む下書きをオフライン保存し、そのままログアウトしました。通信復帰後に利用者Bでログインすると、Aの下書き内容と画像が未送信一覧へ表示されました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "mobile-account-comparison",
+          "name": "mobile-account_comparison.log",
+          "summary": "初期化した端末で5回確認し、5回ともBからAの下書きを参照できました。Aの下書きがない場合と、ログアウト前に送信完了した場合はBの一覧にデータは表示されませんでした。",
+          "contentPreview": [
+            "comparison-check",
+            "初期化した端末で5回確認し、5回ともBからAの下書きを参照できました。Aの下書きがない場合と、ログアウト前に送信完了した場合はBの一覧にデータは表示されませんでした。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "mobile-account-state",
+          "name": "mobile-account_state.json",
+          "summary": "発生時の内部状態。利用者Aで本文と画像を含む下書きをオフライン保存し、そのままログアウトしました。通信復帰後に利用者Bでログインすると、Aの下書き内容と画像が未送信一覧へ表示されました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"mobile-account-switch-shows-previous-offline-draft\",\"result\":\"observed\",\"sequence\":32}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "mobile-account-unrelated",
+          "name": "mobile-account_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "別アカウントへ切り替えると前の利用者の未送信下書きが表示される",
+        "sections": {
+          "detail": "利用者Aがオフラインで保存した下書きがログアウト後に利用者Bでログインすると編集一覧へ表示される",
+          "preconditions": "利用者AとBが同じ端末を使用しAで未送信下書きが1件保存されていること",
+          "steps": "1. オフラインのまま利用者Aからログアウトする\n2. 通信を戻して利用者Bでログインする\n3. 未送信データ一覧を開く",
+          "expected": "利用者BにはAの下書きを表示せずAで再ログインした場合だけ復元すること",
+          "actual": "利用者Bの未送信データ一覧にAの下書き内容と添付画像が表示される",
+          "remarks": "Bで下書きを削除するとAで再ログインしても復元できない",
+          "reproducibility": "5/5"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
+    },
+    "automotive-multimedia-incoming-call-hides-rear-camera": {
+      "scenarioId": "automotive-multimedia-incoming-call-hides-rear-camera",
+      "projectId": "automotive-multimedia",
+      "rubricVersion": "automotive-multimedia-incoming-call-hides-rear-camera.v5",
+      "reviewSource": {
+        "schemaVersion": "scenario-review-source.v1",
+        "sourceType": "scenario-observations",
+        "testTarget": "後方カメラ表示中に着信した場合の画面優先順位と復帰をテストしています。",
+        "environment": [
+          "IVI Software: v3.8.0",
+          "Display Unit Rev: D",
+          "Vehicle profile: MM-04"
+        ],
+        "observations": [
+          {
+            "id": "observation-1",
+            "role": "primary-observation",
+            "text": "停車中にシフトをRへ入れて後方カメラ映像を表示し、Bluetooth接続済みの電話へ着信させました。通話画面が映像を全面で覆い、着信拒否後はホーム画面になりました。"
+          },
+          {
+            "id": "observation-2",
+            "role": "comparison-check",
+            "text": "同じ操作を10回実施して10回ともカメラ映像へ戻りませんでした。シフトPでの着信は通常の全面表示となり、R表示中の音量変更やナビ案内ではカメラ映像が維持されました。"
+          },
+          {
+            "id": "observation-3",
+            "role": "specification-and-context",
+            "text": "IVI画面優先度仕様では、シフトRの間は後方カメラ映像を最優先で表示し、着信通知は映像を妨げない領域へ重ねて表示すると規定されています。 カメラECUからの映像信号は着信中も継続しており、メーターにはシフトRが正しく表示されています。"
+          }
+        ],
+        "specificationReference": "IVI画面優先度仕様書 Rev.4.0「3.1 後方カメラ優先表示」",
+        "learnerVisibleContext": {
+          "confirmedImpactScope": "影響を受けるのは、シフトRで後方カメラを表示中にBluetooth電話へ着信した車両です。カメラ信号自体は継続しています。",
+          "confirmedWorkaround": "修正までは、後退操作前に電話接続を解除するか、映像が消えた場合は直ちに停車して目視確認します。",
+          "confirmedRecovery": "安全に停車してシフトをPへ戻し、再度Rへ入れると後方カメラ映像を表示できます。",
+          "riskAssessment": "後退中に車両後方の映像確認が中断され、周囲の障害物や歩行者の確認を妨げる可能性があります。"
+        }
+      },
+      "requiredFacts": {
+        "subject": [
+          {
+            "id": "subject-main",
+            "description": "題名だけで対象機能と主要な異常を特定できる",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "detail": [
+          {
+            "id": "detail-observation",
+            "description": "主要な操作条件と観測結果を、観測記録に反しない形で説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "steps-reproducible",
+            "description": "第三者が主要事象を再現できる操作の流れを示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "expected": [
+          {
+            "id": "expected-from-specification",
+            "description": "提示された仕様または期待動作を、観測結果と分けて説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-3"
+            ]
+          }
+        ],
+        "actual": [
+          {
+            "id": "actual-observed-result",
+            "description": "実際に観測した結果を、原因の推測を交えず説明する",
+            "importance": "critical",
+            "sourceRefs": [
+              "observation-1"
+            ]
+          }
+        ],
+        "reproducibility": [
+          {
+            "id": "reproducibility-observed",
+            "description": "実施済みの再現確認回数と結果を説明する",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ],
+        "boundary": [
+          {
+            "id": "boundary-confirmed-comparison",
+            "description": "実施済みの正常系・比較条件・周辺確認から、切り分けに役立つ事実を示す",
+            "importance": "important",
+            "sourceRefs": [
+              "observation-2"
+            ]
+          }
+        ]
+      },
+      "factAssessmentPolicy": {
+        "semanticEquivalence": true,
+        "sourceMaterialRule": "reviewSourceに含まれる観測記録、仕様、環境、受講者画面の確認済み情報、および選択済み証跡の要約が事実判定の基準であり、writingExampleは判定に使用しない",
+        "sectionFlexibilityRule": "必要な意味が起票全体から明確に読み取れるなら、記載例と異なる語句、文順、セクション構成を減点しない",
+        "standardOperationDetailRule": "チーム内で既知の標準ツールや業務操作は、操作経路そのものが発生条件でない限り、画面クリックやAPI実行方法までの説明を要求しない",
+        "unsupportedAdditionRule": "reviewSourceにないが矛盾もしない条件や手順を受講者が追加した場合は、ただちに事実誤認や不足とせず、実施済みの事実か推測で補った手順かを記述確認として扱う",
+        "trackingIdentifierRule": "通知ID、注文番号、患者ID、商品名などの具体値は追跡用の発生例であり、同一性や差異が本文で説明され、選択済み証跡から対象を追跡できる場合は、同じ具体値を本文へ記載することを要求しない",
+        "measuredValueRule": "金額、時刻、件数、再現回数、仕様閾値は、発生条件・期待値・実測結果を成立させる情報かを判断し、入力材料と異なる値を記載した場合は矛盾として扱う",
+        "evidenceRule": "選択済み証跡は追跡用識別子や証跡確認の事実を補完できるが、題名、主要な発生条件、期待結果、実際の動作の記載を代替しない",
+        "learnerVisibleContextRule": "learnerVisibleContextは受講者にも提示済みである。confirmedImpactScope、confirmedWorkaround、confirmedRecoveryは確認済み事実として扱い、riskAssessmentは記載どおりの確度を維持して扱う"
+      },
+      "reviewGuide": {
+        "sourceBoundary": "受講者に提示した観測記録、仕様、選択可能な環境および添付証跡だけを確定済み情報として扱う。記載例は事実源にも正解にも使用しない",
+        "strengthCriteria": [
+          "観測記録『停車中にシフトをRへ入れて後方カメラ映像を表示し、Bluetooth接続済みの電話へ着信させました。通話画面が映像を全面で覆い、着信拒否後はホーム画面になりました。』について、対象・操作条件・観測結果をどこまで明確に伝えているか評価する",
+          "比較確認『同じ操作を10回実施して10回ともカメラ映像へ戻りませんでした。シフトPでの着信は通常の全面表示となり、R表示中の音量変更やナビ案内ではカメラ映像が維持されました。』について、正常条件との差や発生範囲をどこまで絞り込めているか評価する",
+          "仕様・周辺情報『IVI画面優先度仕様では、シフトRの間は後方カメラ映像を最優先で表示し、着信通知は映像を妨げない領域へ重ねて表示すると規定されています。 カメラECUからの映像信号は着信中も継続しており、メーターにはシフトRが正しく表示されています。』について、期待動作と確認済み事実を推測から分けているか評価する"
+        ],
+        "nonScoringInvestigationIdeas": [],
+        "disallowedGenericPraise": [
+          "期待結果と実際の動作が分離されている",
+          "再現回数が数値で明記されている",
+          "操作手順が具体的に書かれている",
+          "必要項目が埋められている"
+        ]
+      },
+      "forbiddenClaims": [
+        {
+          "id": "claim-unverified-root-cause",
+          "description": "入力内容や添付証跡で確認されていない実装上の原因を、確認済みの事実として断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-scope",
+          "description": "reviewSourceの確認済み影響範囲を超えて、確認していない利用者、環境、端末またはデータのすべてで発生すると断定する",
+          "severity": "major"
+        },
+        {
+          "id": "claim-unverified-impact",
+          "description": "reviewSourceの確認済み影響範囲やリスク評価を超えた損失、安全影響またはデータ破損を、すでに発生した事実として断定する",
+          "severity": "major"
+        }
+      ],
+      "optionalFacts": [
+        {
+          "id": "optional-environment-detail",
+          "description": "確認したビルド、OS、ブラウザまたは端末を具体的に記載する"
+        },
+        {
+          "id": "optional-evidence-summary",
+          "description": "添付した証跡から確認できる内容を本文へ簡潔に記載する"
+        },
+        {
+          "id": "optional-scope-workaround",
+          "description": "確認済みの影響範囲または暫定回避策を、推測と区別して記載する"
+        }
+      ],
+      "expectedTicketFields": {
+        "severity": "s1",
+        "priority": "normal",
+        "category": "ui",
+        "version": "IVI Software: v3.8.0",
+        "environment": "Display Unit Rev: D / Vehicle profile: MM-04",
+        "assigneeId": "kurumado",
+        "watcherIds": [
+          "kurumado",
+          "mamoriya"
+        ],
+        "dueDatePolicy": {
+          "mode": "days-after-attempt",
+          "offsetDays": 5
+        }
+      },
+      "evidenceFiles": [
+        {
+          "id": "automotive-multimedia-operation",
+          "name": "automotive-multimedia_operation.mp4",
+          "summary": "停車中にシフトをRへ入れて後方カメラ映像を表示し、Bluetooth接続済みの電話へ着信させました。通話画面が映像を全面で覆い、着信拒否後はホーム画面になりました。",
+          "contentPreview": [
+            "操作開始",
+            "停車中にシフトをRへ入れて後方カメラ映像を表示し、Bluetooth接続済みの電話へ着信させました。通話画面が映像を全面で覆い、着信拒否後はホーム画面になりました。",
+            "操作終了"
+          ],
+          "confirmedFinding": "主要な操作条件と画面上の結果を一続きで確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-comparison",
+          "name": "automotive-multimedia_comparison.log",
+          "summary": "同じ操作を10回実施して10回ともカメラ映像へ戻りませんでした。シフトPでの着信は通常の全面表示となり、R表示中の音量変更やナビ案内ではカメラ映像が維持されました。",
+          "contentPreview": [
+            "comparison-check",
+            "同じ操作を10回実施して10回ともカメラ映像へ戻りませんでした。シフトPでの着信は通常の全面表示となり、R表示中の音量変更やナビ案内ではカメラ映像が維持されました。"
+          ],
+          "confirmedFinding": "再現回数と正常条件との差を確認できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-state",
+          "name": "automotive-multimedia_state.json",
+          "summary": "発生時の内部状態。停車中にシフトをRへ入れて後方カメラ映像を表示し、Bluetooth接続済みの電話へ着信させました。通話画面が映像を全面で覆い、着信拒否後はホーム画面になりました。",
+          "contentPreview": [
+            "{\"scenarioId\":\"automotive-multimedia-incoming-call-hides-rear-camera\",\"result\":\"observed\",\"sequence\":33}"
+          ],
+          "confirmedFinding": "画面上の結果と同じ時点の処理状態を追跡できる。",
+          "required": true
+        },
+        {
+          "id": "automotive-multimedia-unrelated",
+          "name": "automotive-multimedia_unrelated.png",
+          "summary": "同じプロジェクトで別の確認作業を行った画面。今回の発生条件とは一致しない。",
+          "contentPreview": [
+            "別日時の確認",
+            "対象操作なし"
+          ],
+          "confirmedFinding": "対象シナリオの操作と結果を示さないため、添付対象ではない。",
+          "required": false
+        }
+      ],
+      "writingExample": {
+        "subject": "後退中の着信で後方カメラ映像が通話画面に切り替わり復帰しない",
+        "sections": {
+          "detail": "シフトRで後方カメラ表示中に着信すると通話画面が全面表示され拒否後もカメラ映像へ戻らない",
+          "preconditions": "車両が停車中でBluetooth接続済みの電話がありシフト位置がRであること",
+          "steps": "1. シフトをRにして後方カメラ映像を表示する\n2. 接続済み電話へ着信させる\n3. 画面上で着信を拒否する",
+          "expected": "後方カメラ映像を維持して着信を小さく表示し拒否後もカメラ表示を継続すること",
+          "actual": "着信画面が後方カメラを覆い拒否後はホーム画面になってカメラ映像へ戻らない",
+          "remarks": "シフトをPへ戻して再度Rにすると後方カメラ映像を表示できる",
+          "reproducibility": "10/10"
+        }
+      },
+      "rubricNotes": [
+        "記載例は正解ではなく、採点時の事実源にも使用しない",
+        "requiredFactsはreviewSourceから独立して定義した伝達要件であり、文面一致を要求しない",
+        "標準的なツール操作は、操作経路自体が発生条件でない限り手順書レベルの詳細を要求しない",
+        "観測記録にない追加手順は、矛盾と断定せず実施済みか推測かを確認する",
+        "追跡用の固有IDは本文、周辺確認・補足、選択済み証跡のいずれかから対象を追跡できればよい",
+        "原因の仮説と確認済み事実を区別する",
+        "事実誤認は文章の拙さより重く扱う",
+        "同じ事実を複数セクションへ重複記載しても加点しない",
+        "チケット項目と添付証跡はシナリオの期待値と照合する"
+      ]
     }
   }
 }
