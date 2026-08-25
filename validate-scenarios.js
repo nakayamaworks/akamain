@@ -1087,6 +1087,18 @@ if (
 if (!/\.scenario-panel-body\s*\{[^}]*overscroll-behavior:\s*none;/s.test(stylesSource)) {
   errors.push("scenario panel body must suppress scroll chaining and rubber-band overscroll");
 }
+const trainingLevelViewStyles = stylesSource.slice(
+  stylesSource.indexOf(".training-level-view {"),
+  stylesSource.indexOf(".training-level-shell {")
+);
+if (
+  !/min-height:\s*0;/.test(trainingLevelViewStyles)
+  || !/flex:\s*1 1 auto;/.test(trainingLevelViewStyles)
+  || !/overflow-y:\s*auto;/.test(trainingLevelViewStyles)
+  || !/padding:\s*48px 28px 96px;/.test(trainingLevelViewStyles)
+) {
+  errors.push("training level view must scroll independently and keep space below the back button");
+}
 
 try {
   const makeClassList = () => ({ add() {}, remove() {}, toggle() {} });

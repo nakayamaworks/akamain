@@ -19,8 +19,12 @@
 
 /* Training level selection */
 .training-level-view {
-  min-height: calc(100vh - 94px);
-  padding: 48px 28px 80px;
+  min-height: 0;
+  padding: 48px 28px 96px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   background:
     radial-gradient(circle at 14% 8%, rgba(220, 38, 38, 0.08), transparent 30%),
     #f6f7f9;
@@ -216,7 +220,7 @@
 
 @media (max-width: 820px) {
   .training-level-view {
-    padding: 28px 16px 64px;
+    padding: 28px 16px 80px;
   }
 
   .training-level-grid {
