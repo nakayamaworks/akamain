@@ -2035,14 +2035,20 @@ try {
           const markup = elements.scenarioIntroFacts.innerHTML;
           return {
             scenarioId: scenario.scenarioId,
-            complete: [
+            complete:
+              markup.includes("<dt>テスト担当者のメモ</dt>")
+              && markup.includes("<dt>追加メモ</dt>")
+              && markup.includes("開始時　")
+              && markup.includes("操作01　")
+              && markup.includes("観測　"),
+            answerShaped: [
               "<dt>確認した事象</dt>",
               "<dt>前提条件</dt>",
               "<dt>実行した操作</dt>",
               "<dt>期待結果</dt>",
               "<dt>確認した結果</dt>",
               "<dt>比較確認</dt>",
-            ].every((label) => markup.includes(label)),
+            ].some((label) => markup.includes(label)),
             scoped: ![
               "<dt>対応日程</dt>",
               "<dt>関係者</dt>",
@@ -2051,22 +2057,29 @@ try {
             ].some((phrase) => markup.includes(phrase)),
           };
         })
-        .filter((item) => !item.complete || !item.scoped);
+        .filter((item) => !item.complete || item.answerShaped || !item.scoped);
       state.scenario = buildScenario(
         scenarioBank.find((scenario) => scenario.scenarioId === "automotive-can-byte-order-reversed"),
         "intermediate"
       );
       renderScenarioBrief();
       const automotiveMarkup = elements.scenarioIntroFacts.innerHTML;
+      state.scenario = buildScenario(
+        scenarioBank.find((scenario) => scenario.scenarioId === "automotive-speed-unit-trip-average-stale"),
+        "intermediate"
+      );
+      renderScenarioBrief();
+      const speedUnitMarkup = elements.scenarioIntroFacts.innerHTML
+        + elements.scenarioIntroDecision.innerHTML;
       state.scenario = previousScenario;
       state.trainingLevel = previousTrainingLevel;
-      return { failures, automotiveMarkup };
+      return { failures, automotiveMarkup, speedUnitMarkup };
     })()`,
     smokeContext
   );
   if (intermediateBugBriefCoverage.failures.length > 0) {
     errors.push(
-      `intermediate bug briefs must stay within operation, result, specification, and basic comparison: ${JSON.stringify(intermediateBugBriefCoverage.failures)}`
+      `intermediate bug briefs must use pre-ticket test memos without answer-shaped field labels: ${JSON.stringify(intermediateBugBriefCoverage.failures)}`
     );
   }
   [
@@ -2086,6 +2099,24 @@ try {
   ) {
     errors.push("intermediate automotive brief must retain the operation, observed result, and one basic comparison");
   }
+  [
+    "速度単位をkm/hからmphへ変更すると現在速度は切り替わるが平均速度はkm/hのままになる",
+    "現在速度と平均速度がどちらもmphへ換算されること",
+  ].forEach((completedAnswer) => {
+    if (intermediateBugBriefCoverage.speedUnitMarkup.includes(completedAnswer)) {
+      errors.push(`intermediate speed-unit brief must not reveal a completed ticket answer: ${completedAnswer}`);
+    }
+  });
+  [
+    "開始時　トリップ平均速度が40km/hで表示されていること",
+    "操作01　表示設定で速度単位をmphへ変更する",
+    "観測　現在速度はmphになるが平均速度は40km/hのまま表示される",
+    "メーター表示仕様書 Rev.5.6",
+  ].forEach((sourceFact) => {
+    if (!intermediateBugBriefCoverage.speedUnitMarkup.includes(sourceFact)) {
+      errors.push(`intermediate speed-unit brief must retain source fact: ${sourceFact}`);
+    }
+  });
   const intermediateQaBriefCoverage = vm.runInContext(
     `(() => {
       const previousScenario = state.scenario;
@@ -2101,15 +2132,27 @@ try {
           state.scenario = buildScenario(scenario, "intermediate");
           renderScenarioBrief();
           const markup = elements.scenarioIntroFacts.innerHTML;
+          let currentSection = "";
+          const question = scenario.report.reduce((text, entry) => {
+            if (entry.kind === "section") currentSection = entry.text;
+            if (entry.kind === "line" && currentSection === "■質問") return text + entry.text;
+            return text;
+          }, "");
+          const memoLineCount = (markup.match(/・/gu) || []).length;
           return {
             scenarioId: scenario.scenarioId,
-            complete: [
+            complete:
+              markup.includes("<dt>起票前の確認メモ</dt>")
+              && memoLineCount >= 4,
+            memoLineCount,
+            questionLeaked: Boolean(question) && markup.includes(question),
+            answerShaped: [
               "<dt>確認した状況</dt>",
               "<dt>仕様書で不明な点</dt>",
               "<dt>現在の解釈</dt>",
               "<dt>確認したいこと</dt>",
               "<dt>回答が必要な理由</dt>",
-            ].every((label) => markup.includes(label)),
+            ].some((label) => markup.includes(label)),
             scoped: ![
               "<dt>周辺確認・補足</dt>",
               "<dt>対応日程</dt>",
@@ -2117,7 +2160,7 @@ try {
             ].some((phrase) => markup.includes(phrase)),
           };
         })
-        .filter((item) => !item.complete || !item.scoped);
+        .filter((item) => !item.complete || item.questionLeaked || item.answerShaped || !item.scoped);
       state.scenario = previousScenario;
       state.trainingLevel = previousTrainingLevel;
       window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = previousQaAuthoring;
@@ -2127,7 +2170,7 @@ try {
   );
   if (intermediateQaBriefCoverage.length > 0) {
     errors.push(
-      `intermediate QA briefs must stay within situation, source gap, interpretation, question, and impact: ${JSON.stringify(intermediateQaBriefCoverage)}`
+      `intermediate QA briefs must use raw confirmation memos without revealing the completed question: ${JSON.stringify(intermediateQaBriefCoverage)}`
     );
   }
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";

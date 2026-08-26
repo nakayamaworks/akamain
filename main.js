@@ -840,6 +840,38 @@ function getIntermediateComparison(scenarioId) {
   return comparisonSentence || "";
 }
 
+function stripScenarioStepNumber(value) {
+  return String(value || "").replace(/^\s*\d+[.．、):：]\s*/u, "").trim();
+}
+
+function buildIntermediateBugTestMemo(context, sectionText) {
+  const precondition = sectionText("■前提条件");
+  const steps = sectionText("■操作手順", "\n")
+    .split("\n")
+    .map(stripScenarioStepNumber)
+    .filter(Boolean);
+  const actual = sectionText("■実際の動作");
+  return [
+    context.testTarget ? `対象　${context.testTarget}` : "",
+    precondition ? `開始時　${trimJapanesePeriod(precondition)}` : "",
+    ...steps.map((step, index) => `操作${String(index + 1).padStart(2, "0")}　${trimJapanesePeriod(step)}`),
+    actual ? `観測　${trimJapanesePeriod(actual)}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+function buildIntermediateQaWorkMemo(context, sectionText) {
+  return [
+    context.testTarget,
+    sectionText("■確認した状況・事実"),
+    sectionText("■確認理由・影響"),
+    sectionText("■参照情報"),
+    sectionText("■現在の解釈"),
+  ]
+    .filter(Boolean)
+    .map((line) => `・${trimJapanesePeriod(line)}`)
+    .join("\n");
+}
+
 function getScenarioNarrativePatternIndex(scenarioId, patternCount = 10) {
   let hash = 5381;
   for (const character of String(scenarioId || "")) {
@@ -3148,23 +3180,21 @@ function renderScenarioBrief() {
     scopedFactItems = [["", beginnerSummary, "testTarget observation"]];
   } else if (state.trainingLevel === "intermediate" && qaScenario) {
     scopedFactItems = [
-      ["", context.testTarget, "testTarget"],
-      ["確認した状況", sectionText("■確認した状況・事実"), "observation"],
-      ["仕様書で不明な点", sectionText("■参照情報"), "sourceGap"],
-      ["現在の解釈", sectionText("■現在の解釈"), "interpretation"],
-      ["確認したいこと", sectionText("■質問"), "question"],
-      ["回答が必要な理由", sectionText("■確認理由・影響"), "impact"],
+      [
+        "起票前の確認メモ",
+        buildIntermediateQaWorkMemo(context, sectionText),
+        "testTarget observation sourceGap interpretation impact",
+      ],
     ];
   } else if (state.trainingLevel === "intermediate") {
     scopedFactItems = [
-      ["", context.testTarget, "testTarget"],
-      ["確認した事象", sectionText("■詳細"), "observation category"],
-      ["前提条件", sectionText("■前提条件"), "observation"],
-      ["実行した操作", sectionText("■操作手順", "\n"), "observation"],
-      ["期待結果", sectionText("■期待結果"), "expected"],
-      ["確認した結果", sectionText("■実際の動作"), "observation"],
       [
-        "比較確認",
+        "テスト担当者のメモ",
+        buildIntermediateBugTestMemo(context, sectionText),
+        "testTarget observation",
+      ],
+      [
+        "追加メモ",
         getIntermediateComparison(state.scenario.scenarioId) || sectionText("■備考"),
         "observation",
       ],
