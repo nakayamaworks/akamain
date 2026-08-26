@@ -2173,6 +2173,59 @@ try {
       `intermediate QA briefs must use raw confirmation memos without revealing the completed question: ${JSON.stringify(intermediateQaBriefCoverage)}`
     );
   }
+  const intermediateQaGlossaryCoverage = vm.runInContext(
+    `(() => {
+      const previousScenario = state.scenario;
+      const previousTrainingLevel = state.trainingLevel;
+      const previousQaAuthoring = window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING;
+      const qaProfiles = ${JSON.stringify(qaAuthoredScenarios)};
+      window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = qaProfiles;
+      state.trainingLevel = "intermediate";
+      const expectations = [
+        ["automotive-qa-auto-hold-setting-after-driver-change", ["オートホールド", "設定復元テスト"]],
+        ["attendance-qa-shift-change-approved-leave", ["所定時間"]],
+        ["automotive-multimedia-qa-audio-volume-driver-profile-switch", ["ドライバープロファイル"]],
+        ["mobile-qa-biometric-cancel-fallback", ["生体認証", "フォールバック"]],
+        ["automotive-qa-speed-unit-persistence", ["不揮発メモリ"]],
+        ["mobile-qa-notification-token-reactivation", ["端末トークン", "同期"]],
+        ["inventory-qa-partial-allocation-lot-order", ["先入れ先出し", "引当"]],
+        ["inventory-qa-reorder-point-reserved-stock", ["発注点", "帳簿在庫・利用可能在庫"]],
+        ["payment-qa-retry-after-header-priority", ["Webhook", "Retry-After", "HTTP 409・429"]],
+        ["payment-qa-partial-capture-remainder", ["売上確定", "HTTP 409・429"]],
+        ["customer-qa-delete-last-page-navigation", ["ページング"]],
+        ["ec-qa-free-shipping-threshold-after-coupon", ["境界値テスト"]],
+        ["automotive-multimedia-qa-audio-source-after-call", ["オーディオソース", "ハンズフリー通話"]],
+      ];
+      const failures = expectations.flatMap(([scenarioId, expectedTerms]) => {
+        const scenario = qaProfiles[scenarioId]?.scenario;
+        state.scenario = buildScenario(scenario, "intermediate");
+        renderScenarioBrief();
+        const markup = elements.scenarioIntroGlossary.innerHTML;
+        const missingTerms = expectedTerms.filter((term) => !markup.includes("<dt>" + term + "</dt>"));
+        return missingTerms.length ? [{ scenarioId, missingTerms }] : [];
+      });
+      const dictionary = scenarioGlossaryEntries.map(({ term, description }) => ({ term, description }));
+      state.scenario = previousScenario;
+      state.trainingLevel = previousTrainingLevel;
+      window.TYPING_WORKBENCH_QA_SCENARIO_AUTHORING = previousQaAuthoring;
+      return { failures, dictionary };
+    })()`,
+    smokeContext
+  );
+  if (intermediateQaGlossaryCoverage.failures.length > 0) {
+    errors.push(
+      `intermediate QA glossary must explain unfamiliar scenario terms: ${JSON.stringify(intermediateQaGlossaryCoverage.failures)}`
+    );
+  }
+  const glossaryTerms = intermediateQaGlossaryCoverage.dictionary.map(({ term }) => term);
+  if (new Set(glossaryTerms).size !== glossaryTerms.length) {
+    errors.push("scenario glossary terms must be unique");
+  }
+  intermediateQaGlossaryCoverage.dictionary.forEach(({ term, description }) => {
+    if (typeof description !== "string" || description.length < 18 || description.length > 90) {
+      errors.push(`scenario glossary description must be concise and explanatory: ${term}`);
+    }
+  });
   const initialTicketMarkup = smokeElements.get("ticketListBody")?.innerHTML || "";
   const leakedInitialSubjects = vm.runInContext(
     `scenarioBank
