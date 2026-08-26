@@ -402,7 +402,7 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v31"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v32"') ||
   !backendScoringSource.includes("systemInstruction:") ||
   !backendScoringSource.includes("buildScoringSystemInstruction(attempt)") ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
@@ -824,6 +824,29 @@ Object.entries(qaAuthoredScenarios).forEach(([scenarioId, profile]) => {
   ) {
     errors.push(`${scenarioId}: QA scenario metadata and ticket settings must be complete`);
   }
+  const qaSubject = scenario?.subject?.text || "";
+  const qaTechnicalPattern = /(?:Webhook|API応答|署名ヘッダー|端末トークン|ローリングカウンタ|受信単位|車両通信断|未送信データ)/u;
+  const qaInputPattern = /(?:電話番号検索|氏名検索|検索条件の入力|必須入力|入力形式|ハイフン)/u;
+  const qaDataWorkflowPattern = /(?:CSV出力|顧客統合|患者ID統合|保持期間|判定基準|基準値|計算|再計算|引当|在庫|返金|売上確定)/u;
+  const qaVisiblePattern = /(?:表示|画面|バッジ|音量|カメラ|導線|案内|オーディオ|警告音|速度単位)/u;
+  const expectedQaCategory = qaTechnicalPattern.test(qaSubject)
+    ? "api"
+    : qaInputPattern.test(qaSubject)
+      ? "input"
+      : qaDataWorkflowPattern.test(qaSubject)
+        ? "workflow"
+        : qaVisiblePattern.test(qaSubject)
+          ? "ui"
+          : null;
+  if (
+    !["ui", "workflow", "input", "api"].includes(scenario?.evaluation?.category)
+    || !Array.isArray(scenario?.evaluation?.acceptedCategories)
+    || !scenario.evaluation.acceptedCategories.includes(scenario.evaluation.category)
+    || !scenario?.evaluation?.categoryRationale
+    || (expectedQaCategory && scenario.evaluation.category !== expectedQaCategory)
+  ) {
+    errors.push(`${scenarioId}: QA category must follow the shared technical-surface decision and include accepted alternatives`);
+  }
   if (
     sectionNames.join(",") !== requiredQaSections.join(",")
     || reportLines.length !== requiredQaSections.length
@@ -971,6 +994,12 @@ allScenarioRefs.forEach(({ projectId, subject }) => {
   });
   if (!allowedCategories.has(category)) {
     errors.push(`${subject}: invalid category "${category}"`);
+  }
+  if (
+    /(?:端末トークン|Webhook|冪等キー|\bCAN\b|Bus-Off|出荷API|決済通知|検査結果連携|注文API|車両ECU)/u.test(subject)
+    && category !== "api"
+  ) {
+    errors.push(`${subject}: integration and protocol scenarios must use the API category`);
   }
 
   const assignment = assignmentContext.getScenarioAssignment({

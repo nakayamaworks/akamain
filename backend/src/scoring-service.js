@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v31";
+export const PROMPT_VERSION = "practice-review.v32";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS_BY_LEVEL = Object.freeze({
@@ -570,7 +570,8 @@ export function buildWorkflowConsistencyPrompt(attempt) {
     "観測記録と受講者手順の主要操作、遷移後の最終状態、結果を観測した場所または対象を比較してください。",
     "観測記録と操作手順がそれぞれ観測先を明示し、その意味が異なる場合はinconsistentです。明記されていない遷移を推測で補完しないでください。",
     "呼称が違っても同じ画面・状態を意味することが明らかな場合はconsistentです。",
-    "inconsistentの場合、factIdには該当する操作手順のrequiredFact、answerQuoteには受講者の不一致部分を原文のまま、suggestedCorrectionには観測記録に基づく確認操作を返してください。",
+    "inconsistentの場合、factIdには該当する操作手順のrequiredFact、answerQuoteには『受講者の操作手順』内に実在する不一致部分だけを原文のまま返してください。実際の動作や他セクションをanswerQuoteへ入れないでください。",
+    "不足していると考えた操作が受講者の操作手順にすでに書かれている場合はconsistentです。suggestedCorrectionには観測記録に基づく確認操作を返してください。",
   ].join("\n");
 }
 
@@ -1111,6 +1112,14 @@ function createAttemptEvidenceChecker(attempt) {
   };
 }
 
+function createAnswerSectionQuoteChecker(attempt, names) {
+  const sectionText = normalizedQuoteText(answerSectionText(attempt, names));
+  return (quote) => {
+    const normalizedQuote = normalizedQuoteText(quote);
+    return Boolean(normalizedQuote) && sectionText.includes(normalizedQuote);
+  };
+}
+
 export function normalizeModelOutput(
   rawOutput,
   scenarioId = DEFAULT_SCENARIO_ID,
@@ -1127,6 +1136,10 @@ export function normalizeModelOutput(
   const validFactIds = new Set(getFactIds(rubric));
   const factIdValues = ["not-applicable", ...validFactIds];
   const isGroundedQuote = createAttemptEvidenceChecker(attempt);
+  const isStepQuote = createAnswerSectionQuoteChecker(
+    attempt,
+    ["steps", "操作手順", "■操作手順"]
+  );
   const attemptAnswerText = JSON.stringify(attempt?.answer || {});
   const trainingLevel = normalizeTrainingLevel(attempt?.answer?.trainingLevel);
   const workflowFactIds = new Set(
@@ -1154,13 +1167,9 @@ export function normalizeModelOutput(
       const rawAnswerQuote = typeof workflow.answerQuote === "string"
         ? workflow.answerQuote.trim().slice(0, 500)
         : "";
-      const fullSteps = answerSectionText(
-        attempt,
-        ["steps", "操作手順", "■操作手順"]
-      ).trim().slice(0, 500);
-      const answerQuote = rawAnswerQuote && isGroundedQuote(rawAnswerQuote)
+      const answerQuote = rawAnswerQuote && isStepQuote(rawAnswerQuote)
         ? rawAnswerQuote
-        : fullSteps;
+        : "";
       const workflowFact = (rubric.requiredFacts?.steps || [])
         .find(({ id }) => id === requestedFactId);
       const observationById = new Map(
@@ -1621,6 +1630,33 @@ function buildTrainingLevelOverallAssessment(trainingLevel, rubric, score) {
   return null;
 }
 
+function buildGroundedTrainingStrength(attempt, rubric) {
+  if (rubric.ticketType === "qa") {
+    const question = answerSectionText(
+      attempt,
+      ["question", "質問", "■質問"]
+    ).trim();
+    return question
+      ? `「${question.slice(0, 120)}」と確認事項を一つに絞っており、回答者が判断すべき論点を直接読み取れます。`
+      : "";
+  }
+  const stepLines = answerSectionText(
+    attempt,
+    ["steps", "操作手順", "■操作手順"]
+  )
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (stepLines.length === 0) {
+    return "";
+  }
+  const firstStep = stepLines[0].slice(0, 100);
+  const lastStep = stepLines.at(-1).slice(0, 100);
+  return firstStep === lastStep
+    ? `「${firstStep}」と操作対象を明示しており、再現担当者が確認を始める条件を特定できます。`
+    : `「${firstStep}」から「${lastStep}」までの操作順序が示され、再現担当者が同じ確認経路をたどれます。`;
+}
+
 function applyTrainingLevelReviewScope(normalized, attempt, rubric) {
   const scope = getTrainingLevelScope(rubric, attempt?.answer?.trainingLevel);
   if (scope.trainingLevel === "advanced") {
@@ -1678,6 +1714,16 @@ function applyTrainingLevelReviewScope(normalized, attempt, rubric) {
         ? "確認した事実と現在の解釈を分けており、回答者が未確定事項を判別しやすくなっています。"
         : "期待結果と実際の動作を分けており、確認した事実を推測と混ぜずに伝えています。"
       ];
+    }
+  }
+  if (
+    scope.trainingLevel !== "beginner"
+    && strengths.length === 0
+    && activeScore >= 90
+  ) {
+    const groundedStrength = buildGroundedTrainingStrength(attempt, rubric);
+    if (groundedStrength) {
+      strengths = [groundedStrength];
     }
   }
   return {

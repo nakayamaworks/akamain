@@ -261,10 +261,12 @@ test("an AI-detected observation-path mismatch is enforced in reproducibility", 
   assert.equal(normalized.rewriteSuggestions[0].original, "3.顧客登録画面を表示する");
 });
 
-test("workflow mismatch quotes are repaired from the saved steps and review source", () => {
+test("workflow mismatch quotes outside the saved steps are ignored", () => {
   const steps = "1. 顧客情報を入力する\n2. 保存ボタンを3回押す\n3.顧客登録画面を表示する";
   const normalized = normalizeModelOutput({
     ...completeModelOutput,
+    improvementItems: [],
+    rewriteSuggestions: [],
     workflowConsistency: {
       status: "inconsistent",
       factId: "steps-reproducible",
@@ -274,22 +276,77 @@ test("workflow mismatch quotes are repaired from the saved steps and review sour
       suggestedCorrection: "登録後の顧客一覧で重複した3件を確認する",
     },
   }, pilotScenarioId, {
-    answer: { subject: "重複登録", sections: { 操作手順: steps } },
+    answer: {
+      subject: "重複登録",
+      sections: {
+        操作手順: steps,
+        実際の動作: "顧客登録画面を確認する",
+      },
+    },
     selectedEvidenceIds: [],
     evidenceDescriptions: {},
   });
-  assert.equal(normalized.workflowConsistency.answerQuote, steps);
-  assert.match(normalized.workflowConsistency.sourceObservation, /登録後の一覧には/);
+  assert.equal(normalized.workflowConsistency.status, "not-applicable");
+  assert.equal(normalized.workflowConsistency.answerQuote, "");
   assert.equal(
     normalized.factAssessments.find(({ factId }) => factId === "steps-reproducible").status,
-    "contradicted"
+    "present"
   );
   assert.equal(
-    normalized.improvementItems.find(({ relatedDimensionIds }) =>
+    normalized.improvementItems.some(({ relatedDimensionIds }) =>
       relatedDimensionIds.includes("reproducibility")
-    ).priority,
-    "修正推奨"
+    ),
+    false
   );
+});
+
+test("workflow audits cannot quote another section across any bug scenario", () => {
+  const bugScenarioIds = SUPPORTED_SCENARIO_IDS.filter(
+    (scenarioId) => getScenarioRubric(scenarioId).ticketType !== "qa"
+  );
+  assert.equal(bugScenarioIds.length, 60);
+  bugScenarioIds.forEach((scenarioId) => {
+    const rubric = getScenarioRubric(scenarioId);
+    const steps = rubric.writingExample.sections.steps;
+    const actual = rubric.writingExample.sections.actual;
+    const output = completeOutputForScenario(scenarioId);
+    output.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 100]));
+    output.improvementItems = [];
+    output.rewriteSuggestions = [];
+    output.workflowConsistency = {
+      status: "inconsistent",
+      factId: rubric.requiredFacts.steps[0].id,
+      sourceObservation: rubric.reviewSource.observations[0].text,
+      answerQuote: actual,
+      reason: "操作手順に不足があります。",
+      suggestedCorrection: steps,
+    };
+    const normalized = normalizeModelOutput(output, scenarioId, {
+      answer: {
+        subject: rubric.writingExample.subject,
+        sections: { steps, actual },
+      },
+      selectedEvidenceIds: [],
+      evidenceDescriptions: {},
+    });
+    assert.equal(
+      normalized.workflowConsistency.status,
+      "not-applicable",
+      `${scenarioId}: another section was accepted as a step quote`
+    );
+    assert.equal(
+      normalized.factAssessments.find(
+        ({ factId }) => factId === rubric.requiredFacts.steps[0].id
+      ).status,
+      "present",
+      `${scenarioId}: a grounded step was contradicted by another section`
+    );
+    assert.equal(
+      normalized.rewriteSuggestions.some(({ section }) => section === "操作手順"),
+      false,
+      `${scenarioId}: an invalid workflow rewrite was rendered`
+    );
+  });
 });
 
 test("an unusable inconsistent audit is ignored instead of rendering blank feedback", () => {
@@ -942,6 +999,56 @@ test("beginner scoring removes advanced review demands and scores writing only",
   assert.equal(result.rubricFindings.scoreBreakdown.writingQuality.maximumPoints, 100);
   assert.equal(result.rubricFindings.scoreBreakdown.ticketSettings.maximumPoints, 0);
   assert.equal(result.rubricFindings.scoreBreakdown.evidenceSelection.maximumPoints, 0);
+});
+
+test("high-scoring intermediate reviews always show a grounded strength", async () => {
+  const scenarioId = "mobile-notification-token-not-reregistered";
+  const rubric = getScenarioRubric(scenarioId);
+  const answer = {
+    ...rubric.writingExample,
+    trainingLevel: "intermediate",
+    ticketFields: expectedTicketFieldsForTest(rubric),
+  };
+  const attempt = createAttemptRecord({
+    scenarioId,
+    projectId: rubric.projectId,
+    answer,
+    selectedEvidenceIds: [],
+    startedAt: fixedAttemptStartedAt,
+  }, { userId: "verified-google-sub" });
+  const output = completeOutputForScenario(scenarioId);
+  output.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 100]));
+  output.dimensionFeedback = Object.fromEntries(
+    rubric.dimensions.map(({ id }) => [id, { reason: "修正が必要な問題はありません。" }])
+  );
+  output.improvementItems = [];
+  output.readerQuestions = [];
+  output.ambiguityRisks = [];
+  output.investigationAdvice = [];
+  output.rewriteSuggestions = [];
+  output.strengths = [];
+  output.factAssessments = output.factAssessments.filter(
+    ({ factId }) => factId !== "reproducibility-observed"
+  );
+
+  const result = await scoreAttemptRecordWithGemini(attempt, {
+    apiKey: "server-only-key",
+    workflowConsistencyAssessment: consistentWorkflowAssessmentFor(rubric),
+    fetchImplementation: async () => ({
+      ok: true,
+      async json() {
+        return {
+          candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
+        };
+      },
+    }),
+  });
+
+  assert.equal(result.status, "succeeded");
+  assert.equal(result.improvementItems.length, 0);
+  assert.equal(result.strengths.length, 1);
+  assert.match(result.strengths[0], /OS設定で通知許可をオフにする/u);
+  assert.match(result.strengths[0], /テスト通知を送る/u);
 });
 
 test("attachment descriptions are normalized and included in the existing AI review prompt", () => {

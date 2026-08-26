@@ -102,6 +102,42 @@
     },
   };
 
+  const resolveQaCategory = (scenario) => {
+    const subject = scenario.subject?.text || "";
+    const technicalPattern = /(?:Webhook|API応答|署名ヘッダー|端末トークン|ローリングカウンタ|受信単位|車両通信断|未送信データ)/u;
+    const inputPattern = /(?:電話番号検索|氏名検索|検索条件の入力|必須入力|入力形式|ハイフン)/u;
+    const dataWorkflowPattern = /(?:CSV出力|顧客統合|患者ID統合|保持期間|判定基準|基準値|計算|再計算|引当|在庫|返金|売上確定)/u;
+    const visiblePattern = /(?:表示|画面|バッジ|音量|カメラ|導線|案内|オーディオ|警告音|速度単位)/u;
+    const workflowPattern = /(?:キャンセル|予約|設定|ログアウト|勤務|打刻|シフト|発注点)/u;
+    const accepted = (recommended, alternatives = []) => ({
+      recommended,
+      accepted: [...new Set([recommended, ...alternatives])],
+      rationale: {
+        api: "外部通信、端末同期、プロトコルまたはAPIの振る舞いが主な確認対象です。",
+        input: "入力値の形式、検索条件または入力チェックが主な確認対象です。",
+        ui: "利用者が確認する画面表示、導線または操作結果が主な確認対象です。",
+        workflow: "業務上の状態遷移、計算またはデータ処理が主な確認対象です。",
+      }[recommended],
+    });
+    if (technicalPattern.test(subject)) {
+      return accepted("api", visiblePattern.test(subject) ? ["ui"] : []);
+    }
+    if (inputPattern.test(subject)) {
+      return accepted("input", visiblePattern.test(subject) || /検索/u.test(subject) ? ["ui"] : []);
+    }
+    if (dataWorkflowPattern.test(subject)) {
+      return accepted("workflow", visiblePattern.test(subject) ? ["ui"] : []);
+    }
+    if (visiblePattern.test(subject)) {
+      return accepted("ui", workflowPattern.test(subject) ? ["workflow"] : []);
+    }
+    if (workflowPattern.test(subject)) {
+      return accepted("workflow");
+    }
+    const fallback = projectDefaults[scenario.projectId]?.category || "workflow";
+    return accepted(fallback);
+  };
+
   const buildQaScenario = (definition) => {
     const defaults = projectDefaults[definition.projectId];
     const reportKeys = ["question", "situation", "reference", "interpretation", "impact", "supplement"];
@@ -1485,6 +1521,16 @@
 
   additionalScenarioDefinitions.forEach((definition) => {
     scenarios[definition.scenarioId] = buildQaScenario(definition);
+  });
+
+  Object.values(scenarios).forEach(({ scenario }) => {
+    const decision = resolveQaCategory(scenario);
+    const currentAccepted = scenario.evaluation.acceptedCategories || [];
+    scenario.evaluation.category = decision.recommended;
+    scenario.evaluation.acceptedCategories = [
+      ...new Set([...decision.accepted, ...currentAccepted]),
+    ];
+    scenario.evaluation.categoryRationale = decision.rationale;
   });
 
   const specificationContentOverrides = {

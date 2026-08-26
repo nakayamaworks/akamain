@@ -8913,7 +8913,7 @@
       "expectedTicketFields": {
         "severity": "s2",
         "priority": "normal",
-        "category": "ui",
+        "category": "api",
         "version": "App 3.4.0 (34018)",
         "environment": "iOS 18.5 / iPhone 15",
         "assigneeId": "otoha",
