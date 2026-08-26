@@ -165,7 +165,7 @@ export const SUPPORTED_SCENARIO_IDS = Object.freeze([
   ...Object.keys(rubricRegistry.scenarios),
   ...Object.keys(qaRubrics),
 ]);
-export const PROMPT_VERSION = "practice-review.v32";
+export const PROMPT_VERSION = "practice-review.v33";
 export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const SCORE_MAXIMUMS_BY_LEVEL = Object.freeze({
@@ -251,6 +251,7 @@ const BUG_SCORING_SYSTEM_INSTRUCTION = [
 const WORKFLOW_CONSISTENCY_SYSTEM_INSTRUCTION = [
   "あなたは不具合票の再現経路だけを監査するQAリードです。",
   "文章品質、チケット設定、証跡の十分さは評価せず、操作手順どおり進んだとき、観測記録にある結果を同じ場所・状態・対象で確認できるかだけを厳密に判定してください。",
+  "前提条件は操作開始前の状態であり、操作手順へ重複記載されていないことだけを理由に不一致としてはいけません。",
   "明記されていない画面遷移や確認操作を推測で補ってはいけません。",
 ].join("\n");
 
@@ -564,12 +565,16 @@ export function buildWorkflowConsistencyPrompt(attempt) {
     "受講者の操作手順:",
     answerSectionText(attempt, ["steps", "操作手順", "■操作手順"]),
     "",
+    "受講者の前提条件:",
+    answerSectionText(attempt, ["preconditions", "前提条件", "■前提条件"]),
+    "",
     "受講者の実際の動作:",
     answerSectionText(attempt, ["actual", "実際の動作", "■実際の動作"]),
     "",
     "観測記録と受講者手順の主要操作、遷移後の最終状態、結果を観測した場所または対象を比較してください。",
     "観測記録と操作手順がそれぞれ観測先を明示し、その意味が異なる場合はinconsistentです。明記されていない遷移を推測で補完しないでください。",
     "呼称が違っても同じ画面・状態を意味することが明らかな場合はconsistentです。",
+    "観測記録との文面の完全一致は要求しません。主要操作が同じ順序で書かれていれば、観測記録の前提状態が操作手順へ重複されていないことだけを理由にinconsistentとしてはいけません。前提状態の不足はこの監査の対象外です。",
     "inconsistentの場合、factIdには該当する操作手順のrequiredFact、answerQuoteには『受講者の操作手順』内に実在する不一致部分だけを原文のまま返してください。実際の動作や他セクションをanswerQuoteへ入れないでください。",
     "不足していると考えた操作が受講者の操作手順にすでに書かれている場合はconsistentです。suggestedCorrectionには観測記録に基づく確認操作を返してください。",
   ].join("\n");
@@ -978,6 +983,30 @@ function normalizedQuoteText(value) {
   return String(value || "").normalize("NFKC").replace(/\s+/gu, "");
 }
 
+function normalizedWorkflowSequence(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("ja-JP")
+    .replace(/(?<![a-z])off(?![a-z])/gu, "オフ")
+    .replace(/(?<![a-z])on(?![a-z])/gu, "オン")
+    .replace(/(?:^|\n)\s*(?:\d+[.．、):：]|[-・])\s*/gu, "\n")
+    .replace(/[。．、,，]/gu, "")
+    .replace(/\s+/gu, "");
+}
+
+function followsCanonicalWorkflow(attempt, rubric) {
+  const learnerSteps = answerSectionText(
+    attempt,
+    ["steps", "操作手順", "■操作手順"]
+  );
+  const canonicalSteps = rubric?.writingExample?.sections?.steps || "";
+  const normalizedLearnerSteps = normalizedWorkflowSequence(learnerSteps);
+  const normalizedCanonicalSteps = normalizedWorkflowSequence(canonicalSteps);
+  return Boolean(normalizedLearnerSteps)
+    && Boolean(normalizedCanonicalSteps)
+    && normalizedLearnerSteps === normalizedCanonicalSteps;
+}
+
 function normalizePublicSectionLabel(value) {
   const label = String(value || "");
   return label === "備考" || label === "■備考" ? "周辺確認・補足" : label;
@@ -1191,27 +1220,38 @@ export function normalizeModelOutput(
       const rawSourceObservation = typeof workflow.sourceObservation === "string"
         ? workflow.sourceObservation.trim().slice(0, 500)
         : "";
+      const canonicalMismatchRejected = status === "inconsistent"
+        && followsCanonicalWorkflow(attempt, rubric);
       const canApplyMismatch = status === "inconsistent"
         && requestedFactId !== "not-applicable"
         && Boolean(answerQuote)
-        && Boolean(workflowFact);
-      const isConsistent = status === "consistent";
+        && Boolean(workflowFact)
+        && !canonicalMismatchRejected;
+      const isConsistent = status === "consistent" || canonicalMismatchRejected;
       workflowConsistency = {
         status: canApplyMismatch ? "inconsistent" : isConsistent ? "consistent" : "not-applicable",
         factId: canApplyMismatch || isConsistent ? requestedFactId : "not-applicable",
         sourceObservation: canApplyMismatch
           ? groundedSourceObservation || rawSourceObservation
-          : isConsistent ? rawSourceObservation : "",
-        answerQuote: canApplyMismatch ? answerQuote : isConsistent ? rawAnswerQuote : "",
+          : canonicalMismatchRejected
+            ? groundedSourceObservation || rawSourceObservation
+            : isConsistent ? rawSourceObservation : "",
+        answerQuote: canApplyMismatch
+          ? answerQuote
+          : canonicalMismatchRejected
+            ? answerSectionText(attempt, ["steps", "操作手順", "■操作手順"])
+            : isConsistent ? rawAnswerQuote : "",
         reason: canApplyMismatch
           ? publicReviewText(
               rawReason || "操作手順の最終状態では、観測記録にある結果を同じ場所・対象で確認できないためです。",
               rubric
             )
-          : isConsistent ? publicReviewText(rawReason, rubric) : "",
+          : canonicalMismatchRejected
+            ? "主要な操作が正しい順序で記載されており、観測記録の確認経路と一致しています。"
+            : isConsistent ? publicReviewText(rawReason, rubric) : "",
         suggestedCorrection: canApplyMismatch
           ? publicReviewText(rawCorrection || workflowFact.description, rubric)
-          : isConsistent ? publicReviewText(rawCorrection, rubric) : "",
+          : canonicalMismatchRejected ? "" : isConsistent ? publicReviewText(rawCorrection, rubric) : "",
       };
     }
   }

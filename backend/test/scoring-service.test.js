@@ -222,6 +222,7 @@ test("workflow consistency uses a separate focused structured assessment", () =>
   assert.ok(workflowSchema.required.includes("status"));
   assert.match(prompt, /登録後の一覧には/);
   assert.match(prompt, /3\. 顧客登録画面を表示する/);
+  assert.match(prompt, /前提状態の不足はこの監査の対象外/);
   assert.doesNotMatch(prompt, /顧客登録画面.*一覧画面との不一致/);
 });
 
@@ -307,7 +308,7 @@ test("workflow audits cannot quote another section across any bug scenario", () 
   assert.equal(bugScenarioIds.length, 60);
   bugScenarioIds.forEach((scenarioId) => {
     const rubric = getScenarioRubric(scenarioId);
-    const steps = rubric.writingExample.sections.steps;
+    const steps = `${rubric.writingExample.sections.steps}\n補足操作を行う`;
     const actual = rubric.writingExample.sections.actual;
     const output = completeOutputForScenario(scenarioId);
     output.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 100]));
@@ -345,6 +346,61 @@ test("workflow audits cannot quote another section across any bug scenario", () 
       normalized.rewriteSuggestions.some(({ section }) => section === "操作手順"),
       false,
       `${scenarioId}: an invalid workflow rewrite was rendered`
+    );
+  });
+});
+
+test("canonical workflow steps cannot be rejected across any bug scenario", () => {
+  const bugScenarioIds = SUPPORTED_SCENARIO_IDS.filter(
+    (scenarioId) => getScenarioRubric(scenarioId).ticketType !== "qa"
+  );
+  assert.equal(bugScenarioIds.length, 60);
+  bugScenarioIds.forEach((scenarioId) => {
+    const rubric = getScenarioRubric(scenarioId);
+    const steps = rubric.writingExample.sections.steps;
+    const firstStep = steps.split("\n")[0].replace(/^\s*\d+[.．、)]\s*/u, "");
+    const output = completeOutputForScenario(scenarioId);
+    output.dimensions = Object.fromEntries(rubric.dimensions.map(({ id }) => [id, 100]));
+    output.improvementItems = [];
+    output.rewriteSuggestions = [];
+    output.workflowConsistency = {
+      status: "inconsistent",
+      factId: rubric.requiredFacts.steps[0].id,
+      sourceObservation: rubric.reviewSource.observations[0].text,
+      answerQuote: firstStep,
+      reason: "観測記録の前提条件または表現と完全には一致しません。",
+      suggestedCorrection: rubric.reviewSource.observations[0].text,
+    };
+    const normalized = normalizeModelOutput(output, scenarioId, {
+      answer: {
+        subject: rubric.writingExample.subject,
+        sections: {
+          preconditions: rubric.writingExample.sections.preconditions,
+          steps: steps
+            .replaceAll("オフ", "OFF")
+            .replaceAll("オン", "ON"),
+          actual: rubric.writingExample.sections.actual,
+        },
+      },
+      selectedEvidenceIds: [],
+      evidenceDescriptions: {},
+    });
+    assert.equal(
+      normalized.workflowConsistency.status,
+      "consistent",
+      `${scenarioId}: canonical workflow was rejected`
+    );
+    assert.equal(
+      normalized.improvementItems.some(({ relatedDimensionIds }) =>
+        relatedDimensionIds.includes("reproducibility")
+      ),
+      false,
+      `${scenarioId}: canonical workflow produced a reproducibility correction`
+    );
+    assert.equal(
+      normalized.rewriteSuggestions.some(({ section }) => section === "操作手順"),
+      false,
+      `${scenarioId}: canonical workflow produced a step rewrite`
     );
   });
 });
