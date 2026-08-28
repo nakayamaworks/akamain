@@ -101,8 +101,8 @@ Firebase ConsoleのHostingから`akamain.com`を追加し、表示されたDNS�
 ## リリース確認
 
 1. `https://akamain.com/`でWelcomeページが表示される
-2. ゲスト体験が`/app.html?guest=1#/tickets`へ遷移する
-3. Googleログイン後に`/app.html#/tickets`を利用できる
+2. ゲスト利用でも`/app.html#/tickets`の一覧画面へ遷移する
+3. Googleログイン後も同じ一覧画面を利用できる
 4. 実践起票を保存できる
 5. AI採点結果を取得できる
 6. マイページ、履歴、ランキングを表示できる

@@ -110,7 +110,6 @@ const requiredWelcomeFragments = [
   '<title>あかマイン｜QA確認・不具合報告の起票トレーニング</title>',
   'href="./welcome.css?v=20260828b"',
   'href="./"',
-  'href="./app.html?guest=1"',
   'href="./app.html"',
   'href="https://akamain.com/"',
   'content="https://akamain.com/assets/images/brand/akamain-main-visual.png"',
@@ -135,6 +134,9 @@ for (const fragment of requiredWelcomeFragments) {
 if (welcomeHtml.includes("./welcome.html") || welcomeHtml.includes("./index.html")) {
   throw new Error("公開トップページにローカル用URLが残っています。");
 }
+if (welcomeHtml.includes("guest=1") || appHtml.includes("guest=1")) {
+  throw new Error("廃止したゲスト自動開始パラメータが公開成果物に残っています。");
+}
 if (!files.some((filePath) => relative(outputDirectory, filePath) === "welcome.js")) {
   throw new Error("Welcomeページの動作スクリプトが公開成果物にありません。");
 }
@@ -144,13 +146,13 @@ if (!appHtml.includes('<meta name="robots" content="noindex, nofollow" />')) {
 if (!bugReportGuideHtml.includes('<link rel="canonical" href="https://akamain.com/bug-report-writing" />')) {
   throw new Error("バグ報告ガイドのcanonical設定がありません。");
 }
-if (!bugReportGuideHtml.includes('href="/app.html?guest=1"')) {
+if (!bugReportGuideHtml.includes('href="/app.html"')) {
   throw new Error("バグ報告ガイドからゲスト体験への導線がありません。");
 }
 if (!qaQuestionGuideHtml.includes('<link rel="canonical" href="https://akamain.com/qa-question-writing" />')) {
   throw new Error("QA確認ガイドのcanonical設定がありません。");
 }
-if (!qaQuestionGuideHtml.includes('href="/app.html?guest=1"')) {
+if (!qaQuestionGuideHtml.includes('href="/app.html"')) {
   throw new Error("QA確認ガイドからゲスト体験への導線がありません。");
 }
 if (!bugReportGuideHtml.includes('href="/terms.html"') || !bugReportGuideHtml.includes('href="/privacy.html"')) {

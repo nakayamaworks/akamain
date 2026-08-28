@@ -1777,8 +1777,6 @@ function persistPracticeDrafts(drafts) {
 
 const initialListPreferences = loadListPreferences();
 
-const guestExperienceRequested = /(?:^|[?&])guest=1(?:&|$)/.test(window.location?.search || "");
-
 const state = {
   running: false,
   awaitingCreate: false,
@@ -7019,7 +7017,3 @@ renderEvidenceAttachment();
 pushMetrics();
 renderChart();
 syncControls();
-
-if (guestExperienceRequested) {
-  startSession({ refreshProgress: false });
-}

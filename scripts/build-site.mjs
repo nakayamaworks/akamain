@@ -19,15 +19,9 @@ let welcomeHtml = await readFile(join(rootDirectory, "welcome.html"), "utf8");
 welcomeHtml = replaceRequired(welcomeHtml, 'href="./welcome.html"', 'href="./"', "Welcomeホームリンク");
 welcomeHtml = replaceRequired(
   welcomeHtml,
-  'href="./index.html?guest=1"',
-  'href="./app.html?guest=1"',
-  "ゲスト体験リンク"
-);
-welcomeHtml = replaceRequired(
-  welcomeHtml,
   'href="./index.html"',
   'href="./app.html"',
-  "ログイン後の開始リンク"
+  "アプリ開始リンク"
 );
 await writeFile(join(outputDirectory, "index.html"), welcomeHtml);
 
