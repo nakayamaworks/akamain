@@ -108,7 +108,7 @@ await verifyLocalReferences(termsHtml, "terms.html");
 
 const requiredWelcomeFragments = [
   '<title>あかマイン｜QA確認・不具合報告の起票トレーニング</title>',
-  'href="./welcome.css?v=20260822a"',
+  'href="./welcome.css?v=20260828b"',
   'href="./"',
   'href="./app.html?guest=1"',
   'href="./app.html"',

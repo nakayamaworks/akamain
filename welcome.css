@@ -266,40 +266,17 @@ a:focus-visible {
   }
 }
 
-.guest-entry {
-  display: grid;
-  width: min(320px, 100%);
-  gap: 12px;
-  place-items: center;
-}
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 12px;
-  color: #a29592;
-  font-size: 0.7rem;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-  content: "";
-}
-
 .guest-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: min(320px, 100%);
   gap: 15px;
   min-height: 46px;
   padding: 0 22px;
-  color: var(--red-dark);
-  background: var(--white);
-  border: 1px solid rgba(207, 32, 38, 0.3);
+  color: var(--white);
+  background: var(--red);
+  border: 1px solid var(--red);
   border-radius: 12px;
   font-size: 0.86rem;
   font-weight: 800;
@@ -308,12 +285,13 @@ a:focus-visible {
 }
 
 .guest-button:hover {
-  background: var(--red-soft);
-  border-color: rgba(207, 32, 38, 0.58);
+  background: var(--red-dark);
+  border-color: var(--red-dark);
 }
 
-.guest-note {
-  font-size: 0.7rem !important;
+.auth-login-note {
+  margin-top: -8px !important;
+  font-size: 0.72rem !important;
 }
 
 .auth-message {
@@ -540,19 +518,6 @@ a:focus-visible {
 
 .footer-legal-links a {
   font-size: 0.72rem;
-}
-
-.auth-legal-note {
-  margin: 16px 0 0 !important;
-  color: #918482 !important;
-  font-size: 0.68rem !important;
-  line-height: 1.7 !important;
-  text-align: center;
-}
-
-.auth-legal-note a {
-  color: var(--muted);
-  text-underline-offset: 3px;
 }
 
 .visually-hidden {

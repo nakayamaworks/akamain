@@ -24,7 +24,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./welcome.css?v=20260822a" />
+    <link rel="stylesheet" href="./welcome.css?v=20260828b" />
   </head>
   <body>
     <div class="page-shell">
@@ -62,20 +62,16 @@
             <div id="signedOutView" class="auth-view">
               <div>
                 <h2 id="authPanelTitle">トレーニングをはじめよう</h2>
-                <p>ログインなしですぐに始められます。Google連携すると、別の端末でも成長の記録を確認できます。</p>
               </div>
+              <a class="guest-button" href="./index.html?guest=1">
+                ログインせず始める
+                <span aria-hidden="true">→</span>
+              </a>
               <div class="google-button-area">
                 <div id="googleSignInButton" aria-label="Googleでログイン"></div>
                 <span id="authLoading" class="auth-loading" role="status" aria-busy="true">ログインを準備しています…</span>
               </div>
-              <div class="guest-entry">
-                <span class="auth-divider">または</span>
-                <a class="guest-button" href="./index.html?guest=1">
-                  ログインせず始める
-                  <span aria-hidden="true">→</span>
-                </a>
-                <p class="guest-note">実践起票、AIレビュー、履歴、ゲストランキングを利用できます。</p>
-              </div>
+              <p class="auth-login-note">Googleログインすると、別の端末でも記録を引き継げます。</p>
             </div>
 
             <div id="signedInView" class="auth-view signed-in-view" hidden>
@@ -94,7 +90,6 @@
             </div>
 
             <p id="authMessage" class="auth-message" role="status"></p>
-            <p class="auth-legal-note">利用開始前に<a href="./terms.html">利用規約</a>と<a href="./privacy.html">プライバシーポリシー</a>をご確認ください。</p>
           </div>
         </section>
 
