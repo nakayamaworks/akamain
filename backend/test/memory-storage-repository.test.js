@@ -134,6 +134,7 @@ test("progress and leaderboard use each scenario's best successful score", async
   const leaderboard = await repository.getLeaderboard({ viewerUserId: "user-1" });
   assert.deepEqual(leaderboard.items, [{
     rankingName: "公開A",
+    isVerified: true,
     achievementPoints: 85,
     achievedScenarioCount: 1,
     scoredScenarioCount: 1,
@@ -141,6 +142,36 @@ test("progress and leaderboard use each scenario's best successful score", async
     rank: 1,
   }]);
   assert.equal(JSON.stringify(leaderboard).includes("非公開名"), false);
+});
+
+test("guest attempts and ranking profile move to a linked Google identity", async () => {
+  const repository = new MemoryStorageRepository({
+    now: () => "2026-08-28T00:00:00.000Z",
+  });
+  await repository.upsertUser({
+    userId: "firebase:guest-1",
+    authProvider: "anonymous",
+    displayName: "ゲスト",
+  });
+  await repository.updateRankingProfile("firebase:guest-1", {
+    rankingName: "ゲスト鉱員",
+    rankingOptIn: true,
+  });
+  await repository.appendAttempt(attempt({ userId: "firebase:guest-1" }));
+  await repository.upsertUser({
+    userId: "firebase:google-1",
+    authProvider: "google",
+    providerSubject: "google-sub-1",
+    displayName: "Google利用者",
+  });
+
+  const merged = await repository.mergeUserData("firebase:guest-1", "firebase:google-1");
+  const tickets = await repository.listTicketsByUser("firebase:google-1");
+
+  assert.equal(merged.rankingName, "ゲスト鉱員");
+  assert.equal(merged.rankingOptIn, true);
+  assert.equal(tickets.items.length, 1);
+  assert.equal(await repository.getUser("firebase:guest-1"), null);
 });
 
 test("QA scores stay out of the bug-ticket leaderboard", async () => {

@@ -1567,6 +1567,7 @@ const elements = {
   rankingOptInInput: document.getElementById("rankingOptInInput"),
   rankingProfileSaveButton: document.getElementById("rankingProfileSaveButton"),
   rankingProfileStatus: document.getElementById("rankingProfileStatus"),
+  rankingIdentityNote: document.getElementById("rankingIdentityNote"),
   myPageRankingStatus: document.getElementById("myPageRankingStatus"),
   myPageRankingBody: document.getElementById("myPageRankingBody"),
   myPageRankingRows: document.getElementById("myPageRankingRows"),
@@ -1885,6 +1886,14 @@ const authoringModeConfig = {
   },
 };
 
+function isAccountIdentityStatus(status) {
+  return status === "anonymous" || status === "signed_in";
+}
+
+function hasAccountIdentity() {
+  return isAccountIdentityStatus(state.authStatus);
+}
+
 const trainingLevelConfig = {
   beginner: {
     label: "初級",
@@ -2046,10 +2055,10 @@ function renderTicketList() {
 }
 
 function renderTicketListState() {
-  const signedIn = state.authStatus === "signed_in";
-  const authLoading = state.authStatus === "loading";
+  const signedIn = hasAccountIdentity();
+  const authLoading = ["loading", "linking"].includes(state.authStatus);
   const isLoading = authLoading || (signedIn && state.ticketListStatus === "loading");
-  elements.ticketListAuthGate?.classList.toggle("hidden", signedIn || state.authStatus === "loading");
+  elements.ticketListAuthGate?.classList.toggle("hidden", signedIn || authLoading);
   elements.ticketListContent?.classList.toggle("hidden", !signedIn || state.ticketListStatus !== "ready");
   elements.ticketListStatus?.classList.toggle(
     "hidden",
@@ -2102,7 +2111,7 @@ async function requestTicketList(options) {
 }
 
 async function loadTicketList(options = {}) {
-  if (state.authStatus !== "signed_in" || !window.TYPING_WORKBENCH_PROFILE_API) {
+  if (!hasAccountIdentity() || !window.TYPING_WORKBENCH_PROFILE_API) {
     state.ticketListItems = [];
     state.ticketListStatus = "idle";
     renderTicketListState();
@@ -4259,7 +4268,7 @@ function resetSession() {
 }
 
 async function refreshProgressForScenarioSelection() {
-  if (state.authStatus !== "signed_in" || !window.TYPING_WORKBENCH_PROFILE_API) {
+  if (!hasAccountIdentity() || !window.TYPING_WORKBENCH_PROFILE_API) {
     return;
   }
   try {
@@ -4485,7 +4494,7 @@ function deletePracticeDraft(scenarioId) {
 
 function resumePracticeDraft(draft) {
   if (
-    state.authStatus !== "signed_in" ||
+    !hasAccountIdentity() ||
     !draft ||
     !selectAuthoringMode("practice") ||
     !selectScenarioById(draft.scenarioId, draft.trainingLevel)
@@ -5568,31 +5577,38 @@ function renderAuthState(authState) {
   const previousStatus = state.authStatus;
   state.authStatus = authState.status;
   const signedIn = authState.status === "signed_in";
+  const identityReady = isAccountIdentityStatus(authState.status);
   setTextContent(
     elements.authStatusLabel,
-    signedIn ? "ログイン中" : guestExperienceRequested ? "体験モード" : "未ログイン"
+    signedIn
+      ? "Google連携済み"
+      : authState.status === "anonymous"
+        ? "ゲスト利用中"
+        : authState.status === "linking"
+          ? "Google連携中"
+          : "準備中"
   );
   setTextContent(elements.authUserName, signedIn ? authState.profile?.name || "Googleユーザー" : "");
   elements.authUserName?.classList.toggle("hidden", !signedIn);
   elements.googleSignInButton?.classList.toggle(
     "hidden",
-    signedIn || authState.status === "not_configured"
+    signedIn || !identityReady
   );
   elements.googleSignOutButton?.classList.toggle(
     "hidden",
     !signedIn
   );
   if (elements.scenarioIntroPracticeButton) {
-    elements.scenarioIntroPracticeButton.disabled = !signedIn;
+    elements.scenarioIntroPracticeButton.disabled = !identityReady;
     setTextContent(
       elements.scenarioIntroPracticeButton,
-      signedIn ? "実践起票を開始" : "実践起票（ログインが必要）"
+      identityReady ? "実践起票を開始" : "実践起票を準備中…"
     );
   }
   renderMyPageAuthState();
   renderTicketListState();
   renderTicketDetailState();
-  if (!signedIn) {
+  if (!identityReady) {
     state.ticketListItems = [];
     state.ticketListNextCursor = null;
     state.ticketDetail = null;
@@ -5600,15 +5616,15 @@ function renderAuthState(authState) {
   }
   if (
     state.view === "mypage" &&
-    authState.status === "signed_in" &&
-    previousStatus !== "signed_in"
+    identityReady &&
+    !isAccountIdentityStatus(previousStatus)
   ) {
     loadMyPageTab(state.myPageTab, { reset: true });
   }
-  if (state.view === "list" && signedIn && previousStatus !== "signed_in") {
+  if (state.view === "list" && identityReady && !isAccountIdentityStatus(previousStatus)) {
     loadTicketList();
   }
-  if (state.view === "detail" && signedIn && previousStatus !== "signed_in") {
+  if (state.view === "detail" && identityReady && !isAccountIdentityStatus(previousStatus)) {
     loadTicketDetail(state.ticketDetailId);
   }
   syncControls();
@@ -5656,7 +5672,7 @@ function setMyPageStatus(statusElement, bodyElement, message, options = {}) {
 }
 
 function renderMyPageAuthState() {
-  const signedIn = state.authStatus === "signed_in";
+  const signedIn = hasAccountIdentity();
   elements.myPageAuthGate?.classList.toggle("hidden", signedIn);
   elements.myPageContent?.classList.toggle("hidden", !signedIn);
   elements.myPageTabs.forEach((button) => {
@@ -5846,6 +5862,12 @@ function renderRankingProfile(profile) {
   if (elements.rankingOptInInput) {
     elements.rankingOptInInput.checked = Boolean(profile?.rankingOptIn);
   }
+  setTextContent(
+    elements.rankingIdentityNote,
+    profile?.authProvider === "anonymous"
+      ? "ゲストとして参加します。Google連携すると確認済み表示になり、別の端末でも履歴を確認できます。"
+      : "Google連携済みの確認済みユーザーとして参加します。"
+  );
 }
 
 function renderMyPageRanking() {
@@ -5863,7 +5885,7 @@ function renderMyPageRanking() {
       .map((entry) => `
         <tr class="${entry.isCurrentUser ? "is-current-user" : ""}">
           <td>${entry.rank}位</td>
-          <td>${escapeHtml(String(entry.rankingName))}${entry.isCurrentUser ? "（あなた）" : ""}</td>
+          <td>${escapeHtml(String(entry.rankingName))}${entry.isVerified ? '<span class="ranking-verified-badge">確認済み</span>' : '<span class="ranking-guest-badge">ゲスト</span>'}${entry.isCurrentUser ? "（あなた）" : ""}</td>
           <td>${entry.achievementPoints}点</td>
           <td>${entry.achievedScenarioCount}</td>
           <td>${entry.scoredScenarioCount}</td>
@@ -5881,7 +5903,7 @@ function renderMyPageRanking() {
 }
 
 async function loadMyPageTab(tab, options = {}) {
-  if (state.authStatus !== "signed_in") {
+  if (!hasAccountIdentity()) {
     renderMyPageAuthState();
     return;
   }
@@ -6140,8 +6162,11 @@ function renderTicketDetail() {
 }
 
 function renderTicketDetailState() {
-  const signedIn = state.authStatus === "signed_in";
-  elements.ticketDetailAuthGate?.classList.toggle("hidden", signedIn || state.authStatus === "loading");
+  const signedIn = hasAccountIdentity();
+  elements.ticketDetailAuthGate?.classList.toggle(
+    "hidden",
+    signedIn || ["loading", "linking"].includes(state.authStatus)
+  );
   if (!signedIn) {
     elements.ticketDetailStatus?.classList.add("hidden");
     elements.ticketDetailContent?.classList.add("hidden");
@@ -6149,7 +6174,7 @@ function renderTicketDetailState() {
 }
 
 async function loadTicketDetail(ticketId) {
-  if (state.authStatus !== "signed_in" || !ticketId) {
+  if (!hasAccountIdentity() || !ticketId) {
     renderTicketDetailState();
     return;
   }
@@ -6191,7 +6216,7 @@ function showTicketDetail(ticketId) {
   setView("detail");
   renderTicketDetailState();
   syncControls();
-  if (state.authStatus === "signed_in") {
+  if (hasAccountIdentity()) {
     loadTicketDetail(ticketId);
   }
 }
@@ -6204,7 +6229,7 @@ function showMyPage(tab = "progress") {
   setMyPageTab(tab);
   renderMyPageAuthState();
   syncControls();
-  if (state.authStatus === "signed_in") {
+  if (hasAccountIdentity()) {
     loadMyPageTab(state.myPageTab, { reset: true });
   }
 }
@@ -6226,7 +6251,7 @@ function handleAppRoute() {
     setView("list");
     syncControls();
     if (
-      state.authStatus === "signed_in" &&
+      hasAccountIdentity() &&
       (previousView !== "list" || state.ticketListStatus === "idle" || state.ticketListStatus === "error")
     ) {
       loadTicketList();
@@ -6325,7 +6350,7 @@ function handleMyPageProgressClick(event) {
 
 async function handleRankingProfileSubmit(event) {
   event.preventDefault();
-  if (state.authStatus !== "signed_in") {
+  if (!hasAccountIdentity()) {
     return;
   }
   const rankingName = elements.rankingNameInput?.value.trim() || "";
@@ -6628,9 +6653,9 @@ function syncControls() {
     const hasProjectDraft = Boolean(getLatestPracticeDraft(state.projectId));
     elements.resumeDraftButton.classList.toggle(
       "hidden",
-      state.view !== "list" || !hasProjectDraft || state.authStatus !== "signed_in"
+      state.view !== "list" || !hasProjectDraft || !hasAccountIdentity()
     );
-    elements.resumeDraftButton.disabled = !canStart || state.authStatus !== "signed_in";
+    elements.resumeDraftButton.disabled = !canStart || !hasAccountIdentity();
   }
 
   if (elements.draftSaveButton) {
@@ -6833,8 +6858,8 @@ function handleScenarioIntroChange() {
 }
 
 function handleScenarioIntroPractice() {
-  if (state.authStatus !== "signed_in") {
-    window.alert?.("実践起票を保存するにはGoogleログインが必要です。上部のログインボタンからログインしてください。");
+  if (!hasAccountIdentity()) {
+    window.alert?.("ゲストデータを準備しています。少し待ってからもう一度お試しください。");
     return;
   }
   selectAuthoringMode("practice");

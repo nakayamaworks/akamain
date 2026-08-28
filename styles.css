@@ -1459,6 +1459,35 @@ button {
   color: var(--danger);
 }
 
+.ranking-identity-note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.ranking-verified-badge,
+.ranking-guest-badge {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+
+.ranking-verified-badge {
+  background: #e8f4ec;
+  color: #267140;
+}
+
+.ranking-guest-badge {
+  background: #edf0f3;
+  color: #5c6670;
+}
+
 .ranking-table td:first-child {
   width: 82px;
   color: #315f89;

@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/brand/akamain-site-icon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/brand/akamain-apple-touch-icon-180.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20260825a" />
+    <link rel="stylesheet" href="./styles.css?v=20260828a" />
   </head>
   <body>
     <div class="redmine-shell">
@@ -22,7 +22,7 @@
             <button id="myPageNavButton" class="rm-meta-link is-interactive" type="button">マイページ</button>
           </nav>
           <div class="rm-meta-user">
-            <span id="authStatusLabel" class="rm-auth-status">未ログイン</span>
+            <span id="authStatusLabel" class="rm-auth-status">準備中</span>
             <strong id="authUserName" class="rm-auth-user-name hidden"></strong>
             <div id="googleSignInButton" class="google-sign-in-button"></div>
             <button id="googleSignOutButton" class="rm-meta-link is-interactive hidden" type="button">ログアウト</button>
@@ -80,8 +80,8 @@
 
           <article class="ticket-list-card">
             <div id="ticketListAuthGate" class="ticket-list-state hidden">
-              <strong>作成したチケットの表示にはGoogleログインが必要です。</strong>
-              <p>ログインすると、保存済みの実践起票をこのプロジェクトごとに確認できます。</p>
+              <strong>ゲストデータを準備できませんでした。</strong>
+              <p>通信環境を確認して再読み込みしてください。</p>
             </div>
             <div id="ticketListStatus" class="ticket-list-state has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
             <div id="ticketListRetry" class="ticket-list-retry hidden">
@@ -173,8 +173,8 @@
             </div>
           </div>
           <div id="ticketDetailAuthGate" class="ticket-list-state hidden">
-            <strong>起票内容の表示にはGoogleログインが必要です。</strong>
-            <p>ログイン後、このURLの起票内容を読み込みます。</p>
+            <strong>ゲストデータを準備できませんでした。</strong>
+            <p>通信環境を確認して再読み込みしてください。</p>
           </div>
           <div id="ticketDetailStatus" class="ticket-list-state has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
           <div id="ticketDetailContent" class="hidden"></div>
@@ -188,8 +188,8 @@
           </div>
 
           <div id="myPageAuthGate" class="my-page-auth-gate hidden">
-            <strong>マイページの利用にはGoogleログインが必要です。</strong>
-            <p>上部の「Google でログイン」からログインすると、成績と履歴を表示できます。</p>
+            <strong>ゲストデータを準備できませんでした。</strong>
+            <p>通信環境を確認して再読み込みしてください。</p>
           </div>
 
           <div id="myPageContent" class="my-page-content">
@@ -271,6 +271,7 @@
                 </label>
                 <button id="rankingProfileSaveButton" class="primary-button" type="submit">設定を保存</button>
                 <span id="rankingProfileStatus" class="ranking-profile-status" role="status"></span>
+                <p id="rankingIdentityNote" class="ranking-identity-note"></p>
               </form>
 
               <div id="myPageRankingStatus" class="my-page-status has-loading-spinner" role="status" aria-busy="true">読み込み中です…</div>
@@ -881,16 +882,18 @@
       </div>
     </div>
 
-    <script src="./runtime-config.js?v=20260802a"></script>
-    <script src="./auth-client.js?v=20260804a"></script>
-    <script src="./scoring-api.js?v=20260801a"></script>
-    <script src="./profile-api.js?v=20260803b"></script>
+    <script src="./runtime-config.js?v=20260828a"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+    <script src="./auth-client.js?v=20260828a"></script>
+    <script src="./scoring-api.js?v=20260828a"></script>
+    <script src="./profile-api.js?v=20260828a"></script>
     <script src="./scenario-authoring-library.js?v=20260825d"></script>
     <script src="./scenario-library.js?v=20260810a"></script>
     <script src="./scenario-briefing-library.js?v=20260810a"></script>
     <script src="./qa-scenario-authoring-library.js?v=20260826a"></script>
     <script src="./evidence-library.js?v=20260825c"></script>
     <script src="./scoring-preview.js?v=20260811a"></script>
-    <script src="./main.js?v=20260826c"></script>
+    <script src="./main.js?v=20260828a"></script>
   </body>
 </html>

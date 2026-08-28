@@ -345,6 +345,57 @@ export class SheetsStorageRepository extends StorageRepository {
     });
   }
 
+  async mergeUserData(sourceUserId, targetUserId) {
+    if (!sourceUserId || !targetUserId || sourceUserId === targetUserId) {
+      return this.getUser(targetUserId);
+    }
+    return this.withWriteLock(async () => {
+      await this.initialize();
+      const userRows = await this.readDataRows("Users");
+      const sourceIndex = userRows.findIndex((row) => row[1] === sourceUserId);
+      const targetIndex = userRows.findIndex((row) => row[1] === targetUserId);
+      if (targetIndex < 0) {
+        throw storageError("USER_NOT_FOUND", "target user was not found");
+      }
+      const target = rowToUser(userRows[targetIndex]);
+      if (sourceIndex < 0) {
+        return target;
+      }
+      const source = rowToUser(userRows[sourceIndex]);
+      const timestamp = this.now();
+      const merged = {
+        ...target,
+        rankingName: target.rankingName || source.rankingName || null,
+        rankingOptIn: target.rankingOptIn || source.rankingOptIn || false,
+        createdAt: [target.createdAt, source.createdAt].filter(Boolean).sort()[0] || target.createdAt,
+        updatedAt: timestamp,
+      };
+      await this.updateRow("Users", targetIndex + 2, userToRow(merged));
+      await this.updateRow("Users", sourceIndex + 2, userToRow({
+        ...source,
+        authProvider: "merged",
+        providerSubject: targetUserId,
+        displayName: "統合済み",
+        rankingName: null,
+        rankingOptIn: false,
+        updatedAt: timestamp,
+      }));
+
+      const attemptRows = await this.readDataRows("Attempts");
+      for (let index = 0; index < attemptRows.length; index += 1) {
+        if (attemptRows[index][2] !== sourceUserId) {
+          continue;
+        }
+        const updatedRow = [...attemptRows[index]];
+        updatedRow[2] = targetUserId;
+        await this.updateRow("Attempts", index + 2, updatedRow);
+      }
+      this.userCache.delete(sourceUserId);
+      this.userCache.set(targetUserId, { user: merged, cachedAt: Date.now() });
+      return merged;
+    });
+  }
+
   async appendAttempt(attempt) {
     return this.withWriteLock(async () => {
       await this.initialize();

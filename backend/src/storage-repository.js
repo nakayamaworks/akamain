@@ -15,6 +15,10 @@ export class StorageRepository {
     throw new Error("updateRankingProfile is not implemented");
   }
 
+  async mergeUserData() {
+    throw new Error("mergeUserData is not implemented");
+  }
+
   async appendAttempt() {
     throw new Error("appendAttempt is not implemented");
   }
@@ -158,6 +162,7 @@ export function buildLeaderboard(users, attempts, scoringResults, viewerUserId =
       const scores = [...bestByScenario.values()];
       return {
         rankingName: user.rankingName,
+        isVerified: user.authProvider !== "anonymous",
         achievementPoints: scores.reduce((total, score) => total + score, 0),
         achievedScenarioCount: scores.filter((score) => score >= ACHIEVEMENT_SCORE).length,
         scoredScenarioCount: scores.length,

@@ -25,8 +25,15 @@ Cloud Runでは次を環境変数として設定する。
 STORAGE_DRIVER=sheets
 GOOGLE_SHEETS_SPREADSHEET_ID=スプレッドシートID
 GOOGLE_WEB_CLIENT_ID=OAuth WebクライアントID
+FIREBASE_PROJECT_ID=typing-workbench-misemaru
 GEMINI_MODEL=gemini-3.5-flash-lite
 ALLOWED_ORIGINS=http://localhost:5500
+RATE_LIMIT_DRIVER=firestore
+RATE_LIMIT_SALT=Secret Managerから渡すランダム値
+SCORING_LIMIT_PER_MINUTE=5
+SCORING_LIMIT_PER_USER_DAY=20
+SCORING_LIMIT_PER_IP_DAY=40
+SCORING_LIMIT_GLOBAL_DAY=500
 ```
 
 `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT`は設定しない。Cloud Runへ割り当てたサービスIDをApplication Default Credentialsとして直接使用する。
@@ -56,7 +63,9 @@ ALLOWED_ORIGINS=http://localhost:5500
 --no-invoker-iam-check
 ```
 
-Cloud RunのIAMチェックを通過した後も、`/api/*`はGoogle OAuthのIDトークンをアプリ内で検証する。未ログインリクエストは`401 AUTH_REQUIRED`を返す。
+Cloud RunのIAMチェックを通過した後も、本人用`/api/*`はFirebase IDトークンをアプリ内で検証する。トークンがないリクエストは`401 AUTH_REQUIRED`を返す。移行期間中は既存クライアントのGoogle OAuth IDトークンも検証する。
+
+Firebase Authenticationでは匿名プロバイダとGoogleプロバイダを有効にする。AIレビューの利用回数はFirestoreトランザクションで利用者、接続元IPのハッシュ、サービス全体の日次上限を共有する。Cloud Runの実行IDにはFirestoreの読み書き権限を付与する。
 
 ## デプロイ後
 

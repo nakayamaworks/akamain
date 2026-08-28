@@ -13,9 +13,9 @@
       throw createError("API_NOT_CONFIGURED", "成績保存APIがまだ接続されていません。");
     }
 
-    const idToken = global.TYPING_WORKBENCH_AUTH?.getIdToken();
+    const idToken = await global.TYPING_WORKBENCH_AUTH?.getIdToken();
     if (!idToken) {
-      throw createError("AUTH_REQUIRED", "マイページの利用にはGoogleログインが必要です。");
+      throw createError("AUTH_REQUIRED", "ゲストデータを準備できませんでした。再読み込みしてください。");
     }
 
     const controller = new AbortController();

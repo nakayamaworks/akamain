@@ -288,10 +288,10 @@ const runtimeConfigKeys = [
   ...runtimeConfigSource.matchAll(/^\s{2}([A-Za-z][A-Za-z0-9]*):/gm),
 ].map((match) => match[1]);
 if (
-  runtimeConfigKeys.join(",") !== "apiBaseUrl,googleClientId" ||
+  runtimeConfigKeys.join(",") !== "apiBaseUrl,googleClientId,firebaseApiKey,firebaseAuthDomain,firebaseProjectId" ||
   /GEMINI_API_KEY|geminiApiKey|clientSecret/i.test(runtimeConfigSource)
 ) {
-  errors.push("browser runtime config must contain only public endpoint and Google client settings");
+  errors.push("browser runtime config must contain only public endpoint and Firebase/Google client settings");
 }
 if (
   !authClientSource.includes("getIdToken") ||
@@ -300,7 +300,7 @@ if (
   !backendScoringSource.includes('"x-goog-api-key": apiKey') ||
   !backendScoringSource.includes("calculateWeightedTotal")
 ) {
-  errors.push("phase 3 scoring must verify Google identity and keep Gemini scoring server-side");
+  errors.push("phase 3 scoring must verify Firebase/Google identity and keep Gemini scoring server-side");
 }
 if (
   !indexSource.includes('src="./profile-api.js') ||

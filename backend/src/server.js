@@ -11,9 +11,13 @@ import {
   scoreAttemptRecordWithGemini,
 } from "./scoring-service.js";
 import { createStorageRepository } from "./storage-factory.js";
+import { createScoringRateLimiter } from "./scoring-rate-limiter.js";
 
 const port = Number(process.env.PORT || 8787);
 const googleClientId = process.env.GOOGLE_WEB_CLIENT_ID || "";
+const firebaseProjectId = process.env.FIREBASE_PROJECT_ID
+  || process.env.GOOGLE_CLOUD_PROJECT
+  || "typing-workbench-misemaru";
 const geminiApiKey = process.env.GEMINI_API_KEY || "";
 const geminiModel = process.env.GEMINI_MODEL || DEFAULT_MODEL;
 const storageDriver = String(process.env.STORAGE_DRIVER || "memory").toLowerCase();
@@ -25,9 +29,10 @@ const allowedOrigins = new Set(
     .filter(Boolean)
 );
 const googleAuthClient = new OAuth2Client();
-const scoringWindows = new Map();
-const scoringWindowMs = 60000;
-const scoringLimitPerWindow = 5;
+const firebaseAuthClient = new OAuth2Client();
+let firebaseCertificates = null;
+let firebaseCertificatesExpireAt = 0;
+const scoringRateLimiter = createScoringRateLimiter();
 
 function latestCompatibleScoringResult(attempt) {
   return (attempt?.scoringResults || []).find(
@@ -92,17 +97,23 @@ function readJson(request) {
   });
 }
 
-async function verifyGoogleUser(request) {
+function bearerToken(request) {
+  const authorization = request.headers.authorization || "";
+  return authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+}
+
+function unverifiedTokenPayload(idToken) {
+  try {
+    return JSON.parse(Buffer.from(String(idToken).split(".")[1], "base64url").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+async function verifyGoogleUserToken(idToken) {
   if (!googleClientId) {
     const error = new Error("Googleログインのバックエンド設定がありません。");
     error.code = "AUTH_NOT_CONFIGURED";
-    throw error;
-  }
-  const authorization = request.headers.authorization || "";
-  const idToken = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-  if (!idToken) {
-    const error = new Error("Googleログインが必要です。");
-    error.code = "AUTH_REQUIRED";
     throw error;
   }
   let ticket;
@@ -132,24 +143,91 @@ async function verifyGoogleUser(request) {
   };
 }
 
-async function authenticateAndUpsertUser(request) {
-  const verifiedUser = await verifyGoogleUser(request);
-  return storageRepository.upsertUser(verifiedUser);
-}
-
-function enforceScoringRateLimit(userId) {
-  const now = Date.now();
-  const currentWindow = scoringWindows.get(userId);
-  if (!currentWindow || now - currentWindow.startedAt >= scoringWindowMs) {
-    scoringWindows.set(userId, { startedAt: now, count: 1 });
-    return;
-  }
-  if (currentWindow.count >= scoringLimitPerWindow) {
-    const error = new Error("AI採点の連続実行が多すぎます。1分後にもう一度お試しください。");
-    error.code = "RATE_LIMITED";
+async function verifyFirebaseUserToken(idToken) {
+  let payload;
+  try {
+    if (!firebaseCertificates || Date.now() >= firebaseCertificatesExpireAt) {
+      const response = await fetch(
+        "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+      );
+      if (!response.ok) {
+        throw new Error("Firebase signing certificates are unavailable");
+      }
+      firebaseCertificates = await response.json();
+      const maximumAge = Number.parseInt(
+        response.headers.get("cache-control")?.match(/max-age=(\d+)/)?.[1] || "3600",
+        10
+      );
+      firebaseCertificatesExpireAt = Date.now() + maximumAge * 1000;
+    }
+    const ticket = await firebaseAuthClient.verifySignedJwtWithCertsAsync(
+      idToken,
+      firebaseCertificates,
+      firebaseProjectId,
+      [`https://securetoken.google.com/${firebaseProjectId}`]
+    );
+    payload = ticket.getPayload();
+  } catch {
+    const error = new Error("利用者情報を確認できませんでした。再読み込みしてください。");
+    error.code = "INVALID_ID_TOKEN";
     throw error;
   }
-  currentWindow.count += 1;
+  if (!payload?.sub || payload.sub.length > 128) {
+    const error = new Error("利用者情報を確認できませんでした。再読み込みしてください。");
+    error.code = "INVALID_ID_TOKEN";
+    throw error;
+  }
+  const signInProvider = payload.firebase?.sign_in_provider || "";
+  const googleSubject = payload.firebase?.identities?.["google.com"]?.[0] || null;
+  const anonymous = signInProvider === "anonymous";
+  return {
+    userId: `firebase:${payload.sub}`,
+    authProvider: anonymous ? "anonymous" : googleSubject ? "google" : signInProvider || "firebase",
+    providerSubject: googleSubject || payload.sub,
+    email: payload.email_verified ? payload.email || null : null,
+    emailVerified: Boolean(payload.email_verified),
+    displayName: anonymous ? "ゲスト" : payload.name || "Googleユーザー",
+    legacyUserId: googleSubject,
+    anonymous,
+  };
+}
+
+async function verifyAuthenticatedUser(request) {
+  const idToken = bearerToken(request);
+  if (!idToken) {
+    const error = new Error("利用者情報が必要です。再読み込みしてください。");
+    error.code = "AUTH_REQUIRED";
+    throw error;
+  }
+  const issuer = unverifiedTokenPayload(idToken)?.iss || "";
+  if (issuer.startsWith("https://securetoken.google.com/")) {
+    return verifyFirebaseUserToken(idToken);
+  }
+  return verifyGoogleUserToken(idToken);
+}
+
+async function authenticateAndUpsertUser(request) {
+  const verifiedUser = await verifyAuthenticatedUser(request);
+  let user = await storageRepository.upsertUser(verifiedUser);
+  if (verifiedUser.legacyUserId && verifiedUser.legacyUserId !== verifiedUser.userId) {
+    const legacyUser = await storageRepository.getUser(verifiedUser.legacyUserId);
+    if (legacyUser && legacyUser.authProvider !== "merged") {
+      user = await storageRepository.mergeUserData(verifiedUser.legacyUserId, verifiedUser.userId);
+    }
+  }
+  return user;
+}
+
+function requestIpAddress(request) {
+  const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return forwarded || request.socket?.remoteAddress || "unknown";
+}
+
+async function enforceScoringRateLimit(userId, request) {
+  await scoringRateLimiter.consume({
+    userId,
+    ipAddress: requestIpAddress(request),
+  });
 }
 
 function displayTicketId(attempt) {
@@ -210,6 +288,7 @@ function errorStatus(code) {
     "INVALID_JSON",
     "INVALID_RANKING_PROFILE",
     "INVALID_REQUEST",
+    "INVALID_SOURCE_IDENTITY",
     "PAYLOAD_TOO_LARGE",
     "SCENARIO_NOT_SUPPORTED",
   ]).has(code)) {
@@ -265,7 +344,8 @@ const server = http.createServer(async (request, response) => {
   if (request.method === "GET" && request.url === "/health") {
     sendJson(response, 200, {
       status: "ok",
-      scoringConfigured: Boolean(googleClientId && geminiApiKey),
+      scoringConfigured: Boolean(geminiApiKey),
+      firebaseAuthentication: true,
       modelId: geminiModel,
       storageDriver,
       persistenceConfigured: storageDriver === "memory"
@@ -285,6 +365,37 @@ const server = http.createServer(async (request, response) => {
       sendJson(response, 200, { user }, origin);
     } catch (error) {
       sendError(response, error, origin, "me");
+    }
+    return;
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/identity/claim") {
+    try {
+      const target = await verifyAuthenticatedUser(request);
+      if (target.anonymous || target.authProvider === "anonymous") {
+        const error = new Error("Google連携済みの利用者情報が必要です。");
+        error.code = "INVALID_SOURCE_IDENTITY";
+        throw error;
+      }
+      let targetUser = await storageRepository.upsertUser(target);
+      if (target.legacyUserId && target.legacyUserId !== target.userId) {
+        const legacyUser = await storageRepository.getUser(target.legacyUserId);
+        if (legacyUser && legacyUser.authProvider !== "merged") {
+          targetUser = await storageRepository.mergeUserData(target.legacyUserId, target.userId);
+        }
+      }
+      const input = await readJson(request);
+      const source = await verifyFirebaseUserToken(String(input.anonymousIdToken || ""));
+      if (!source.anonymous || source.userId === target.userId) {
+        const error = new Error("引き継ぎ元のゲスト情報を確認できませんでした。");
+        error.code = "INVALID_SOURCE_IDENTITY";
+        throw error;
+      }
+      await storageRepository.upsertUser(source);
+      targetUser = await storageRepository.mergeUserData(source.userId, target.userId);
+      sendJson(response, 200, { user: targetUser }, origin);
+    } catch (error) {
+      sendError(response, error, origin, "identity-claim");
     }
     return;
   }
@@ -351,7 +462,7 @@ const server = http.createServer(async (request, response) => {
       }
       const previousAttempt = previousTicketRevision(ticket, attempt);
       const previousScoringResult = latestCompatibleScoringResult(previousAttempt);
-      enforceScoringRateLimit(user.userId);
+      await enforceScoringRateLimit(user.userId, request);
       let scoringResult;
       try {
         scoringResult = await scoreAttemptRecordWithGemini(attempt, {
@@ -488,7 +599,7 @@ const server = http.createServer(async (request, response) => {
   if (request.method === "POST" && url.pathname === "/api/scoring") {
     try {
       const user = await authenticateAndUpsertUser(request);
-      enforceScoringRateLimit(user.userId);
+      await enforceScoringRateLimit(user.userId, request);
       const attemptInput = await readJson(request);
       if (!isScoringSupported(attemptInput.scenarioId)) {
         const error = new Error("このシナリオはAI採点の対象外です。");

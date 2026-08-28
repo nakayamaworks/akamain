@@ -16,11 +16,11 @@
       );
     }
 
-    const idToken = global.TYPING_WORKBENCH_AUTH?.getIdToken();
+    const idToken = await global.TYPING_WORKBENCH_AUTH?.getIdToken();
     if (!idToken) {
       throw createError(
         "AUTH_REQUIRED",
-        "AIレビューを利用するにはGoogleアカウントでログインしてください。"
+        "ゲストデータを準備できませんでした。再読み込みしてください。"
       );
     }
 

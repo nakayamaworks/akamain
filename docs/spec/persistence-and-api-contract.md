@@ -23,14 +23,14 @@
 
 ### 2.1 Users
 
-Googleアカウントと公開プロフィールを管理する。
+Firebase匿名アカウント、任意のGoogle連携および公開プロフィールを管理する。
 
 | 列 | 内容 |
 | --- | --- |
 | `schema_version` | `user.v1` |
-| `user_id` | バックエンドで検証したGoogle IDトークンの`sub` |
-| `auth_provider` | 初期値は`google` |
-| `provider_subject` | Google IDトークンの`sub`。将来の認証方式追加に備えて保持する |
+| `user_id` | `firebase:<Firebase UID>`。既存行のGoogle `sub`は初回連携時に統合する |
+| `auth_provider` | `anonymous`、`google`または移行用の認証方式 |
+| `provider_subject` | 匿名時はFirebase UID、Google連携後はGoogle `sub` |
 | `email` | 検証済みIDトークンから取得する非公開属性 |
 | `email_verified` | Googleがメール確認済みか |
 | `display_name` | アカウント画面用の表示名 |
@@ -40,7 +40,7 @@ Googleアカウントと公開プロフィールを管理する。
 | `last_login_at` | 最終認証日時 |
 | `updated_at` | 更新日時 |
 
-メールアドレスを主キーにしない。メールアドレスとGoogleアカウントの本名はランキングへ表示しない。
+メールアドレスを主キーにしない。メールアドレスとGoogleアカウントの本名はランキングへ表示しない。ランキングにはゲストまたはGoogle連携済みの区分だけを表示する。
 
 ### 2.2 Attempts
 
@@ -113,7 +113,7 @@ getLeaderboard(options)
 
 画面はSheetsのタブ名、セル範囲、行番号を知らない。Sheetsアダプターだけが物理構造を扱う。
 
-バックエンドのHTTP APIは次を提供する。すべてGoogle IDトークンを検証し、URLやリクエスト本文から`user_id`を受け取らない。
+バックエンドのHTTP APIは次を提供する。本人用APIはFirebase IDトークンを検証し、URLやリクエスト本文から`user_id`を受け取らない。移行期間中は既存Google IDトークンも受け付ける。
 
 | Method | Path | 内容 |
 | --- | --- | --- |

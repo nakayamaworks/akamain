@@ -77,6 +77,33 @@ export class MemoryStorageRepository extends StorageRepository {
     return clone(updated);
   }
 
+  async mergeUserData(sourceUserId, targetUserId) {
+    if (!sourceUserId || !targetUserId || sourceUserId === targetUserId) {
+      return this.getUser(targetUserId);
+    }
+    const source = this.users.get(sourceUserId);
+    const target = this.users.get(targetUserId);
+    if (!target) {
+      throw storageError("USER_NOT_FOUND", "target user was not found");
+    }
+    if (!source) {
+      return clone(target);
+    }
+    this.attempts = this.attempts.map((attempt) =>
+      attempt.userId === sourceUserId ? { ...attempt, userId: targetUserId } : attempt
+    );
+    const merged = {
+      ...target,
+      rankingName: target.rankingName || source.rankingName || null,
+      rankingOptIn: target.rankingOptIn || source.rankingOptIn || false,
+      createdAt: [target.createdAt, source.createdAt].filter(Boolean).sort()[0] || target.createdAt,
+      updatedAt: this.now(),
+    };
+    this.users.set(targetUserId, merged);
+    this.users.delete(sourceUserId);
+    return clone(merged);
+  }
+
   async appendAttempt(attempt) {
     const existing = this.attempts.find((stored) => stored.attemptId === attempt?.attemptId);
     if (existing?.userId === attempt?.userId) {
