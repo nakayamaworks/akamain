@@ -1888,6 +1888,10 @@ function isAccountIdentityStatus(status) {
   return status === "anonymous" || status === "signed_in";
 }
 
+function isLocalGuestStatus(status) {
+  return status === "guest";
+}
+
 function hasAccountIdentity() {
   return isAccountIdentityStatus(state.authStatus);
 }
@@ -2054,13 +2058,18 @@ function renderTicketList() {
 
 function renderTicketListState() {
   const signedIn = hasAccountIdentity();
-  const authLoading = ["loading", "linking"].includes(state.authStatus);
+  const localGuest = isLocalGuestStatus(state.authStatus);
+  const authLoading = ["loading", "linking", "authenticating"].includes(state.authStatus);
+  const authFailed = ["error", "not_configured"].includes(state.authStatus);
   const isLoading = authLoading || (signedIn && state.ticketListStatus === "loading");
-  elements.ticketListAuthGate?.classList.toggle("hidden", signedIn || authLoading);
-  elements.ticketListContent?.classList.toggle("hidden", !signedIn || state.ticketListStatus !== "ready");
+  elements.ticketListAuthGate?.classList.toggle("hidden", !authFailed);
+  elements.ticketListContent?.classList.toggle(
+    "hidden",
+    !localGuest && (!signedIn || state.ticketListStatus !== "ready")
+  );
   elements.ticketListStatus?.classList.toggle(
     "hidden",
-    (!signedIn && !authLoading) || (signedIn && state.ticketListStatus === "ready")
+    localGuest || authFailed || (!signedIn && !authLoading) || (signedIn && state.ticketListStatus === "ready")
   );
   if (elements.ticketListStatus) {
     elements.ticketListStatus.textContent = authLoading
@@ -4492,7 +4501,6 @@ function deletePracticeDraft(scenarioId) {
 
 function resumePracticeDraft(draft) {
   if (
-    !hasAccountIdentity() ||
     !draft ||
     !selectAuthoringMode("practice") ||
     !selectScenarioById(draft.scenarioId, draft.trainingLevel)
@@ -5580,8 +5588,10 @@ function renderAuthState(authState) {
     elements.authStatusLabel,
     signedIn
       ? "Google連携済み"
-      : authState.status === "anonymous"
+      : ["guest", "anonymous"].includes(authState.status)
         ? "ゲスト利用中"
+        : authState.status === "authenticating"
+          ? "ゲスト記録を準備中"
         : authState.status === "linking"
           ? "Google連携中"
           : "準備中"
@@ -5590,18 +5600,15 @@ function renderAuthState(authState) {
   elements.authUserName?.classList.toggle("hidden", !signedIn);
   elements.googleSignInButton?.classList.toggle(
     "hidden",
-    signedIn || !identityReady
+    signedIn || !["guest", "anonymous"].includes(authState.status)
   );
   elements.googleSignOutButton?.classList.toggle(
     "hidden",
     !signedIn
   );
   if (elements.scenarioIntroPracticeButton) {
-    elements.scenarioIntroPracticeButton.disabled = !identityReady;
-    setTextContent(
-      elements.scenarioIntroPracticeButton,
-      identityReady ? "実践起票を開始" : "実践起票を準備中…"
-    );
+    elements.scenarioIntroPracticeButton.disabled = authState.status === "linking";
+    setTextContent(elements.scenarioIntroPracticeButton, "実践起票を開始");
   }
   renderMyPageAuthState();
   renderTicketListState();
@@ -5611,6 +5618,7 @@ function renderAuthState(authState) {
     state.ticketListNextCursor = null;
     state.ticketDetail = null;
     state.ticketDetailRevisions = [];
+    renderTicketList();
   }
   if (
     state.view === "mypage" &&
@@ -5671,8 +5679,21 @@ function setMyPageStatus(statusElement, bodyElement, message, options = {}) {
 
 function renderMyPageAuthState() {
   const signedIn = hasAccountIdentity();
+  const localGuest = isLocalGuestStatus(state.authStatus);
   elements.myPageAuthGate?.classList.toggle("hidden", signedIn);
   elements.myPageContent?.classList.toggle("hidden", !signedIn);
+  const authGateTitle = elements.myPageAuthGate?.querySelector("strong");
+  const authGateDescription = elements.myPageAuthGate?.querySelector("p");
+  setTextContent(
+    authGateTitle,
+    localGuest ? "まだ保存された記録はありません。" : "ゲストデータを準備できませんでした。"
+  );
+  setTextContent(
+    authGateDescription,
+    localGuest
+      ? "AIレビューを完了すると、学習状況や履歴を確認できます。"
+      : "通信環境を確認して再読み込みしてください。"
+  );
   elements.myPageTabs.forEach((button) => {
     button.disabled = !signedIn;
   });
@@ -6651,9 +6672,9 @@ function syncControls() {
     const hasProjectDraft = Boolean(getLatestPracticeDraft(state.projectId));
     elements.resumeDraftButton.classList.toggle(
       "hidden",
-      state.view !== "list" || !hasProjectDraft || !hasAccountIdentity()
+      state.view !== "list" || !hasProjectDraft
     );
-    elements.resumeDraftButton.disabled = !canStart || !hasAccountIdentity();
+    elements.resumeDraftButton.disabled = !canStart;
   }
 
   if (elements.draftSaveButton) {
@@ -6856,10 +6877,6 @@ function handleScenarioIntroChange() {
 }
 
 function handleScenarioIntroPractice() {
-  if (!hasAccountIdentity()) {
-    window.alert?.("ゲストデータを準備しています。少し待ってからもう一度お試しください。");
-    return;
-  }
   selectAuthoringMode("practice");
   beginSessionForCurrentScenario();
 }

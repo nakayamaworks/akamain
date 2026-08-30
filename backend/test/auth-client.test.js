@@ -26,6 +26,7 @@ function createAuthContext(options = {}) {
   const listeners = new Set();
   let credentialCallback = null;
   let currentUser = options.initialUser || null;
+  let anonymousSignInCount = 0;
   const authInstance = {
     get currentUser() {
       return currentUser;
@@ -37,6 +38,7 @@ function createAuthContext(options = {}) {
       return () => listeners.delete(listener);
     },
     async signInAnonymously() {
+      anonymousSignInCount += 1;
       currentUser = createUser({ uid: options.nextAnonymousUid || "anonymous-1" });
       currentUser.linkWithCredential = async () => {
         currentUser.isAnonymous = false;
@@ -114,10 +116,11 @@ function createAuthContext(options = {}) {
   return {
     auth: window.TYPING_WORKBENCH_AUTH,
     getCredentialCallback: () => credentialCallback,
+    getAnonymousSignInCount: () => anonymousSignInCount,
   };
 }
 
-test("initialization silently creates a persistent anonymous identity", async () => {
+test("initialization keeps a new visitor local until an ID token is requested", async () => {
   const page = createAuthContext();
   let latestSnapshot = null;
   page.auth.subscribe((snapshot) => {
@@ -125,9 +128,32 @@ test("initialization silently creates a persistent anonymous identity", async ()
   });
   await page.auth.initialize({});
 
+  assert.equal(latestSnapshot.status, "guest");
+  assert.equal(latestSnapshot.accountType, "guest");
+  assert.equal(page.getAnonymousSignInCount(), 0);
+
+  assert.equal(await page.auth.getIdToken(), "anonymous-token-anonymous-1");
   assert.equal(latestSnapshot.status, "anonymous");
   assert.equal(latestSnapshot.accountType, "anonymous");
-  assert.equal(await page.auth.getIdToken(), "anonymous-token-anonymous-1");
+  assert.equal(page.getAnonymousSignInCount(), 1);
+});
+
+test("concurrent server requests create only one anonymous identity", async () => {
+  const page = createAuthContext();
+  await page.auth.initialize({});
+
+  const tokens = await Promise.all([
+    page.auth.getIdToken(),
+    page.auth.getIdToken(),
+    page.auth.getIdToken(),
+  ]);
+
+  assert.deepEqual(tokens, [
+    "anonymous-token-anonymous-1",
+    "anonymous-token-anonymous-1",
+    "anonymous-token-anonymous-1",
+  ]);
+  assert.equal(page.getAnonymousSignInCount(), 1);
 });
 
 test("Google credential upgrades an anonymous identity without changing its uid", async () => {
@@ -137,6 +163,7 @@ test("Google credential upgrades an anonymous identity without changing its uid"
     latestSnapshot = snapshot;
   });
   await page.auth.initialize({});
+  await page.auth.getIdToken();
   await page.getCredentialCallback()({ credential: "google-id-token" });
 
   assert.equal(latestSnapshot.status, "signed_in");
@@ -144,11 +171,32 @@ test("Google credential upgrades an anonymous identity without changing its uid"
   assert.equal(await page.auth.getIdToken(), "google-token-anonymous-1");
 });
 
-test("signing out returns the browser to a new anonymous identity", async () => {
+test("Google credential signs in directly when no guest data exists", async () => {
+  const page = createAuthContext();
+  let latestSnapshot = null;
+  page.auth.subscribe((snapshot) => {
+    latestSnapshot = snapshot;
+  });
+  await page.auth.initialize({});
+  await page.getCredentialCallback()({ credential: "google-id-token" });
+
+  assert.equal(latestSnapshot.status, "signed_in");
+  assert.equal(await page.auth.getIdToken(), "google-token-google-1");
+  assert.equal(page.getAnonymousSignInCount(), 0);
+});
+
+test("signing out returns the browser to a local guest without creating an account", async () => {
   const page = createAuthContext({ nextAnonymousUid: "guest-after-signout" });
+  let latestSnapshot = null;
+  page.auth.subscribe((snapshot) => {
+    latestSnapshot = snapshot;
+  });
   await page.auth.initialize({});
   await page.getCredentialCallback()({ credential: "google-id-token" });
   await page.auth.signOut();
 
+  assert.equal(latestSnapshot.status, "guest");
+  assert.equal(page.getAnonymousSignInCount(), 0);
   assert.equal(await page.auth.getIdToken(), "anonymous-token-guest-after-signout");
+  assert.equal(page.getAnonymousSignInCount(), 1);
 });

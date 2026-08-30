@@ -7,6 +7,7 @@
   let accountType = null;
   let initialized = false;
   let transitionInProgress = false;
+  let anonymousSignInPromise = null;
 
   function snapshot() {
     return Object.freeze({ status, profile, accountType });
@@ -55,7 +56,7 @@
       return;
     }
     if (!user) {
-      setState("loading");
+      setState("guest", Object.freeze({ name: "ゲスト", picture: "" }), "guest");
       return;
     }
     if (user.isAnonymous) {
@@ -180,9 +181,34 @@
       applyFirebaseUser(initialUser);
       return true;
     }
-    const credential = await auth.signInAnonymously();
-    applyFirebaseUser(credential.user);
+    applyFirebaseUser(null);
     return true;
+  }
+
+  async function ensureAnonymousUser() {
+    if (!auth) {
+      return null;
+    }
+    if (auth.currentUser) {
+      return auth.currentUser;
+    }
+    if (!anonymousSignInPromise) {
+      setState("authenticating", Object.freeze({ name: "ゲスト", picture: "" }), "guest");
+      anonymousSignInPromise = auth.signInAnonymously()
+        .then((credential) => {
+          applyFirebaseUser(credential.user);
+          return credential.user;
+        })
+        .catch((error) => {
+          console.error(`[auth] ${error?.code || "ANONYMOUS_SIGN_IN_FAILED"}: ${error?.message || error}`);
+          setState("error");
+          throw error;
+        })
+        .finally(() => {
+          anonymousSignInPromise = null;
+        });
+    }
+    return anonymousSignInPromise;
   }
 
   async function initialize(buttonElement) {
@@ -222,10 +248,11 @@
   }
 
   async function getIdToken() {
-    if (!auth?.currentUser) {
+    const user = auth?.currentUser || await ensureAnonymousUser();
+    if (!user) {
       return "";
     }
-    return auth.currentUser.getIdToken();
+    return user.getIdToken();
   }
 
   async function signOut() {
@@ -237,9 +264,8 @@
     global.google?.accounts?.id?.disableAutoSelect();
     try {
       await auth.signOut();
-      const credential = await auth.signInAnonymously();
       transitionInProgress = false;
-      applyFirebaseUser(credential.user);
+      applyFirebaseUser(null);
     } catch (error) {
       transitionInProgress = false;
       console.error(`[auth] ${error?.code || "SIGN_OUT_FAILED"}: ${error?.message || error}`);
