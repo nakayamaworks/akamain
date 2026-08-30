@@ -174,6 +174,47 @@ test("guest attempts and ranking profile move to a linked Google identity", asyn
   assert.equal(await repository.getUser("firebase:guest-1"), null);
 });
 
+test("expired anonymous user cleanup deletes the user, attempts, scores, and ranking entry", async () => {
+  const repository = new MemoryStorageRepository();
+  await repository.upsertUser({
+    userId: "firebase:expired-guest",
+    authProvider: "anonymous",
+    loginAt: "2026-07-01T00:00:00.000Z",
+    displayName: "ゲスト",
+  });
+  await repository.updateRankingProfile("firebase:expired-guest", {
+    rankingName: "削除対象",
+    rankingOptIn: true,
+  });
+  await repository.upsertUser({
+    userId: "firebase:linked-user",
+    authProvider: "google",
+    loginAt: "2026-07-01T00:00:00.000Z",
+    displayName: "連携済み",
+  });
+  const storedAttempt = attempt({ userId: "firebase:expired-guest" });
+  await repository.appendAttempt(storedAttempt);
+  await repository.appendScoringResult(scoringResult(storedAttempt.attemptId, 88));
+
+  const candidates = await repository.listAnonymousUsersCreatedBefore(
+    "2026-07-31T00:00:00.000Z"
+  );
+  assert.deepEqual(candidates.map((user) => user.userId), ["firebase:expired-guest"]);
+
+  const deleted = await repository.deleteUsersData([
+    "firebase:expired-guest",
+    "firebase:linked-user",
+  ]);
+  assert.deepEqual(deleted, {
+    deletedUserCount: 1,
+    deletedAttemptCount: 1,
+    deletedScoringResultCount: 1,
+  });
+  assert.equal(await repository.getUser("firebase:expired-guest"), null);
+  assert.ok(await repository.getUser("firebase:linked-user"));
+  assert.equal((await repository.getLeaderboard()).items.length, 0);
+});
+
 test("QA scores stay out of the bug-ticket leaderboard", async () => {
   const repository = new MemoryStorageRepository();
   await repository.upsertUser({ userId: "user-1", displayName: "非公開名" });

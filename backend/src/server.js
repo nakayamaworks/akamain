@@ -12,6 +12,12 @@ import {
 } from "./scoring-service.js";
 import { createStorageRepository } from "./storage-factory.js";
 import { createScoringRateLimiter } from "./scoring-rate-limiter.js";
+import {
+  anonymousCleanupConfiguration,
+  cleanupExpiredAnonymousUsers,
+} from "./anonymous-user-cleanup.js";
+import { verifyCleanupAuthorization } from "./cleanup-authorization.js";
+import { FirebaseAuthDirectory } from "./firebase-auth-directory.js";
 
 const port = Number(process.env.PORT || 8787);
 const googleClientId = process.env.GOOGLE_WEB_CLIENT_ID || "";
@@ -33,6 +39,11 @@ const firebaseAuthClient = new OAuth2Client();
 let firebaseCertificates = null;
 let firebaseCertificatesExpireAt = 0;
 const scoringRateLimiter = createScoringRateLimiter();
+const anonymousCleanup = anonymousCleanupConfiguration();
+const cleanupServiceAccountEmail = process.env.CLEANUP_SERVICE_ACCOUNT_EMAIL || "";
+const cleanupOidcAudience = process.env.CLEANUP_OIDC_AUDIENCE || "";
+const cleanupOidcClient = new OAuth2Client();
+const firebaseAuthDirectory = new FirebaseAuthDirectory({ projectId: firebaseProjectId });
 
 function latestCompatibleScoringResult(attempt) {
   return (attempt?.scoringResults || []).find(
@@ -279,11 +290,17 @@ function toTicketSummary(attempt) {
 }
 
 function errorStatus(code) {
-  if (code === "AUTH_REQUIRED" || code === "INVALID_ID_TOKEN") {
+  if (new Set([
+    "AUTH_REQUIRED",
+    "CLEANUP_AUTH_INVALID",
+    "CLEANUP_AUTH_REQUIRED",
+    "INVALID_ID_TOKEN",
+  ]).has(code)) {
     return 401;
   }
   if (new Set([
     "AUTH_NOT_CONFIGURED",
+    "CLEANUP_AUTH_NOT_CONFIGURED",
     "INVALID_CURSOR",
     "INVALID_JSON",
     "INVALID_RANKING_PROFILE",
@@ -309,11 +326,14 @@ function sendError(response, error, origin, context = "api") {
   const causeMessage = error.cause?.message ? ` (${error.cause.message})` : "";
   console.error(`[${context}] ${code}: ${error.message}${causeMessage}`);
   const storageFailure = code.startsWith("STORAGE_");
+  const cleanupFailure = context === "anonymous-cleanup";
   sendJson(response, statusCode, {
     error: {
       code,
       message: statusCode >= 500
-        ? storageFailure
+        ? cleanupFailure
+          ? "ゲストデータの定期削除を完了できませんでした。"
+          : storageFailure
           ? "成績データへ接続できませんでした。少し待ってからもう一度お試しください。"
           : "AI採点を完了できませんでした。入力内容は保持されています。"
         : error.message,
@@ -350,6 +370,7 @@ const server = http.createServer(async (request, response) => {
       storageDriver,
       persistenceConfigured: storageDriver === "memory"
         || Boolean(process.env.GOOGLE_SHEETS_SPREADSHEET_ID),
+      anonymousCleanupConfigured: Boolean(cleanupServiceAccountEmail && cleanupOidcAudience),
     }, origin);
     return;
   }
@@ -358,6 +379,27 @@ const server = http.createServer(async (request, response) => {
   const ticketDetailMatch = url.pathname.match(/^\/api\/tickets\/([0-9a-f-]+)$/i);
   const ticketRevisionMatch = url.pathname.match(/^\/api\/tickets\/([0-9a-f-]+)\/revisions$/i);
   const reviewAttemptMatch = url.pathname.match(/^\/api\/attempts\/([0-9a-f-]+)\/review$/i);
+
+  if (request.method === "POST" && url.pathname === "/internal/cleanup/anonymous-users") {
+    try {
+      await verifyCleanupAuthorization(bearerToken(request), {
+        client: cleanupOidcClient,
+        audience: cleanupOidcAudience,
+        expectedEmail: cleanupServiceAccountEmail,
+      });
+      const summary = await cleanupExpiredAnonymousUsers({
+        storageRepository,
+        firebaseAuthDirectory,
+        retentionDays: anonymousCleanup.retentionDays,
+        batchSize: anonymousCleanup.batchSize,
+      });
+      console.log(`[anonymous-cleanup] ${JSON.stringify(summary)}`);
+      sendJson(response, 200, { status: "ok", ...summary }, origin);
+    } catch (error) {
+      sendError(response, error, origin, "anonymous-cleanup");
+    }
+    return;
+  }
 
   if (request.method === "GET" && url.pathname === "/api/me") {
     try {

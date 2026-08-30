@@ -50,6 +50,23 @@ export class StorageRepository {
   async getLeaderboard() {
     throw new Error("getLeaderboard is not implemented");
   }
+
+  async listAnonymousUsersCreatedBefore() {
+    throw new Error("listAnonymousUsersCreatedBefore is not implemented");
+  }
+
+  async deleteUsersData() {
+    throw new Error("deleteUsersData is not implemented");
+  }
+}
+
+export function isAnonymousUserCreatedBefore(user, cutoff) {
+  if (user?.authProvider !== "anonymous") {
+    return false;
+  }
+  const createdAt = Date.parse(String(user.createdAt || ""));
+  const cutoffAt = Date.parse(String(cutoff || ""));
+  return Number.isFinite(createdAt) && Number.isFinite(cutoffAt) && createdAt <= cutoffAt;
 }
 
 export function normalizePageOptions(options = {}) {

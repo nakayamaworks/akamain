@@ -4,6 +4,7 @@ import {
   buildScenarioProgress,
   encodeCursor,
   groupResultsByAttempt,
+  isAnonymousUserCreatedBefore,
   latestTicketRevision,
   normalizePageOptions,
   revisionNumberOf,
@@ -50,6 +51,36 @@ export class MemoryStorageRepository extends StorageRepository {
 
   async getUser(userId) {
     return clone(this.users.get(userId) || null);
+  }
+
+  async listAnonymousUsersCreatedBefore(cutoff, options = {}) {
+    const limit = Math.min(Math.max(Number(options.limit) || 100, 1), 1000);
+    return [...this.users.values()]
+      .filter((user) => isAnonymousUserCreatedBefore(user, cutoff))
+      .sort((left, right) => left.createdAt.localeCompare(right.createdAt))
+      .slice(0, limit)
+      .map(clone);
+  }
+
+  async deleteUsersData(userIds) {
+    const requested = new Set((userIds || []).filter(Boolean));
+    const deletable = new Set(
+      [...requested].filter((userId) => this.users.get(userId)?.authProvider === "anonymous")
+    );
+    const attemptIds = new Set(
+      this.attempts.filter((attempt) => deletable.has(attempt.userId)).map((attempt) => attempt.attemptId)
+    );
+    const deletedScoringResultCount = this.scoringResults.filter(
+      (result) => attemptIds.has(result.attemptId)
+    ).length;
+    this.scoringResults = this.scoringResults.filter((result) => !attemptIds.has(result.attemptId));
+    this.attempts = this.attempts.filter((attempt) => !deletable.has(attempt.userId));
+    deletable.forEach((userId) => this.users.delete(userId));
+    return {
+      deletedUserCount: deletable.size,
+      deletedAttemptCount: attemptIds.size,
+      deletedScoringResultCount,
+    };
   }
 
   async updateRankingProfile(userId, input) {

@@ -109,6 +109,8 @@ listTicketsByUser(userId, options)
 getTicketById(userId, ticketId)
 getScenarioProgress(userId)
 getLeaderboard(options)
+listAnonymousUsersCreatedBefore(cutoff, options)
+deleteUsersData(userIds)
 ```
 
 画面はSheetsのタブ名、セル範囲、行番号を知らない。Sheetsアダプターだけが物理構造を扱う。
@@ -128,6 +130,9 @@ getLeaderboard(options)
 | `GET` | `/api/tickets` | 本人の実践起票をプロジェクト別のチケット概要として返す |
 | `GET` | `/api/tickets/:ticket_id` | 本人の実践起票の最新版、全版、版ごとのAIレビュー詳細を返す |
 | `POST` | `/api/tickets/:ticket_id/revisions` | 最新版を親に持つ修正版を追記する。チケット番号は変えない |
+| `POST` | `/internal/cleanup/anonymous-users` | Cloud Scheduler専用。Firebase Authで削除済みの期限切れゲストデータを削除する |
+
+ゲストデータの削除候補は`auth_provider = anonymous`かつ`created_at`が保持期限以前の利用者に限定する。日数だけでは削除せず、Identity Toolkit APIでFirebase UIDが存在しないことを確認してから、関連するScoringResults、Attempts、Usersの順に内容を消去する。Google連携済み、統合済み、Firebase Authに残っているUIDは削除しない。
 
 `POST /api/scoring`ではAttemptをGemini呼び出し前に保存する。Geminiが失敗した場合も、0点にはせず`failed`または`unavailable`のScoringResultを追記する。
 

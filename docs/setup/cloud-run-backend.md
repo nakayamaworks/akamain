@@ -34,6 +34,10 @@ SCORING_LIMIT_PER_MINUTE=5
 SCORING_LIMIT_PER_USER_DAY=20
 SCORING_LIMIT_PER_IP_DAY=40
 SCORING_LIMIT_GLOBAL_DAY=500
+ANONYMOUS_DATA_RETENTION_DAYS=31
+ANONYMOUS_CLEANUP_BATCH_SIZE=100
+CLEANUP_SERVICE_ACCOUNT_EMAIL=typing-workbench-cleanup@typing-workbench-misemaru.iam.gserviceaccount.com
+CLEANUP_OIDC_AUDIENCE=https://typing-workbench-backend-91251265328.asia-northeast1.run.app
 ```
 
 `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT`は設定しない。Cloud Runへ割り当てたサービスIDをApplication Default Credentialsとして直接使用する。
@@ -67,9 +71,30 @@ Cloud RunのIAMチェックを通過した後も、本人用`/api/*`はFirebase 
 
 Firebase Authenticationでは匿名プロバイダとGoogleプロバイダを有効にする。AIレビューの利用回数はFirestoreトランザクションで利用者、接続元IPのハッシュ、サービス全体の日次上限を共有する。Cloud Runの実行IDにはFirestoreの読み書き権限を付与する。
 
+## ゲストデータの定期削除
+
+Firebase Authenticationの匿名アカウント自動削除とサーバー側データを同期させるため、Cloud Schedulerから毎日`POST /internal/cleanup/anonymous-users`を呼ぶ。呼び出し元は`typing-workbench-cleanup@typing-workbench-misemaru.iam.gserviceaccount.com`のOIDCトークンだけを許可する。
+
+削除条件はすべて満たす必要がある。
+
+1. Sheetsの利用者が`anonymous`
+2. `created_at`から31日以上経過
+3. Identity Toolkit APIでFirebase UIDが存在しない
+
+Cloud Run実行IDには読み取り専用の`roles/firebaseauth.viewer`を付与する。削除処理はAIレビュー結果、起票履歴、ランキング設定を含む利用者行をまとめて消去する。Firebase UIDの確認に失敗した場合は削除せず、ジョブを失敗させる。
+
+Cloud Schedulerは毎日03:15（日本時間）に実行する。
+
+```text
+15 3 * * *
+Asia/Tokyo
+```
+
 ## デプロイ後
 
 1. `/health`が`storageDriver: sheets`を返すことを確認する
 2. フロントエンドの`runtime-config.js`をCloud Run URLへ変更する
 3. Googleログイン後に`/api/me`、`/api/progress`、`/api/leaderboard`を確認する
 4. 採点保存を検証する場合は、検証用Googleアカウントを使って本番履歴を汚さない
+5. `/health`が`anonymousCleanupConfigured: true`を返すことを確認する
+6. Cloud Schedulerの手動実行が成功し、削除対象がなければ`deletedUserCount: 0`を返すことを確認する

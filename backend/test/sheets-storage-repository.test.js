@@ -171,3 +171,69 @@ test("Sheets attempts preserve optional attachment descriptions", () => {
     attempt.evidenceDescriptions
   );
 });
+
+test("Sheets cleanup clears exact source rows while preserving linked users", async () => {
+  const repository = new SheetsStorageRepository({ spreadsheetId: "test-sheet", auth: {} });
+  repository.initialize = async () => {};
+  repository.readValues = async (range) => {
+    if (range.includes("Users")) {
+      return [
+        ["user.v1", "firebase:guest-a", "anonymous"],
+        [],
+        ["user.v1", "firebase:linked", "google"],
+      ];
+    }
+    if (range.includes("Attempts")) {
+      return [
+        ["attempt.v3", "attempt-a", "firebase:guest-a"],
+        [],
+        ["attempt.v3", "attempt-linked", "firebase:linked"],
+      ];
+    }
+    return [
+      ["scoring-result.v3", "result-a", "attempt-a"],
+      [],
+      ["scoring-result.v3", "result-linked", "attempt-linked"],
+    ];
+  };
+  const deletedRows = [];
+  repository.deleteRows = async (rows) => deletedRows.push(...rows);
+
+  const deleted = await repository.deleteUsersData([
+    "firebase:guest-a",
+    "firebase:linked",
+  ]);
+
+  assert.deepEqual(deleted, {
+    deletedUserCount: 1,
+    deletedAttemptCount: 1,
+    deletedScoringResultCount: 1,
+  });
+  assert.deepEqual(deletedRows, [
+    { title: "ScoringResults", rowNumber: 2 },
+    { title: "Attempts", rowNumber: 2 },
+    { title: "Users", rowNumber: 2 },
+  ]);
+});
+
+test("Sheets cleanup deletes physical rows from bottom to top", async () => {
+  const repository = new SheetsStorageRepository({ spreadsheetId: "test-sheet", auth: {} });
+  repository.sheetIds = new Map([["Users", 10], ["Attempts", 20]]);
+  const requests = [];
+  repository.getClient = async () => ({
+    async request(input) {
+      requests.push(input);
+      return { data: {} };
+    },
+  });
+
+  await repository.deleteRows([
+    { title: "Users", rowNumber: 3 },
+    { title: "Attempts", rowNumber: 7 },
+    { title: "Users", rowNumber: 8 },
+  ]);
+
+  assert.equal(requests[0].data.requests[1].deleteDimension.range.startIndex, 7);
+  assert.equal(requests[0].data.requests[2].deleteDimension.range.startIndex, 2);
+  assert.equal(requests[0].data.requests[0].deleteDimension.range.sheetId, 20);
+});

@@ -5,6 +5,7 @@ import {
   buildScenarioProgress,
   encodeCursor,
   groupResultsByAttempt,
+  isAnonymousUserCreatedBefore,
   latestTicketRevision,
   normalizePageOptions,
   revisionNumberOf,
@@ -248,6 +249,7 @@ export class SheetsStorageRepository extends StorageRepository {
     this.userCache = new Map();
     this.userUpsertPromises = new Map();
     this.userCacheTtlMs = 5 * 60 * 1000;
+    this.sheetIds = new Map();
   }
 
   async initialize() {
@@ -315,6 +317,54 @@ export class SheetsStorageRepository extends StorageRepository {
     await this.initialize();
     const row = (await this.readDataRows("Users")).find((item) => item[1] === userId);
     return row ? rowToUser(row) : null;
+  }
+
+  async listAnonymousUsersCreatedBefore(cutoff, options = {}) {
+    await this.initialize();
+    const limit = Math.min(Math.max(Number(options.limit) || 100, 1), 1000);
+    return (await this.readDataRows("Users"))
+      .map(rowToUser)
+      .filter((user) => isAnonymousUserCreatedBefore(user, cutoff))
+      .sort((left, right) => left.createdAt.localeCompare(right.createdAt))
+      .slice(0, limit);
+  }
+
+  async deleteUsersData(userIds) {
+    const requested = new Set((userIds || []).filter(Boolean));
+    if (!requested.size) {
+      return { deletedUserCount: 0, deletedAttemptCount: 0, deletedScoringResultCount: 0 };
+    }
+    return this.withWriteLock(async () => {
+      await this.initialize();
+      const [rawUserRows, rawAttemptRows, rawResultRows] = await Promise.all([
+        this.readValues(`${quoteTab("Users")}!A2:L`),
+        this.readValues(`${quoteTab("Attempts")}!A2:O`),
+        this.readValues(`${quoteTab("ScoringResults")}!A2:U`),
+      ]);
+      const userRows = rawUserRows
+        .map((row, index) => ({ row, rowNumber: index + 2 }))
+        .filter(({ row }) => requested.has(row[1]) && row[2] === "anonymous");
+      const deletable = new Set(userRows.map(({ row }) => row[1]));
+      const attemptRows = rawAttemptRows
+        .map((row, index) => ({ row, rowNumber: index + 2 }))
+        .filter(({ row }) => deletable.has(row[2]));
+      const attemptIds = new Set(attemptRows.map(({ row }) => row[1]));
+      const resultRows = rawResultRows
+        .map((row, index) => ({ row, rowNumber: index + 2 }))
+        .filter(({ row }) => attemptIds.has(row[2]));
+      const rowsToDelete = [
+        ...resultRows.map(({ rowNumber }) => ({ title: "ScoringResults", rowNumber })),
+        ...attemptRows.map(({ rowNumber }) => ({ title: "Attempts", rowNumber })),
+        ...userRows.map(({ rowNumber }) => ({ title: "Users", rowNumber })),
+      ];
+      await this.deleteRows(rowsToDelete);
+      deletable.forEach((userId) => this.userCache.delete(userId));
+      return {
+        deletedUserCount: userRows.length,
+        deletedAttemptCount: attemptRows.length,
+        deletedScoringResultCount: resultRows.length,
+      };
+    });
   }
 
   async updateRankingProfile(userId, input) {
@@ -606,8 +656,8 @@ export class SheetsStorageRepository extends StorageRepository {
 
   async initializeSpreadsheet() {
     const client = await this.getClient();
-    const metadata = await client.request({
-      url: `${SHEETS_API}/${encodeURIComponent(this.spreadsheetId)}?fields=sheets.properties.title`,
+    let metadata = await client.request({
+      url: `${SHEETS_API}/${encodeURIComponent(this.spreadsheetId)}?fields=sheets.properties(sheetId,title)`,
     });
     const existingTitles = new Set(
       (metadata.data.sheets || []).map((sheet) => sheet.properties.title)
@@ -621,7 +671,16 @@ export class SheetsStorageRepository extends StorageRepository {
           requests: missingTitles.map((title) => ({ addSheet: { properties: { title } } })),
         },
       });
+      metadata = await client.request({
+        url: `${SHEETS_API}/${encodeURIComponent(this.spreadsheetId)}?fields=sheets.properties(sheetId,title)`,
+      });
     }
+    this.sheetIds = new Map(
+      (metadata.data.sheets || []).map((sheet) => [
+        sheet.properties.title,
+        sheet.properties.sheetId,
+      ])
+    );
     for (const [title, columns] of Object.entries(TAB_COLUMNS)) {
       const values = await this.readValues(`${quoteTab(title)}!1:1`);
       const header = values[0] || [];
@@ -721,6 +780,37 @@ export class SheetsStorageRepository extends StorageRepository {
       url: `${SHEETS_API}/${encodeURIComponent(this.spreadsheetId)}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,
       method: "PUT",
       data: { values },
+    });
+  }
+
+  async deleteRows(rows) {
+    if (!rows.length) {
+      return;
+    }
+    const ordered = [...rows].sort((left, right) =>
+      left.title.localeCompare(right.title) || right.rowNumber - left.rowNumber
+    );
+    const requests = ordered.map(({ title, rowNumber }) => {
+      const sheetId = this.sheetIds.get(title);
+      if (!Number.isInteger(sheetId)) {
+        throw storageError("STORAGE_SCHEMA_MISMATCH", `${title}タブのsheetIdが見つかりません。`);
+      }
+      return {
+        deleteDimension: {
+          range: {
+            sheetId,
+            dimension: "ROWS",
+            startIndex: rowNumber - 1,
+            endIndex: rowNumber,
+          },
+        },
+      };
+    });
+    const client = await this.getClient();
+    await client.request({
+      url: `${SHEETS_API}/${encodeURIComponent(this.spreadsheetId)}:batchUpdate`,
+      method: "POST",
+      data: { requests },
     });
   }
 
