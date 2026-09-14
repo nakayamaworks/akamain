@@ -4,7 +4,7 @@
 
 ## 1. 推奨Repository設定
 
-現在のRepositoryは`nakayamaworks/akamain`で、2026-09-14時点のvisibilityは`PRIVATE`である。公開方針は確定したが、公開切り替えは本チェックリスト完了後に行う。
+現在のRepositoryは`nakayamaworks/akamain`で、2026-09-14に`PUBLIC`へ切り替えた。未ログインのHTTPアクセスで`200 OK`、GitHub画面でREADME、Mermaid、スクリーンショット、LICENSE、SECURITYの表示を確認済みである。
 
 ### Name
 
@@ -108,12 +108,14 @@ READMEには次の3枚を掲載する。
 
 - [ ] mainブランチ保護
 - [ ] pull request時の`npm run verify`と`backend/npm test`
-- [ ] Dependabotまたは依存関係アラート
-- [ ] Secret scanning（利用可能なプラン範囲）
-- [ ] Private vulnerability reporting（公開Repositoryで利用可能なら）
-- [ ] GitHub Actionsの最小権限
+- [x] Dependabotの依存関係アラート
+- [x] Secret scanningとpush protection
+- [x] Private vulnerability reporting
+- [x] GitHub Actionsの最小権限
 
 現行ActionsはFirebase Hosting公開用で、`contents: read`と`id-token: write`を使用し、長期サービスアカウント鍵を置かない構成である。
+
+公開切り替え直後の設定確認で、上記3つのセキュリティ機能が無効だったため有効化した。mainブランチ保護とPR専用CIは、個人開発の直接push運用を変えるため自動では設定していない。
 
 ## 8. Portfolioで見せる順番
 
@@ -130,10 +132,11 @@ READMEには次の3枚を掲載する。
 
 ## 9. 公開後の確認
 
-- [ ] 未ログイン状態でRepositoryを開ける
-- [ ] READMEのMermaidが表示される
-- [ ] 画像と相対リンクが切れていない
-- [ ] 公開サービスへのリンクが開く
-- [ ] Actionsに秘密値が表示されていない
+- [x] 未ログイン状態でRepositoryを開ける
+- [x] READMEのMermaidが表示される
+- [x] 画像と相対リンクが切れていない
+- [x] 公開サービスへのリンクが開く
+- [x] 公開切り替え後のFirebase Hosting Actionが成功する
+- [x] 公開切り替え後のActionsログに主要な秘密値パターンが表示されていない
 - [ ] GitHub検索で意図しない秘密情報が見つからない
 - [ ] スマートフォンでもREADMEの表が最低限読める
