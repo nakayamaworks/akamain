@@ -1,6 +1,7 @@
 backend/node_modules/
 backend/.env
 backend/reports/
+outputs/
 backend/credentials/
 backend/*service-account*.json
 dist/

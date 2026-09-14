@@ -1,4 +1,6 @@
-# フェーズ3A：認証付きGemini採点パイロット
+# フェーズ3A：認証付きGemini採点パイロット（開発履歴）
+
+> **Historical:** この文書は1シナリオでGemini接続を検証した当時の記録であり、現行セットアップ手順ではない。現在はFirebase匿名認証、任意のGoogle連携、全120シナリオのAIレビューへ移行している。現行構成は`docs/spec/system-architecture.md`を参照する。
 
 ## 実装範囲
 

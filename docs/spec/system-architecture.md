@@ -1,7 +1,8 @@
 # あかマイン システム設計書（現行実装）
 
-最終更新: 2026-08-07  
-対象: `akamain.com`で公開している現行システム  
+最終更新: 2026-09-14
+
+対象: `akamain.com`で公開している現行システム
 文書種別: As-Built（構想ではなく、現在動いている実装の説明）
 
 ## 1. システムの目的
@@ -21,12 +22,12 @@
 ### 2.1 実装済み
 
 - Welcomeページ
-- Google Identity Servicesによるログイン
+- Firebase匿名認証と任意のGoogle連携
 - ログイン不要の見本入力体験
 - Redmine風のチケット作成画面
 - 見本入力モード
 - 実践起票モード
-- 8プロジェクト、27シナリオ
+- 10プロジェクト、バグ起票60・QA起票60の合計120シナリオ
 - 証跡選択
 - Gemini APIによる6軸AIレビュー
 - チケット一覧、詳細、修正版の版管理
@@ -51,9 +52,10 @@ flowchart LR
     User["利用者のブラウザ"]
     GitHub["GitHub<br/>ソース管理・Actions"]
     Hosting["Firebase Hosting<br/>Welcome・アプリ画面"]
-    Google["Google Identity Services<br/>ログイン"]
+    Google["Firebase Authentication<br/>匿名認証・Google連携"]
     Run["Cloud Run<br/>Node.js API"]
     Sheets["Google Sheets<br/>Users / Attempts / ScoringResults"]
+    Firestore["Firestore<br/>AI利用回数"]
     Gemini["Gemini API<br/>文章レビュー"]
     Secret["Secret Manager<br/>Gemini APIキー"]
 
@@ -64,6 +66,7 @@ flowchart LR
     User -->|"IDトークン + APIリクエスト"| Run
     Run -->|"トークン検証"| Google
     Run -->|"サービスアカウント"| Sheets
+    Run -->|"トランザクション"| Firestore
     Secret -->|"実行時に注入"| Run
     Run -->|"採点プロンプト"| Gemini
     Gemini -->|"構造化レビュー"| Run
@@ -76,11 +79,12 @@ flowchart LR
 | --- | --- | --- |
 | フロントエンド | HTML / CSS / JavaScript | 画面表示、入力、状態管理、API呼び出し |
 | 公開基盤 | Firebase Hosting | 静的ファイル配信、独自ドメイン、HTTPS |
-| 認証 | Google Identity Services | Googleアカウントによる本人確認 |
+| 認証 | Firebase Authentication / Google | 必要時の匿名認証、任意のGoogle連携 |
 | API | Node.js / Cloud Run | 認証確認、保存、集計、Gemini連携 |
 | コンテナ | Docker | Node.jsバックエンドと採点定義を実行可能な単位へ梱包 |
 | 永続化 | Google Sheets API | ユーザー、挑戦、採点結果の保存 |
 | AI | Gemini API | 起票文章の構造化レビュー |
+| 利用制限 | Firestore | Gemini利用回数を利用者・IP・全体で共有管理 |
 | 秘密情報 | Secret Manager | Gemini APIキーの保管とCloud Runへの受け渡し |
 | ソース管理 | Git / GitHub | 履歴管理、レビュー、フロントエンド自動公開 |
 
@@ -100,7 +104,7 @@ flowchart LR
 | モード | ログイン | 内容 |
 | --- | --- | --- |
 | 見本入力 | 不要 | 完成例を見ながら入力し、チケット構成を覚える |
-| 実践起票 | Googleログイン不要 | Firebase匿名アカウントで、未整理情報から自分で題名・説明・項目・証跡を組み立てる |
+| 実践起票 | Googleログイン不要 | ローカルゲストとして開始し、保存・AIレビュー時に必要ならFirebase匿名アカウントを作成して起票を保存する |
 
 ゲストでも実践起票、保存、AIレビュー、履歴、進捗およびランキングを利用できる。Google連携は任意であり、別端末からの利用、データ復旧および確認済みランキング表示に使用する。
 
@@ -117,11 +121,12 @@ flowchart LR
 
 ### 6.1 ブラウザ側
 
-1. Firebase Authenticationで匿名アカウントを自動発行する
-2. Firebase SDKが認証状態をブラウザへ永続化する
-3. API呼び出し時にFirebase IDトークンを`Authorization: Bearer <ID token>`として送る
-4. 利用者がGoogle連携を選択した場合、Google Identity Servicesの認証情報を匿名アカウントへリンクする
-5. すでに別のFirebaseアカウントへ連携済みの場合、ゲスト履歴を連携済みアカウントへ統合する
+1. 初回表示ではFirebaseアカウントを作らず、ローカルゲストとして開始する
+2. 保存・AIレビューなどIDトークンが必要な操作でFirebase匿名アカウントを一度だけ発行する
+3. Firebase SDKが認証状態をブラウザへ永続化する
+4. API呼び出し時にFirebase IDトークンを`Authorization: Bearer <ID token>`として送る
+5. 利用者がGoogle連携を選択した場合、Google Identity Servicesの認証情報を匿名アカウントへリンクする
+6. すでに別のFirebaseアカウントへ連携済みの場合、ゲスト履歴を連携済みアカウントへ統合する
 
 ### 6.2 バックエンド側
 
@@ -237,19 +242,21 @@ sequenceDiagram
     else 新しい修正内容
     API->>AI: シナリオ別基準と回答を送信
     AI-->>API: JSON形式のレビュー
-    API->>API: 形式検証・重み計算・上限適用・前回評価との安定化
+    API->>API: 形式・引用検証、事実ゲート、固定配点、上限、前回評価との安定化
     API->>Store: ScoringResultを追記
     end
     API-->>Browser: レビュー結果
 ```
 
-Geminiへ点数を完全に任せない。Geminiは各評価や指摘を構造化JSONで返し、バックエンドが次を実施する。
+Geminiへ点数を任せない。Geminiは各評価、必須事実の状態、指摘を構造化JSONで返し、バックエンドが次を実施する。
 
 - レスポンス形式の検証
-- 6軸の重み付き総合点計算
+- 必須事実の充足・欠落・矛盾から品質ゲートを決定
 - 必須情報の欠落・矛盾確認
 - チケット項目と期待値の照合
 - 重大な不足がある場合の点数上限適用
+- Geminiの感覚点ではなく品質ゲートと客観項目から表示点を計算
+- 攻撃・採点操作をGemini実行前に40点上限・不合格とする
 - 同一内容に対する成功済みレビューの再利用
 - 修正版で明確な事実後退がない場合の、AI出力揺れによる減点抑止
 
@@ -269,7 +276,7 @@ Geminiへ点数を完全に任せない。Geminiは各評価や指摘を構造�
 - サービスアカウントJSON鍵を作成・保存しない
 - APIごとにGoogle IDトークンを検証する
 - CORSは許可した本番・開発オリジンだけに限定する
-- AIレビューはCloud Runプロセス内で1ユーザーあたり1分5回までに制限する
+- AIレビューは1分・利用者日次・IP日次・全体日次で制限し、本番はFirestoreトランザクションでインスタンス間共有する
 - APIレスポンスは`Cache-Control: no-store`とする
 - 公開ビルドで`.env`、バックエンド、内部資料の混入を検査する
 
@@ -310,12 +317,12 @@ Cloud Runの運用設定は次を基本とする。
 
 1. JavaScript構文
 2. シナリオと画面要素の整合性
-3. 8プロジェクト・27シナリオの定義
+3. 10プロジェクト・バグ60・QA60シナリオの定義
 4. 公開用`dist/`の生成
 5. 内部ファイル・秘密情報の混入防止
 6. Welcomeとアプリのリンク
 
-AI採点は、27シナリオのうち評価用に用意した16シナリオ × 5回答パターン、合計80件の実API検証を実施し、期待条件を確認している。
+商品品質評価では代表15シナリオに良・中・悪・インジェクションの4回答、合計60件を用意している。`practice-review.v39`では各回答を3回、合計180回実APIで評価し、既知ケースの点数・判定完全一致を確認した。現行`v43`の全実API評価と未調整ホールドアウト評価は未完了であり、v39の数値を流用しない。
 
 ## 13. 現在の制約と移行方針
 
@@ -333,10 +340,15 @@ Google Sheetsは試作・少人数運用には適するが、同時アクセス�
 
 生成AIの出力は完全には決定論的ではない。同一内容は保存済み結果を再利用し、修正版は前回評価を基準に比較する。構造化出力、固定seed、ルーブリック、サーバー側再計算、回帰検証で揺れを抑えているが、人間の最終判断を完全に代替するものではない。
 
-現在のレート制限はCloud Runプロセスのメモリ上にあるため、再起動や複数インスタンスをまたいだ全体制限にはならない。課金防止を強化する段階では、共有ストレージまたはAPI Gateway側の制限へ移す。
+本番設定ではFirestoreトランザクションを利用し、Cloud Runの複数インスタンス間で利用者、接続元IP、サービス全体の日次上限を共有する。ローカル開発の既定値はメモリ実装であり、プロセス再起動をまたがない。実際の本番環境変数と課金アラートはリポジトリだけでは確認できない。
 
 ## 14. 関連資料
 
+- [プロダクト要件](../product/product-requirements.md)
+- [AIレビュー・採点パイプライン](../architecture/ai-review-pipeline.md)
+- [AIレビュー品質評価](../testing/ai-quality-evaluation.md)
+- [脅威モデル](../security/threat-model.md)
+- [設計判断記録](../decisions/README.md)
 - [作成モード設計](./authoring-modes-spec.md)
 - [永続化・API契約](./persistence-and-api-contract.md)
 - [本番公開手順](../setup/production-release.md)
