@@ -8,7 +8,10 @@
     "test": "node --test",
     "test:sheets": "node --env-file=.env scripts/verify-sheets-integration.js",
     "verify:scoring-fixtures": "node --env-file=.env scripts/verify-scenario-fixtures.js",
-    "verify:scoring-fixtures:dry-run": "node scripts/verify-scenario-fixtures.js --dry-run"
+    "verify:scoring-fixtures:dry-run": "node scripts/verify-scenario-fixtures.js --dry-run",
+    "verify:product-quality": "node --env-file=.env scripts/verify-product-quality.js",
+    "verify:product-quality:dry-run": "node scripts/verify-product-quality.js --dry-run",
+    "verify:product-quality:reliable": "node --env-file=.env scripts/verify-product-quality.js --runs 3"
   },
   "engines": {
     "node": ">=20"

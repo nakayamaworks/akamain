@@ -5216,6 +5216,10 @@ const scoringVerdictPresentation = {
     label: "着手可能・軽微な改善あり",
     description: "調査には着手できます。より伝わりやすくするための軽微な改善があります。",
   },
+  "提出前に表現修正": {
+    label: "提出前に表現修正が必要",
+    description: "技術的な情報は揃っていますが、業務チケットとして不適切な表現を修正してから提出してください。",
+  },
   "追加確認を推奨": {
     label: "追加確認を推奨",
     description: "調査は開始できますが、判断精度を上げるために追加確認を推奨します。",
@@ -5295,10 +5299,21 @@ function scoreBreakdownMarkup(result) {
       ? "添付不要を正しく選択"
       : `不要なファイルを${evidence.unrelatedCount}件選択`
     : `${evidence.correctCount} / ${evidence.requiredCount}件が正解${evidence.unrelatedCount > 0 ? `・不要${evidence.unrelatedCount}件` : ""}`;
-  const capNotice = Number.isInteger(breakdown.appliedMaximum)
-    && breakdown.totalScore < breakdown.uncappedTotalScore
-      ? `<p class="practice-score-cap">重大な不足または事実誤認により、総合点は${escapeHtml(String(breakdown.appliedMaximum))}点が上限です。</p>`
-      : "";
+  const scoreCaps = result?.rubricFindings?.scoreCaps || [];
+  const professionalLanguageCap = scoreCaps.find(({ reason }) => reason === "unprofessional-language");
+  const capNotice = professionalLanguageCap
+    ? `<p class="practice-score-cap">業務に不適切な表現があるため、総合点は${escapeHtml(String(professionalLanguageCap.maximum))}点が上限です。技術内容が十分でも、提出前に表現の修正が必要です。</p>`
+    : Number.isInteger(breakdown.appliedMaximum)
+      && breakdown.totalScore < breakdown.uncappedTotalScore
+        ? `<p class="practice-score-cap">重大な不足または事実誤認により、総合点は${escapeHtml(String(breakdown.appliedMaximum))}点が上限です。</p>`
+        : "";
+  const dimensionScore = result?.rubricFindings?.rawWeightedScore ?? writing.rawScore;
+  const writingDetail = breakdown.strategyVersion?.startsWith("structured-facts.")
+    ? Number(dimensionScore) === Number(writing.rawScore)
+      ? `6観点評価 ${escapeHtml(String(dimensionScore))}点`
+      : `6観点評価 ${escapeHtml(String(dimensionScore))}点・文章採点 ${escapeHtml(String(writing.rawScore))}点`
+    : `AI評価 ${escapeHtml(String(writing.rawScore))}点`;
+  const writingLabel = professionalLanguageCap ? "技術情報の品質" : "文章品質";
   const ticketMarkup = ticket.maximumPoints > 0 ? `
     <div>
       <span>チケット設定</span>
@@ -5313,9 +5328,9 @@ function scoreBreakdownMarkup(result) {
     </div>` : "";
   return `
     <div>
-      <span>文章品質</span>
+      <span>${writingLabel}</span>
       <strong>${escapeHtml(String(writing.awardedPoints))} / ${escapeHtml(String(writing.maximumPoints))}</strong>
-      <small>AI評価 ${escapeHtml(String(writing.rawScore))}点</small>
+      <small>${writingDetail}</small>
     </div>
     ${ticketMarkup}
     ${evidenceMarkup}
@@ -5413,7 +5428,7 @@ function renderPracticeScoringPreview() {
   elements.practiceScoringVerdict?.classList.toggle(
     "is-warning",
     scopedVerdictWarning
-      || (trainingLevel === "advanced" && ["開発着手可能（軽微な改善あり）", "回答依頼可能（軽微な改善あり）", "追加確認を推奨", "追加整理を推奨"].includes(preview.verdict))
+      || (trainingLevel === "advanced" && ["開発着手可能（軽微な改善あり）", "回答依頼可能（軽微な改善あり）", "提出前に表現修正", "追加確認を推奨", "追加整理を推奨"].includes(preview.verdict))
   );
   elements.practiceScoringVerdict?.classList.toggle(
     "is-danger",
@@ -5428,10 +5443,17 @@ function renderPracticeScoringPreview() {
   }
   renderPracticeDimensionFeedback(preview);
   const improvementItems = renderPracticeImprovementItems(preview);
+  const dimensionScores = Object.values(preview.dimensions || {})
+    .filter((score) => Number.isFinite(Number(score)))
+    .map(Number);
+  const highQualityReview = dimensionScores.length > 0
+    && dimensionScores.every((score) => score >= 90);
   renderPracticeScoringPreviewList(
     elements.practiceScoringPreviewStrengths,
     preview.strengths,
-    simplifiedReview
+    highQualityReview
+      ? "文章品質の各観点で、調査開始を妨げる問題は見つかりませんでした"
+      : simplifiedReview
       ? "今回の入力では、評価できる記述をまだ特定できませんでした"
       : "明確に評価できる記述はありません"
   );

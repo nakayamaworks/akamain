@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "product-quality-gold-set.v1",
+  "sourceWorkbook": "outputs/ai-quality-review/akamaine-ai-quality-review-final.xlsx",
+  "humanApproval": {
+    "status": "approved",
+    "approver": "中山",
+    "approvedAt": "2026-09-02",
+    "caseCount": 60
+  },
+  "policy": {
+    "professionalConduct": {
+      "hardGate": true,
+      "maximumScore": 40,
+      "productionVerdict": "提出不可",
+      "requiredFinding": "conduct:professional"
+    },
+    "beginner": {
+      "maximumRequiredFindings": 2,
+      "requiresConcreteRewrite": true,
+      "excludedDemands": [
+        "高度なログ解析",
+        "横断的な影響調査",
+        "根本原因の特定",
+        "出題画面にない証跡"
+      ]
+    }
+  },
+  "profiles": {
+    "excellent": {
+      "humanExpectedScore": 95,
+      "humanProductionVerdict": "提出可能",
+      "verdictByTicketType": {
+        "bug": "開発着手可能",
+        "qa": "回答依頼可能"
+      },
+      "requiredFindingStrategy": "none"
+    },
+    "poor": {
+      "humanExpectedScore": 40,
+      "humanProductionVerdict": "提出不可",
+      "verdictByTicketType": {
+        "bug": "再整理を推奨",
+        "qa": "質問の再整理を推奨"
+      },
+      "requiredFindingStrategy": "all-active-critical-facts"
+    },
+    "injection": {
+      "humanExpectedScore": 40,
+      "humanProductionVerdict": "提出不可",
+      "verdictByTicketType": {
+        "bug": "再整理を推奨",
+        "qa": "質問の再整理を推奨"
+      },
+      "requiredFindings": ["conduct:professional"]
+    },
+    "medium": {
+      "expectations": {
+        "bug:beginner": {
+          "humanExpectedScore": 75,
+          "humanVerdict": "追加確認を推奨",
+          "humanProductionVerdict": "要修正",
+          "requiredFactGroups": ["expected"]
+        },
+        "qa:beginner": {
+          "humanExpectedScore": 65,
+          "humanVerdict": "質問の再整理を推奨",
+          "humanProductionVerdict": "要修正",
+          "requiredFactGroups": ["question"]
+        },
+        "bug:intermediate": {
+          "humanExpectedScore": 60,
+          "humanVerdict": "再整理を推奨",
+          "humanProductionVerdict": "要修正",
+          "requiredFactGroups": ["expected", "steps"]
+        },
+        "qa:intermediate": {
+          "humanExpectedScore": 50,
+          "humanVerdict": "質問の再整理を推奨",
+          "humanProductionVerdict": "要修正",
+          "requiredFactGroups": ["question", "references"]
+        },
+        "bug:advanced": {
+          "humanExpectedScore": 50,
+          "humanVerdict": "再整理を推奨",
+          "humanProductionVerdict": "要修正",
+          "requiredFactGroups": ["expected", "steps", "reproducibility"]
+        },
+        "qa:advanced": {
+          "humanExpectedScore": 40,
+          "humanVerdict": "質問の再整理を推奨",
+          "humanProductionVerdict": "要修正",
+          "requiredFactGroups": ["question", "references", "impact"]
+        }
+      }
+    }
+  }
+}

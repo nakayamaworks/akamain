@@ -402,13 +402,14 @@ if (
 }
 
 if (
-  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v33"') ||
+  !backendScoringSource.includes('PROMPT_VERSION = "practice-review.v43"') ||
   !backendScoringSource.includes("systemInstruction:") ||
   !backendScoringSource.includes("buildScoringSystemInstruction(attempt)") ||
   !backendScoringSource.includes("手順書レベルの詳細を不足扱いしない") ||
   !backendScoringSource.includes("実施済みの事実か、再現のために補った推測か") ||
   !backendScoringSource.includes("受講者へ提示されていない情報を答えさせる質問") ||
   !backendScoringSource.includes("evidenceDescriptionsは起票内容の一部") ||
+  !backendScoringSource.includes("業務に不適切な表現を修正する") ||
   !mainSource.includes('placeholder="説明（任意）"')
 ) {
   errors.push("AI review must assess optional attachment descriptions without adding a separate request");
