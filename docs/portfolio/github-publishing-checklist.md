@@ -61,7 +61,7 @@ Topicsは技術名だけで埋めず、最初にプロダクトの対象領域�
 - [x] `outputs/`のExcel・検査ファイルは公開Git管理から除外する
 - [x] AI品質レポートが架空シナリオの評価データであることを確認
 
-2026-09-14の確認では、現在の追跡ファイルとGit履歴から秘密鍵、Gemini APIキー、OAuth認可コード、実Spreadsheet IDは検出されなかった。`runtime-config.js`のFirebase Web APIキー、Google CloudプロジェクトID、Workload Identity Provider、デプロイ用サービスアカウント名は公開設定として追跡されている。これらはパスワードではないが、APIキー制限、IAM最小権限、Workload Identityの属性条件はクラウド設定側で別途確認が必要である。
+2026-09-14の確認では、現在の追跡ファイルとGit履歴から秘密鍵、Gemini APIキー、OAuth認可コード、実Spreadsheet IDは検出されなかった。`runtime-config.js`のFirebase Web APIキー、Google CloudプロジェクトID、Workload Identity Provider、デプロイ用サービスアカウント名は公開設定として追跡されている。Firebase Web APIキーは、公開・Firebase Hosting・ローカル検証のHTTPリファラー8件と、Identity Toolkit API・Token Service APIだけへ制限した。Cloud RunのGeminiキーはSecret Manager参照であり、公開Firebaseキーとは分離されていることを管理画面と実動作で確認した。IAM最小権限、Workload Identityの属性条件、Geminiキー自体のAPI制限と予算アラートは別途確認が必要である。
 
 `outputs/`の4つのExcelも読み取り監査し、メールアドレス、APIキー、OAuth認可コード、実Spreadsheet ID、ローカルパスは検出されなかった。長い文字列28件は`scenarioId（機械用）`であり、秘密情報ではない。内容は架空シナリオ、攻撃回答、AIレビュー、QA担当者の期待評価・内部メモである。`.inspect.ndjson`はExcelのセル内容をほぼ重複して保持するため、公開ポートフォリオには冗長である。
 

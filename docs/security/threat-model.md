@@ -8,8 +8,9 @@
 次を区別する。
 
 - **コード確認済み**: リポジトリの実装・テストから確認できる
+- **運用確認済み**: クラウド管理画面または公開サービスの実動作で確認できる
 - **設定依存**: Cloud Run、Firebase、Secret Manager等が文書どおり設定されている場合に成立する
-- **未確認**: クラウド管理画面、監視、GitHub側のセキュリティ設定等をこの確認では検証していない
+- **未確認**: 管理画面や監視を含め、この確認で証拠を取得していない
 
 本書はセキュリティ監査証明ではない。公開前後の残存リスクを明示するためのAs-Built脅威モデルである。
 
@@ -74,24 +75,26 @@ Gemini APIキーやSheets編集権限がブラウザ、GitHub、コンテナイ�
 - ブラウザ用`runtime-config.js`にGemini APIキーを置かない（コード確認済み）
 - `.env`、サービスアカウントJSON、レポートを`.gitignore`と`.dockerignore`で除外（コード確認済み）
 - 公開ビルドの許可ファイル一覧を検査（コード確認済み）
-- Secret ManagerからCloud RunへAPIキーを渡す設計（設定依存）
+- Secret ManagerからCloud RunへAPIキーを渡す設計（コード確認済み）
+- 本番Cloud Runの`GEMINI_API_KEY`がSecret Managerのsecret versionを参照（運用確認済み）
+- 公開Firebase Web APIキーをHTTPリファラー8件と認証用2 APIに制限（運用確認済み）
 - Cloud Runの実行サービスアカウントでSheetsへ接続し、JSON鍵を作らない設計（設定依存）
 
 **確認結果**
 
-追跡対象ファイルとGit履歴を主要な鍵形式で検索し、秘密鍵、実Geminiキー、OAuth認可コード、client secret、実Spreadsheet IDは見つからなかった。`.env.example`とセットアップ文書にはプレースホルダーがある。`runtime-config.js`のFirebase Web APIキーはクライアント用の公開設定である。
+追跡対象ファイルとGit履歴を主要な鍵形式で検索し、秘密鍵、実Geminiキー、OAuth認可コード、client secret、実Spreadsheet IDは見つからなかった。`.env.example`とセットアップ文書にはプレースホルダーがある。`runtime-config.js`のFirebase Web APIキーはクライアント用の公開設定である。2026-09-14にこの公開キーを`akamain.com`、`www.akamain.com`、Firebase Hosting既定ドメイン2件、ローカル検証元4件へ制限し、許可APIをIdentity Toolkit APIとToken Service APIだけにした。変更後、公開サービスで新規ゲスト認証、起票保存、Geminiレビュー完了まで確認した。
 
 **残存リスク**
 
 - パターン検索は高エントロピー文字列を含む全種類の秘密情報を証明するものではない
-- GitHub Secret Scanningとpush protectionの有効状態は未確認
 - クラウドIAMが文書より広く設定されていないか未確認
+- Secret Manager内のGeminiキー自体のAPI制限と予算アラートは未確認
 
 **次の対策**
 
-- GitHubのSecret Scanningとpush protectionを有効化し、公開後も継続監視
+- GitHubのSecret Scanningとpush protectionを継続監視
 - Secret Manager、Cloud Run実行ID、Sheets共有先のIAM棚卸し
-- APIキーの利用元・API・予算アラートを制限
+- GeminiキーのAPI制限と予算アラートを確認
 
 ### 4.3 Gemini APIの不正利用・コスト攻撃
 
@@ -272,9 +275,11 @@ Cookieベースの自動送信ではないため、一般的なCSRFリスクは�
 ## 6. 公開前チェック
 
 - [x] Git履歴を主要な鍵形式でsecret scan
-- [x] GitHubリポジトリが現在Privateであることを確認
+- [x] GitHubリポジトリを公開し、Secret Scanningとpush protectionを有効化
+- [x] Firebase Web APIキーをHTTPリファラーと認証用APIに制限
+- [x] Cloud RunがGeminiキーをSecret Managerから取得することを確認
 - [ ] Cloud Run実行ID、Secret Manager、Sheets共有先のIAM確認
-- [ ] GeminiのAPI制限と予算アラート確認
+- [ ] Secret Manager内のGeminiキーのAPI制限と予算アラート確認
 - [ ] Firestoreレート制限が本番で有効か確認
 - [ ] Firebase匿名アカウント削除とScheduler成功履歴を確認
 - [ ] Cloud Loggingの本文・トークン非記録を確認
@@ -286,11 +291,10 @@ Cookieベースの自動送信ではないため、一般的なCSRFリスクは�
 
 今回のリポジトリ確認だけでは、次を証明できない。
 
-- 本番Cloud Runの実際の環境変数値
-- Secret Managerのアクセス権限
+- Secret Managerのsecret valueとアクセス権限
 - Google Sheetsの共有相手
 - Firebase Consoleの認証・匿名削除設定
 - Firestoreルールと本番レート制限データ
 - Cloud Loggingの保持・閲覧権限
-- GitHubのbranch protection、secret scanning、push protectionの有効状態
+- GitHubのbranch protection設定
 - パターン検索で検出できない秘密情報がGit履歴に存在しないこと
