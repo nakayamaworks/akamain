@@ -107,15 +107,17 @@ Gemini APIキーやSheets編集権限がブラウザ、GitHub、コンテナイ�
 - 利用者1日20回
 - IP 1日40回
 - 全体1日500回
-- 本番想定はFirestoreトランザクションで複数Cloud Runインスタンス間に共有
+- 本番はFirestoreトランザクションで複数Cloud Runインスタンス間に共有（2026-09-14確認）
 - IPはsalt付きSHA-256の短縮値としてキー化
 - 同一Attemptの成功結果と同一内容の互換レビューを再利用
+- レート制限ドキュメントの`expiresAt`フィールドにTTLポリシーを設定（2026-09-14作成）
 
 **残存リスク**
 
 - 上限値は環境変数で変更でき、実本番値は設定依存
 - 分散送信、複数匿名アカウント、複数IPを組み合わせた攻撃は残る
 - CORSはブラウザ制約であり、API認証や課金防止の代わりではない
+- TTL削除は即時ではなく、期限後も一定時間データが残る場合がある
 
 **次の対策**
 
@@ -279,8 +281,10 @@ Cookieベースの自動送信ではないため、一般的なCSRFリスクは�
 - [x] Firebase Web APIキーをHTTPリファラーと認証用APIに制限
 - [x] Cloud RunがGeminiキーをSecret Managerから取得することを確認
 - [ ] Cloud Run実行ID、Secret Manager、Sheets共有先のIAM確認
-- [ ] Secret Manager内のGeminiキーのAPI制限と予算アラート確認
-- [ ] Firestoreレート制限が本番で有効か確認
+- [x] Gemini APIプロジェクトに月額Spend Capが設定されていることを確認
+- [ ] Secret Manager内のGeminiキー自体のAPI制限を確認
+- [x] Firestoreレート制限が本番で有効であることを確認
+- [x] Firestoreレート制限データの`expiresAt`にTTLポリシーを作成
 - [ ] Firebase匿名アカウント削除とScheduler成功履歴を確認
 - [ ] Cloud Loggingの本文・トークン非記録を確認
 - [ ] 画像・教材・文章の公開権利を確認
@@ -294,7 +298,7 @@ Cookieベースの自動送信ではないため、一般的なCSRFリスクは�
 - Secret Managerのsecret valueとアクセス権限
 - Google Sheetsの共有相手
 - Firebase Consoleの認証・匿名削除設定
-- Firestoreルールと本番レート制限データ
+- Firestoreルールの意図と実設定の一致
 - Cloud Loggingの保持・閲覧権限
 - GitHubのbranch protection設定
 - パターン検索で検出できない秘密情報がGit履歴に存在しないこと

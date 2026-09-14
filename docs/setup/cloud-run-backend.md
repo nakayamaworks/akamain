@@ -71,6 +71,8 @@ Cloud RunのIAMチェックを通過した後も、本人用`/api/*`はFirebase 
 
 Firebase Authenticationでは匿名プロバイダとGoogleプロバイダを有効にする。AIレビューの利用回数はFirestoreトランザクションで利用者、接続元IPのハッシュ、サービス全体の日次上限を共有する。Cloud Runの実行IDにはFirestoreの読み書き権限を付与する。
 
+Firestoreのコレクショングループ`akamain_scoring_rate_limits`には、タイムスタンプフィールド`expiresAt`を対象とするTTLポリシーを設定する。有効期限のオフセットは0秒とし、期限切れの一時カウンターを自動削除する。アプリが`expiresAt`を書き込むだけでは自動削除されないため、環境構築時にFirestore側のTTL設定も確認する。
+
 ## ゲストデータの定期削除
 
 Firebase Authenticationの匿名アカウント自動削除とサーバー側データを同期させるため、Cloud Schedulerから毎日`POST /internal/cleanup/anonymous-users`を呼ぶ。呼び出し元は`typing-workbench-cleanup@typing-workbench-misemaru.iam.gserviceaccount.com`のOIDCトークンだけを許可する。
